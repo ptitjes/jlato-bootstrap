@@ -8,7 +8,6 @@ import org.jlato.tree.name.QualifiedName;
 import org.jlato.tree.stmt.Stmt;
 import org.jlato.tree.type.QualifiedType;
 import org.jlato.tree.type.Type;
-import org.jlato.util.Function1;
 
 import static org.jlato.tree.NodeOption.some;
 import static org.jlato.tree.TreeFactory.*;
@@ -55,7 +54,7 @@ public class NodeStatesCreation extends TreeClassRefactoring {
 		final NodeList<FormalParameter> treeParams = collectConstructorParams(decl);
 
 		final QualifiedType stateType = qualifiedType().withScope(some(qualifiedType().withName(decl.name()))).withName(STATE_NAME);
-		final NodeList<FormalParameter> stateParams = deriveStateParams(treeParams, hierarchy);
+		final NodeList<FormalParameter> stateParams = deriveStateParams(treeParams);
 
 //		final MethodDecl streeFactoryMethod = buildMakeFactoryMethod(stateType, stateParams);
 //		decl = decl.withMembers(ms -> ms.insert(0, streeFactoryMethod));

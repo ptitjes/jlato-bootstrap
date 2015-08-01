@@ -23,6 +23,7 @@ public class TreeClass extends TypePattern.OfClass<TreeClassDescriptor> {
 
 	public TreeClass() {
 		super(
+				new TreeConstruction(),
 				new StateClassContribution()
 		);
 	}

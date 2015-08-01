@@ -1,5 +1,7 @@
 package org.jlato.bootstrap;
 
+import org.jlato.bootstrap.descriptors.AllDescriptors;
+import org.jlato.bootstrap.descriptors.TreeTypeDescriptor;
 import org.jlato.rewrite.Substitution;
 import org.jlato.rewrite.TypeSafeMatcher;
 import org.jlato.tree.*;
@@ -94,12 +96,12 @@ public class Utils {
 		return markerAnnotationExpr().withName(QualifiedName.of("Override"));
 	}
 
-	public NodeList<FormalParameter> deriveStateParams(NodeList<FormalParameter> treeConstructorParams, TreeTypeHierarchy hierarchy) {
+	public NodeList<FormalParameter> deriveStateParams(NodeList<FormalParameter> treeConstructorParams) {
 		NodeList<FormalParameter> stateConstructorParams = NodeList.empty();
 		for (FormalParameter param : treeConstructorParams) {
 			Type treeType = param.type();
 
-			Type stateParamType = treeTypeToSTreeType(treeType, hierarchy);
+			Type stateParamType = treeTypeToSTreeType(treeType);
 			stateConstructorParams = stateConstructorParams.append(
 					formalParameter().withType(stateParamType).withId(param.id())
 			);
@@ -107,13 +109,15 @@ public class Utils {
 		return stateConstructorParams;
 	}
 
-	public Type treeTypeToSTreeType(Type treeType, TreeTypeHierarchy hierarchy) {
+	public Type treeTypeToSTreeType(Type treeType) {
 		Type stateParamType;
 		if (propertyFieldType(treeType)) {
 			stateParamType = treeType;
 		} else {
 			Type stateType = treeTypeToStateType((QualifiedType) treeType);
-			if (hierarchy.isInterface(((QualifiedType) treeType).name())) {
+			final Name name = ((QualifiedType) treeType).name();
+			final TreeTypeDescriptor descriptor = AllDescriptors.get(name);
+			if (descriptor != null && descriptor.isInterface()) {
 				stateType = wildcardType().withExt(some((ReferenceType) stateType));
 			}
 			stateParamType = qType("STree", stateType);

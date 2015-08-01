@@ -21,6 +21,7 @@ package org.jlato.bootstrap;
 
 import org.jlato.bootstrap.ast.KindEnum;
 import org.jlato.bootstrap.ast.TreeClass;
+import org.jlato.bootstrap.descriptors.AllDescriptors;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.ast.TreeFactoryClass;
 import org.jlato.bootstrap.util.DeclPattern;
@@ -49,7 +50,7 @@ public class Bootstrap {
 		File rootDirectory = new File("../jlato/src/main/java");
 		TreeSet<CompilationUnit> treeSet = parser.parseAll(rootDirectory, "UTF-8");
 
-		final TreeClassDescriptor[] descriptors = TreeClassDescriptor.ALL;
+		final TreeClassDescriptor[] descriptors = AllDescriptors.ALL_CLASSES;
 
 		// Generate Tree classes
 		final TreeClass treeClassPattern = new TreeClass();

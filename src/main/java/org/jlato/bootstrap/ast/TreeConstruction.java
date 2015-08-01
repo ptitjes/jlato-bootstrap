@@ -37,7 +37,7 @@ public class TreeConstruction implements DeclContribution<TreeClassDescriptor, M
 	public static class TreePrivateConstructor extends Utils implements DeclPattern<TreeClassDescriptor, ConstructorDecl> {
 		@Override
 		public Pattern<MemberDecl> matcher(TreeClassDescriptor arg) {
-			return memberDecl("private " + arg.name + "(..$_) { ..$_ }");
+			return memberDecl("private " + arg.name + "(SLocation<" + arg.name + ".State> location) { ..$_ }");
 		}
 
 		@Override
@@ -49,6 +49,7 @@ public class TreeConstruction implements DeclContribution<TreeClassDescriptor, M
 			final Name location = new Name("location");
 
 			decl = constructorDecl()
+					.withModifiers(NodeList.of(Modifier.Private))
 					.withName(name)
 					.withParams(NodeList.of(
 							formalParameter().withId(variableDeclaratorId().withName(location)).withType(locationType)
@@ -71,10 +72,56 @@ public class TreeConstruction implements DeclContribution<TreeClassDescriptor, M
 		}
 	}
 
+	public static class TreeMakeMethod extends Utils implements DeclPattern<TreeClassDescriptor, MethodDecl> {
+		@Override
+		public Pattern<MemberDecl> matcher(TreeClassDescriptor arg) {
+			return memberDecl("public static STree<" + arg.name + ".State> make(..$_) { ..$_ }");
+		}
+
+		@Override
+		public MethodDecl rewrite(MethodDecl decl, TreeClassDescriptor arg) {
+			final NodeList<FormalParameter> parameters = arg.parameters;
+			final NodeList<FormalParameter> stateParams = deriveStateParams(parameters);
+			final QualifiedType stateType = arg.stateType();
+			final QualifiedType treeType = qType("STree", stateType);
+
+			// Make STree creation expression from STrees
+			final ObjectCreationExpr sTreeCreationExpr = objectCreationExpr()
+					.withType(treeType)
+					.withArgs(NodeList.of(
+							objectCreationExpr().withType(stateType)
+									.withArgs(parameters.map(p -> p.id().name()))
+					));
+
+			// Add STree factory method
+			decl = methodDecl()
+					.withModifiers(NodeList.of(Modifier.Public, Modifier.Static))
+					.withType(treeType)
+					.withName(new Name("make"))
+					.withParams(stateParams)
+					.withBody(some(blockStmt().withStmts(NodeList.<Stmt>of(
+							returnStmt().withExpr(some(sTreeCreationExpr))
+					))));
+
+			if (GenSettings.generateDocs)
+				decl = decl.insertLeadingComment(
+						genDoc(decl,
+								"Compares this state object to the specified object.",
+								new String[]{"the object to compare this state with."},
+								"<code>true</code> if the specified object is equal to this state, <code>false</code> otherwise."
+						)
+				);
+
+			return decl;
+		}
+	}
+
 	public static class TreePublicConstructor extends Utils implements DeclPattern<TreeClassDescriptor, ConstructorDecl> {
 		@Override
 		public Pattern<MemberDecl> matcher(TreeClassDescriptor arg) {
-			return memberDecl("public " + arg.name + "(..$_) { ..$_ }");
+			return memberDecl("public " + arg.name + "(..$_) { ..$_ }")
+					// FIXME There is a bug here and TreePattern doesn't match the public modifier
+					.suchThat(m -> ((ConstructorDecl) m).modifiers().contains(Modifier.Public));
 		}
 
 		@Override
@@ -96,12 +143,13 @@ public class TreeConstruction implements DeclContribution<TreeClassDescriptor, M
 										else return methodInvocationExpr()
 												.withScope(some(new Name("TreeBase")))
 												.withTypeArgs(NodeList.of(treeTypeToStateType((QualifiedType) treeType)))
-												.withName(new Name("nodeOf"))
+												.withName(new Name("treeOf"))
 												.withArgs(NodeList.of(p.id().name()));
 									}))
 					));
 
 			decl = constructorDecl()
+					.withModifiers(NodeList.of(Modifier.Public))
 					.withName(name)
 					.withParams(parameters)
 					.withBody(blockStmt().withStmts(NodeList.of(
@@ -120,57 +168,6 @@ public class TreeConstruction implements DeclContribution<TreeClassDescriptor, M
 						)
 				);
 			}
-
-			return decl;
-		}
-	}
-
-	public static class TreeMakeMethod extends Utils implements DeclPattern<TreeClassDescriptor, MethodDecl> {
-		@Override
-		public Pattern<MemberDecl> matcher(TreeClassDescriptor arg) {
-			return memberDecl("@Override public boolean equals(Object o) { ..$_ }");
-		}
-
-		@Override
-		public MethodDecl rewrite(MethodDecl decl, TreeClassDescriptor arg) {
-			final NodeList<FormalParameter> stateParams = deriveStateParams(arg.parameters, /*hierarchy*/null);
-			final QualifiedType stateType = arg.stateType();
-			final QualifiedType treeType = qType("STree", stateType);
-
-			// Make STree creation expression from STrees
-			final ObjectCreationExpr sTreeCreationExpr = objectCreationExpr()
-					.withType(treeType)
-					.withArgs(NodeList.of(
-							objectCreationExpr().withType(stateType)
-									.withArgs(stateParams.map(p -> {
-										Type paramTreeType = p.type();
-										if (propertyFieldType(paramTreeType)) return p.id().name();
-										else return methodInvocationExpr()
-												.withScope(some(new Name("TreeBase")))
-												.withTypeArgs(((QualifiedType) paramTreeType).typeArgs().get())
-												.withName(new Name("nodeOf"))
-												.withArgs(NodeList.of(p.id().name()));
-									}))
-					));
-
-			// Add STree factory method
-			decl = methodDecl()
-					.withModifiers(NodeList.of(Modifier.Public, Modifier.Static))
-					.withType(treeType)
-					.withName(new Name("make"))
-					.withParams(stateParams)
-					.withBody(some(blockStmt().withStmts(NodeList.<Stmt>of(
-							returnStmt().withExpr(some(sTreeCreationExpr))
-					))));
-
-			if (GenSettings.generateDocs)
-				decl = decl.insertLeadingComment(
-						genDoc(decl,
-								"Compares this state object to the specified object.",
-								new String[]{"the object to compare this state with."},
-								"<code>true</code> if the specified object is equal to this state, <code>false</code> otherwise."
-						)
-				);
 
 			return decl;
 		}

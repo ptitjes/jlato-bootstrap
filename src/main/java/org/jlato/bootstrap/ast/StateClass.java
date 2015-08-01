@@ -23,7 +23,7 @@ class StateClass extends TypePattern.OfClass<TreeClassDescriptor> {
 
 	@Override
 	public Pattern<TypeDecl> matcher(TreeClassDescriptor arg) {
-		return typeDecl("public static class State extends ..$_ implements ..$_ { ..$_ }");
+		return typeDecl("public static class State extends SNodeState<..$_> implements ..$_ { ..$_ }");
 	}
 
 	@Override

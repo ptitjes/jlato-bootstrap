@@ -58,7 +58,7 @@ public class ExtractTreeDescriptors extends TreeClassRefactoring {
 
 		classDescriptors.sort((o1, o2) -> (o1.packageName.id() + "." + o1.name.id()).compareTo(o2.packageName.id() + "." + o2.name.id()));
 
-		System.out.println("public static final TreeInterfaceDescriptor[] ALL = new TreeInterfaceDescriptor[] {");
+		System.out.println("public static final TreeInterfaceDescriptor[] ALL_INTERFACES = new TreeInterfaceDescriptor[] {");
 		for (TreeInterfaceDescriptor descriptor : interfaceDescriptors) {
 			final Expr creation = expr(
 					"new TreeInterfaceDescriptor(new Name(\"" + descriptor.packageName + "\"), " +
@@ -80,7 +80,7 @@ public class ExtractTreeDescriptors extends TreeClassRefactoring {
 
 		classDescriptors.sort((o1, o2) -> (o1.packageName.id() + "." + o1.name.id()).compareTo(o2.packageName.id() + "." + o2.name.id()));
 
-//		System.out.println("public static final TreeClassDescriptor[] ALL = new TreeClassDescriptor[] {");
+//		System.out.println("public static final TreeClassDescriptor[] ALL_CLASSES = new TreeClassDescriptor[] {");
 //		for (TreeClassDescriptor descriptor : classDescriptors) {
 //			final Expr creation = expr(
 //					"new TreeClassDescriptor(new Name(\"" + descriptor.packageName + "\"), " +
