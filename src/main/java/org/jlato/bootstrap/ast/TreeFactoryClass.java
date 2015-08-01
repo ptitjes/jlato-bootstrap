@@ -2,6 +2,7 @@ package org.jlato.bootstrap.ast;
 
 import org.jlato.bootstrap.GenSettings;
 import org.jlato.bootstrap.Utils;
+import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.util.DeclPattern;
 import org.jlato.rewrite.Pattern;
 import org.jlato.tree.NodeList;
@@ -14,7 +15,6 @@ import org.jlato.tree.type.PrimitiveType;
 import org.jlato.tree.type.QualifiedType;
 import org.jlato.tree.type.Type;
 
-import static org.jlato.rewrite.Quotes.expr;
 import static org.jlato.rewrite.Quotes.typeDecl;
 import static org.jlato.tree.NodeOption.none;
 import static org.jlato.tree.NodeOption.some;
@@ -44,16 +44,17 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 			if (descriptor.customTailored) continue;
 			if (descriptor.name.id().equals("LiteralExpr")) continue;
 
-			factoryMethods = factoryMethods.append(generateFactoryMethod(descriptor));
+			factoryMethods = factoryMethods.append(generateFactoryMethod(descriptor, false));
 		}
 
 		return decl.withMembers(factoryMethods);
 	}
 
-	private MethodDecl generateFactoryMethod(TreeClassDescriptor descriptor) {
+	private MethodDecl generateFactoryMethod(TreeClassDescriptor descriptor, boolean noNulls) {
+		NodeList<FormalParameter> params = NodeList.empty();
 		NodeList<Expr> args = NodeList.empty();
-		for (FormalParameter parameter : safeList(descriptor.parameters)) {
-			Type type = parameter.type();
+		for (FormalParameter param : safeList(descriptor.parameters)) {
+			Type type = param.type();
 			if (type instanceof QualifiedType) {
 				final QualifiedType qualifiedType = (QualifiedType) type;
 				final String id = qualifiedType.name().id();
@@ -88,7 +89,12 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 						);
 						break;
 					default:
-						args = args.append(LiteralExpr.nullLiteral());
+						if (noNulls) {
+							params = params.append(param);
+							args = args.append(param.id().name());
+						} else {
+							args = args.append(LiteralExpr.nullLiteral());
+						}
 						break;
 				}
 			} else if (type instanceof PrimitiveType) {
@@ -110,7 +116,7 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 				.withModifiers(m -> m.append(Modifier.Public).append(Modifier.Static))
 				.withType(resultType)
 				.withName(new Name(lowerCaseFirst(descriptor.name.id())))
-				.withParams(NodeList.<FormalParameter>empty())
+				.withParams(params)
 				.withBody(some(blockStmt().withStmts(s -> s.append(creation))));
 
 		if (GenSettings.generateDocs)

@@ -44,7 +44,7 @@ public class Refactoring {
 	}
 
 	public void generate() throws IOException, ParseException {
-		TreeClassRefactoring refactoring = new ExtractTreeClassDescriptors();
+		TreeClassRefactoring refactoring = new ExtractTreeDescriptors();
 
 		refactorTreeClasses(refactoring);
 	}

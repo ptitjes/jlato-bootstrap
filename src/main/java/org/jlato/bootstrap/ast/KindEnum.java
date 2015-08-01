@@ -1,6 +1,7 @@
 package org.jlato.bootstrap.ast;
 
 import org.jlato.bootstrap.GenSettings;
+import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.util.DeclPattern;
 import org.jlato.rewrite.Pattern;
 import org.jlato.tree.NodeList;

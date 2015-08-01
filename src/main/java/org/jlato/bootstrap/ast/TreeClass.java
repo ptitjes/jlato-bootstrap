@@ -1,9 +1,13 @@
 package org.jlato.bootstrap.ast;
 
+import org.jlato.bootstrap.GenSettings;
+import org.jlato.bootstrap.Utils;
+import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.util.DeclContribution;
 import org.jlato.bootstrap.util.DeclPattern;
 import org.jlato.bootstrap.util.TypePattern;
 import org.jlato.rewrite.Pattern;
+import org.jlato.tree.decl.ClassDecl;
 import org.jlato.tree.decl.MemberDecl;
 import org.jlato.tree.decl.TypeDecl;
 import org.jlato.tree.name.Name;
@@ -25,14 +29,19 @@ public class TreeClass extends TypePattern.OfClass<TreeClassDescriptor> {
 
 	@Override
 	public Pattern<TypeDecl> matcher(TreeClassDescriptor arg) {
-		final Name name = arg.name;
-		final Name superTypeName = arg.superTypeName;
 		return typeDecl(
-				"public class " + name +
-						" extends TreeBase<" + name + ".State, " + superTypeName + ", " + name + ">" +
-						" implements " + superTypeName +
-						" { ..$_ }"
+				"public class " + arg.name + " extends TreeBase<..$_> implements ..$_ { ..$_ }"
 		);
+	}
+
+	@Override
+	public TypeDecl rewrite(TypeDecl decl, TreeClassDescriptor arg) {
+		ClassDecl classDecl = (ClassDecl) super.rewrite(decl, arg);
+
+		if (GenSettings.generateDocs)
+			classDecl = classDecl.insertLeadingComment("/** " + Utils.upperCaseFirst(arg.prefixedDescription()) + ". */");
+
+		return classDecl;
 	}
 
 	public static class StateClassContribution implements DeclContribution<TreeClassDescriptor, MemberDecl> {

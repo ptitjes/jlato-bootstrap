@@ -243,7 +243,22 @@ public class Utils {
 			builder.append(" * @param " + param.id() + " " + paramDescription[index] + "\n");
 			index++;
 		}
-		builder.append(" * @return " + returnDescription + "\n");
+		if (returnDescription != null)
+			builder.append(" * @return " + returnDescription + "\n");
+		builder.append(" */");
+		return builder.toString();
+	}
+
+	public static String genDoc(ConstructorDecl decl, String description, String[] paramDescription) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("/**\n");
+		builder.append(" * " + description + "\n");
+		builder.append(" *\n");
+		int index = 0;
+		for (FormalParameter param : decl.params()) {
+			builder.append(" * @param " + param.id() + " " + paramDescription[index] + "\n");
+			index++;
+		}
 		builder.append(" */");
 		return builder.toString();
 	}

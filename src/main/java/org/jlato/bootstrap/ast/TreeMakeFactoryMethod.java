@@ -1,8 +1,8 @@
-package org.jlato.bootstrap.ast.classes;
+package org.jlato.bootstrap.ast;
 
 import org.jlato.bootstrap.GenSettings;
 import org.jlato.bootstrap.Utils;
-import org.jlato.bootstrap.ast.TreeClassDescriptor;
+import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.util.DeclContribution;
 import org.jlato.bootstrap.util.DeclPattern;
 import org.jlato.rewrite.Pattern;
@@ -21,12 +21,9 @@ import org.jlato.tree.type.Type;
 
 import java.util.Arrays;
 
-import static org.jlato.rewrite.Quotes.expr;
-import static org.jlato.rewrite.Quotes.memberDecl;
-import static org.jlato.rewrite.Quotes.stmt;
+import static org.jlato.rewrite.Quotes.*;
 import static org.jlato.tree.NodeOption.some;
 import static org.jlato.tree.TreeFactory.*;
-import static org.jlato.tree.TreeFactory.returnStmt;
 import static org.jlato.tree.expr.BinaryExpr.BinaryOp.Equal;
 import static org.jlato.tree.expr.BinaryExpr.BinaryOp.NotEqual;
 import static org.jlato.tree.expr.UnaryExpr.UnaryOp.Not;
@@ -34,7 +31,7 @@ import static org.jlato.tree.expr.UnaryExpr.UnaryOp.Not;
 /**
  * @author Didier Villevalois
  */
-public class StateEqualsAndHashCode implements DeclContribution<TreeClassDescriptor, MemberDecl> {
+public class TreeMakeFactoryMethod implements DeclContribution<TreeClassDescriptor, MemberDecl> {
 
 	@Override
 	public Iterable<DeclPattern<TreeClassDescriptor, ? extends MemberDecl>> declarations() {

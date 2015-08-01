@@ -20,8 +20,8 @@
 package org.jlato.bootstrap;
 
 import org.jlato.bootstrap.ast.KindEnum;
-import org.jlato.bootstrap.ast.TreeClassDescriptor;
 import org.jlato.bootstrap.ast.TreeClass;
+import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.ast.TreeFactoryClass;
 import org.jlato.bootstrap.util.DeclPattern;
 import org.jlato.parser.ParseException;
@@ -55,7 +55,7 @@ public class Bootstrap {
 		final TreeClass treeClassPattern = new TreeClass();
 		for (TreeClassDescriptor descriptor : descriptors) {
 			if (descriptor.customTailored) continue;
-			treeSet = applyPattern(treeSet, descriptor.treeClassFileName(), treeClassPattern, descriptor);
+			treeSet = applyPattern(treeSet, descriptor.treeFilePath(), treeClassPattern, descriptor);
 		}
 
 		// Generate Kind enum
