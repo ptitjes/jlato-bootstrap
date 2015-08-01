@@ -12,6 +12,7 @@ import org.jlato.tree.expr.MethodInvocationExpr;
 import org.jlato.tree.expr.ObjectCreationExpr;
 import org.jlato.tree.name.Name;
 import org.jlato.tree.name.QualifiedName;
+import org.jlato.tree.stmt.ForeachStmt;
 import org.jlato.tree.type.PrimitiveType;
 import org.jlato.tree.type.QualifiedType;
 import org.jlato.tree.type.ReferenceType;
@@ -42,6 +43,10 @@ public class Utils {
 		return !(name.equals("NodeOption") || name.equals("NodeList") || name.equals("NodeEither"));
 	}
 
+	public String constantName(FormalParameter parameter) {
+		return constantName(parameter.id().name().id(), parameter.type());
+	}
+
 	public String constantName(String propertyName, Type propertyType) {
 		if (propertyType instanceof PrimitiveType &&
 				((PrimitiveType) propertyType).primitive() == PrimitiveType.Primitive.Boolean) {
@@ -52,6 +57,10 @@ public class Utils {
 			}
 		}
 		return camelToConstant(propertyName);
+	}
+
+	public String propertySetterName(FormalParameter parameter) {
+		return propertySetterName(parameter.id().name().id(), parameter.type());
 	}
 
 	public String propertySetterName(String propertyName, Type propertyType) {
