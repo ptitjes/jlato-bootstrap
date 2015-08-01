@@ -119,9 +119,7 @@ public class TreeConstruction implements DeclContribution<TreeClassDescriptor, M
 	public static class TreePublicConstructor extends Utils implements DeclPattern<TreeClassDescriptor, ConstructorDecl> {
 		@Override
 		public Pattern<MemberDecl> matcher(TreeClassDescriptor arg) {
-			return memberDecl("public " + arg.name + "(..$_) { ..$_ }")
-					// FIXME There is a bug here and TreePattern doesn't match the public modifier
-					.suchThat(m -> ((ConstructorDecl) m).modifiers().contains(Modifier.Public));
+			return memberDecl("public " + arg.name + "(..$_) { ..$_ }");
 		}
 
 		@Override
