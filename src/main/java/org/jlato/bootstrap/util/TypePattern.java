@@ -27,7 +27,7 @@ public abstract class TypePattern<A, T extends TypeDecl> implements DeclPattern<
 	}
 
 	private T applyContribution(T decl, A arg, DeclContribution<A, MemberDecl> contribution) {
-		for (DeclPattern<A, ? extends MemberDecl> declaration : contribution.declarations()) {
+		for (DeclPattern<A, ? extends MemberDecl> declaration : contribution.declarations(arg)) {
 			decl = contributeMember(decl, declaration, arg);
 		}
 		return decl;

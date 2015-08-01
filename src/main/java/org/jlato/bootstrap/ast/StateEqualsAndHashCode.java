@@ -37,7 +37,7 @@ import static org.jlato.tree.expr.UnaryExpr.UnaryOp.Not;
 public class StateEqualsAndHashCode implements DeclContribution<TreeClassDescriptor, MemberDecl> {
 
 	@Override
-	public Iterable<DeclPattern<TreeClassDescriptor, ? extends MemberDecl>> declarations() {
+	public Iterable<DeclPattern<TreeClassDescriptor, ? extends MemberDecl>> declarations(TreeClassDescriptor arg) {
 		return Arrays.asList(
 				new EqualsMethod(),
 				new HashCodeMethod()

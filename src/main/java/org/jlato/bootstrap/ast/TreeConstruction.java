@@ -26,7 +26,7 @@ import static org.jlato.tree.TreeFactory.*;
 public class TreeConstruction implements DeclContribution<TreeClassDescriptor, MemberDecl> {
 
 	@Override
-	public Iterable<DeclPattern<TreeClassDescriptor, ? extends MemberDecl>> declarations() {
+	public Iterable<DeclPattern<TreeClassDescriptor, ? extends MemberDecl>> declarations(TreeClassDescriptor arg) {
 		return Arrays.asList(
 				new TreePrivateConstructor(),
 				new TreeMakeMethod(),

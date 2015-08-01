@@ -7,5 +7,5 @@ import org.jlato.tree.decl.Decl;
  */
 public interface DeclContribution<A, D extends Decl> {
 
-	Iterable<DeclPattern<A, ? extends D>> declarations();
+	Iterable<DeclPattern<A, ? extends D>> declarations(A arg);
 }
