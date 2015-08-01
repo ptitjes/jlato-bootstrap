@@ -1,8 +1,10 @@
 package org.jlato.bootstrap.ast;
 
+import org.jlato.bootstrap.GenSettings;
 import org.jlato.bootstrap.util.DeclPattern;
 import org.jlato.rewrite.Pattern;
 import org.jlato.tree.NodeList;
+import org.jlato.tree.decl.EnumConstantDecl;
 import org.jlato.tree.decl.EnumDecl;
 import org.jlato.tree.decl.Modifier;
 import org.jlato.tree.decl.TypeDecl;
@@ -29,9 +31,15 @@ public class KindEnum implements DeclPattern<TreeClassDescriptor[], EnumDecl> {
 				.withName(new Name("Kind"));
 
 		for (TreeClassDescriptor descriptor : arg) {
-			decl = decl.withEnumConstants(cs -> cs.append(
-					enumConstantDecl().withName(descriptor.name)
-			));
+			decl = decl.withEnumConstants(cs -> {
+				EnumConstantDecl constantDecl = enumConstantDecl().withName(descriptor.name);
+
+				if (GenSettings.generateDocs)
+					constantDecl = constantDecl
+							.insertLeadingComment("/** Kind for " + descriptor.prefixedDescription() + ". */");
+
+				return cs.append(constantDecl);
+			});
 		}
 
 		return decl;
