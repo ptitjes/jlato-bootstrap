@@ -4,6 +4,7 @@ import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.descriptors.TreeInterfaceDescriptor;
 import org.jlato.parser.ParseException;
 import org.jlato.tree.NodeList;
+import org.jlato.tree.Tree;
 import org.jlato.tree.TreeSet;
 import org.jlato.tree.decl.*;
 import org.jlato.tree.expr.Expr;
@@ -13,6 +14,7 @@ import org.jlato.tree.type.QualifiedType;
 import java.util.List;
 
 import static org.jlato.rewrite.Quotes.expr;
+import static org.jlato.rewrite.Quotes.memberDecl;
 
 /**
  * @author Didier Villevalois
@@ -34,7 +36,13 @@ public class ExtractTreeDescriptors extends TreeClassRefactoring {
 
 		final NodeList<QualifiedType> superInterfaces = decl.extendsClause();
 
-		interfaceDescriptors.add(new TreeInterfaceDescriptor(packageName, name, makeDocumentationName(name), superInterfaces));
+		final NodeList<MemberDecl> shapes = NodeList.of(decl.findAll(
+				memberDecl("public final static LexicalShape $_ = $_;")
+						.or(memberDecl("public static final LexicalShape $_ = $_;"))
+						.or(memberDecl("LexicalShape $_ = $_;"))
+		)).map(m -> ((FieldDecl) m).withModifiers(NodeList.empty()));
+
+		interfaceDescriptors.add(new TreeInterfaceDescriptor(packageName, name, makeDocumentationName(name), superInterfaces, shapes));
 
 		return decl;
 	}
@@ -48,7 +56,13 @@ public class ExtractTreeDescriptors extends TreeClassRefactoring {
 
 		final NodeList<QualifiedType> superInterfaces = decl.implementsClause();
 
-		classDescriptors.add(new TreeClassDescriptor(packageName, name, makeDocumentationName(name), superInterfaces, params == null, params == null ? NodeList.empty() : params));
+		final NodeList<MemberDecl> shapes = NodeList.of(decl.findAll(
+				memberDecl("public final static LexicalShape $_ = $_;")
+						.or(memberDecl("public static final LexicalShape $_ = $_;"))
+						.or(memberDecl("LexicalShape $_ = $_;"))
+		)).map(m -> ((FieldDecl) m).withModifiers(NodeList.of(Modifier.Public, Modifier.Static, Modifier.Final)));
+
+		classDescriptors.add(new TreeClassDescriptor(packageName, name, makeDocumentationName(name), superInterfaces, shapes, params == null, params == null ? NodeList.empty() : params));
 
 		return decl;
 	}
@@ -66,9 +80,11 @@ public class ExtractTreeDescriptors extends TreeClassRefactoring {
 							"\"" + descriptor.description + "\",\n" +
 							(descriptor.superInterfaces.isEmpty() ?
 									"NodeList.<QualifiedType>empty()" :
-									descriptor.superInterfaces.map(t ->
-													expr("(QualifiedType) type(\"" + t + "\").build()").build()
-									).mkString("NodeList.of(\n", ",\n", "\n)")
+									descriptor.superInterfaces.map(t -> reify(t)).mkString("NodeList.of(\n", ",\n", "\n)")
+							) + ",\n" +
+							(descriptor.shapes.isEmpty() ?
+									"NodeList.<MemberDecl>empty()" :
+									descriptor.shapes.map(d -> reify(d)).mkString("NodeList.of(\n", ",\n", "\n)")
 							) + "\n)"
 			).build();
 			System.out.print(creation);
@@ -80,32 +96,50 @@ public class ExtractTreeDescriptors extends TreeClassRefactoring {
 
 		classDescriptors.sort((o1, o2) -> (o1.packageName.id() + "." + o1.name.id()).compareTo(o2.packageName.id() + "." + o2.name.id()));
 
-//		System.out.println("public static final TreeClassDescriptor[] ALL_CLASSES = new TreeClassDescriptor[] {");
-//		for (TreeClassDescriptor descriptor : classDescriptors) {
-//			final Expr creation = expr(
-//					"new TreeClassDescriptor(new Name(\"" + descriptor.packageName + "\"), " +
-//							"new Name(\"" + descriptor.name + "\"), " +
-//							"\"" + descriptor.description + "\",\n" +
-//							(descriptor.superInterfaces.isEmpty() ?
-//									"NodeList.<QualifiedType>empty()" :
-//									descriptor.superInterfaces.map(t ->
-//													expr("(QualifiedType) type(\"" + t + "\").build()").build()
-//									).mkString("NodeList.of(\n", ",\n", "\n)")
-//							) + ",\n" +
-//							(descriptor.customTailored ? "true" : "false") + ",\n" +
-//							(descriptor.parameters.isEmpty() ?
-//									"NodeList.<FormalParameter>empty()" :
-//									descriptor.parameters.map(p ->
-//													expr("param(\"" + p + "\").build()").build()
-//									).mkString("NodeList.of(\n", ",\n", "\n)")
-//							) + "\n)"
-//			).build();
-//			System.out.print(creation);
-//			System.out.println(",");
-//		}
-//		System.out.println("};");
+		System.out.println("public static final TreeClassDescriptor[] ALL_CLASSES = new TreeClassDescriptor[] {");
+		for (TreeClassDescriptor descriptor : classDescriptors) {
+			final Expr creation = expr(
+					"new TreeClassDescriptor(new Name(\"" + descriptor.packageName + "\"), " +
+							"new Name(\"" + descriptor.name + "\"), " +
+							"\"" + descriptor.description + "\",\n" +
+							(descriptor.superInterfaces.isEmpty() ?
+									"NodeList.<QualifiedType>empty()" :
+									descriptor.superInterfaces.map(t -> reify(t)).mkString("NodeList.of(\n", ",\n", "\n)")
+							) + ",\n" +
+							(descriptor.shapes.isEmpty() ?
+									"NodeList.<MemberDecl>empty()" :
+									descriptor.shapes.map(d -> reify(d)).mkString("NodeList.of(\n", ",\n", "\n)")
+							) + ",\n" +
+							(descriptor.customTailored ? "true" : "false") + ",\n" +
+							(descriptor.parameters.isEmpty() ?
+									"NodeList.<FormalParameter>empty()" :
+									descriptor.parameters.map(p -> reify(p)).mkString("NodeList.of(\n", ",\n", "\n)")
+							) + "\n)"
+			).build();
+			System.out.print(creation);
+			System.out.println(",");
+		}
+		System.out.println("};");
 
 		return treeSet;
+	}
+
+	private Expr reify(QualifiedType e) {
+		return reify("(QualifiedType) type", e);
+	}
+
+	private Expr reify(FormalParameter p) {
+		return reify("param", p);
+	}
+
+	private Expr reify(MemberDecl d) {
+		return reify("memberDecl", d);
+	}
+
+	private Expr reify(String kind, Tree d) {
+		final String asString = d.toString();
+		final String escaped = asString.replace("\n", "\\n\" +\n\"").replace("\t", "\\t");
+		return expr(kind + "(\"" + escaped + "\").build()").build();
 	}
 
 	private String makeDocumentationName(Name name) {

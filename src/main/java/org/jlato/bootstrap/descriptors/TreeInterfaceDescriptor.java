@@ -1,6 +1,7 @@
 package org.jlato.bootstrap.descriptors;
 
 import org.jlato.tree.NodeList;
+import org.jlato.tree.decl.MemberDecl;
 import org.jlato.tree.name.Name;
 import org.jlato.tree.type.QualifiedType;
 
@@ -13,8 +14,9 @@ import static org.jlato.tree.TreeFactory.qualifiedType;
 public class TreeInterfaceDescriptor extends TreeTypeDescriptor {
 
 	public TreeInterfaceDescriptor(Name packageName, Name name, String description,
-	                               NodeList<QualifiedType> superInterfaces) {
-		super(packageName, name, description, superInterfaces);
+	                               NodeList<QualifiedType> superInterfaces,
+	                               NodeList<MemberDecl> shapes) {
+		super(packageName, name, description, superInterfaces, shapes);
 	}
 
 	@Override

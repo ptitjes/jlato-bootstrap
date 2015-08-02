@@ -1,8 +1,7 @@
 package org.jlato.bootstrap.descriptors;
 
-import org.jlato.bootstrap.Utils;
 import org.jlato.tree.NodeList;
-import org.jlato.tree.decl.FormalParameter;
+import org.jlato.tree.decl.MemberDecl;
 import org.jlato.tree.name.Name;
 import org.jlato.tree.type.QualifiedType;
 
@@ -22,12 +21,16 @@ public abstract class TreeTypeDescriptor {
 	public final Name name;
 	public final String description;
 	public final NodeList<QualifiedType> superInterfaces;
+	public final NodeList<MemberDecl> shapes;
 
-	public TreeTypeDescriptor(Name packageName, Name name, String description, NodeList<QualifiedType> superInterfaces) {
+	public TreeTypeDescriptor(Name packageName, Name name, String description,
+	                          NodeList<QualifiedType> superInterfaces,
+	                          NodeList<MemberDecl> shapes) {
 		this.packageName = packageName;
 		this.name = name;
 		this.description = description;
 		this.superInterfaces = superInterfaces;
+		this.shapes = shapes;
 	}
 
 	public abstract boolean isInterface();
