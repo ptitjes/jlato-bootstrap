@@ -1,5 +1,6 @@
 package org.jlato.bootstrap.ast;
 
+import org.jlato.bootstrap.Utils;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.descriptors.TreeTypeDescriptor;
 import org.jlato.bootstrap.util.DeclContribution;
@@ -9,6 +10,7 @@ import org.jlato.tree.NodeList;
 import org.jlato.tree.decl.*;
 import org.jlato.tree.expr.AssignExpr;
 import org.jlato.tree.expr.ObjectCreationExpr;
+import org.jlato.tree.name.Name;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,19 +23,47 @@ import static org.jlato.tree.TreeFactory.*;
 /**
  * @author Didier Villevalois
  */
-public class StateBaseMembers implements DeclContribution<TreeClassDescriptor, MemberDecl> {
+public class StateBaseMembers extends Utils implements DeclContribution<TreeClassDescriptor, MemberDecl> {
 
 	@Override
 	public Iterable<DeclPattern<TreeClassDescriptor, ? extends MemberDecl>> declarations(TreeClassDescriptor arg) {
 		List<DeclPattern<TreeClassDescriptor, ? extends MemberDecl>> decls = new ArrayList<>();
-		decls.add(new Constructor());
-		decls.add(new KindMethod());
-		decls.add(new DoInstantiateMethod());
+
 		for (FormalParameter parameter : arg.parameters) {
 			decls.addAll(Arrays.asList(
-					new Accessor(parameter),
+					new Field(parameter)
+			));
+		}
+
+		decls.add(new Constructor());
+		decls.add(new KindMethod());
+
+		for (FormalParameter parameter : arg.parameters) {
+			decls.addAll(Arrays.asList(
+//					new Accessor(parameter),
 					new Mutator(parameter)
 			));
+		}
+
+		decls.add(new DoInstantiateMethod());
+		decls.add(new ShapeMethod());
+
+		// Preprocess params to find properties and traversals
+		NodeList<FormalParameter> propertyParams = NodeList.empty();
+		NodeList<FormalParameter> traversalParams = NodeList.empty();
+		for (FormalParameter param : arg.parameters) {
+			if (propertyFieldType(param.type()))
+				propertyParams = propertyParams.append(param);
+			else
+				traversalParams = traversalParams.append(param);
+		}
+
+		if (!propertyParams.isEmpty()) {
+			decls.add(new AllPropertiesMethod(propertyParams));
+		}
+		if (!traversalParams.isEmpty()) {
+			decls.add(new FirstLastChildMethod("first", traversalParams.first()));
+			decls.add(new FirstLastChildMethod("last", traversalParams.last()));
 		}
 		return decls;
 	}
@@ -113,11 +143,100 @@ public class StateBaseMembers implements DeclContribution<TreeClassDescriptor, M
 		}
 	}
 
-	public static class Accessor extends MemberPattern.OfField<TreeClassDescriptor> {
+	public static class ShapeMethod extends MemberPattern.OfMethod<TreeClassDescriptor> {
+		@Override
+		protected String makeQuote(TreeClassDescriptor arg) {
+			return "@Override public LexicalShape shape() { ..$_ }";
+		}
+
+		@Override
+		protected MethodDecl makeDecl(MethodDecl decl, TreeClassDescriptor arg) {
+			return decl.withBody(some(blockStmt().withStmts(NodeList.of(
+					stmt("return shape;").build()
+			))));
+		}
+
+		@Override
+		protected String makeDoc(MethodDecl decl, TreeClassDescriptor arg) {
+			return genDoc(decl,
+					"Returns the shape for this " + arg.description + " state.",
+					new String[]{},
+					"the shape for this " + arg.description + " state."
+			);
+		}
+	}
+
+	public static class FirstLastChildMethod extends MemberPattern.OfMethod<TreeClassDescriptor> {
+
+		private final String firstOrLast;
+		private final FormalParameter param;
+
+		public FirstLastChildMethod(String firstOrLast, FormalParameter param) {
+			this.firstOrLast = firstOrLast;
+			this.param = param;
+		}
+
+		@Override
+		protected String makeQuote(TreeClassDescriptor arg) {
+			return "@Override public STraversal " + firstOrLast + "Child() { ..$_ }";
+		}
+
+		@Override
+		protected MethodDecl makeDecl(MethodDecl decl, TreeClassDescriptor arg) {
+			return decl.withBody(some(blockStmt().withStmts(NodeList.of(
+					stmt("return " + constantName(param) + ";").build()
+			))));
+		}
+
+		@Override
+		protected String makeDoc(MethodDecl decl, TreeClassDescriptor arg) {
+			return genDoc(decl,
+					"Returns the " + firstOrLast + " child traversal for this " + arg.description + " state.",
+					new String[]{},
+					"the " + firstOrLast + " child traversal for this " + arg.description + " state."
+			);
+		}
+	}
+
+	public static class AllPropertiesMethod extends MemberPattern.OfMethod<TreeClassDescriptor> {
+
+		private final NodeList<FormalParameter> params;
+
+		public AllPropertiesMethod(NodeList<FormalParameter> params) {
+			this.params = params;
+		}
+
+		@Override
+		protected String makeQuote(TreeClassDescriptor arg) {
+			return "@Override public Iterable<SProperty> allProperties() { ..$_ }";
+		}
+
+		@Override
+		protected MethodDecl makeDecl(MethodDecl decl, TreeClassDescriptor arg) {
+			return decl.withBody(some(blockStmt().withStmts(NodeList.of(
+					params.size() == 1 ?
+							stmt("return Collections.<SProperty>singleton(" + constantName(params.first()) + ");").build() :
+							stmt("return Arrays.<SProperty>asList(" +
+									params.map(p -> new Name(constantName(p))).mkString("", ", ", "")
+									+ ");").build()
+			))));
+		}
+
+		@Override
+		protected String makeDoc(MethodDecl decl, TreeClassDescriptor arg) {
+			return genDoc(decl,
+					"Returns the properties for this " + arg.description + " state.",
+					new String[]{},
+					"the properties for this " + arg.description + " state."
+			);
+		}
+	}
+
+	public static class Field extends MemberPattern.OfField<TreeClassDescriptor> {
 
 		private final FormalParameter param;
 
-		public Accessor(FormalParameter param) {
+		public Field(FormalParameter param) {
 			this.param = param;
 		}
 
@@ -135,6 +254,36 @@ public class StateBaseMembers implements DeclContribution<TreeClassDescriptor, M
 		protected String makeDoc(FieldDecl decl, TreeClassDescriptor arg) {
 			return genDoc(decl,
 					"The " + param.id().name() + " of this " + arg.description + " state."
+			);
+		}
+	}
+
+	public static class Accessor extends MemberPattern.OfMethod<TreeClassDescriptor> {
+
+		private final FormalParameter param;
+
+		public Accessor(FormalParameter param) {
+			this.param = param;
+		}
+
+		@Override
+		protected String makeQuote(TreeClassDescriptor arg) {
+			return "public " + treeTypeToSTreeType(param.type()) + " " + param.id().name() + "() { ..$_ }";
+		}
+
+		@Override
+		protected MethodDecl makeDecl(MethodDecl decl, TreeClassDescriptor arg) {
+			return decl.withBody(some(blockStmt().withStmts(NodeList.of(
+					returnStmt().withExpr(some(param.id().name()))
+			))));
+		}
+
+		@Override
+		protected String makeDoc(MethodDecl decl, TreeClassDescriptor arg) {
+			return genDoc(decl,
+					"Returns the " + param.id().name() + " of this " + arg.description + " state.",
+					new String[]{},
+					"the " + param.id().name() + " of this " + arg.description + " state."
 			);
 		}
 	}
