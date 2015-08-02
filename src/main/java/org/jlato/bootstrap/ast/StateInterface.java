@@ -8,6 +8,7 @@ import org.jlato.rewrite.Pattern;
 import org.jlato.tree.NodeList;
 import org.jlato.tree.decl.Decl;
 import org.jlato.tree.decl.InterfaceDecl;
+import org.jlato.tree.decl.MemberDecl;
 import org.jlato.tree.decl.TypeDecl;
 import org.jlato.tree.type.QualifiedType;
 
@@ -41,7 +42,7 @@ class StateInterface extends TypePattern.OfInterface<TreeInterfaceDescriptor> {
 				treeInterfaceChild ? NodeList.of(qualifiedType().withName(TreeTypeDescriptor.STREE_STATE_NAME)) :
 						parentInterfaces.map(t ->
 								qualifiedType().withScope(some(t)).withName(TreeTypeDescriptor.STATE_NAME))
-		);
+		).withMembers(ms -> ms == null ? NodeList.<MemberDecl>empty() : ms);
 
 		if (GenSettings.generateDocs)
 			interfaceDecl = interfaceDecl.insertLeadingComment("/** A state object for " + arg.prefixedDescription() + ". */");

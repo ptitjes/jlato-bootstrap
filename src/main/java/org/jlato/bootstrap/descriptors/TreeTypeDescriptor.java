@@ -14,8 +14,10 @@ import static org.jlato.tree.TreeFactory.qualifiedType;
 public abstract class TreeTypeDescriptor {
 
 	public static final Name TREE_NAME = new Name("Tree");
+	public static final Name TREE_BASE_NAME = new Name("TreeBase");
 	public static final Name STATE_NAME = new Name("State");
 	public static final Name STREE_STATE_NAME = new Name("STreeState");
+	public static final Name SNODE_STATE_NAME = new Name("SNodeState");
 
 	public final Name packageName;
 	public final Name name;
@@ -36,6 +38,10 @@ public abstract class TreeTypeDescriptor {
 	public abstract boolean isInterface();
 
 	public abstract String treeFilePath();
+
+	public QualifiedType type() {
+		return qualifiedType().withName(name);
+	}
 
 	public abstract QualifiedType stateType();
 

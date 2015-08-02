@@ -10,6 +10,7 @@ import org.jlato.tree.NodeList;
 import org.jlato.tree.decl.*;
 import org.jlato.tree.expr.AssignExpr;
 import org.jlato.tree.expr.AssignOp;
+import org.jlato.tree.expr.LiteralExpr;
 import org.jlato.tree.expr.ObjectCreationExpr;
 import org.jlato.tree.name.Name;
 
@@ -38,7 +39,7 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 		}
 
 		decls.add(new Constructor());
-		decls.add(new KindMethod());
+//		decls.add(new KindMethod());
 
 		for (FormalParameter parameter : arg.parameters) {
 			decls.addAll(Arrays.asList(
@@ -46,6 +47,8 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 					new Mutator(parameter)
 			));
 		}
+
+		decls.add(new KindMethod());
 
 		decls.add(new DoInstantiateMethod());
 		decls.add(new ShapeMethod());
@@ -63,10 +66,8 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 		if (!propertyParams.isEmpty()) {
 			decls.add(new AllPropertiesMethod(propertyParams));
 		}
-		if (!traversalParams.isEmpty()) {
-			decls.add(new FirstLastChildMethod("first", traversalParams.first()));
-			decls.add(new FirstLastChildMethod("last", traversalParams.last()));
-		}
+		decls.add(new FirstLastChildMethod("first", traversalParams.isEmpty() ? null : traversalParams.first()));
+		decls.add(new FirstLastChildMethod("last", traversalParams.isEmpty() ? null : traversalParams.last()));
 		return decls;
 	}
 
@@ -102,7 +103,7 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 
 		@Override
 		protected String makeQuote(TreeClassDescriptor arg) {
-			return "@Override public Kind kind() { ..$_ }";
+			return "@Override\npublic Kind kind() { ..$_ }";
 		}
 
 		@Override
@@ -125,7 +126,7 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 	public static class DoInstantiateMethod extends MemberPattern.OfMethod<TreeClassDescriptor> {
 		@Override
 		protected String makeQuote(TreeClassDescriptor arg) {
-			return "@Override protected Tree doInstantiate(SLocation<" + arg.name + ".State> location) { ..$_ }";
+			return "@Override\nprotected Tree doInstantiate(SLocation<" + arg.name + ".State> location) { ..$_ }";
 		}
 
 		@Override
@@ -148,7 +149,7 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 	public static class ShapeMethod extends MemberPattern.OfMethod<TreeClassDescriptor> {
 		@Override
 		protected String makeQuote(TreeClassDescriptor arg) {
-			return "@Override public LexicalShape shape() { ..$_ }";
+			return "@Override\npublic LexicalShape shape() { ..$_ }";
 		}
 
 		@Override
@@ -180,13 +181,13 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 
 		@Override
 		protected String makeQuote(TreeClassDescriptor arg) {
-			return "@Override public STraversal " + firstOrLast + "Child() { ..$_ }";
+			return "@Override\npublic STraversal " + firstOrLast + "Child() { ..$_ }";
 		}
 
 		@Override
 		protected MethodDecl makeDecl(MethodDecl decl, TreeClassDescriptor arg) {
 			return decl.withBody(some(blockStmt().withStmts(NodeList.of(
-					stmt("return " + constantName(param) + ";").build()
+					stmt("return " + (param == null ? "null" : constantName(param)) + ";").build()
 			))));
 		}
 
@@ -210,7 +211,7 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 
 		@Override
 		protected String makeQuote(TreeClassDescriptor arg) {
-			return "@Override public Iterable<SProperty> allProperties() { ..$_ }";
+			return "@Override\npublic Iterable<SProperty> allProperties() { ..$_ }";
 		}
 
 		@Override

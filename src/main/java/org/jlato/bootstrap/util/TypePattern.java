@@ -3,6 +3,7 @@ package org.jlato.bootstrap.util;
 import org.jlato.rewrite.MatchVisitor;
 import org.jlato.rewrite.Pattern;
 import org.jlato.rewrite.TypeSafeMatcher;
+import org.jlato.tree.NodeList;
 import org.jlato.tree.decl.*;
 
 /**
@@ -35,8 +36,8 @@ public abstract class TypePattern<A, T extends TypeDecl> implements DeclPattern<
 
 	@SuppressWarnings("unchecked")
 	private <M extends MemberDecl> T contributeMember(T type, DeclPattern<A, M> pattern, A arg) {
-		final MatchVisitor<M> visitor = (m, s) -> pattern.rewrite(m, arg);
 		final Pattern<? extends M> matcher = (Pattern<? extends M>) pattern.matcher(arg);
+		final MatchVisitor<M> visitor = (m, s) -> pattern.rewrite(m, arg);
 
 		if (type.findAll(pattern.matcher(arg)).iterator().hasNext()) {
 			return forAll(type, matcher, visitor);
@@ -63,7 +64,7 @@ public abstract class TypePattern<A, T extends TypeDecl> implements DeclPattern<
 
 		@Override
 		protected <M extends MemberDecl> ClassDecl appendMember(ClassDecl type, M member) {
-			return type.withMembers(ms -> ms.append(member));
+			return type.withMembers(ms -> (ms == null ? NodeList.<MemberDecl>empty() : ms).append(member));
 		}
 	}
 
@@ -80,7 +81,7 @@ public abstract class TypePattern<A, T extends TypeDecl> implements DeclPattern<
 
 		@Override
 		protected <M extends MemberDecl> InterfaceDecl appendMember(InterfaceDecl type, M member) {
-			return type.withMembers(ms -> ms.append(member));
+			return type.withMembers(ms -> (ms == null ? NodeList.<MemberDecl>empty() : ms).append(member));
 		}
 	}
 }

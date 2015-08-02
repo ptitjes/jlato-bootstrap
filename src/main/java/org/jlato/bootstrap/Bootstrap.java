@@ -31,8 +31,11 @@ import org.jlato.parser.ParseException;
 import org.jlato.parser.Parser;
 import org.jlato.parser.ParserConfiguration;
 import org.jlato.printer.FormattingSettings;
+import org.jlato.rewrite.MatchVisitor;
+import org.jlato.rewrite.Pattern;
 import org.jlato.tree.TreeSet;
 import org.jlato.tree.decl.CompilationUnit;
+import org.jlato.tree.decl.Decl;
 import org.jlato.tree.decl.TypeDecl;
 
 import java.io.File;
@@ -46,6 +49,8 @@ public class Bootstrap {
 	public static void main(String[] args) throws IOException, ParseException {
 		new Bootstrap().generate();
 	}
+
+	private static final boolean REPLACE = true;
 
 	public void generate() throws IOException, ParseException {
 		Parser parser = new Parser(ParserConfiguration.Default.preserveWhitespaces(true));
@@ -81,7 +86,10 @@ public class Bootstrap {
 
 	private <A, T extends TypeDecl> TreeSet<CompilationUnit> applyPattern(TreeSet<CompilationUnit> treeSet, String path, DeclPattern<A, T> pattern, A descriptor) {
 		final CompilationUnit cu = treeSet.get(path);
-		final CompilationUnit newCU = cu.forAll(pattern.matcher(descriptor), (c, s) -> pattern.rewrite((T) c, descriptor));
+
+		final Pattern<? extends Decl> matcher = pattern.matcher(descriptor);
+		final MatchVisitor<Decl> visitor = (c, s) -> pattern.rewrite((T) (REPLACE ? matcher.build() : c), descriptor);
+		final CompilationUnit newCU = cu.forAll(matcher, visitor);
 		return treeSet.put(path, newCU);
 	}
 }

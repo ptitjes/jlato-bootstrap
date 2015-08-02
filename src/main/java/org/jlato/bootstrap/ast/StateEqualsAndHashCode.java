@@ -48,7 +48,7 @@ public class StateEqualsAndHashCode implements DeclContribution<TreeClassDescrip
 	public static class EqualsMethod extends Utils implements DeclPattern<TreeClassDescriptor, MethodDecl> {
 		@Override
 		public Pattern<? extends Decl> matcher(TreeClassDescriptor arg) {
-			return memberDecl("@Override public boolean equals(Object o) { ..$_ }");
+			return memberDecl("@Override\npublic boolean equals(Object o) { ..$_ }");
 		}
 
 		public static final Name EQUALS = new Name("equals");
@@ -114,7 +114,7 @@ public class StateEqualsAndHashCode implements DeclContribution<TreeClassDescrip
 	public static class HashCodeMethod extends Utils implements DeclPattern<TreeClassDescriptor, MethodDecl> {
 		@Override
 		public Pattern<? extends Decl> matcher(TreeClassDescriptor arg) {
-			return memberDecl("@Override public int hashCode() { ..$_ }");
+			return memberDecl("@Override\npublic int hashCode() { ..$_ }");
 		}
 
 		@Override

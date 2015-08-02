@@ -37,9 +37,7 @@ public class ExtractTreeDescriptors extends TreeClassRefactoring {
 		final NodeList<QualifiedType> superInterfaces = decl.extendsClause();
 
 		final NodeList<MemberDecl> shapes = NodeList.of(decl.findAll(
-				memberDecl("public final static LexicalShape $_ = $_;")
-						.or(memberDecl("public static final LexicalShape $_ = $_;"))
-						.or(memberDecl("LexicalShape $_ = $_;"))
+				memberDecl("LexicalShape $_ = $_;")
 		)).map(m -> ((FieldDecl) m).withModifiers(NodeList.empty()));
 
 		interfaceDescriptors.add(new TreeInterfaceDescriptor(packageName, name, makeDocumentationName(name), superInterfaces, shapes));
@@ -57,9 +55,7 @@ public class ExtractTreeDescriptors extends TreeClassRefactoring {
 		final NodeList<QualifiedType> superInterfaces = decl.implementsClause();
 
 		final NodeList<MemberDecl> shapes = NodeList.of(decl.findAll(
-				memberDecl("public final static LexicalShape $_ = $_;")
-						.or(memberDecl("public static final LexicalShape $_ = $_;"))
-						.or(memberDecl("LexicalShape $_ = $_;"))
+				memberDecl("public static final LexicalShape $_ = $_;")
 		)).map(m -> ((FieldDecl) m).withModifiers(NodeList.of(Modifier.Public, Modifier.Static, Modifier.Final)));
 
 		classDescriptors.add(new TreeClassDescriptor(packageName, name, makeDocumentationName(name), superInterfaces, shapes, params == null, params == null ? NodeList.empty() : params));
