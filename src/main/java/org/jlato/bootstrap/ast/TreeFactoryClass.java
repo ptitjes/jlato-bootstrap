@@ -11,6 +11,7 @@ import org.jlato.tree.expr.Expr;
 import org.jlato.tree.expr.LiteralExpr;
 import org.jlato.tree.name.Name;
 import org.jlato.tree.stmt.Stmt;
+import org.jlato.tree.type.Primitive;
 import org.jlato.tree.type.PrimitiveType;
 import org.jlato.tree.type.QualifiedType;
 import org.jlato.tree.type.Type;
@@ -26,7 +27,7 @@ import static org.jlato.tree.TreeFactory.*;
 public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDescriptor[], ClassDecl> {
 
 	@Override
-	public Pattern<TypeDecl> matcher(TreeClassDescriptor[] arg) {
+	public Pattern<? extends Decl> matcher(TreeClassDescriptor[] arg) {
 		return typeDecl("public abstract class TreeFactory { ..$_ }");
 	}
 
@@ -98,7 +99,7 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 						break;
 				}
 			} else if (type instanceof PrimitiveType) {
-				PrimitiveType.Primitive primitive = ((PrimitiveType) type).primitive();
+				Primitive primitive = ((PrimitiveType) type).primitive();
 				switch (primitive) {
 					case Boolean:
 						args = args.append(LiteralExpr.of(false));

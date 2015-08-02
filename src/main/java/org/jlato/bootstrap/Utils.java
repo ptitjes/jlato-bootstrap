@@ -13,10 +13,7 @@ import org.jlato.tree.expr.ObjectCreationExpr;
 import org.jlato.tree.name.Name;
 import org.jlato.tree.name.QualifiedName;
 import org.jlato.tree.stmt.ForeachStmt;
-import org.jlato.tree.type.PrimitiveType;
-import org.jlato.tree.type.QualifiedType;
-import org.jlato.tree.type.ReferenceType;
-import org.jlato.tree.type.Type;
+import org.jlato.tree.type.*;
 import org.jlato.util.Function1;
 
 import java.util.Iterator;
@@ -49,7 +46,7 @@ public class Utils {
 
 	public static String constantName(String propertyName, Type propertyType) {
 		if (propertyType instanceof PrimitiveType &&
-				((PrimitiveType) propertyType).primitive() == PrimitiveType.Primitive.Boolean) {
+				((PrimitiveType) propertyType).primitive() == Primitive.Boolean) {
 			if (propertyName.startsWith("is")) {
 				return camelToConstant(lowerCaseFirst(propertyName.substring(2)));
 			} else if (propertyName.startsWith("has")) {
@@ -65,7 +62,7 @@ public class Utils {
 
 	public static String propertySetterName(String propertyName, Type propertyType) {
 		if (propertyType instanceof PrimitiveType &&
-				((PrimitiveType) propertyType).primitive() == PrimitiveType.Primitive.Boolean) {
+				((PrimitiveType) propertyType).primitive() == Primitive.Boolean) {
 			if (propertyName.startsWith("is")) {
 				return "set" + upperCaseFirst(propertyName.substring(2));
 			} else if (propertyName.startsWith("has")) {
@@ -78,7 +75,7 @@ public class Utils {
 	public static Type boxedType(Type type) {
 		if (type instanceof QualifiedType) return type;
 		else if (type instanceof PrimitiveType) {
-			PrimitiveType.Primitive primitive = ((PrimitiveType) type).primitive();
+			Primitive primitive = ((PrimitiveType) type).primitive();
 			switch (primitive) {
 				case Boolean:
 					return qType("Boolean");

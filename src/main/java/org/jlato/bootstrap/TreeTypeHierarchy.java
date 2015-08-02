@@ -28,7 +28,7 @@ public class TreeTypeHierarchy {
 			CompilationUnit cu = treeSet.get(path);
 
 			final TypeDecl typeDecl = cu.types().get(0);
-			if (typeDecl.typeKind() == TypeDecl.TypeKind.Class) {
+			if (typeDecl instanceof ClassDecl) {
 				final ClassDecl classDecl = (ClassDecl) typeDecl;
 				final String nameString = classDecl.name().id();
 
@@ -56,7 +56,7 @@ public class TreeTypeHierarchy {
 			CompilationUnit cu = treeSet.get(path);
 
 			final TypeDecl typeDecl = cu.types().get(0);
-			if (typeDecl.typeKind() == TypeDecl.TypeKind.Interface) {
+			if (typeDecl instanceof InterfaceDecl) {
 				final InterfaceDecl interfaceDecl = (InterfaceDecl) typeDecl;
 				final Name name = interfaceDecl.name();
 				String nameString = name.id();

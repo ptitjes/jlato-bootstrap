@@ -9,6 +9,7 @@ import org.jlato.tree.expr.*;
 import org.jlato.tree.name.Name;
 import org.jlato.tree.name.QualifiedName;
 import org.jlato.tree.stmt.Stmt;
+import org.jlato.tree.type.Primitive;
 import org.jlato.tree.type.PrimitiveType;
 import org.jlato.tree.type.QualifiedType;
 import org.jlato.tree.type.Type;
@@ -21,7 +22,9 @@ import java.util.HashSet;
 
 import static org.jlato.tree.NodeOption.some;
 import static org.jlato.tree.TreeFactory.*;
-import static org.jlato.tree.expr.AssignExpr.AssignOp.Normal;
+import static org.jlato.tree.expr.AssignOp.Normal;
+import static org.jlato.tree.expr.BinaryOp.Less;
+import static org.jlato.tree.expr.UnaryOp.PostIncrement;
 
 /**
  * @author Didier Villevalois
@@ -397,7 +400,7 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 				.withInit(NodeList.of(
 						variableDeclarationExpr().withDeclaration(
 								localVariableDecl()
-										.withType(primitiveType().withPrimitive(PrimitiveType.Primitive.Int))
+										.withType(primitiveType().withPrimitive(Primitive.Int))
 										.withVariables(NodeList.of(
 												variableDeclarator().withId(variableDeclaratorId().withName(i))
 														.withInit(some(LiteralExpr.of(0)))
@@ -405,15 +408,10 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 						)
 				))
 				.withCompare(
-						binaryExpr()
-								.withLeft(i)
-								.withOp(BinaryExpr.BinaryOp.Less)
-								.withRight(LiteralExpr.of(count))
+						binaryExpr().withLeft(i).withOp(Less).withRight(LiteralExpr.of(count))
 				)
 				.withUpdate(NodeList.of(
-						unaryExpr()
-								.withOp(UnaryExpr.UnaryOp.PostIncrement)
-								.withExpr(i)
+						unaryExpr().withOp(PostIncrement).withExpr(i)
 				))
 				.withBody(blockStmt().withStmts(loopStmts));
 	}

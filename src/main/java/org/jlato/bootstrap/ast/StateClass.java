@@ -5,6 +5,7 @@ import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.util.TypePattern;
 import org.jlato.rewrite.Pattern;
 import org.jlato.tree.decl.ClassDecl;
+import org.jlato.tree.decl.Decl;
 import org.jlato.tree.decl.TypeDecl;
 
 import static org.jlato.rewrite.Quotes.typeDecl;
@@ -22,7 +23,7 @@ class StateClass extends TypePattern.OfClass<TreeClassDescriptor> {
 	}
 
 	@Override
-	public Pattern<TypeDecl> matcher(TreeClassDescriptor arg) {
+	public Pattern<? extends Decl> matcher(TreeClassDescriptor arg) {
 		return typeDecl("public static class State extends SNodeState<..$_> implements ..$_ { ..$_ }");
 	}
 

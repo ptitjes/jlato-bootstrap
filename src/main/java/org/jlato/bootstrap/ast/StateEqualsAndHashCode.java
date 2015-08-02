@@ -8,6 +8,7 @@ import org.jlato.bootstrap.util.DeclPattern;
 import org.jlato.rewrite.Pattern;
 import org.jlato.rewrite.Substitution;
 import org.jlato.tree.NodeList;
+import org.jlato.tree.decl.Decl;
 import org.jlato.tree.decl.FormalParameter;
 import org.jlato.tree.decl.MemberDecl;
 import org.jlato.tree.decl.MethodDecl;
@@ -27,9 +28,9 @@ import static org.jlato.rewrite.Quotes.stmt;
 import static org.jlato.tree.NodeOption.some;
 import static org.jlato.tree.TreeFactory.*;
 import static org.jlato.tree.TreeFactory.returnStmt;
-import static org.jlato.tree.expr.BinaryExpr.BinaryOp.Equal;
-import static org.jlato.tree.expr.BinaryExpr.BinaryOp.NotEqual;
-import static org.jlato.tree.expr.UnaryExpr.UnaryOp.Not;
+import static org.jlato.tree.expr.BinaryOp.Equal;
+import static org.jlato.tree.expr.BinaryOp.NotEqual;
+import static org.jlato.tree.expr.UnaryOp.Not;
 
 /**
  * @author Didier Villevalois
@@ -46,7 +47,7 @@ public class StateEqualsAndHashCode implements DeclContribution<TreeClassDescrip
 
 	public static class EqualsMethod extends Utils implements DeclPattern<TreeClassDescriptor, MethodDecl> {
 		@Override
-		public Pattern<MemberDecl> matcher(TreeClassDescriptor arg) {
+		public Pattern<? extends Decl> matcher(TreeClassDescriptor arg) {
 			return memberDecl("@Override public boolean equals(Object o) { ..$_ }");
 		}
 
@@ -112,7 +113,7 @@ public class StateEqualsAndHashCode implements DeclContribution<TreeClassDescrip
 
 	public static class HashCodeMethod extends Utils implements DeclPattern<TreeClassDescriptor, MethodDecl> {
 		@Override
-		public Pattern<MemberDecl> matcher(TreeClassDescriptor arg) {
+		public Pattern<? extends Decl> matcher(TreeClassDescriptor arg) {
 			return memberDecl("@Override public int hashCode() { ..$_ }");
 		}
 

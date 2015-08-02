@@ -64,14 +64,14 @@ public class Refactoring {
 
 			final TypeDecl typeDecl = cu.types().get(0);
 			TypeDecl newDecl = null;
-			if (typeDecl.typeKind() == TypeDecl.TypeKind.Interface) {
+			if (typeDecl instanceof InterfaceDecl) {
 				final InterfaceDecl interfaceDecl = (InterfaceDecl) typeDecl;
 				final Name name = interfaceDecl.name();
 
 				if (hierarchy.isInterface(name) && !hierarchy.isTreeInterface(name)) {
 					newDecl = refactoring.refactorTreeInterface(treeSet, path, interfaceDecl, hierarchy);
 				}
-			} else if (typeDecl.typeKind() == TypeDecl.TypeKind.Class) {
+			} else if (typeDecl instanceof ClassDecl) {
 				final ClassDecl classDecl = (ClassDecl) typeDecl;
 				final Name name = classDecl.name();
 

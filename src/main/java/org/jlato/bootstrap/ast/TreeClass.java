@@ -4,11 +4,11 @@ import org.jlato.bootstrap.GenSettings;
 import org.jlato.bootstrap.Utils;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.util.DeclContribution;
-import org.jlato.bootstrap.util.DeclPattern;
 import org.jlato.bootstrap.util.TypePattern;
 import org.jlato.rewrite.Pattern;
 import org.jlato.tree.decl.ClassDecl;
-import org.jlato.tree.decl.MemberDecl;
+import org.jlato.tree.decl.Decl;
+import org.jlato.tree.decl.FieldDecl;
 import org.jlato.tree.decl.TypeDecl;
 
 import java.util.Arrays;
@@ -25,13 +25,14 @@ public class TreeClass extends TypePattern.OfClass<TreeClassDescriptor> {
 				new TreeConstruction(),
 				new TreeKind(),
 				new TreeAccessors(),
-				new StateClassContribution(),
-				new PropertyAndTraversalClasses()
+				a -> Arrays.asList(new StateClass()),
+				new PropertyAndTraversalClasses(),
+				DeclContribution.mergeFields(a -> a.shapes.map(m -> (FieldDecl) m))
 		);
 	}
 
 	@Override
-	public Pattern<TypeDecl> matcher(TreeClassDescriptor arg) {
+	public Pattern<? extends Decl> matcher(TreeClassDescriptor arg) {
 		return typeDecl(
 				"public class " + arg.name + " extends TreeBase<..$_> implements ..$_ { ..$_ }"
 		);
@@ -45,12 +46,5 @@ public class TreeClass extends TypePattern.OfClass<TreeClassDescriptor> {
 			classDecl = classDecl.insertLeadingComment("/** " + Utils.upperCaseFirst(arg.prefixedDescription()) + ". */");
 
 		return classDecl;
-	}
-
-	public static class StateClassContribution implements DeclContribution<TreeClassDescriptor, MemberDecl> {
-		@Override
-		public Iterable<DeclPattern<TreeClassDescriptor, ? extends MemberDecl>> declarations(TreeClassDescriptor arg) {
-			return Arrays.asList(new StateClass());
-		}
 	}
 }

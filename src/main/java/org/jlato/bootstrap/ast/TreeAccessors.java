@@ -8,10 +8,6 @@ import org.jlato.bootstrap.util.DeclPattern;
 import org.jlato.rewrite.Pattern;
 import org.jlato.tree.NodeList;
 import org.jlato.tree.decl.*;
-import org.jlato.tree.expr.ObjectCreationExpr;
-import org.jlato.tree.name.Name;
-import org.jlato.tree.stmt.Stmt;
-import org.jlato.tree.type.QualifiedType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,7 +45,7 @@ public class TreeAccessors implements DeclContribution<TreeClassDescriptor, Memb
 		}
 
 		@Override
-		public Pattern<MemberDecl> matcher(TreeClassDescriptor arg) {
+		public Pattern<? extends Decl> matcher(TreeClassDescriptor arg) {
 			return memberDecl("public " + param.type() + " " + param.id().name() + "() { ..$_ }");
 		}
 
@@ -82,7 +78,7 @@ public class TreeAccessors implements DeclContribution<TreeClassDescriptor, Memb
 		}
 
 		@Override
-		public Pattern<MemberDecl> matcher(TreeClassDescriptor arg) {
+		public Pattern<? extends Decl> matcher(TreeClassDescriptor arg) {
 			return memberDecl("public " + arg.name + " " + propertySetterName(param) + "(" + param + ") { ..$_ }");
 		}
 
@@ -115,7 +111,7 @@ public class TreeAccessors implements DeclContribution<TreeClassDescriptor, Memb
 		}
 
 		@Override
-		public Pattern<MemberDecl> matcher(TreeClassDescriptor arg) {
+		public Pattern<? extends Decl> matcher(TreeClassDescriptor arg) {
 			return memberDecl("public " + arg.name + " " + propertySetterName(param) + "(Mutation<" + boxedType(param.type()) + "> mutation) { ..$_ }");
 		}
 

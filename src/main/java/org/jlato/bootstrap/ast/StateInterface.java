@@ -1,20 +1,18 @@
 package org.jlato.bootstrap.ast;
 
 import org.jlato.bootstrap.GenSettings;
-import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.descriptors.TreeInterfaceDescriptor;
 import org.jlato.bootstrap.descriptors.TreeTypeDescriptor;
 import org.jlato.bootstrap.util.TypePattern;
 import org.jlato.rewrite.Pattern;
 import org.jlato.tree.NodeList;
-import org.jlato.tree.decl.ClassDecl;
+import org.jlato.tree.decl.Decl;
 import org.jlato.tree.decl.InterfaceDecl;
 import org.jlato.tree.decl.TypeDecl;
 import org.jlato.tree.type.QualifiedType;
 
 import static org.jlato.rewrite.Quotes.typeDecl;
 import static org.jlato.tree.NodeOption.some;
-import static org.jlato.tree.TreeFactory.interfaceDecl;
 import static org.jlato.tree.TreeFactory.qualifiedType;
 
 /**
@@ -28,7 +26,7 @@ class StateInterface extends TypePattern.OfInterface<TreeInterfaceDescriptor> {
 	}
 
 	@Override
-	public Pattern<TypeDecl> matcher(TreeInterfaceDescriptor arg) {
+	public Pattern<? extends Decl> matcher(TreeInterfaceDescriptor arg) {
 		return typeDecl("interface State extends ..$_ { ..$_ }");
 	}
 

@@ -5,10 +5,7 @@ import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.util.DeclPattern;
 import org.jlato.rewrite.Pattern;
 import org.jlato.tree.NodeList;
-import org.jlato.tree.decl.EnumConstantDecl;
-import org.jlato.tree.decl.EnumDecl;
-import org.jlato.tree.decl.Modifier;
-import org.jlato.tree.decl.TypeDecl;
+import org.jlato.tree.decl.*;
 import org.jlato.tree.name.Name;
 
 import static org.jlato.rewrite.Quotes.typeDecl;
@@ -21,7 +18,7 @@ import static org.jlato.tree.TreeFactory.enumDecl;
 public class KindEnum implements DeclPattern<TreeClassDescriptor[], EnumDecl> {
 
 	@Override
-	public Pattern<TypeDecl> matcher(TreeClassDescriptor[] arg) {
+	public Pattern<? extends Decl> matcher(TreeClassDescriptor[] arg) {
 		return typeDecl("public enum Kind { ..$_ }");
 	}
 

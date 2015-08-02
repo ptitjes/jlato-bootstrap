@@ -36,7 +36,7 @@ public class TreeConstruction implements DeclContribution<TreeClassDescriptor, M
 
 	public static class TreePrivateConstructor extends Utils implements DeclPattern<TreeClassDescriptor, ConstructorDecl> {
 		@Override
-		public Pattern<MemberDecl> matcher(TreeClassDescriptor arg) {
+		public Pattern<? extends Decl> matcher(TreeClassDescriptor arg) {
 			return memberDecl("private " + arg.name + "(SLocation<" + arg.name + ".State> location) { ..$_ }");
 		}
 
@@ -74,7 +74,7 @@ public class TreeConstruction implements DeclContribution<TreeClassDescriptor, M
 
 	public static class TreeMakeMethod extends Utils implements DeclPattern<TreeClassDescriptor, MethodDecl> {
 		@Override
-		public Pattern<MemberDecl> matcher(TreeClassDescriptor arg) {
+		public Pattern<? extends Decl> matcher(TreeClassDescriptor arg) {
 			return memberDecl("public static STree<" + arg.name + ".State> make(..$_) { ..$_ }");
 		}
 
@@ -118,7 +118,7 @@ public class TreeConstruction implements DeclContribution<TreeClassDescriptor, M
 
 	public static class TreePublicConstructor extends Utils implements DeclPattern<TreeClassDescriptor, ConstructorDecl> {
 		@Override
-		public Pattern<MemberDecl> matcher(TreeClassDescriptor arg) {
+		public Pattern<? extends Decl> matcher(TreeClassDescriptor arg) {
 			return memberDecl("public " + arg.name + "(..$_) { ..$_ }");
 		}
 

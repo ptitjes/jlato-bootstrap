@@ -9,6 +9,7 @@ import org.jlato.bootstrap.util.MemberPattern;
 import org.jlato.tree.NodeList;
 import org.jlato.tree.decl.*;
 import org.jlato.tree.expr.AssignExpr;
+import org.jlato.tree.expr.AssignOp;
 import org.jlato.tree.expr.ObjectCreationExpr;
 import org.jlato.tree.name.Name;
 
@@ -19,6 +20,7 @@ import java.util.List;
 import static org.jlato.rewrite.Quotes.stmt;
 import static org.jlato.tree.NodeOption.some;
 import static org.jlato.tree.TreeFactory.*;
+import static org.jlato.tree.expr.AssignOp.Normal;
 
 /**
  * @author Didier Villevalois
@@ -82,7 +84,7 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 					.withBody(blockStmt().withStmts(
 							stateParameters.map(p -> expressionStmt().withExpr(
 									assignExpr().withTarget(fieldAccessExpr().withScope(some(thisExpr())).withName(p.id().name()))
-											.withOp(AssignExpr.AssignOp.Normal).withValue(p.id().name())
+											.withOp(Normal).withValue(p.id().name())
 							))
 					));
 		}

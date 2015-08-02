@@ -7,13 +7,11 @@ import org.jlato.bootstrap.util.DeclContribution;
 import org.jlato.bootstrap.util.DeclPattern;
 import org.jlato.rewrite.Pattern;
 import org.jlato.tree.NodeList;
-import org.jlato.tree.decl.FormalParameter;
+import org.jlato.tree.decl.Decl;
 import org.jlato.tree.decl.MemberDecl;
 import org.jlato.tree.decl.MethodDecl;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import static org.jlato.rewrite.Quotes.memberDecl;
 import static org.jlato.rewrite.Quotes.stmt;
@@ -34,7 +32,7 @@ public class TreeKind implements DeclContribution<TreeClassDescriptor, MemberDec
 
 	public static class KindMethod extends Utils implements DeclPattern<TreeClassDescriptor, MethodDecl> {
 		@Override
-		public Pattern<MemberDecl> matcher(TreeClassDescriptor arg) {
+		public Pattern<? extends Decl> matcher(TreeClassDescriptor arg) {
 			return memberDecl("public Kind kind() { ..$_ }");
 		}
 
