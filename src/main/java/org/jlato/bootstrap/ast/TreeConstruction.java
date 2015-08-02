@@ -81,7 +81,7 @@ public class TreeConstruction implements DeclContribution<TreeClassDescriptor, M
 		@Override
 		public MethodDecl rewrite(MethodDecl decl, TreeClassDescriptor arg) {
 			final NodeList<FormalParameter> parameters = arg.parameters;
-			final NodeList<FormalParameter> stateParams = deriveStateParams(parameters);
+			final NodeList<FormalParameter> stateParams = arg.stateParameters();
 			final QualifiedType stateType = arg.stateType();
 			final QualifiedType treeType = qType("STree", stateType);
 

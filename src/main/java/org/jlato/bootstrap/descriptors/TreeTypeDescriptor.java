@@ -1,6 +1,8 @@
 package org.jlato.bootstrap.descriptors;
 
+import org.jlato.bootstrap.Utils;
 import org.jlato.tree.NodeList;
+import org.jlato.tree.decl.FormalParameter;
 import org.jlato.tree.name.Name;
 import org.jlato.tree.type.QualifiedType;
 

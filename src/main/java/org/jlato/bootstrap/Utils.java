@@ -29,25 +29,25 @@ import static org.jlato.tree.TreeFactory.*;
  */
 public class Utils {
 
-	public NodeList<FormalParameter> collectConstructorParams(ClassDecl decl) {
+	public static NodeList<FormalParameter> collectConstructorParams(ClassDecl decl) {
 		Iterator<ConstructorDecl> iterator = decl.findAll(publicConstructorMatcher).iterator();
 		if (!iterator.hasNext()) return null;
 		final ConstructorDecl treeConstructor = iterator.next();
 		return treeConstructor.params();
 	}
 
-	protected boolean nullable(FormalParameter p) {
+	protected static boolean nullable(FormalParameter p) {
 		final Type type = p.type();
 		if (type instanceof PrimitiveType) return false;
 		final String name = ((QualifiedType) type).name().id();
 		return !(name.equals("NodeOption") || name.equals("NodeList") || name.equals("NodeEither"));
 	}
 
-	public String constantName(FormalParameter parameter) {
+	public static String constantName(FormalParameter parameter) {
 		return constantName(parameter.id().name().id(), parameter.type());
 	}
 
-	public String constantName(String propertyName, Type propertyType) {
+	public static String constantName(String propertyName, Type propertyType) {
 		if (propertyType instanceof PrimitiveType &&
 				((PrimitiveType) propertyType).primitive() == PrimitiveType.Primitive.Boolean) {
 			if (propertyName.startsWith("is")) {
@@ -59,11 +59,11 @@ public class Utils {
 		return camelToConstant(propertyName);
 	}
 
-	public String propertySetterName(FormalParameter parameter) {
+	public static String propertySetterName(FormalParameter parameter) {
 		return propertySetterName(parameter.id().name().id(), parameter.type());
 	}
 
-	public String propertySetterName(String propertyName, Type propertyType) {
+	public static String propertySetterName(String propertyName, Type propertyType) {
 		if (propertyType instanceof PrimitiveType &&
 				((PrimitiveType) propertyType).primitive() == PrimitiveType.Primitive.Boolean) {
 			if (propertyName.startsWith("is")) {
@@ -75,7 +75,7 @@ public class Utils {
 		return "with" + upperCaseFirst(propertyName);
 	}
 
-	public Type boxedType(Type type) {
+	public static Type boxedType(Type type) {
 		if (type instanceof QualifiedType) return type;
 		else if (type instanceof PrimitiveType) {
 			PrimitiveType.Primitive primitive = ((PrimitiveType) type).primitive();
@@ -101,11 +101,11 @@ public class Utils {
 		return null;
 	}
 
-	public AnnotationExpr overrideAnn() {
+	public static AnnotationExpr overrideAnn() {
 		return markerAnnotationExpr().withName(QualifiedName.of("Override"));
 	}
 
-	public NodeList<FormalParameter> deriveStateParams(NodeList<FormalParameter> treeConstructorParams) {
+	public static NodeList<FormalParameter> deriveStateParams(NodeList<FormalParameter> treeConstructorParams) {
 		NodeList<FormalParameter> stateConstructorParams = NodeList.empty();
 		for (FormalParameter param : treeConstructorParams) {
 			Type treeType = param.type();
@@ -118,7 +118,7 @@ public class Utils {
 		return stateConstructorParams;
 	}
 
-	public Type treeTypeToSTreeType(Type treeType) {
+	public static Type treeTypeToSTreeType(Type treeType) {
 		Type stateParamType;
 		if (propertyFieldType(treeType)) {
 			stateParamType = treeType;
@@ -244,6 +244,14 @@ public class Utils {
 		}
 
 		return newTs;
+	}
+
+	public static String genDoc(FieldDecl decl, String description) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("/**\n");
+		builder.append(" * " + description + "\n");
+		builder.append(" */");
+		return builder.toString();
 	}
 
 	public static String genDoc(MethodDecl decl, String description, String[] paramDescription, String returnDescription) {

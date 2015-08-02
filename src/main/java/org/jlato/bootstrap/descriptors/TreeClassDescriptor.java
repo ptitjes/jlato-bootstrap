@@ -1,5 +1,6 @@
 package org.jlato.bootstrap.descriptors;
 
+import org.jlato.bootstrap.Utils;
 import org.jlato.tree.NodeList;
 import org.jlato.tree.decl.FormalParameter;
 import org.jlato.tree.name.Name;
@@ -40,5 +41,21 @@ public class TreeClassDescriptor extends TreeTypeDescriptor {
 	@Override
 	public QualifiedType stateType() {
 		return qualifiedType().withScope(some(qualifiedType().withName(name))).withName(STATE_NAME);
+	}
+
+	public NodeList<FormalParameter> stateParameters() {
+		return Utils.deriveStateParams(parameters);
+	}
+
+	public String[] parameterDescriptions() {
+		final NodeList<FormalParameter> stateParameters = stateParameters();
+		String[] paramDescriptions = new String[stateParameters.size()];
+		int index = 0;
+		for (FormalParameter parameter : stateParameters) {
+			// TODO Do that well...
+			paramDescriptions[index] = parameter.id().name().id();
+			index++;
+		}
+		return paramDescriptions;
 	}
 }

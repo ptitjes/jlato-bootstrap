@@ -55,7 +55,7 @@ public class TreeAccessors implements DeclContribution<TreeClassDescriptor, Memb
 
 		@Override
 		public MethodDecl rewrite(MethodDecl decl, TreeClassDescriptor arg) {
-			// Add STree factory method
+
 			decl = decl.withBody(some(blockStmt().withStmts(NodeList.of(
 					stmt("return location.safe" + (propertyFieldType(param.type()) ? "Property" : "Traversal") + "(" + constantName(param) + ");").build()
 			))));
@@ -88,7 +88,7 @@ public class TreeAccessors implements DeclContribution<TreeClassDescriptor, Memb
 
 		@Override
 		public MethodDecl rewrite(MethodDecl decl, TreeClassDescriptor arg) {
-			// Add STree factory method
+
 			decl = decl.withBody(some(blockStmt().withStmts(NodeList.of(
 					stmt("return location.safe" + (propertyFieldType(param.type()) ? "Property" : "Traversal") + "Replace(" + constantName(param) + ", " + param.id().name() + ");").build()
 			))));
@@ -121,7 +121,7 @@ public class TreeAccessors implements DeclContribution<TreeClassDescriptor, Memb
 
 		@Override
 		public MethodDecl rewrite(MethodDecl decl, TreeClassDescriptor arg) {
-			// Add STree factory method
+
 			decl = decl.withBody(some(blockStmt().withStmts(NodeList.of(
 					stmt("return location.safe" + (propertyFieldType(param.type()) ? "Property" : "Traversal") + "Mutate(" + constantName(param) + ", mutation);").build()
 			))));
