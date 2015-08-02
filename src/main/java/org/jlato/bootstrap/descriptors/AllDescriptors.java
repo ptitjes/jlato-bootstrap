@@ -192,6 +192,7 @@ public class AllDescriptors {
 							(QualifiedType) type("MemberDecl").build()
 					),
 					NodeList.of(
+							memberDecl("public static final LexicalShape defaultValShape = composite(token(LToken.Default).withSpacingBefore(space()), element());").build(),
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(MODIFIERS, ExtendedModifier.multiLineShape),\n" +
 									"\t\t\tchild(TYPE), child(NAME),\n" +
@@ -217,7 +218,8 @@ public class AllDescriptors {
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(ANNOTATIONS, AnnotationExpr.singleLineAnnotationsShapeWithSpaceBefore),\n" +
 									"\t\t\ttoken(LToken.BracketLeft), token(LToken.BracketRight)\n" +
-									"\t);").build()
+									"\t);").build(),
+							memberDecl("public static final LexicalShape listShape = list();").build()
 					),
 					false,
 					NodeList.of(
@@ -328,6 +330,11 @@ public class AllDescriptors {
 									"\t\t\tchild(CLASS_BODY, when(some(),\n" +
 									"\t\t\t\t\telement(MemberDecl.bodyShape).withSpacingAfter(spacing(EnumConstant_AfterBody))\n" +
 									"\t\t\t))\n" +
+									"\t);").build(),
+							memberDecl("public static final LexicalShape listShape = list(\n" +
+									"\t\t\tnone().withSpacingAfter(spacing(EnumBody_BeforeConstants)),\n" +
+									"\t\t\ttoken(LToken.Comma).withSpacingAfter(spacing(EnumBody_BetweenConstants)),\n" +
+									"\t\t\tnull\n" +
 									"\t);").build()
 					),
 					false,
@@ -407,6 +414,11 @@ public class AllDescriptors {
 									"\t\t\twhen(data(VAR_ARGS), token(LToken.Ellipsis)),\n" +
 									"\t\t\twhen(not(childIs(TYPE, withKind(Kind.UnknownType))), none().withSpacingAfter(space())),\n" +
 									"\t\t\tchild(ID)\n" +
+									"\t);").build(),
+							memberDecl("public static final LexicalShape listShape = list(true,\n" +
+									"\t\t\tnone(),\n" +
+									"\t\t\ttoken(LToken.Comma).withSpacingAfter(space()),\n" +
+									"\t\t\tnone()\n" +
 									"\t);").build()
 					),
 					false,
@@ -428,6 +440,11 @@ public class AllDescriptors {
 									"\t\t\tchild(NAME),\n" +
 									"\t\t\twhen(data(ON_DEMAND), composite(token(LToken.Dot), token(LToken.Times))),\n" +
 									"\t\t\ttoken(LToken.SemiColon)\n" +
+									"\t);").build(),
+							memberDecl("public static final LexicalShape listShape = list(\n" +
+									"\t\t\tnone(),\n" +
+									"\t\t\tnone().withSpacingAfter(newLine()),\n" +
+									"\t\t\tnone().withSpacingAfter(spacing(CompilationUnit_AfterImports))\n" +
 									"\t);").build()
 					),
 					false,
@@ -532,13 +549,7 @@ public class AllDescriptors {
 					NodeList.of(
 							(QualifiedType) type("ExtendedModifier").build()
 					),
-					NodeList.of(
-							memberDecl("public static final LexicalShape shape = token(new LSToken.Provider() {\n" +
-									"\t\tpublic LToken tokenFor(STree tree) {\n" +
-									"\t\t\treturn ((State) tree.state).keyword;\n" +
-									"\t\t}\n" +
-									"\t});").build()
-					),
+					NodeList.<MemberDecl>empty(),
 					true,
 					NodeList.<FormalParameter>empty()
 			),
@@ -565,10 +576,20 @@ public class AllDescriptors {
 							(QualifiedType) type("Tree").build()
 					),
 					NodeList.of(
+							memberDecl("public static final LexicalShape boundsShape = list(\n" +
+									"\t\t\tkeyword(LToken.Extends),\n" +
+									"\t\t\ttoken(LToken.BinAnd).withSpacing(space(), space()),\n" +
+									"\t\t\tnone()\n" +
+									"\t);").build(),
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(ANNOTATIONS, list()),\n" +
 									"\t\t\tchild(NAME),\n" +
 									"\t\t\tchild(BOUNDS, boundsShape)\n" +
+									"\t);").build(),
+							memberDecl("public static final LexicalShape listShape = list(\n" +
+									"\t\t\ttoken(LToken.Less),\n" +
+									"\t\t\ttoken(LToken.Comma).withSpacingAfter(space()),\n" +
+									"\t\t\ttoken(LToken.Greater).withSpacingAfter(space())\n" +
 									"\t);").build()
 					),
 					false,
@@ -583,6 +604,10 @@ public class AllDescriptors {
 							(QualifiedType) type("Tree").build()
 					),
 					NodeList.of(
+							memberDecl("public static final LexicalShape initializerShape = composite(\n" +
+									"\t\t\ttoken(LToken.Assign).withSpacing(space(), space()),\n" +
+									"\t\t\telement()\n" +
+									"\t);").build(),
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(ID),\n" +
 									"\t\t\tchild(INIT, when(some(), initializerShape))\n" +
@@ -658,7 +683,8 @@ public class AllDescriptors {
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(ANNOTATIONS, AnnotationExpr.singleLineAnnotationsShapeWithSpaceBefore),\n" +
 									"\t\t\ttoken(LToken.BracketLeft), child(EXPR), token(LToken.BracketRight)\n" +
-									"\t);").build()
+									"\t);").build(),
+							memberDecl("public static final LexicalShape listShape = list();").build()
 					),
 					false,
 					NodeList.of(
@@ -699,7 +725,36 @@ public class AllDescriptors {
 									"\t\t\tchild(TARGET),\n" +
 									"\t\t\ttoken(new LSToken.Provider() {\n" +
 									"\t\t\t\tpublic LToken tokenFor(STree tree) {\n" +
-									"\t\t\t\t\treturn ((State) tree.state).op.token;\n" +
+									"\t\t\t\t\tfinal AssignOp op = ((State) tree.state).op;\n" +
+									"\t\t\t\t\tswitch (op) {\n" +
+									"\t\t\t\t\t\tcase Normal:\n" +
+									"\t\t\t\t\t\t\treturn LToken.Assign;\n" +
+									"\t\t\t\t\t\tcase Plus:\n" +
+									"\t\t\t\t\t\t\treturn LToken.AssignPlus;\n" +
+									"\t\t\t\t\t\tcase Minus:\n" +
+									"\t\t\t\t\t\t\treturn LToken.AssignMinus;\n" +
+									"\t\t\t\t\t\tcase Times:\n" +
+									"\t\t\t\t\t\t\treturn LToken.AssignTimes;\n" +
+									"\t\t\t\t\t\tcase Divide:\n" +
+									"\t\t\t\t\t\t\treturn LToken.AssignDivide;\n" +
+									"\t\t\t\t\t\tcase And:\n" +
+									"\t\t\t\t\t\t\treturn LToken.AssignAnd;\n" +
+									"\t\t\t\t\t\tcase Or:\n" +
+									"\t\t\t\t\t\t\treturn LToken.AssignOr;\n" +
+									"\t\t\t\t\t\tcase XOr:\n" +
+									"\t\t\t\t\t\t\treturn LToken.AssignXOr;\n" +
+									"\t\t\t\t\t\tcase Remainder:\n" +
+									"\t\t\t\t\t\t\treturn LToken.AssignRemainder;\n" +
+									"\t\t\t\t\t\tcase LeftShift:\n" +
+									"\t\t\t\t\t\t\treturn LToken.AssignLShift;\n" +
+									"\t\t\t\t\t\tcase RightSignedShift:\n" +
+									"\t\t\t\t\t\t\treturn LToken.AssignRSignedShift;\n" +
+									"\t\t\t\t\t\tcase RightUnsignedShift:\n" +
+									"\t\t\t\t\t\t\treturn LToken.AssignRUnsignedShift;\n" +
+									"\t\t\t\t\t\tdefault:\n" +
+									"\t\t\t\t\t\t\t// Can't happen by definition of enum\n" +
+									"\t\t\t\t\t\t\tthrow new IllegalStateException();\n" +
+									"\t\t\t\t\t}\n" +
 									"\t\t\t\t}\n" +
 									"\t\t\t}).withSpacing(space(), space()),\n" +
 									"\t\t\tchild(VALUE)\n" +
@@ -721,7 +776,50 @@ public class AllDescriptors {
 									"\t\t\tchild(LEFT),\n" +
 									"\t\t\ttoken(new LSToken.Provider() {\n" +
 									"\t\t\t\tpublic LToken tokenFor(STree tree) {\n" +
-									"\t\t\t\t\treturn ((State) tree.state).op.token;\n" +
+									"\t\t\t\t\tfinal BinaryOp op = ((State) tree.state).op;\n" +
+									"\t\t\t\t\tswitch (op) {\n" +
+									"\t\t\t\t\t\tcase Or:\n" +
+									"\t\t\t\t\t\t\treturn LToken.Or;\n" +
+									"\t\t\t\t\t\tcase And:\n" +
+									"\t\t\t\t\t\t\treturn LToken.And;\n" +
+									"\t\t\t\t\t\tcase BinOr:\n" +
+									"\t\t\t\t\t\t\treturn LToken.BinOr;\n" +
+									"\t\t\t\t\t\tcase BinAnd:\n" +
+									"\t\t\t\t\t\t\treturn LToken.BinAnd;\n" +
+									"\t\t\t\t\t\tcase XOr:\n" +
+									"\t\t\t\t\t\t\treturn LToken.XOr;\n" +
+									"\t\t\t\t\t\tcase Equal:\n" +
+									"\t\t\t\t\t\t\treturn LToken.Equal;\n" +
+									"\t\t\t\t\t\tcase NotEqual:\n" +
+									"\t\t\t\t\t\t\treturn LToken.NotEqual;\n" +
+									"\t\t\t\t\t\tcase Less:\n" +
+									"\t\t\t\t\t\t\treturn LToken.Less;\n" +
+									"\t\t\t\t\t\tcase Greater:\n" +
+									"\t\t\t\t\t\t\treturn LToken.Greater;\n" +
+									"\t\t\t\t\t\tcase LessOrEqual:\n" +
+									"\t\t\t\t\t\t\treturn LToken.LessOrEqual;\n" +
+									"\t\t\t\t\t\tcase GreaterOrEqual:\n" +
+									"\t\t\t\t\t\t\treturn LToken.GreaterOrEqual;\n" +
+									"\t\t\t\t\t\tcase LeftShift:\n" +
+									"\t\t\t\t\t\t\treturn LToken.LShift;\n" +
+									"\t\t\t\t\t\tcase RightSignedShift:\n" +
+									"\t\t\t\t\t\t\treturn LToken.RSignedShift;\n" +
+									"\t\t\t\t\t\tcase RightUnsignedShift:\n" +
+									"\t\t\t\t\t\t\treturn LToken.RUnsignedShift;\n" +
+									"\t\t\t\t\t\tcase Plus:\n" +
+									"\t\t\t\t\t\t\treturn LToken.Plus;\n" +
+									"\t\t\t\t\t\tcase Minus:\n" +
+									"\t\t\t\t\t\t\treturn LToken.Minus;\n" +
+									"\t\t\t\t\t\tcase Times:\n" +
+									"\t\t\t\t\t\t\treturn LToken.Times;\n" +
+									"\t\t\t\t\t\tcase Divide:\n" +
+									"\t\t\t\t\t\t\treturn LToken.Divide;\n" +
+									"\t\t\t\t\t\tcase Remainder:\n" +
+									"\t\t\t\t\t\t\treturn LToken.Remainder;\n" +
+									"\t\t\t\t\t\tdefault:\n" +
+									"\t\t\t\t\t\t\t// Can't happen by definition of enum\n" +
+									"\t\t\t\t\t\t\tthrow new IllegalStateException();\n" +
+									"\t\t\t\t\t}\n" +
 									"\t\t\t\t}\n" +
 									"\t\t\t}).withSpacing(space(), space()),\n" +
 									"\t\t\tchild(RIGHT)\n" +
@@ -841,15 +939,7 @@ public class AllDescriptors {
 					NodeList.of(
 							(QualifiedType) type("Expr").build()
 					),
-					NodeList.of(
-							memberDecl("public static final LexicalShape shape = token(new LSToken.Provider() {\n" +
-									"\t\tpublic LToken tokenFor(STree tree) {\n" +
-									"\t\t\tfinal Class<?> literalClass = ((State) tree.state).literalClass;\n" +
-									"\t\t\tfinal String literalString = ((State) tree.state).literalString;\n" +
-									"\t\t\treturn new LToken(0, literalString); // TODO Fix\n" +
-									"\t\t}\n" +
-									"\t});").build()
-					),
+					NodeList.<MemberDecl>empty(),
 					false,
 					NodeList.of(
 							param("Class<T> literalClass").build(),
@@ -1179,7 +1269,8 @@ public class AllDescriptors {
 									"\t\t\tchild(EXCEPT),\n" +
 									"\t\t\ttoken(LToken.ParenthesisRight).withSpacingAfter(space()),\n" +
 									"\t\t\tchild(CATCH_BLOCK)\n" +
-									"\t);").build()
+									"\t);").build(),
+							memberDecl("public static final LexicalShape listShape = list();").build()
 					),
 					false,
 					NodeList.of(
@@ -1423,7 +1514,8 @@ public class AllDescriptors {
 									"\t\t\tnone().withIndentationAfter(indent(BLOCK)),\n" +
 									"\t\t\tchild(STMTS, Stmt.listShape),\n" +
 									"\t\t\tnone().withIndentationBefore(unIndent(BLOCK))\n" +
-									"\t);").build()
+									"\t);").build(),
+							memberDecl("public static final LexicalShape listShape = list(none().withSpacingAfter(newLine()));").build()
 					),
 					false,
 					NodeList.of(
@@ -1606,7 +1698,28 @@ public class AllDescriptors {
 									"\t\t\tchild(ANNOTATIONS, list()),\n" +
 									"\t\t\ttoken(new LSToken.Provider() {\n" +
 									"\t\t\t\tpublic LToken tokenFor(STree tree) {\n" +
-									"\t\t\t\t\treturn ((State) tree.state).primitive.token;\n" +
+									"\t\t\t\t\tfinal Primitive primitive = ((State) tree.state).primitive;\n" +
+									"\t\t\t\t\tswitch (primitive) {\n" +
+									"\t\t\t\t\t\tcase Boolean:\n" +
+									"\t\t\t\t\t\t\treturn LToken.Boolean;\n" +
+									"\t\t\t\t\t\tcase Char:\n" +
+									"\t\t\t\t\t\t\treturn LToken.Char;\n" +
+									"\t\t\t\t\t\tcase Byte:\n" +
+									"\t\t\t\t\t\t\treturn LToken.Byte;\n" +
+									"\t\t\t\t\t\tcase Short:\n" +
+									"\t\t\t\t\t\t\treturn LToken.Short;\n" +
+									"\t\t\t\t\t\tcase Int:\n" +
+									"\t\t\t\t\t\t\treturn LToken.Int;\n" +
+									"\t\t\t\t\t\tcase Long:\n" +
+									"\t\t\t\t\t\t\treturn LToken.Long;\n" +
+									"\t\t\t\t\t\tcase Float:\n" +
+									"\t\t\t\t\t\t\treturn LToken.Float;\n" +
+									"\t\t\t\t\t\tcase Double:\n" +
+									"\t\t\t\t\t\t\treturn LToken.Double;\n" +
+									"\t\t\t\t\t\tdefault:\n" +
+									"\t\t\t\t\t\t\t// Can't happen by definition of enum\n" +
+									"\t\t\t\t\t\t\tthrow new IllegalStateException();\n" +
+									"\t\t\t\t\t}\n" +
 									"\t\t\t\t}\n" +
 									"\t\t\t})\n" +
 									"\t);").build()
@@ -1622,11 +1735,27 @@ public class AllDescriptors {
 							(QualifiedType) type("ReferenceType").build()
 					),
 					NodeList.of(
+							memberDecl("public static final LexicalShape scopeShape = composite(element(), token(LToken.Dot));").build(),
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(SCOPE, when(some(), scopeShape)),\n" +
 									"\t\t\tchild(ANNOTATIONS, AnnotationExpr.singleLineAnnotationsShape),\n" +
 									"\t\t\tchild(NAME),\n" +
 									"\t\t\tchild(TYPE_ARGS, when(some(), element(Type.typeArgumentsOrDiamondShape)))\n" +
+									"\t);").build(),
+							memberDecl("public static final LexicalShape extendsClauseShape = list(\n" +
+									"\t\t\tkeyword(LToken.Extends),\n" +
+									"\t\t\ttoken(LToken.Comma).withSpacingAfter(space()),\n" +
+									"\t\t\tnull\n" +
+									"\t);").build(),
+							memberDecl("public static final LexicalShape implementsClauseShape = list(\n" +
+									"\t\t\tkeyword(LToken.Implements),\n" +
+									"\t\t\ttoken(LToken.Comma).withSpacingAfter(space()),\n" +
+									"\t\t\tnull\n" +
+									"\t);").build(),
+							memberDecl("public static final LexicalShape throwsClauseShape = list(\n" +
+									"\t\t\tkeyword(LToken.Throws),\n" +
+									"\t\t\ttoken(LToken.Comma).withSpacingAfter(space()),\n" +
+									"\t\t\tnull\n" +
 									"\t);").build()
 					),
 					false,
