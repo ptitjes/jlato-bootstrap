@@ -21,7 +21,7 @@ import static org.jlato.tree.TreeFactory.*;
 /**
  * @author Didier Villevalois
  */
-public class TreeAccessors implements DeclContribution<TreeClassDescriptor, MemberDecl> {
+public class TreeClassAccessors implements DeclContribution<TreeClassDescriptor, MemberDecl> {
 
 	@Override
 	public Iterable<DeclPattern<TreeClassDescriptor, ? extends MemberDecl>> declarations(TreeClassDescriptor arg) {

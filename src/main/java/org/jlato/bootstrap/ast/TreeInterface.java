@@ -22,6 +22,7 @@ public class TreeInterface extends TypePattern.OfInterface<TreeInterfaceDescript
 
 	public TreeInterface() {
 		super(
+				new TreeInterfaceAccessors(),
 				a -> Arrays.asList(new StateInterface()),
 				DeclContribution.mergeFields(a -> a.shapes.map(m -> (FieldDecl) m))
 		);

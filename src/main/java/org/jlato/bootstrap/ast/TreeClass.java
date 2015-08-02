@@ -8,7 +8,6 @@ import org.jlato.bootstrap.util.DeclContribution;
 import org.jlato.bootstrap.util.TypePattern;
 import org.jlato.rewrite.Pattern;
 import org.jlato.tree.NodeList;
-import org.jlato.tree.NodeOption;
 import org.jlato.tree.decl.ClassDecl;
 import org.jlato.tree.decl.Decl;
 import org.jlato.tree.decl.FieldDecl;
@@ -30,7 +29,7 @@ public class TreeClass extends TypePattern.OfClass<TreeClassDescriptor> {
 				new TreeKind(),
 				new TreeConstruction(),
 //				new TreeKind(),
-				new TreeAccessors(),
+				new TreeClassAccessors(),
 				a -> Arrays.asList(new StateClass()),
 				new PropertyAndTraversalClasses(),
 				DeclContribution.mergeFields(a -> a.shapes.map(m -> (FieldDecl) m))
