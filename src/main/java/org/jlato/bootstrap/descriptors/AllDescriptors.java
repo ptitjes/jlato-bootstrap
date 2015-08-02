@@ -23,13 +23,13 @@ public class AllDescriptors {
 
 	private static final HashMap<Name, TreeTypeDescriptor> perName = new HashMap<>();
 
-	public static final TreeInterfaceDescriptor[] ALL_INTERFACES = new TreeInterfaceDescriptor[] {
+	public static final TreeInterfaceDescriptor[] ALL_INTERFACES = new TreeInterfaceDescriptor[]{
 			new TreeInterfaceDescriptor(new Name("decl"), new Name("Decl"), "declaration",
 					NodeList.of(
 							(QualifiedType) type("Tree").build()
 					),
-					NodeList.<MemberDecl>empty()
-			),
+					NodeList.<MemberDecl>empty(),
+					NodeList.<FormalParameter>empty()),
 			new TreeInterfaceDescriptor(new Name("decl"), new Name("ExtendedModifier"), "extended modifier",
 					NodeList.of(
 							(QualifiedType) type("Tree").build()
@@ -51,8 +51,8 @@ public class AllDescriptors {
 									"\t\t\t\t\tnone().withSpacingAfter(newLine())\n" +
 									"\t\t\t)\n" +
 									"\t);").build()
-					)
-			),
+					),
+					NodeList.<FormalParameter>empty()),
 			new TreeInterfaceDescriptor(new Name("decl"), new Name("MemberDecl"), "member declaration",
 					NodeList.of(
 							(QualifiedType) type("Decl").build()
@@ -81,8 +81,8 @@ public class AllDescriptors {
 									"\t\t\tnone().withSpacingAfter(spacing(ClassBody_BetweenMembers)),\n" +
 									"\t\t\tnone().withSpacingAfter(spacing(ClassBody_AfterMembers))\n" +
 									"\t);").build()
-					)
-			),
+					),
+					NodeList.<FormalParameter>empty()),
 			new TreeInterfaceDescriptor(new Name("decl"), new Name("TypeDecl"), "type declaration",
 					NodeList.of(
 							(QualifiedType) type("MemberDecl").build()
@@ -91,8 +91,8 @@ public class AllDescriptors {
 							memberDecl("LexicalShape listShape = list(\n" +
 									"\t\t\tnone().withSpacingAfter(spacing(CompilationUnit_BetweenTopLevelDecl))\n" +
 									"\t);").build()
-					)
-			),
+					),
+					NodeList.<FormalParameter>empty()),
 			new TreeInterfaceDescriptor(new Name("expr"), new Name("AnnotationExpr"), "annotation expression",
 					NodeList.of(
 							(QualifiedType) type("Expr").build(),
@@ -114,8 +114,10 @@ public class AllDescriptors {
 									"\t\t\tnone().withSpacingAfter(newLine()),\n" +
 									"\t\t\tnone().withSpacingAfter(newLine())\n" +
 									"\t);").build()
-					)
-			),
+					),
+					NodeList.of(
+							param("QualifiedName name").build()
+					)),
 			new TreeInterfaceDescriptor(new Name("expr"), new Name("Expr"), "expression",
 					NodeList.of(
 							(QualifiedType) type("Tree").build()
@@ -129,22 +131,22 @@ public class AllDescriptors {
 							memberDecl("LexicalShape listShape = list(\n" +
 									"\t\t\ttoken(LToken.Comma).withSpacingAfter(space())\n" +
 									"\t);").build()
-					)
-			),
+					),
+					NodeList.<FormalParameter>empty()),
 			new TreeInterfaceDescriptor(new Name("stmt"), new Name("Stmt"), "statement",
 					NodeList.of(
 							(QualifiedType) type("Tree").build()
 					),
 					NodeList.of(
 							memberDecl("LexicalShape listShape = list(none().withSpacingAfter(newLine()));").build()
-					)
-			),
+					),
+					NodeList.<FormalParameter>empty()),
 			new TreeInterfaceDescriptor(new Name("type"), new Name("ReferenceType"), "reference type",
 					NodeList.of(
 							(QualifiedType) type("Type").build()
 					),
-					NodeList.<MemberDecl>empty()
-			),
+					NodeList.<MemberDecl>empty(),
+					NodeList.<FormalParameter>empty()),
 			new TreeInterfaceDescriptor(new Name("type"), new Name("Type"), "type",
 					NodeList.of(
 							(QualifiedType) type("Tree").build()
@@ -162,12 +164,12 @@ public class AllDescriptors {
 									"\t);").build(),
 							memberDecl("LexicalShape intersectionShape = list(token(LToken.BinAnd).withSpacing(space(), space()));").build(),
 							memberDecl("LexicalShape unionShape = list(token(LToken.BinOr).withSpacing(space(), space()));").build()
-					)
-			),
+					),
+					NodeList.<FormalParameter>empty()),
 	};
 
 
-	public static final TreeClassDescriptor[] ALL_CLASSES = new TreeClassDescriptor[] {
+	public static final TreeClassDescriptor[] ALL_CLASSES = new TreeClassDescriptor[]{
 			new TreeClassDescriptor(new Name("decl"), new Name("AnnotationDecl"), "annotation type declaration",
 					NodeList.of(
 							(QualifiedType) type("TypeDecl").build()
@@ -1136,10 +1138,36 @@ public class AllDescriptors {
 							(QualifiedType) type("Expr").build()
 					),
 					NodeList.of(
+							memberDecl("public final static LexicalShape opShape = token(new LSToken.Provider() {\n" +
+									"\t\tpublic LToken tokenFor(STree tree) {\n" +
+									"\t\t\tfinal UnaryOp op = ((State) tree.state).op;\n" +
+									"\t\t\tswitch (op) {\n" +
+									"\t\t\t\tcase Positive:\n" +
+									"\t\t\t\t\treturn LToken.Plus;\n" +
+									"\t\t\t\tcase Negative:\n" +
+									"\t\t\t\t\treturn LToken.Minus;\n" +
+									"\t\t\t\tcase PreIncrement:\n" +
+									"\t\t\t\t\treturn LToken.Increment;\n" +
+									"\t\t\t\tcase PreDecrement:\n" +
+									"\t\t\t\t\treturn LToken.Decrement;\n" +
+									"\t\t\t\tcase Not:\n" +
+									"\t\t\t\t\treturn LToken.Not;\n" +
+									"\t\t\t\tcase Inverse:\n" +
+									"\t\t\t\t\treturn LToken.Inverse;\n" +
+									"\t\t\t\tcase PostIncrement:\n" +
+									"\t\t\t\t\treturn LToken.Increment;\n" +
+									"\t\t\t\tcase PostDecrement:\n" +
+									"\t\t\t\t\treturn LToken.Decrement;\n" +
+									"\t\t\t\tdefault:\n" +
+									"\t\t\t\t\t// Can't happen by definition of enum\n" +
+									"\t\t\t\t\tthrow new IllegalStateException();\n" +
+									"\t\t\t}\n" +
+									"\t\t}\n" +
+									"\t});").build(),
 							memberDecl("public static final LexicalShape shape = alternative(new LSCondition() {\n" +
 									"\t\tpublic boolean test(STree tree) {\n" +
 									"\t\t\tfinal UnaryOp op = ((State) tree.state).op;\n" +
-									"\t\t\treturn isPrefix(op);\n" +
+									"\t\t\treturn op.isPrefix();\n" +
 									"\t\t}\n" +
 									"\t}, composite(opShape, child(EXPR)), composite(child(EXPR), opShape));").build()
 					),

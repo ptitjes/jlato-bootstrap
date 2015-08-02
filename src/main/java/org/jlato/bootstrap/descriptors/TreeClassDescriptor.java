@@ -18,16 +18,14 @@ import static org.jlato.tree.TreeFactory.qualifiedType;
 public class TreeClassDescriptor extends TreeTypeDescriptor {
 
 	public final boolean customTailored;
-	public final NodeList<FormalParameter> parameters;
 
 	public TreeClassDescriptor(Name packageName, Name name, String description,
 	                           NodeList<QualifiedType> superInterfaces,
 	                           NodeList<MemberDecl> shapes,
 	                           boolean customTailored,
 	                           NodeList<FormalParameter> parameters) {
-		super(packageName, name, description, superInterfaces, shapes);
+		super(packageName, name, description, superInterfaces, shapes, parameters);
 		this.customTailored = customTailored;
-		this.parameters = parameters;
 	}
 
 	@Override

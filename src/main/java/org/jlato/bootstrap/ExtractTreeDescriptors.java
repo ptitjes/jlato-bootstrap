@@ -40,7 +40,8 @@ public class ExtractTreeDescriptors extends TreeClassRefactoring {
 				memberDecl("LexicalShape $_ = $_;")
 		)).map(m -> ((FieldDecl) m).withModifiers(NodeList.empty()));
 
-		interfaceDescriptors.add(new TreeInterfaceDescriptor(packageName, name, makeDocumentationName(name), superInterfaces, shapes));
+		// TODO Fix parameters collection for interfaces
+		interfaceDescriptors.add(new TreeInterfaceDescriptor(packageName, name, makeDocumentationName(name), superInterfaces, shapes, NodeList.<FormalParameter>empty()));
 
 		return decl;
 	}
