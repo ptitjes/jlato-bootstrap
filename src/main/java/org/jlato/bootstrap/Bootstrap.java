@@ -21,9 +21,11 @@ package org.jlato.bootstrap;
 
 import org.jlato.bootstrap.ast.KindEnum;
 import org.jlato.bootstrap.ast.TreeClass;
+import org.jlato.bootstrap.ast.TreeInterface;
 import org.jlato.bootstrap.descriptors.AllDescriptors;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.ast.TreeFactoryClass;
+import org.jlato.bootstrap.descriptors.TreeInterfaceDescriptor;
 import org.jlato.bootstrap.util.DeclPattern;
 import org.jlato.parser.ParseException;
 import org.jlato.parser.Parser;
@@ -50,22 +52,29 @@ public class Bootstrap {
 		File rootDirectory = new File("../jlato/src/main/java");
 		TreeSet<CompilationUnit> treeSet = parser.parseAll(rootDirectory, "UTF-8");
 
-		final TreeClassDescriptor[] descriptors = AllDescriptors.ALL_CLASSES;
+		final TreeInterfaceDescriptor[] interfaceDescriptors = AllDescriptors.ALL_INTERFACES;
+		final TreeClassDescriptor[] classDescriptors = AllDescriptors.ALL_CLASSES;
+
+		// Generate Tree interfaces
+		final TreeInterface treeInterfacePattern = new TreeInterface();
+		for (TreeInterfaceDescriptor descriptor : interfaceDescriptors) {
+			treeSet = applyPattern(treeSet, descriptor.treeFilePath(), treeInterfacePattern, descriptor);
+		}
 
 		// Generate Tree classes
 		final TreeClass treeClassPattern = new TreeClass();
-		for (TreeClassDescriptor descriptor : descriptors) {
+		for (TreeClassDescriptor descriptor : classDescriptors) {
 			if (descriptor.customTailored) continue;
 			treeSet = applyPattern(treeSet, descriptor.treeFilePath(), treeClassPattern, descriptor);
 		}
 
 		// Generate Kind enum
 		final KindEnum kindEnumPattern = new KindEnum();
-		treeSet = applyPattern(treeSet, "org/jlato/tree/Kind.java", kindEnumPattern, descriptors);
+		treeSet = applyPattern(treeSet, "org/jlato/tree/Kind.java", kindEnumPattern, classDescriptors);
 
 		// Generate Kind enum
 		final TreeFactoryClass treeFactoryClassPattern = new TreeFactoryClass();
-		treeSet = applyPattern(treeSet, "org/jlato/tree/TreeFactory.java", treeFactoryClassPattern, descriptors);
+		treeSet = applyPattern(treeSet, "org/jlato/tree/TreeFactory.java", treeFactoryClassPattern, classDescriptors);
 
 		treeSet.updateOnDisk(false, FormattingSettings.Default);
 	}
