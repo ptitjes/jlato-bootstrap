@@ -25,7 +25,8 @@ public class TreeClass extends TypePattern.OfClass<TreeClassDescriptor> {
 				new TreeConstruction(),
 				new TreeKind(),
 				new TreeAccessors(),
-				new StateClassContribution()
+				new StateClassContribution(),
+				new PropertyAndTraversalClasses()
 		);
 	}
 
