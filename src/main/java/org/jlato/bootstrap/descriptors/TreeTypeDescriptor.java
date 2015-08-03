@@ -4,6 +4,7 @@ import org.jlato.tree.NodeList;
 import org.jlato.tree.decl.FormalParameter;
 import org.jlato.tree.decl.MemberDecl;
 import org.jlato.tree.name.Name;
+import org.jlato.tree.name.QualifiedName;
 import org.jlato.tree.type.QualifiedType;
 
 import static org.jlato.tree.NodeOption.some;
@@ -40,6 +41,10 @@ public abstract class TreeTypeDescriptor {
 	}
 
 	public abstract boolean isInterface();
+
+	public abstract QualifiedName packageQualifiedName();
+
+	public abstract QualifiedName qualifiedName();
 
 	public abstract String treeFilePath();
 

@@ -1,9 +1,11 @@
 package org.jlato.bootstrap.descriptors;
 
 import org.jlato.tree.NodeList;
+import org.jlato.tree.TreeFactory;
 import org.jlato.tree.decl.FormalParameter;
 import org.jlato.tree.decl.MemberDecl;
 import org.jlato.tree.name.Name;
+import org.jlato.tree.name.QualifiedName;
 import org.jlato.tree.type.QualifiedType;
 
 import static org.jlato.tree.NodeOption.some;
@@ -23,6 +25,16 @@ public class TreeInterfaceDescriptor extends TreeTypeDescriptor {
 	@Override
 	public boolean isInterface() {
 		return true;
+	}
+
+	@Override
+	public QualifiedName qualifiedName() {
+		return TreeFactory.qualifiedName("org.jlato.tree." + packageName + "." + name);
+	}
+
+	@Override
+	public QualifiedName packageQualifiedName() {
+		return TreeFactory.qualifiedName("org.jlato.tree." + packageName);
 	}
 
 	@Override

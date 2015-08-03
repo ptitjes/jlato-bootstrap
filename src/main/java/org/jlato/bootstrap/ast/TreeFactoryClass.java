@@ -40,9 +40,13 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 		if (GenSettings.generateDocs)
 			decl = decl.insertLeadingComment("/** A factory for tree nodes. */");
 
+		importManager.addImport(importDecl(qualifiedName("org.jlato.internal.bu.Literals")));
+
 		NodeList<MemberDecl> factoryMethods = NodeList.empty();
 		for (TreeClassDescriptor descriptor : arg) {
 			if (descriptor.customTailored) continue;
+
+			importManager.addImport(importDecl(descriptor.packageQualifiedName()).setOnDemand(true));
 
 			if (!descriptor.name.id().equals("LiteralExpr")) {
 				if (!noNullsFormHasNoParams(descriptor))
