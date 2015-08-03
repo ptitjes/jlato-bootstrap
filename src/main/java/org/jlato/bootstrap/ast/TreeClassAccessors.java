@@ -5,6 +5,7 @@ import org.jlato.bootstrap.Utils;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.util.DeclContribution;
 import org.jlato.bootstrap.util.DeclPattern;
+import org.jlato.bootstrap.util.ImportManager;
 import org.jlato.rewrite.Pattern;
 import org.jlato.tree.NodeList;
 import org.jlato.tree.decl.*;
@@ -50,7 +51,7 @@ public class TreeClassAccessors implements DeclContribution<TreeClassDescriptor,
 		}
 
 		@Override
-		public MethodDecl rewrite(MethodDecl decl, TreeClassDescriptor arg) {
+		public MethodDecl rewrite(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
 
 			decl = decl.withBody(some(blockStmt().withStmts(NodeList.of(
 					stmt("return location.safe" + (propertyFieldType(param.type()) ? "Property" : "Traversal") + "(" + constantName(param) + ");").build()
@@ -83,7 +84,7 @@ public class TreeClassAccessors implements DeclContribution<TreeClassDescriptor,
 		}
 
 		@Override
-		public MethodDecl rewrite(MethodDecl decl, TreeClassDescriptor arg) {
+		public MethodDecl rewrite(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
 
 			decl = decl.withBody(some(blockStmt().withStmts(NodeList.of(
 					stmt("return location.safe" + (propertyFieldType(param.type()) ? "Property" : "Traversal") + "Replace(" + constantName(param) + ", " + param.id().name() + ");").build()
@@ -116,7 +117,7 @@ public class TreeClassAccessors implements DeclContribution<TreeClassDescriptor,
 		}
 
 		@Override
-		public MethodDecl rewrite(MethodDecl decl, TreeClassDescriptor arg) {
+		public MethodDecl rewrite(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
 
 			decl = decl.withBody(some(blockStmt().withStmts(NodeList.of(
 					stmt("return location.safe" + (propertyFieldType(param.type()) ? "Property" : "Traversal") + "Mutate(" + constantName(param) + ", mutation);").build()

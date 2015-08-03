@@ -4,11 +4,11 @@ import org.jlato.bootstrap.GenSettings;
 import org.jlato.bootstrap.Utils;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.util.DeclPattern;
+import org.jlato.bootstrap.util.ImportManager;
 import org.jlato.rewrite.Pattern;
 import org.jlato.tree.NodeList;
 import org.jlato.tree.decl.*;
 import org.jlato.tree.expr.Expr;
-import org.jlato.tree.expr.LiteralExpr;
 import org.jlato.tree.name.Name;
 import org.jlato.tree.stmt.Stmt;
 import org.jlato.tree.type.Primitive;
@@ -33,7 +33,7 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 	}
 
 	@Override
-	public ClassDecl rewrite(ClassDecl decl, TreeClassDescriptor[] arg) {
+	public ClassDecl rewrite(ClassDecl decl, ImportManager importManager, TreeClassDescriptor[] arg) {
 		decl = classDecl(new Name("TreeFactory"))
 				.withModifiers(m -> m.append(Modifier.Public).append(Modifier.Abstract));
 

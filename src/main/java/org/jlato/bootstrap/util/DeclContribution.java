@@ -44,7 +44,7 @@ public interface DeclContribution<A, D extends Decl> {
 						}
 
 						@Override
-						public FieldDecl rewrite(FieldDecl decl, A arg) {
+						public FieldDecl rewrite(FieldDecl decl, ImportManager importManager, A arg) {
 							return declaration;
 						}
 					});

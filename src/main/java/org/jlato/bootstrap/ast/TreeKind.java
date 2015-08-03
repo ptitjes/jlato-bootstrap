@@ -5,6 +5,7 @@ import org.jlato.bootstrap.Utils;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.util.DeclContribution;
 import org.jlato.bootstrap.util.DeclPattern;
+import org.jlato.bootstrap.util.ImportManager;
 import org.jlato.rewrite.Pattern;
 import org.jlato.tree.NodeList;
 import org.jlato.tree.decl.Decl;
@@ -37,7 +38,7 @@ public class TreeKind implements DeclContribution<TreeClassDescriptor, MemberDec
 		}
 
 		@Override
-		public MethodDecl rewrite(MethodDecl decl, TreeClassDescriptor arg) {
+		public MethodDecl rewrite(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
 			// Add STree factory method
 			decl = decl.withBody(some(blockStmt().withStmts(NodeList.of(
 					stmt("return Kind." + arg.name + ";").build()

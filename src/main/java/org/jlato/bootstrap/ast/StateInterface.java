@@ -3,6 +3,7 @@ package org.jlato.bootstrap.ast;
 import org.jlato.bootstrap.GenSettings;
 import org.jlato.bootstrap.descriptors.TreeInterfaceDescriptor;
 import org.jlato.bootstrap.descriptors.TreeTypeDescriptor;
+import org.jlato.bootstrap.util.ImportManager;
 import org.jlato.bootstrap.util.TypePattern;
 import org.jlato.rewrite.Pattern;
 import org.jlato.tree.NodeList;
@@ -32,8 +33,8 @@ class StateInterface extends TypePattern.OfInterface<TreeInterfaceDescriptor> {
 	}
 
 	@Override
-	public TypeDecl rewrite(TypeDecl decl, TreeInterfaceDescriptor arg) {
-		InterfaceDecl interfaceDecl = (InterfaceDecl) super.rewrite(decl, arg);
+	public TypeDecl rewrite(TypeDecl decl, ImportManager importManager, TreeInterfaceDescriptor arg) {
+		InterfaceDecl interfaceDecl = (InterfaceDecl) super.rewrite(decl, importManager, arg);
 
 		NodeList<QualifiedType> parentInterfaces = arg.superInterfaces;
 		boolean treeInterfaceChild = parentInterfaces.size() == 1 && parentInterfaces.get(0).name().equals(TreeTypeDescriptor.TREE_NAME);

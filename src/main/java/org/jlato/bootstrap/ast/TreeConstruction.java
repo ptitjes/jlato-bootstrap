@@ -5,6 +5,7 @@ import org.jlato.bootstrap.Utils;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.util.DeclContribution;
 import org.jlato.bootstrap.util.DeclPattern;
+import org.jlato.bootstrap.util.ImportManager;
 import org.jlato.rewrite.Pattern;
 import org.jlato.tree.NodeList;
 import org.jlato.tree.decl.*;
@@ -41,7 +42,7 @@ public class TreeConstruction implements DeclContribution<TreeClassDescriptor, M
 		}
 
 		@Override
-		public ConstructorDecl rewrite(ConstructorDecl decl, TreeClassDescriptor arg) {
+		public ConstructorDecl rewrite(ConstructorDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
 			final Name name = arg.name;
 			final QualifiedType stateType = arg.stateType();
 			final QualifiedType locationType = qType("SLocation", stateType);
@@ -78,7 +79,7 @@ public class TreeConstruction implements DeclContribution<TreeClassDescriptor, M
 		}
 
 		@Override
-		public MethodDecl rewrite(MethodDecl decl, TreeClassDescriptor arg) {
+		public MethodDecl rewrite(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
 			final NodeList<FormalParameter> parameters = arg.parameters;
 			final NodeList<FormalParameter> stateParams = arg.stateParameters();
 			final QualifiedType stateType = arg.stateType();
@@ -118,7 +119,7 @@ public class TreeConstruction implements DeclContribution<TreeClassDescriptor, M
 		}
 
 		@Override
-		public ConstructorDecl rewrite(ConstructorDecl decl, TreeClassDescriptor arg) {
+		public ConstructorDecl rewrite(ConstructorDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
 			final Name name = arg.name;
 			final QualifiedType stateType = arg.stateType();
 			final QualifiedType locationType = qType("SLocation", stateType);

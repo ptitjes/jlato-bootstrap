@@ -20,7 +20,7 @@ public abstract class MemberPattern<A, M extends MemberDecl> extends Utils imple
 	protected abstract String makeQuote(A arg);
 
 	@Override
-	public M rewrite(M decl, A arg) {
+	public M rewrite(M decl, ImportManager importManager, A arg) {
 		decl = makeDecl(decl, arg);
 
 		if (GenSettings.generateDocs) {

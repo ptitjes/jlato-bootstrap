@@ -20,30 +20,30 @@ public abstract class TypePattern<A, T extends TypeDecl> implements DeclPattern<
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public TypeDecl rewrite(TypeDecl decl, A arg) {
+	public TypeDecl rewrite(TypeDecl decl, ImportManager importManager, A arg) {
 		for (DeclContribution<A, MemberDecl> contribution : contributions) {
-			decl = applyContribution((T) decl, arg, contribution);
+			decl = applyContribution((T) decl, importManager, arg, contribution);
 		}
 		return decl;
 	}
 
-	private T applyContribution(T decl, A arg, DeclContribution<A, MemberDecl> contribution) {
+	private T applyContribution(T decl, ImportManager importManager, A arg, DeclContribution<A, MemberDecl> contribution) {
 		for (DeclPattern<A, ? extends MemberDecl> declaration : contribution.declarations(arg)) {
-			decl = contributeMember(decl, declaration, arg);
+			decl = contributeMember(decl, importManager, declaration, arg);
 		}
 		return decl;
 	}
 
 	@SuppressWarnings("unchecked")
-	private <M extends MemberDecl> T contributeMember(T type, DeclPattern<A, M> pattern, A arg) {
+	private <M extends MemberDecl> T contributeMember(T type, ImportManager importManager, DeclPattern<A, M> pattern, A arg) {
 		final Pattern<? extends M> matcher = (Pattern<? extends M>) pattern.matcher(arg);
-		final MatchVisitor<M> visitor = (m, s) -> pattern.rewrite(m, arg);
+		final MatchVisitor<M> visitor = (m, s) -> pattern.rewrite(m, importManager, arg);
 
 		if (type.findAll(pattern.matcher(arg)).iterator().hasNext()) {
 			return forAll(type, matcher, visitor);
 		} else {
 			final M member = matcher.build();
-			return appendMember(type, pattern.rewrite(member, arg));
+			return appendMember(type, pattern.rewrite(member, importManager, arg));
 		}
 	}
 

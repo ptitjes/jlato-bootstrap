@@ -3,11 +3,10 @@ package org.jlato.bootstrap.ast;
 import org.jlato.bootstrap.GenSettings;
 import org.jlato.bootstrap.Utils;
 import org.jlato.bootstrap.descriptors.TreeInterfaceDescriptor;
-import org.jlato.bootstrap.descriptors.TreeInterfaceDescriptor;
 import org.jlato.bootstrap.util.DeclContribution;
 import org.jlato.bootstrap.util.DeclPattern;
+import org.jlato.bootstrap.util.ImportManager;
 import org.jlato.rewrite.Pattern;
-import org.jlato.tree.NodeList;
 import org.jlato.tree.decl.Decl;
 import org.jlato.tree.decl.FormalParameter;
 import org.jlato.tree.decl.MemberDecl;
@@ -18,9 +17,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.jlato.rewrite.Quotes.memberDecl;
-import static org.jlato.rewrite.Quotes.stmt;
-import static org.jlato.tree.NodeOption.some;
-import static org.jlato.tree.TreeFactory.blockStmt;
 
 /**
  * @author Didier Villevalois
@@ -54,7 +50,7 @@ public class TreeInterfaceAccessors implements DeclContribution<TreeInterfaceDes
 		}
 
 		@Override
-		public MethodDecl rewrite(MethodDecl decl, TreeInterfaceDescriptor arg) {
+		public MethodDecl rewrite(MethodDecl decl, ImportManager importManager, TreeInterfaceDescriptor arg) {
 			if (GenSettings.generateDocs)
 				decl = decl.insertLeadingComment(
 						genDoc(decl,
@@ -82,7 +78,7 @@ public class TreeInterfaceAccessors implements DeclContribution<TreeInterfaceDes
 		}
 
 		@Override
-		public MethodDecl rewrite(MethodDecl decl, TreeInterfaceDescriptor arg) {
+		public MethodDecl rewrite(MethodDecl decl, ImportManager importManager, TreeInterfaceDescriptor arg) {
 			if (GenSettings.generateDocs)
 				decl = decl.insertLeadingComment(
 						genDoc(decl,
@@ -110,7 +106,7 @@ public class TreeInterfaceAccessors implements DeclContribution<TreeInterfaceDes
 		}
 
 		@Override
-		public MethodDecl rewrite(MethodDecl decl, TreeInterfaceDescriptor arg) {
+		public MethodDecl rewrite(MethodDecl decl, ImportManager importManager, TreeInterfaceDescriptor arg) {
 
 			if (GenSettings.generateDocs)
 				decl = decl.insertLeadingComment(

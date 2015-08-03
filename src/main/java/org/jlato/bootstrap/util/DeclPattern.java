@@ -13,5 +13,5 @@ public interface DeclPattern<A, D extends Decl> {
 
 	Pattern<? extends Decl> matcher(A arg);
 
-	D rewrite(D decl, A arg);
+	D rewrite(D decl, ImportManager importManager, A arg);
 }

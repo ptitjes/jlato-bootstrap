@@ -27,6 +27,7 @@ import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.ast.TreeFactoryClass;
 import org.jlato.bootstrap.descriptors.TreeInterfaceDescriptor;
 import org.jlato.bootstrap.util.DeclPattern;
+import org.jlato.bootstrap.util.ImportManager;
 import org.jlato.parser.ParseException;
 import org.jlato.parser.Parser;
 import org.jlato.parser.ParserConfiguration;
@@ -49,8 +50,6 @@ public class Bootstrap {
 	public static void main(String[] args) throws IOException, ParseException {
 		new Bootstrap().generate();
 	}
-
-	private static final boolean REPLACE = true;
 
 	public void generate() throws IOException, ParseException {
 		Parser parser = new Parser(ParserConfiguration.Default.preserveWhitespaces(true));
@@ -77,7 +76,7 @@ public class Bootstrap {
 		final KindEnum kindEnumPattern = new KindEnum();
 		treeSet = applyPattern(treeSet, "org/jlato/tree/Kind.java", kindEnumPattern, classDescriptors);
 
-		// Generate Kind enum
+		// Generate TreeFactory
 		final TreeFactoryClass treeFactoryClassPattern = new TreeFactoryClass();
 		treeSet = applyPattern(treeSet, "org/jlato/tree/TreeFactory.java", treeFactoryClassPattern, classDescriptors);
 
@@ -88,8 +87,10 @@ public class Bootstrap {
 		final CompilationUnit cu = treeSet.get(path);
 
 		final Pattern<? extends Decl> matcher = pattern.matcher(descriptor);
-		final MatchVisitor<Decl> visitor = (c, s) -> pattern.rewrite((T) (REPLACE ? matcher.build() : c), descriptor);
-		final CompilationUnit newCU = cu.forAll(matcher, visitor);
+		ImportManager importManager = new ImportManager(cu.imports());
+		final MatchVisitor<Decl> visitor = (c, s) -> pattern.rewrite((T) (GenSettings.replace ? matcher.build() : c), importManager, descriptor);
+		final CompilationUnit newCU = cu.forAll(matcher, visitor)
+				.withImports(importManager.imports());
 		return treeSet.put(path, newCU);
 	}
 }

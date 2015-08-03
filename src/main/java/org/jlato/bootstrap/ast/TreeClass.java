@@ -5,6 +5,7 @@ import org.jlato.bootstrap.Utils;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.descriptors.TreeTypeDescriptor;
 import org.jlato.bootstrap.util.DeclContribution;
+import org.jlato.bootstrap.util.ImportManager;
 import org.jlato.bootstrap.util.TypePattern;
 import org.jlato.rewrite.Pattern;
 import org.jlato.tree.NodeList;
@@ -44,8 +45,8 @@ public class TreeClass extends TypePattern.OfClass<TreeClassDescriptor> {
 	}
 
 	@Override
-	public TypeDecl rewrite(TypeDecl decl, TreeClassDescriptor arg) {
-		ClassDecl classDecl = (ClassDecl) super.rewrite(decl, arg);
+	public TypeDecl rewrite(TypeDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
+		ClassDecl classDecl = (ClassDecl) super.rewrite(decl, importManager, arg);
 
 		classDecl = classDecl
 				.withExtendsClause(some(

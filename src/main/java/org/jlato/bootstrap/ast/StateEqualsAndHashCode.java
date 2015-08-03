@@ -5,6 +5,7 @@ import org.jlato.bootstrap.Utils;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.util.DeclContribution;
 import org.jlato.bootstrap.util.DeclPattern;
+import org.jlato.bootstrap.util.ImportManager;
 import org.jlato.rewrite.Pattern;
 import org.jlato.rewrite.Substitution;
 import org.jlato.tree.NodeList;
@@ -14,7 +15,6 @@ import org.jlato.tree.decl.MemberDecl;
 import org.jlato.tree.decl.MethodDecl;
 import org.jlato.tree.expr.Expr;
 import org.jlato.tree.expr.FieldAccessExpr;
-import org.jlato.tree.expr.LiteralExpr;
 import org.jlato.tree.name.Name;
 import org.jlato.tree.stmt.Stmt;
 import org.jlato.tree.type.PrimitiveType;
@@ -54,7 +54,7 @@ public class StateEqualsAndHashCode implements DeclContribution<TreeClassDescrip
 		public static final Name EQUALS = new Name("equals");
 
 		@Override
-		public MethodDecl rewrite(MethodDecl decl, TreeClassDescriptor arg) {
+		public MethodDecl rewrite(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
 			final NodeList<FormalParameter> params = arg.parameters;
 
 			NodeList<Stmt> stmts = NodeList.empty();
@@ -114,7 +114,7 @@ public class StateEqualsAndHashCode implements DeclContribution<TreeClassDescrip
 		}
 
 		@Override
-		public MethodDecl rewrite(MethodDecl decl, TreeClassDescriptor arg) {
+		public MethodDecl rewrite(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
 			NodeList<Stmt> stmts = NodeList.empty();
 
 			stmts = stmts.append(stmt("int result = 17;").build());

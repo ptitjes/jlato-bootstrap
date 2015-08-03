@@ -3,10 +3,10 @@ package org.jlato.bootstrap.ast;
 import org.jlato.bootstrap.GenSettings;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.util.DeclPattern;
+import org.jlato.bootstrap.util.ImportManager;
 import org.jlato.rewrite.Pattern;
 import org.jlato.tree.NodeList;
 import org.jlato.tree.decl.*;
-import org.jlato.tree.name.Name;
 
 import static org.jlato.rewrite.Quotes.typeDecl;
 import static org.jlato.tree.TreeFactory.enumConstantDecl;
@@ -24,7 +24,7 @@ public class KindEnum implements DeclPattern<TreeClassDescriptor[], EnumDecl> {
 	}
 
 	@Override
-	public EnumDecl rewrite(EnumDecl decl, TreeClassDescriptor[] arg) {
+	public EnumDecl rewrite(EnumDecl decl, ImportManager importManager, TreeClassDescriptor[] arg) {
 		decl = enumDecl(name("Kind"))
 				.withModifiers(NodeList.of(Modifier.Public));
 
