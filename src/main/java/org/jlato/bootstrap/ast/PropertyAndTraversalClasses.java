@@ -4,11 +4,10 @@ import org.jlato.bootstrap.Utils;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.util.DeclContribution;
 import org.jlato.bootstrap.util.DeclPattern;
+import org.jlato.bootstrap.util.ImportManager;
 import org.jlato.bootstrap.util.MemberPattern;
-import org.jlato.rewrite.Pattern;
 import org.jlato.tree.NodeList;
 import org.jlato.tree.decl.*;
-import org.jlato.tree.expr.LiteralExpr;
 import org.jlato.tree.name.Name;
 import org.jlato.tree.type.QualifiedType;
 import org.jlato.tree.type.Type;
@@ -16,7 +15,6 @@ import org.jlato.tree.type.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.jlato.rewrite.Quotes.typeDecl;
 import static org.jlato.tree.NodeOption.some;
 import static org.jlato.tree.TreeFactory.*;
 
@@ -73,7 +71,7 @@ public class PropertyAndTraversalClasses extends Utils implements DeclContributi
 		}
 
 		@Override
-		protected FieldDecl makeDecl(FieldDecl decl, TreeClassDescriptor arg) {
+		protected FieldDecl makeDecl(FieldDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
 			Type treeType = param.type();
 			String traversalName = param.id().name().id();
 			String constantName = constantName(traversalName, treeType);
@@ -160,7 +158,7 @@ public class PropertyAndTraversalClasses extends Utils implements DeclContributi
 		}
 
 		@Override
-		protected FieldDecl makeDecl(FieldDecl decl, TreeClassDescriptor arg) {
+		protected FieldDecl makeDecl(FieldDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
 			Type treeType = param.type();
 			String traversalName = param.id().name().id();
 			String constantName = constantName(traversalName, treeType);

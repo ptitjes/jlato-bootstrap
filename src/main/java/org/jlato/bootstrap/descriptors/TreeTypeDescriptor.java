@@ -1,11 +1,15 @@
 package org.jlato.bootstrap.descriptors;
 
+import org.jlato.bootstrap.util.ImportManager;
 import org.jlato.tree.NodeList;
 import org.jlato.tree.decl.FormalParameter;
 import org.jlato.tree.decl.MemberDecl;
 import org.jlato.tree.name.Name;
 import org.jlato.tree.name.QualifiedName;
 import org.jlato.tree.type.QualifiedType;
+
+import java.util.Arrays;
+import java.util.List;
 
 import static org.jlato.tree.NodeOption.some;
 import static org.jlato.tree.TreeFactory.qualifiedType;
@@ -16,6 +20,23 @@ import static org.jlato.tree.TreeFactory.qualifiedType;
 public abstract class TreeTypeDescriptor {
 
 	public static final Name TREE_NAME = new Name("Tree");
+
+	public static final Name NODE_LIST = new Name("NodeList");
+	public static final Name NODE_OPTION = new Name("NodeOption");
+	public static final Name NODE_EITHER = new Name("NodeEither");
+	public static final Name TREE_SET = new Name("TreeSet");
+	public static final List<Name> NODE_CONTAINERS = Arrays.asList(
+			NODE_LIST, NODE_EITHER, NODE_OPTION, TREE_SET
+	);
+
+	public static final Name ASSIGN_OP = new Name("AssignOp");
+	public static final Name BINARY_OP = new Name("BinaryOp");
+	public static final Name UNARY_OP = new Name("UnaryOp");
+	public static final Name PRIMITIVE = new Name("Primitive");
+	public static final List<Name> VALUE_ENUMS = Arrays.asList(
+			ASSIGN_OP, BINARY_OP, UNARY_OP, PRIMITIVE
+	);
+
 	public static final Name TREE_BASE_NAME = new Name("TreeBase");
 	public static final Name STATE_NAME = new Name("State");
 	public static final Name STREE_STATE_NAME = new Name("STreeState");
@@ -42,9 +63,9 @@ public abstract class TreeTypeDescriptor {
 
 	public abstract boolean isInterface();
 
-	public abstract QualifiedName packageQualifiedName();
+	public abstract QualifiedName packageQualifiedName(ImportManager importManager);
 
-	public abstract QualifiedName qualifiedName();
+	public abstract QualifiedName qualifiedName(ImportManager importManager);
 
 	public abstract String treeFilePath();
 

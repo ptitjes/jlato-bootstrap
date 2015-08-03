@@ -1,15 +1,19 @@
 package org.jlato.bootstrap.descriptors;
 
-import org.jlato.tree.NodeList;
+import org.jlato.bootstrap.util.ImportManager;
+import org.jlato.tree.*;
 import org.jlato.tree.decl.FormalParameter;
 import org.jlato.tree.decl.MemberDecl;
 import org.jlato.tree.expr.Expr;
-import org.jlato.tree.name.Name;
-import org.jlato.tree.type.QualifiedType;
+import org.jlato.tree.name.*;
+import org.jlato.tree.type.*;
 
 import java.util.HashMap;
 
+import static org.jlato.bootstrap.descriptors.TreeTypeDescriptor.*;
 import static org.jlato.rewrite.Quotes.*;
+import static org.jlato.tree.NodeOption.some;
+import static org.jlato.tree.TreeFactory.qualifiedName;
 
 /**
  * @author Didier Villevalois
@@ -20,9 +24,62 @@ public class AllDescriptors {
 		return perName.get(name);
 	}
 
+	public static void addImports(ImportManager importManager, NodeList<? extends Type> types) {
+		for (Type type : types) {
+			addImports(importManager, type);
+		}
+	}
+
+	public static void addImports(ImportManager importManager, Type type) {
+		if (type instanceof QualifiedType) {
+			final QualifiedType qualifiedType = (QualifiedType) type;
+			final QualifiedName resolved = resolve(importManager, qualifiedType.name());
+			if (resolved != null) importManager.addImportByName(resolved);
+
+			final NodeOption<QualifiedType> scope = qualifiedType.scope();
+			if (scope.isDefined()) addImports(importManager, scope.get());
+
+			// Poor man's name resolution needs some dirty hacks
+			final String id = qualifiedType.name().id();
+			if (id.equals("Class")) return;
+
+			final NodeOption<NodeList<Type>> typeArgs = qualifiedType.typeArgs();
+			if (typeArgs.isDefined()) addImports(importManager, typeArgs.get());
+		} else if (type instanceof WildcardType) {
+			final WildcardType wildcardType = (WildcardType) type;
+
+			final NodeOption<ReferenceType> ext = wildcardType.ext();
+			if (ext.isDefined()) addImports(importManager, ext.get());
+
+			final NodeOption<ReferenceType> sup = wildcardType.sup();
+			if (sup.isDefined()) addImports(importManager, sup.get());
+		}
+	}
+
+	public static QualifiedName resolve(ImportManager importManager, Name name) {
+		final QualifiedName packageName = importManager.packageName;
+		final QualifiedName treeRoot = packageName.qualifier().get();
+
+		final String id = name.id();
+		if (id.equals("Class") || id.equals("String")) {
+			return null;
+		} else if (name.equals(TREE_NAME) || NODE_CONTAINERS.contains(name)) {
+			return qualifiedName(name).withQualifier(some(treeRoot));
+		} else if (VALUE_ENUMS.contains(name)) {
+			return null;
+		}
+
+		final TreeTypeDescriptor descriptor = perName.get(name);
+		if (descriptor == null)
+			throw new IllegalArgumentException("Can't resolve name '" + name + "'");
+		if (descriptor.packageQualifiedName(importManager).equals(importManager.packageName))
+			return null;
+		return descriptor.qualifiedName(importManager);
+	}
+
 	private static final HashMap<Name, TreeTypeDescriptor> perName = new HashMap<>();
 
-	public static final TreeInterfaceDescriptor[] ALL_INTERFACES = new TreeInterfaceDescriptor[] {
+	public static final TreeInterfaceDescriptor[] ALL_INTERFACES = new TreeInterfaceDescriptor[]{
 			new TreeInterfaceDescriptor(new Name("decl"), new Name("Decl"), "declaration",
 					NodeList.of(
 							(QualifiedType) type("Tree").build()
@@ -177,7 +234,7 @@ public class AllDescriptors {
 	};
 
 
-	public static final TreeClassDescriptor[] ALL_CLASSES = new TreeClassDescriptor[] {
+	public static final TreeClassDescriptor[] ALL_CLASSES = new TreeClassDescriptor[]{
 			new TreeClassDescriptor(new Name("decl"), new Name("AnnotationDecl"), "annotation type declaration",
 					NodeList.of(
 							(QualifiedType) type("TypeDecl").build()

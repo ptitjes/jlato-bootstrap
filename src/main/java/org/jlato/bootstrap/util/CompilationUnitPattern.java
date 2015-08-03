@@ -27,7 +27,7 @@ public abstract class CompilationUnitPattern<A> {
 
 		ImportManager importManager = new ImportManager(packageName, newCU.imports());
 		newCU = rewrite(newCU, importManager, arg);
-		newCU.withImports(importManager.imports());
+		newCU = newCU.withImports(importManager.imports());
 
 		return treeSet.put(path, newCU);
 	}

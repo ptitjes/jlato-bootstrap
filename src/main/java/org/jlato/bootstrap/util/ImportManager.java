@@ -77,6 +77,20 @@ public class ImportManager {
 		}
 	}
 
+	public void addImportsByName(NodeList<QualifiedName> qualifiedNames) {
+		addImports(qualifiedNames.map(n -> importDecl(n)));
+	}
+
+	public void addImportByName(QualifiedName qualifiedName) {
+		addImport(importDecl(qualifiedName));
+	}
+
+	public void addImports(NodeList<ImportDecl> importDecls) {
+		for (ImportDecl importDecl : importDecls) {
+			addImport(importDecl);
+		}
+	}
+
 	public void addImport(ImportDecl importDecl) {
 		final QualifiedName name = importDecl.name();
 

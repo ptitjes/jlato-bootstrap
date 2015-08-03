@@ -21,7 +21,7 @@ public abstract class MemberPattern<A, M extends MemberDecl> extends Utils imple
 
 	@Override
 	public M rewrite(M decl, ImportManager importManager, A arg) {
-		decl = makeDecl(decl, arg);
+		decl = makeDecl(decl, importManager, arg);
 
 		if (GenSettings.generateDocs) {
 			final String doc = makeDoc(decl, arg);
@@ -31,7 +31,7 @@ public abstract class MemberPattern<A, M extends MemberDecl> extends Utils imple
 		return decl;
 	}
 
-	protected abstract M makeDecl(M decl, A arg);
+	protected abstract M makeDecl(M decl, ImportManager importManager, A arg);
 
 	protected abstract String makeDoc(M decl, A arg);
 

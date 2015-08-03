@@ -3,6 +3,7 @@ package org.jlato.bootstrap.ast;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.descriptors.TreeTypeDescriptor;
 import org.jlato.bootstrap.util.DeclContribution;
+import org.jlato.bootstrap.util.ImportManager;
 import org.jlato.bootstrap.util.TypePattern;
 import org.jlato.tree.*;
 import org.jlato.tree.decl.*;
@@ -28,7 +29,7 @@ class StateClass extends TypePattern.OfClass<TreeClassDescriptor> {
 	}
 
 	@Override
-	protected ClassDecl contributeSignature(ClassDecl decl, TreeClassDescriptor arg) {
+	protected ClassDecl contributeSignature(ClassDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
 		decl = decl
 				.withExtendsClause(some(
 						qualifiedType(TreeTypeDescriptor.SNODE_STATE_NAME)

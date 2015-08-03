@@ -1,7 +1,6 @@
 package org.jlato.bootstrap.util;
 
 import org.jlato.bootstrap.GenSettings;
-import org.jlato.bootstrap.descriptors.TreeInterfaceDescriptor;
 import org.jlato.rewrite.MatchVisitor;
 import org.jlato.rewrite.Pattern;
 import org.jlato.rewrite.TypeSafeMatcher;
@@ -31,7 +30,7 @@ public abstract class TypePattern<A, T extends TypeDecl> implements DeclPattern<
 			decl = insertJavadoc((T) decl, doc);
 		}
 
-		decl = contributeSignature((T) decl, arg);
+		decl = contributeSignature((T) decl, importManager, arg);
 		decl = ensureBody((T) decl);
 		for (DeclContribution<A, MemberDecl> contribution : contributions(arg)) {
 			decl = applyContribution((T) decl, importManager, arg, contribution);
@@ -43,7 +42,7 @@ public abstract class TypePattern<A, T extends TypeDecl> implements DeclPattern<
 
 	protected abstract String makeDoc(T decl, A arg);
 
-	protected T contributeSignature(T decl, A arg) {
+	protected T contributeSignature(T decl, ImportManager importManager, A arg) {
 		return decl;
 	}
 

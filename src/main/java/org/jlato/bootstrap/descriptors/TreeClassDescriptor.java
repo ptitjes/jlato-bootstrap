@@ -1,6 +1,7 @@
 package org.jlato.bootstrap.descriptors;
 
 import org.jlato.bootstrap.Utils;
+import org.jlato.bootstrap.util.ImportManager;
 import org.jlato.tree.NodeList;
 import org.jlato.tree.TreeFactory;
 import org.jlato.tree.decl.FormalParameter;
@@ -10,8 +11,6 @@ import org.jlato.tree.name.Name;
 import org.jlato.tree.name.QualifiedName;
 import org.jlato.tree.type.QualifiedType;
 
-import static org.jlato.rewrite.Quotes.type;
-import static org.jlato.rewrite.Quotes.param;
 import static org.jlato.tree.NodeOption.some;
 import static org.jlato.tree.TreeFactory.qualifiedName;
 import static org.jlato.tree.TreeFactory.qualifiedType;
@@ -46,13 +45,14 @@ public class TreeClassDescriptor extends TreeTypeDescriptor {
 	}
 
 	@Override
-	public QualifiedName qualifiedName() {
-		return TreeFactory.qualifiedName("org.jlato.tree." + packageName + "." + name);
+	public QualifiedName qualifiedName(ImportManager importManager) {
+		return TreeFactory.qualifiedName(name).withQualifier(some(packageQualifiedName(importManager)));
 	}
 
 	@Override
-	public QualifiedName packageQualifiedName() {
-		return TreeFactory.qualifiedName("org.jlato.tree." + packageName);
+	public QualifiedName packageQualifiedName(ImportManager importManager) {
+		final QualifiedName treeRoot = importManager.packageName.qualifier().get();
+		return TreeFactory.qualifiedName(packageName).withQualifier(some(treeRoot));
 	}
 
 	@Override

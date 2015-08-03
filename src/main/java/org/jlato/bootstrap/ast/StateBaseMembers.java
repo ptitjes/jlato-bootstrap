@@ -5,12 +5,10 @@ import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.descriptors.TreeTypeDescriptor;
 import org.jlato.bootstrap.util.DeclContribution;
 import org.jlato.bootstrap.util.DeclPattern;
+import org.jlato.bootstrap.util.ImportManager;
 import org.jlato.bootstrap.util.MemberPattern;
 import org.jlato.tree.NodeList;
 import org.jlato.tree.decl.*;
-import org.jlato.tree.expr.AssignExpr;
-import org.jlato.tree.expr.AssignOp;
-import org.jlato.tree.expr.LiteralExpr;
 import org.jlato.tree.expr.ObjectCreationExpr;
 import org.jlato.tree.name.Name;
 
@@ -78,7 +76,7 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 		}
 
 		@Override
-		protected ConstructorDecl makeDecl(ConstructorDecl decl, TreeClassDescriptor arg) {
+		protected ConstructorDecl makeDecl(ConstructorDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
 			final NodeList<FormalParameter> stateParameters = arg.stateParameters();
 			return constructorDecl(TreeTypeDescriptor.STATE_NAME,
 					blockStmt().withStmts(
@@ -106,7 +104,7 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 		}
 
 		@Override
-		protected MethodDecl makeDecl(MethodDecl decl, TreeClassDescriptor arg) {
+		protected MethodDecl makeDecl(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
 			return decl.withBody(some(blockStmt().withStmts(NodeList.of(
 					stmt("return Kind." + arg.name + ";").build()
 			))));
@@ -129,7 +127,7 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 		}
 
 		@Override
-		protected MethodDecl makeDecl(MethodDecl decl, TreeClassDescriptor arg) {
+		protected MethodDecl makeDecl(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
 			return decl.withBody(some(blockStmt().withStmts(NodeList.of(
 					stmt("return new " + arg.name + "(location);").build()
 			))));
@@ -152,7 +150,7 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 		}
 
 		@Override
-		protected MethodDecl makeDecl(MethodDecl decl, TreeClassDescriptor arg) {
+		protected MethodDecl makeDecl(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
 			return decl.withBody(some(blockStmt().withStmts(NodeList.of(
 					stmt("return shape;").build()
 			))));
@@ -184,7 +182,7 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 		}
 
 		@Override
-		protected MethodDecl makeDecl(MethodDecl decl, TreeClassDescriptor arg) {
+		protected MethodDecl makeDecl(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
 			return decl.withBody(some(blockStmt().withStmts(NodeList.of(
 					stmt("return " + (param == null ? "null" : constantName(param)) + ";").build()
 			))));
@@ -214,7 +212,7 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 		}
 
 		@Override
-		protected MethodDecl makeDecl(MethodDecl decl, TreeClassDescriptor arg) {
+		protected MethodDecl makeDecl(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
 			return decl.withBody(some(blockStmt().withStmts(NodeList.of(
 					params.size() == 1 ?
 							stmt("return Collections.<SProperty>singleton(" + constantName(params.first()) + ");").build() :
@@ -248,7 +246,7 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 		}
 
 		@Override
-		protected FieldDecl makeDecl(FieldDecl decl, TreeClassDescriptor arg) {
+		protected FieldDecl makeDecl(FieldDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
 			return decl;
 		}
 
@@ -274,7 +272,7 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 		}
 
 		@Override
-		protected MethodDecl makeDecl(MethodDecl decl, TreeClassDescriptor arg) {
+		protected MethodDecl makeDecl(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
 			return decl.withBody(some(blockStmt().withStmts(NodeList.of(
 					returnStmt().withExpr(some(param.id().name()))
 			))));
@@ -304,7 +302,7 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 		}
 
 		@Override
-		protected MethodDecl makeDecl(MethodDecl decl, TreeClassDescriptor arg) {
+		protected MethodDecl makeDecl(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
 			final ObjectCreationExpr stateCreationExpr = objectCreationExpr(arg.stateType())
 					.withArgs(arg.parameters.map(p -> p.id().name()));
 

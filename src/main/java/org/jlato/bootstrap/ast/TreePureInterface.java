@@ -1,9 +1,11 @@
 package org.jlato.bootstrap.ast;
 
 import org.jlato.bootstrap.Utils;
+import org.jlato.bootstrap.descriptors.AllDescriptors;
 import org.jlato.bootstrap.descriptors.TreeTypeDescriptor;
 import org.jlato.bootstrap.util.CompilationUnitPattern;
 import org.jlato.bootstrap.util.DeclContribution;
+import org.jlato.bootstrap.util.ImportManager;
 import org.jlato.bootstrap.util.TypePattern;
 import org.jlato.tree.*;
 import org.jlato.tree.decl.*;
@@ -32,8 +34,9 @@ public class TreePureInterface extends CompilationUnitPattern<TreeTypeDescriptor
 							}
 
 							@Override
-							protected InterfaceDecl contributeSignature(InterfaceDecl decl, TreeTypeDescriptor arg) {
+							protected InterfaceDecl contributeSignature(InterfaceDecl decl, ImportManager importManager, TreeTypeDescriptor arg) {
 								NodeList<QualifiedType> parentInterfaces = arg.superInterfaces;
+								AllDescriptors.addImports(importManager, parentInterfaces);
 								return decl.withExtendsClause(parentInterfaces);
 							}
 

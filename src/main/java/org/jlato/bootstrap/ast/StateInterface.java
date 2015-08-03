@@ -3,6 +3,7 @@ package org.jlato.bootstrap.ast;
 import org.jlato.bootstrap.descriptors.TreeInterfaceDescriptor;
 import org.jlato.bootstrap.descriptors.TreeTypeDescriptor;
 import org.jlato.bootstrap.util.DeclContribution;
+import org.jlato.bootstrap.util.ImportManager;
 import org.jlato.bootstrap.util.TypePattern;
 import org.jlato.tree.*;
 import org.jlato.tree.decl.*;
@@ -29,7 +30,7 @@ class StateInterface extends TypePattern.OfInterface<TreeInterfaceDescriptor> {
 	}
 
 	@Override
-	protected InterfaceDecl contributeSignature(InterfaceDecl decl, TreeInterfaceDescriptor arg) {
+	protected InterfaceDecl contributeSignature(InterfaceDecl decl, ImportManager importManager, TreeInterfaceDescriptor arg) {
 		NodeList<QualifiedType> parentInterfaces = arg.superInterfaces;
 		boolean treeInterfaceChild = parentInterfaces.size() == 1 && parentInterfaces.get(0).name().equals(TreeTypeDescriptor.TREE_NAME);
 
