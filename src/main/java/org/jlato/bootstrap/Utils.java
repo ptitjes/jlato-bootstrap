@@ -102,6 +102,10 @@ public class Utils {
 		return markerAnnotationExpr().withName(qualifiedName("Override"));
 	}
 
+	public static AnnotationExpr deprecatedAnn() {
+		return markerAnnotationExpr().withName(qualifiedName("Deprecated"));
+	}
+
 	public static NodeList<FormalParameter> deriveStateParams(NodeList<FormalParameter> treeConstructorParams) {
 		NodeList<FormalParameter> stateConstructorParams = NodeList.empty();
 		for (FormalParameter param : treeConstructorParams) {

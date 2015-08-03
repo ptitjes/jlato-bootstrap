@@ -16,6 +16,7 @@ import org.jlato.tree.type.PrimitiveType;
 import org.jlato.tree.type.QualifiedType;
 import org.jlato.tree.type.Type;
 
+import static org.jlato.rewrite.Quotes.memberDecl;
 import static org.jlato.rewrite.Quotes.typeDecl;
 import static org.jlato.tree.NodeOption.none;
 import static org.jlato.tree.NodeOption.some;
@@ -43,12 +44,77 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 		NodeList<MemberDecl> factoryMethods = NodeList.empty();
 		for (TreeClassDescriptor descriptor : arg) {
 			if (descriptor.customTailored) continue;
-			if (descriptor.name.id().equals("LiteralExpr")) continue;
 
-			factoryMethods = factoryMethods.append(generateFactoryMethod(descriptor, false));
+			if (!descriptor.name.id().equals("LiteralExpr")) {
+				if (!noNullsFormHasNoParams(descriptor))
+					factoryMethods = factoryMethods.append(generateFactoryMethod(descriptor, false));
+				factoryMethods = factoryMethods.append(generateFactoryMethod(descriptor, true));
+			}
+
+			if (descriptor.name.id().equals("QualifiedName")) {
+				factoryMethods = factoryMethods.append(memberDecl("public static QualifiedName qualifiedName(String nameString) {\n" +
+						"\t\tfinal String[] split = nameString.split(\"\\\\.\");\n" +
+						"\t\tQualifiedName name = null;\n" +
+						"\t\tfor (String part : split) {\n" +
+						"\t\t\tname = new QualifiedName(NodeOption.of(name), new Name(part));\n" +
+						"\t\t}\n" +
+						"\t\treturn name;\n" +
+						"\t}").build());
+			} else if (descriptor.name.id().equals("LiteralExpr")) {
+				factoryMethods = factoryMethods.append(memberDecl("public static LiteralExpr<Void> nullLiteralExpr() {\n" +
+						"\treturn new LiteralExpr<Void>(Void.class, Literals.from(Void.class, null));\n" +
+						"}").build());
+				factoryMethods = factoryMethods.append(memberDecl("public static LiteralExpr<Boolean> literalExpr(boolean value) {\n" +
+						"\treturn new LiteralExpr<Boolean>(Boolean.class, Literals.from(Boolean.class, value));\n" +
+						"}").build());
+				factoryMethods = factoryMethods.append(memberDecl("public static LiteralExpr<Integer> literalExpr(int value) {\n" +
+						"\treturn new LiteralExpr<Integer>(Integer.class, Literals.from(Integer.class, value));\n" +
+						"}").build());
+				factoryMethods = factoryMethods.append(memberDecl("public static LiteralExpr<Long> literalExpr(long value) {\n" +
+						"\treturn new LiteralExpr<Long>(Long.class, Literals.from(Long.class, value));\n" +
+						"}").build());
+				factoryMethods = factoryMethods.append(memberDecl("public static LiteralExpr<Float> literalExpr(float value) {\n" +
+						"\treturn new LiteralExpr<Float>(Float.class, Literals.from(Float.class, value));\n" +
+						"}").build());
+				factoryMethods = factoryMethods.append(memberDecl("public static LiteralExpr<Double> literalExpr(double value) {\n" +
+						"\treturn new LiteralExpr<Double>(Double.class, Literals.from(Double.class, value));\n" +
+						"}").build());
+				factoryMethods = factoryMethods.append(memberDecl("public static LiteralExpr<Character> literalExpr(char value) {\n" +
+						"\treturn new LiteralExpr<Character>(Character.class, Literals.from(Character.class, value));\n" +
+						"}").build());
+				factoryMethods = factoryMethods.append(memberDecl("public static LiteralExpr<String> literalExpr(String value) {\n" +
+						"\treturn new LiteralExpr<String>(String.class, Literals.from(String.class, value));\n" +
+						"}").build());
+			}
 		}
 
 		return decl.withMembers(factoryMethods);
+	}
+
+	private boolean noNullsFormHasNoParams(TreeClassDescriptor descriptor) {
+		int count = 0;
+		int index = 0;
+		for (FormalParameter param : safeList(descriptor.parameters)) {
+			Type type = param.type();
+
+			final Expr defaultValue = descriptor.defaultValues.get(index);
+			if (defaultValue == null) {
+				if (type instanceof QualifiedType) {
+					final QualifiedType qualifiedType = (QualifiedType) type;
+					switch (qualifiedType.name().id()) {
+						case "NodeList":
+							break;
+						case "NodeOption":
+							break;
+						default:
+							count++;
+							break;
+					}
+				}
+			}
+			index++;
+		}
+		return count == 0;
 	}
 
 	private MethodDecl generateFactoryMethod(TreeClassDescriptor descriptor, boolean noNulls) {
@@ -107,7 +173,10 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 		);
 
 		MethodDecl method = methodDecl()
-				.withModifiers(m -> m.append(Modifier.Public).append(Modifier.Static))
+				.withModifiers(m -> noNulls ?
+								m.append(Modifier.Public).append(Modifier.Static) :
+								m.append(deprecatedAnn()).append(Modifier.Public).append(Modifier.Static)
+				)
 				.withType(resultType)
 				.withName(new Name(lowerCaseFirst(descriptor.name.id())))
 				.withParams(params)
