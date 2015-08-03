@@ -20,9 +20,13 @@ import static org.jlato.tree.TreeFactory.qualifiedName;
  */
 public class AllDescriptors {
 
-	public static final QualifiedName TREE_INTERFACES_ROOT = qualifiedName("org.jlato.tree2");
-	//	public static final QualifiedName TREE_IMPLEMENTATION_ROOT = qualifiedName("org.jlato.internal.tree");
-	public static final QualifiedName TREE_IMPLEMENTATION_ROOT = qualifiedName("org.jlato.tree");
+	public static final String TREE_INTERFACES_PATH = "org/jlato/tree";
+	public static final String TREE_IMPLEMENTATION_PATH = "org/jlato/internal/impl";
+	public static final QualifiedName TREE_INTERFACES_ROOT = qualifiedName(TREE_INTERFACES_PATH.replace('/', '.'));
+	public static final QualifiedName TREE_IMPLEMENTATION_ROOT = qualifiedName(TREE_IMPLEMENTATION_PATH.replace('/', '.'));
+
+//	public static final QualifiedName TREE_INTERFACES_ROOT = qualifiedName("org.jlato.tree2");
+//	public static final QualifiedName TREE_IMPLEMENTATION_ROOT = qualifiedName("org.jlato.tree");
 
 	public static TreeTypeDescriptor get(Name name) {
 		return perName.get(name);
@@ -1214,7 +1218,14 @@ public class AllDescriptors {
 					NodeList.of(
 							(QualifiedType) type("Expr").build()
 					),
-					NodeList.<MemberDecl>empty(),
+					NodeList.of(
+							memberDecl("public static final LexicalShape shape = token(new LSToken.Provider() {\n" +
+									"\t\tpublic LToken tokenFor(STree tree) {\n" +
+									"\t\t\tfinal String literalString = ((State) tree.state).literalString;\n" +
+									"\t\t\treturn new LToken(0, literalString); // TODO Fix\n" +
+									"\t\t}\n" +
+									"\t});").build()
+					),
 					NodeList.of(
 							param("Class<T> literalClass").build(),
 							param("String literalString").build()
