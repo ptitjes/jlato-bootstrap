@@ -99,7 +99,7 @@ public class Utils {
 	}
 
 	public static AnnotationExpr overrideAnn() {
-		return markerAnnotationExpr().withName(QualifiedName.of("Override"));
+		return markerAnnotationExpr().withName(qualifiedName("Override"));
 	}
 
 	public static NodeList<FormalParameter> deriveStateParams(NodeList<FormalParameter> treeConstructorParams) {

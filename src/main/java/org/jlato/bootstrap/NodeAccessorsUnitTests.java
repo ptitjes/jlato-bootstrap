@@ -305,27 +305,27 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 		private NodeList<MethodDecl> collectedTestMethods = NodeList.empty();
 
 		public NodeList<ImportDecl> imports = NodeList.of(
-				importDecl().withName(QualifiedName.of("org.jlato.tree")).setOnDemand(true),
-				importDecl().withName(QualifiedName.of("org.jlato.tree.decl")).setOnDemand(true),
-				importDecl().withName(QualifiedName.of("org.jlato.tree.expr")).setOnDemand(true),
-				importDecl().withName(QualifiedName.of("org.jlato.tree.expr.AssignExpr.AssignOp")),
-				importDecl().withName(QualifiedName.of("org.jlato.tree.expr.BinaryExpr.BinaryOp")),
-				importDecl().withName(QualifiedName.of("org.jlato.tree.expr.UnaryExpr.UnaryOp")),
-				importDecl().withName(QualifiedName.of("org.jlato.tree.name")).setOnDemand(true),
-				importDecl().withName(QualifiedName.of("org.jlato.tree.stmt")).setOnDemand(true),
-				importDecl().withName(QualifiedName.of("org.jlato.tree.type")).setOnDemand(true),
-				importDecl().withName(QualifiedName.of("org.jlato.tree.type.PrimitiveType.Primitive")),
-				importDecl().withName(QualifiedName.of("org.jlato.tree.TreeFactory")).setStatic(true).setOnDemand(true),
-				importDecl().withName(QualifiedName.of("org.jlato.unit.util.Arbitrary")),
-				importDecl().withName(QualifiedName.of("org.junit")).setOnDemand(true),
-				importDecl().withName(QualifiedName.of("org.junit.runner.RunWith")),
-				importDecl().withName(QualifiedName.of("org.junit.runners.JUnit4"))
+				importDecl().withName(qualifiedName("org.jlato.tree")).setOnDemand(true),
+				importDecl().withName(qualifiedName("org.jlato.tree.decl")).setOnDemand(true),
+				importDecl().withName(qualifiedName("org.jlato.tree.expr")).setOnDemand(true),
+				importDecl().withName(qualifiedName("org.jlato.tree.expr.AssignExpr.AssignOp")),
+				importDecl().withName(qualifiedName("org.jlato.tree.expr.BinaryExpr.BinaryOp")),
+				importDecl().withName(qualifiedName("org.jlato.tree.expr.UnaryExpr.UnaryOp")),
+				importDecl().withName(qualifiedName("org.jlato.tree.name")).setOnDemand(true),
+				importDecl().withName(qualifiedName("org.jlato.tree.stmt")).setOnDemand(true),
+				importDecl().withName(qualifiedName("org.jlato.tree.type")).setOnDemand(true),
+				importDecl().withName(qualifiedName("org.jlato.tree.type.PrimitiveType.Primitive")),
+				importDecl().withName(qualifiedName("org.jlato.tree.TreeFactory")).setStatic(true).setOnDemand(true),
+				importDecl().withName(qualifiedName("org.jlato.unit.util.Arbitrary")),
+				importDecl().withName(qualifiedName("org.junit")).setOnDemand(true),
+				importDecl().withName(qualifiedName("org.junit.runner.RunWith")),
+				importDecl().withName(qualifiedName("org.junit.runners.JUnit4"))
 		);
 
 		public void generateTestMethod(String name, NodeList<Stmt> stmts) {
 			MethodDecl testMethod = methodDecl()
 					.withModifiers(NodeList.of(
-							markerAnnotationExpr().withName(QualifiedName.of("Test")),
+							markerAnnotationExpr().withName(qualifiedName("Test")),
 							Modifier.Public
 					))
 					.withType(voidType())
@@ -343,7 +343,7 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 					classDecl()
 							.withModifiers(NodeList.of(
 									singleMemberAnnotationExpr()
-											.withName(QualifiedName.of("RunWith"))
+											.withName(qualifiedName("RunWith"))
 											.withMemberValue(classExpr().withType(qType("JUnit4"))),
 									Modifier.Public
 							))
@@ -355,7 +355,7 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 
 	private void writeTestClass(String packageName, String className, NodeList<ImportDecl> imports, ClassDecl classDecl) {
 		CompilationUnit cu = compilationUnit()
-				.withPackageDecl(packageDecl().withName(QualifiedName.of(packageName)))
+				.withPackageDecl(packageDecl().withName(qualifiedName(packageName)))
 				.withImports(imports)
 				.withTypes(NodeList.of(
 						classDecl
@@ -454,21 +454,21 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 
 	private void generateArbitrary() {
 		final NodeList<ImportDecl> imports = NodeList.of(
-				importDecl().withName(QualifiedName.of("org.jlato.tree")).setOnDemand(true),
-				importDecl().withName(QualifiedName.of("org.jlato.tree.decl")).setOnDemand(true),
-				importDecl().withName(QualifiedName.of("org.jlato.tree.expr")).setOnDemand(true),
-				importDecl().withName(QualifiedName.of("org.jlato.tree.expr.AssignExpr.AssignOp")),
-				importDecl().withName(QualifiedName.of("org.jlato.tree.expr.BinaryExpr.BinaryOp")),
-				importDecl().withName(QualifiedName.of("org.jlato.tree.expr.UnaryExpr.UnaryOp")),
-				importDecl().withName(QualifiedName.of("org.jlato.tree.name")).setOnDemand(true),
-				importDecl().withName(QualifiedName.of("org.jlato.tree.stmt")).setOnDemand(true),
-				importDecl().withName(QualifiedName.of("org.jlato.tree.type")).setOnDemand(true),
-				importDecl().withName(QualifiedName.of("org.jlato.tree.type.PrimitiveType.Primitive")),
-				importDecl().withName(QualifiedName.of("org.jlato.tree.TreeFactory")).setStatic(true).setOnDemand(true),
-				importDecl().withName(QualifiedName.of("org.jlato.unit.util.Arbitrary")),
-				importDecl().withName(QualifiedName.of("org.junit")).setOnDemand(true),
-				importDecl().withName(QualifiedName.of("org.junit.runner.RunWith")),
-				importDecl().withName(QualifiedName.of("org.junit.runners.JUnit4"))
+				importDecl().withName(qualifiedName("org.jlato.tree")).setOnDemand(true),
+				importDecl().withName(qualifiedName("org.jlato.tree.decl")).setOnDemand(true),
+				importDecl().withName(qualifiedName("org.jlato.tree.expr")).setOnDemand(true),
+				importDecl().withName(qualifiedName("org.jlato.tree.expr.AssignExpr.AssignOp")),
+				importDecl().withName(qualifiedName("org.jlato.tree.expr.BinaryExpr.BinaryOp")),
+				importDecl().withName(qualifiedName("org.jlato.tree.expr.UnaryExpr.UnaryOp")),
+				importDecl().withName(qualifiedName("org.jlato.tree.name")).setOnDemand(true),
+				importDecl().withName(qualifiedName("org.jlato.tree.stmt")).setOnDemand(true),
+				importDecl().withName(qualifiedName("org.jlato.tree.type")).setOnDemand(true),
+				importDecl().withName(qualifiedName("org.jlato.tree.type.PrimitiveType.Primitive")),
+				importDecl().withName(qualifiedName("org.jlato.tree.TreeFactory")).setStatic(true).setOnDemand(true),
+				importDecl().withName(qualifiedName("org.jlato.unit.util.Arbitrary")),
+				importDecl().withName(qualifiedName("org.junit")).setOnDemand(true),
+				importDecl().withName(qualifiedName("org.junit.runner.RunWith")),
+				importDecl().withName(qualifiedName("org.junit.runners.JUnit4"))
 		);
 
 		writeTestClass("org.jlato.unit.util", "Arbitrary", imports,

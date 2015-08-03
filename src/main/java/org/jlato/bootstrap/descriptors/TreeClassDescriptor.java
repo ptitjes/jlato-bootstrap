@@ -4,6 +4,7 @@ import org.jlato.bootstrap.Utils;
 import org.jlato.tree.NodeList;
 import org.jlato.tree.decl.FormalParameter;
 import org.jlato.tree.decl.MemberDecl;
+import org.jlato.tree.expr.Expr;
 import org.jlato.tree.name.Name;
 import org.jlato.tree.type.QualifiedType;
 
@@ -17,13 +18,17 @@ import static org.jlato.tree.TreeFactory.qualifiedType;
  */
 public class TreeClassDescriptor extends TreeTypeDescriptor {
 
+	public final NodeList<Expr> defaultValues;
 	public final boolean customTailored;
 
 	public TreeClassDescriptor(Name packageName, Name name, String description,
 	                           NodeList<QualifiedType> superInterfaces,
 	                           NodeList<MemberDecl> shapes,
-	                           NodeList<FormalParameter> parameters, boolean customTailored) {
+	                           NodeList<FormalParameter> parameters,
+	                           NodeList<Expr> defaultValues,
+	                           boolean customTailored) {
 		super(packageName, name, description, superInterfaces, shapes, parameters);
+		this.defaultValues = defaultValues;
 		this.customTailored = customTailored;
 	}
 

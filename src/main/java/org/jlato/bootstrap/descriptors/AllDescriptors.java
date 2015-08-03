@@ -3,14 +3,13 @@ package org.jlato.bootstrap.descriptors;
 import org.jlato.tree.NodeList;
 import org.jlato.tree.decl.FormalParameter;
 import org.jlato.tree.decl.MemberDecl;
+import org.jlato.tree.expr.Expr;
 import org.jlato.tree.name.Name;
 import org.jlato.tree.type.QualifiedType;
 
 import java.util.HashMap;
 
-import static org.jlato.rewrite.Quotes.memberDecl;
-import static org.jlato.rewrite.Quotes.param;
-import static org.jlato.rewrite.Quotes.type;
+import static org.jlato.rewrite.Quotes.*;
 
 /**
  * @author Didier Villevalois
@@ -23,13 +22,14 @@ public class AllDescriptors {
 
 	private static final HashMap<Name, TreeTypeDescriptor> perName = new HashMap<>();
 
-	public static final TreeInterfaceDescriptor[] ALL_INTERFACES = new TreeInterfaceDescriptor[]{
+	public static final TreeInterfaceDescriptor[] ALL_INTERFACES = new TreeInterfaceDescriptor[] {
 			new TreeInterfaceDescriptor(new Name("decl"), new Name("Decl"), "declaration",
 					NodeList.of(
 							(QualifiedType) type("Tree").build()
 					),
 					NodeList.<MemberDecl>empty(),
-					NodeList.<FormalParameter>empty()),
+					NodeList.<FormalParameter>empty()
+			),
 			new TreeInterfaceDescriptor(new Name("decl"), new Name("ExtendedModifier"), "extended modifier",
 					NodeList.of(
 							(QualifiedType) type("Tree").build()
@@ -52,7 +52,8 @@ public class AllDescriptors {
 									"\t\t\t)\n" +
 									"\t);").build()
 					),
-					NodeList.<FormalParameter>empty()),
+					NodeList.<FormalParameter>empty()
+			),
 			new TreeInterfaceDescriptor(new Name("decl"), new Name("MemberDecl"), "member declaration",
 					NodeList.of(
 							(QualifiedType) type("Decl").build()
@@ -82,7 +83,8 @@ public class AllDescriptors {
 									"\t\t\tnone().withSpacingAfter(spacing(ClassBody_AfterMembers))\n" +
 									"\t);").build()
 					),
-					NodeList.<FormalParameter>empty()),
+					NodeList.<FormalParameter>empty()
+			),
 			new TreeInterfaceDescriptor(new Name("decl"), new Name("TypeDecl"), "type declaration",
 					NodeList.of(
 							(QualifiedType) type("MemberDecl").build()
@@ -92,7 +94,8 @@ public class AllDescriptors {
 									"\t\t\tnone().withSpacingAfter(spacing(CompilationUnit_BetweenTopLevelDecl))\n" +
 									"\t);").build()
 					),
-					NodeList.<FormalParameter>empty()),
+					NodeList.<FormalParameter>empty()
+			),
 			new TreeInterfaceDescriptor(new Name("expr"), new Name("AnnotationExpr"), "annotation expression",
 					NodeList.of(
 							(QualifiedType) type("Expr").build(),
@@ -117,7 +120,8 @@ public class AllDescriptors {
 					),
 					NodeList.of(
 							param("QualifiedName name").build()
-					)),
+					)
+			),
 			new TreeInterfaceDescriptor(new Name("expr"), new Name("Expr"), "expression",
 					NodeList.of(
 							(QualifiedType) type("Tree").build()
@@ -132,7 +136,8 @@ public class AllDescriptors {
 									"\t\t\ttoken(LToken.Comma).withSpacingAfter(space())\n" +
 									"\t);").build()
 					),
-					NodeList.<FormalParameter>empty()),
+					NodeList.<FormalParameter>empty()
+			),
 			new TreeInterfaceDescriptor(new Name("stmt"), new Name("Stmt"), "statement",
 					NodeList.of(
 							(QualifiedType) type("Tree").build()
@@ -140,13 +145,15 @@ public class AllDescriptors {
 					NodeList.of(
 							memberDecl("LexicalShape listShape = list(none().withSpacingAfter(newLine()));").build()
 					),
-					NodeList.<FormalParameter>empty()),
+					NodeList.<FormalParameter>empty()
+			),
 			new TreeInterfaceDescriptor(new Name("type"), new Name("ReferenceType"), "reference type",
 					NodeList.of(
 							(QualifiedType) type("Type").build()
 					),
 					NodeList.<MemberDecl>empty(),
-					NodeList.<FormalParameter>empty()),
+					NodeList.<FormalParameter>empty()
+			),
 			new TreeInterfaceDescriptor(new Name("type"), new Name("Type"), "type",
 					NodeList.of(
 							(QualifiedType) type("Tree").build()
@@ -165,11 +172,12 @@ public class AllDescriptors {
 							memberDecl("LexicalShape intersectionShape = list(token(LToken.BinAnd).withSpacing(space(), space()));").build(),
 							memberDecl("LexicalShape unionShape = list(token(LToken.BinOr).withSpacing(space(), space()));").build()
 					),
-					NodeList.<FormalParameter>empty()),
+					NodeList.<FormalParameter>empty()
+			),
 	};
 
 
-	public static final TreeClassDescriptor[] ALL_CLASSES = new TreeClassDescriptor[]{
+	public static final TreeClassDescriptor[] ALL_CLASSES = new TreeClassDescriptor[] {
 			new TreeClassDescriptor(new Name("decl"), new Name("AnnotationDecl"), "annotation type declaration",
 					NodeList.of(
 							(QualifiedType) type("TypeDecl").build()
@@ -186,7 +194,13 @@ public class AllDescriptors {
 							param("NodeList<ExtendedModifier> modifiers").build(),
 							param("Name name").build(),
 							param("NodeList<MemberDecl> members").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("decl"), new Name("AnnotationMemberDecl"), "annotation type member declaration",
 					NodeList.of(
@@ -208,7 +222,15 @@ public class AllDescriptors {
 							param("Name name").build(),
 							param("NodeList<ArrayDim> dims").build(),
 							param("NodeOption<Expr> defaultValue").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null,
+							(Expr) null,
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("decl"), new Name("ArrayDim"), "array dimension",
 					NodeList.of(
@@ -223,7 +245,11 @@ public class AllDescriptors {
 					),
 					NodeList.of(
 							param("NodeList<AnnotationExpr> annotations").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("decl"), new Name("ClassDecl"), "class declaration",
 					NodeList.of(
@@ -249,7 +275,16 @@ public class AllDescriptors {
 							param("NodeOption<QualifiedType> extendsClause").build(),
 							param("NodeList<QualifiedType> implementsClause").build(),
 							param("NodeList<MemberDecl> members").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null,
+							(Expr) null,
+							(Expr) null,
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("decl"), new Name("CompilationUnit"), "compilation unit",
 					NodeList.of(
@@ -267,7 +302,13 @@ public class AllDescriptors {
 							param("PackageDecl packageDecl").build(),
 							param("NodeList<ImportDecl> imports").build(),
 							param("NodeList<TypeDecl> types").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("decl"), new Name("ConstructorDecl"), "constructor declaration",
 					NodeList.of(
@@ -292,7 +333,16 @@ public class AllDescriptors {
 							param("NodeList<FormalParameter> params").build(),
 							param("NodeList<QualifiedType> throwsClause").build(),
 							param("BlockStmt body").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null,
+							(Expr) null,
+							(Expr) null,
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("decl"), new Name("EmptyMemberDecl"), "empty member declaration",
 					NodeList.of(
@@ -301,7 +351,9 @@ public class AllDescriptors {
 					NodeList.of(
 							memberDecl("public static final LexicalShape shape = token(LToken.SemiColon);").build()
 					),
-					NodeList.<FormalParameter>empty(), false
+					NodeList.<FormalParameter>empty(),
+					NodeList.<Expr>empty(),
+					false
 			),
 			new TreeClassDescriptor(new Name("decl"), new Name("EmptyTypeDecl"), "empty type declaration",
 					NodeList.of(
@@ -310,7 +362,9 @@ public class AllDescriptors {
 					NodeList.of(
 							memberDecl("public static final LexicalShape shape = token(LToken.SemiColon);").build()
 					),
-					NodeList.<FormalParameter>empty(), false
+					NodeList.<FormalParameter>empty(),
+					NodeList.<Expr>empty(),
+					false
 			),
 			new TreeClassDescriptor(new Name("decl"), new Name("EnumConstantDecl"), "enum constant declaration",
 					NodeList.of(
@@ -336,7 +390,14 @@ public class AllDescriptors {
 							param("Name name").build(),
 							param("NodeOption<NodeList<Expr>> args").build(),
 							param("NodeOption<NodeList<MemberDecl>> classBody").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null,
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("decl"), new Name("EnumDecl"), "enum declaration",
 					NodeList.of(
@@ -374,7 +435,16 @@ public class AllDescriptors {
 							param("NodeList<EnumConstantDecl> enumConstants").build(),
 							param("boolean trailingComma").build(),
 							param("NodeList<MemberDecl> members").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null,
+							(Expr) null,
+							(Expr) null,
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("decl"), new Name("FieldDecl"), "field declaration",
 					NodeList.of(
@@ -392,7 +462,13 @@ public class AllDescriptors {
 							param("NodeList<ExtendedModifier> modifiers").build(),
 							param("Type type").build(),
 							param("NodeList<VariableDeclarator> variables").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("decl"), new Name("FormalParameter"), "formal parameter",
 					NodeList.of(
@@ -417,7 +493,14 @@ public class AllDescriptors {
 							param("Type type").build(),
 							param("boolean isVarArgs").build(),
 							param("VariableDeclaratorId id").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null,
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("decl"), new Name("ImportDecl"), "import declaration",
 					NodeList.of(
@@ -441,7 +524,13 @@ public class AllDescriptors {
 							param("QualifiedName name").build(),
 							param("boolean isStatic").build(),
 							param("boolean isOnDemand").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("decl"), new Name("InitializerDecl"), "initializer declaration",
 					NodeList.of(
@@ -456,7 +545,12 @@ public class AllDescriptors {
 					NodeList.of(
 							param("NodeList<ExtendedModifier> modifiers").build(),
 							param("BlockStmt body").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("decl"), new Name("InterfaceDecl"), "interface declaration",
 					NodeList.of(
@@ -478,7 +572,15 @@ public class AllDescriptors {
 							param("NodeList<TypeParameter> typeParams").build(),
 							param("NodeList<QualifiedType> extendsClause").build(),
 							param("NodeList<MemberDecl> members").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null,
+							(Expr) null,
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("decl"), new Name("LocalVariableDecl"), "local variable declaration",
 					NodeList.of(
@@ -495,7 +597,13 @@ public class AllDescriptors {
 							param("NodeList<ExtendedModifier> modifiers").build(),
 							param("Type type").build(),
 							param("NodeList<VariableDeclarator> variables").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("decl"), new Name("MethodDecl"), "method declaration",
 					NodeList.of(
@@ -528,14 +636,27 @@ public class AllDescriptors {
 							param("NodeList<ArrayDim> dims").build(),
 							param("NodeList<QualifiedType> throwsClause").build(),
 							param("NodeOption<BlockStmt> body").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null,
+							(Expr) null,
+							(Expr) null,
+							(Expr) null,
+							(Expr) null,
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("decl"), new Name("Modifier"), "modifier",
 					NodeList.of(
 							(QualifiedType) type("ExtendedModifier").build()
 					),
 					NodeList.<MemberDecl>empty(),
-					NodeList.<FormalParameter>empty(), true
+					NodeList.<FormalParameter>empty(),
+					NodeList.<Expr>empty(),
+					true
 			),
 			new TreeClassDescriptor(new Name("decl"), new Name("PackageDecl"), "package declaration",
 					NodeList.of(
@@ -552,7 +673,12 @@ public class AllDescriptors {
 					NodeList.of(
 							param("NodeList<AnnotationExpr> annotations").build(),
 							param("QualifiedName name").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("decl"), new Name("TypeParameter"), "type parameter",
 					NodeList.of(
@@ -579,7 +705,13 @@ public class AllDescriptors {
 							param("NodeList<AnnotationExpr> annotations").build(),
 							param("Name name").build(),
 							param("NodeList<Type> bounds").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("decl"), new Name("VariableDeclarator"), "variable declarator",
 					NodeList.of(
@@ -599,7 +731,12 @@ public class AllDescriptors {
 					NodeList.of(
 							param("VariableDeclaratorId id").build(),
 							param("NodeOption<Expr> init").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("decl"), new Name("VariableDeclaratorId"), "variable declarator identifier",
 					NodeList.of(
@@ -614,7 +751,12 @@ public class AllDescriptors {
 					NodeList.of(
 							param("Name name").build(),
 							param("NodeList<ArrayDim> dims").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("expr"), new Name("ArrayAccessExpr"), "array access expression",
 					NodeList.of(
@@ -629,7 +771,12 @@ public class AllDescriptors {
 					NodeList.of(
 							param("Expr name").build(),
 							param("Expr index").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("expr"), new Name("ArrayCreationExpr"), "array creation expression",
 					NodeList.of(
@@ -651,7 +798,14 @@ public class AllDescriptors {
 							param("NodeList<ArrayDimExpr> dimExprs").build(),
 							param("NodeList<ArrayDim> dims").build(),
 							param("NodeOption<ArrayInitializerExpr> init").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null,
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("expr"), new Name("ArrayDimExpr"), "array dimension expression",
 					NodeList.of(
@@ -667,7 +821,12 @@ public class AllDescriptors {
 					NodeList.of(
 							param("NodeList<AnnotationExpr> annotations").build(),
 							param("Expr expr").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("expr"), new Name("ArrayInitializerExpr"), "array initializer expression",
 					NodeList.of(
@@ -690,7 +849,12 @@ public class AllDescriptors {
 					NodeList.of(
 							param("NodeList<Expr> values").build(),
 							param("boolean trailingComma").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("expr"), new Name("AssignExpr"), "assignment expression",
 					NodeList.of(
@@ -740,7 +904,13 @@ public class AllDescriptors {
 							param("Expr target").build(),
 							param("AssignOp op").build(),
 							param("Expr value").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("expr"), new Name("BinaryExpr"), "binary expression",
 					NodeList.of(
@@ -804,7 +974,13 @@ public class AllDescriptors {
 							param("Expr left").build(),
 							param("BinaryOp op").build(),
 							param("Expr right").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("expr"), new Name("CastExpr"), "cast expression",
 					NodeList.of(
@@ -818,7 +994,12 @@ public class AllDescriptors {
 					NodeList.of(
 							param("Type type").build(),
 							param("Expr expr").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("expr"), new Name("ClassExpr"), "'class' expression",
 					NodeList.of(
@@ -832,7 +1013,11 @@ public class AllDescriptors {
 					),
 					NodeList.of(
 							param("Type type").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("expr"), new Name("ConditionalExpr"), "conditional expression",
 					NodeList.of(
@@ -851,7 +1036,13 @@ public class AllDescriptors {
 							param("Expr condition").build(),
 							param("Expr thenExpr").build(),
 							param("Expr elseExpr").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("expr"), new Name("FieldAccessExpr"), "field access expression",
 					NodeList.of(
@@ -866,7 +1057,12 @@ public class AllDescriptors {
 					NodeList.of(
 							param("NodeOption<Expr> scope").build(),
 							param("Name name").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("expr"), new Name("InstanceOfExpr"), "'instanceof' expression",
 					NodeList.of(
@@ -882,7 +1078,12 @@ public class AllDescriptors {
 					NodeList.of(
 							param("Expr expr").build(),
 							param("Type type").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("expr"), new Name("LambdaExpr"), "lambda expression",
 					NodeList.of(
@@ -901,7 +1102,13 @@ public class AllDescriptors {
 							param("NodeList<FormalParameter> params").build(),
 							param("boolean hasParens").build(),
 							param("NodeEither<Expr, BlockStmt> body").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) expr("true").build(),
+							(Expr) expr("NodeEither.<Expr, BlockStmt>right(blockStmt())").build()
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("expr"), new Name("LiteralExpr"), "literal expression",
 					NodeList.of(
@@ -911,7 +1118,12 @@ public class AllDescriptors {
 					NodeList.of(
 							param("Class<T> literalClass").build(),
 							param("String literalString").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("expr"), new Name("MarkerAnnotationExpr"), "marker annotation expression",
 					NodeList.of(
@@ -924,7 +1136,11 @@ public class AllDescriptors {
 					),
 					NodeList.of(
 							param("QualifiedName name").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("expr"), new Name("MemberValuePair"), "annotation member value pair",
 					NodeList.of(
@@ -940,7 +1156,12 @@ public class AllDescriptors {
 					NodeList.of(
 							param("Name name").build(),
 							param("Expr value").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("expr"), new Name("MethodInvocationExpr"), "method invocation expression",
 					NodeList.of(
@@ -959,7 +1180,14 @@ public class AllDescriptors {
 							param("NodeList<Type> typeArgs").build(),
 							param("Name name").build(),
 							param("NodeList<Expr> args").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null,
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("expr"), new Name("MethodReferenceExpr"), "method reference expression",
 					NodeList.of(
@@ -977,7 +1205,13 @@ public class AllDescriptors {
 							param("Expr scope").build(),
 							param("NodeList<Type> typeArgs").build(),
 							param("Name name").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("expr"), new Name("NormalAnnotationExpr"), "normal annotation expression",
 					NodeList.of(
@@ -994,7 +1228,12 @@ public class AllDescriptors {
 					NodeList.of(
 							param("QualifiedName name").build(),
 							param("NodeList<MemberValuePair> pairs").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("expr"), new Name("ObjectCreationExpr"), "object creation expression",
 					NodeList.of(
@@ -1016,7 +1255,15 @@ public class AllDescriptors {
 							param("QualifiedType type").build(),
 							param("NodeList<Expr> args").build(),
 							param("NodeOption<NodeList<MemberDecl>> body").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null,
+							(Expr) null,
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("expr"), new Name("ParenthesizedExpr"), "parenthesized expression",
 					NodeList.of(
@@ -1029,7 +1276,11 @@ public class AllDescriptors {
 					),
 					NodeList.of(
 							param("Expr inner").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("expr"), new Name("SingleMemberAnnotationExpr"), "single member annotation expression",
 					NodeList.of(
@@ -1046,7 +1297,12 @@ public class AllDescriptors {
 					NodeList.of(
 							param("QualifiedName name").build(),
 							param("Expr memberValue").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("expr"), new Name("SuperExpr"), "'super' expression",
 					NodeList.of(
@@ -1060,7 +1316,11 @@ public class AllDescriptors {
 					),
 					NodeList.of(
 							param("NodeOption<Expr> classExpr").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("expr"), new Name("ThisExpr"), "'this' expression",
 					NodeList.of(
@@ -1074,7 +1334,11 @@ public class AllDescriptors {
 					),
 					NodeList.of(
 							param("NodeOption<Expr> classExpr").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("expr"), new Name("TypeExpr"), "type expression",
 					NodeList.of(
@@ -1085,14 +1349,18 @@ public class AllDescriptors {
 					),
 					NodeList.of(
 							param("Type type").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("expr"), new Name("UnaryExpr"), "unary expression",
 					NodeList.of(
 							(QualifiedType) type("Expr").build()
 					),
 					NodeList.of(
-							memberDecl("public final static LexicalShape opShape = token(new LSToken.Provider() {\n" +
+							memberDecl("public static final LexicalShape opShape = token(new LSToken.Provider() {\n" +
 									"\t\tpublic LToken tokenFor(STree tree) {\n" +
 									"\t\t\tfinal UnaryOp op = ((State) tree.state).op;\n" +
 									"\t\t\tswitch (op) {\n" +
@@ -1128,7 +1396,12 @@ public class AllDescriptors {
 					NodeList.of(
 							param("UnaryOp op").build(),
 							param("Expr expr").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("expr"), new Name("VariableDeclarationExpr"), "variable declaration expression",
 					NodeList.of(
@@ -1139,7 +1412,11 @@ public class AllDescriptors {
 					),
 					NodeList.of(
 							param("LocalVariableDecl declaration").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("name"), new Name("Name"), "name",
 					NodeList.of(
@@ -1154,7 +1431,11 @@ public class AllDescriptors {
 					),
 					NodeList.of(
 							param("String id").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("name"), new Name("QualifiedName"), "qualified name",
 					NodeList.of(
@@ -1169,7 +1450,12 @@ public class AllDescriptors {
 					NodeList.of(
 							param("NodeOption<QualifiedName> qualifier").build(),
 							param("Name name").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("stmt"), new Name("AssertStmt"), "'assert' statement",
 					NodeList.of(
@@ -1188,7 +1474,12 @@ public class AllDescriptors {
 					NodeList.of(
 							param("Expr check").build(),
 							param("NodeOption<Expr> msg").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("stmt"), new Name("BlockStmt"), "block statement",
 					NodeList.of(
@@ -1216,7 +1507,11 @@ public class AllDescriptors {
 					),
 					NodeList.of(
 							param("NodeList<Stmt> stmts").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("stmt"), new Name("BreakStmt"), "'break' statement",
 					NodeList.of(
@@ -1231,7 +1526,11 @@ public class AllDescriptors {
 					),
 					NodeList.of(
 							param("NodeOption<Name> id").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("stmt"), new Name("CatchClause"), "catch clause",
 					NodeList.of(
@@ -1250,7 +1549,12 @@ public class AllDescriptors {
 					NodeList.of(
 							param("FormalParameter except").build(),
 							param("BlockStmt catchBlock").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("stmt"), new Name("ContinueStmt"), "'continue' statement",
 					NodeList.of(
@@ -1265,7 +1569,11 @@ public class AllDescriptors {
 					),
 					NodeList.of(
 							param("NodeOption<Name> id").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("stmt"), new Name("DoStmt"), "'do-while' statement",
 					NodeList.of(
@@ -1285,7 +1593,12 @@ public class AllDescriptors {
 					NodeList.of(
 							param("Stmt body").build(),
 							param("Expr condition").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("stmt"), new Name("EmptyStmt"), "empty statement",
 					NodeList.of(
@@ -1294,7 +1607,9 @@ public class AllDescriptors {
 					NodeList.of(
 							memberDecl("public static final LexicalShape shape = token(LToken.SemiColon);").build()
 					),
-					NodeList.<FormalParameter>empty(), false
+					NodeList.<FormalParameter>empty(),
+					NodeList.<Expr>empty(),
+					false
 			),
 			new TreeClassDescriptor(new Name("stmt"), new Name("ExplicitConstructorInvocationStmt"), "explicit constructor invocation statement",
 					NodeList.of(
@@ -1318,7 +1633,14 @@ public class AllDescriptors {
 							param("boolean isThis").build(),
 							param("NodeOption<Expr> expr").build(),
 							param("NodeList<Expr> args").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null,
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("stmt"), new Name("ExpressionStmt"), "expression statement",
 					NodeList.of(
@@ -1331,7 +1653,11 @@ public class AllDescriptors {
 					),
 					NodeList.of(
 							param("Expr expr").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("stmt"), new Name("ForStmt"), "'for' statement",
 					NodeList.of(
@@ -1354,7 +1680,14 @@ public class AllDescriptors {
 							param("Expr compare").build(),
 							param("NodeList<Expr> update").build(),
 							param("Stmt body").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null,
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("stmt"), new Name("ForeachStmt"), "\"enhanced\" 'for' statement",
 					NodeList.of(
@@ -1374,7 +1707,13 @@ public class AllDescriptors {
 							param("VariableDeclarationExpr var").build(),
 							param("Expr iterable").build(),
 							param("Stmt body").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("stmt"), new Name("IfStmt"), "'if' statement",
 					NodeList.of(
@@ -1429,7 +1768,13 @@ public class AllDescriptors {
 							param("Expr condition").build(),
 							param("Stmt thenStmt").build(),
 							param("NodeOption<Stmt> elseStmt").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("stmt"), new Name("LabeledStmt"), "labeled statement",
 					NodeList.of(
@@ -1447,7 +1792,12 @@ public class AllDescriptors {
 					NodeList.of(
 							param("Name label").build(),
 							param("Stmt stmt").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("stmt"), new Name("ReturnStmt"), "'return' statement",
 					NodeList.of(
@@ -1462,7 +1812,11 @@ public class AllDescriptors {
 					),
 					NodeList.of(
 							param("NodeOption<Expr> expr").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("stmt"), new Name("SwitchCase"), "'switch' case",
 					NodeList.of(
@@ -1484,7 +1838,12 @@ public class AllDescriptors {
 					NodeList.of(
 							param("NodeOption<Expr> label").build(),
 							param("NodeList<Stmt> stmts").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("stmt"), new Name("SwitchStmt"), "'switch' statement",
 					NodeList.of(
@@ -1519,7 +1878,12 @@ public class AllDescriptors {
 					NodeList.of(
 							param("Expr selector").build(),
 							param("NodeList<SwitchCase> cases").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("stmt"), new Name("SynchronizedStmt"), "'synchronized' statement",
 					NodeList.of(
@@ -1537,7 +1901,12 @@ public class AllDescriptors {
 					NodeList.of(
 							param("Expr expr").build(),
 							param("BlockStmt block").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("stmt"), new Name("ThrowStmt"), "'throw' statement",
 					NodeList.of(
@@ -1550,7 +1919,11 @@ public class AllDescriptors {
 					),
 					NodeList.of(
 							param("Expr expr").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("stmt"), new Name("TryStmt"), "'try' statement",
 					NodeList.of(
@@ -1583,7 +1956,15 @@ public class AllDescriptors {
 							param("BlockStmt tryBlock").build(),
 							param("NodeList<CatchClause> catchs").build(),
 							param("NodeOption<BlockStmt> finallyBlock").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null,
+							(Expr) null,
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("stmt"), new Name("TypeDeclarationStmt"), "type declaration statement",
 					NodeList.of(
@@ -1596,7 +1977,11 @@ public class AllDescriptors {
 					),
 					NodeList.of(
 							param("TypeDecl typeDecl").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("stmt"), new Name("WhileStmt"), "'while' statement",
 					NodeList.of(
@@ -1614,7 +1999,12 @@ public class AllDescriptors {
 					NodeList.of(
 							param("Expr condition").build(),
 							param("Stmt body").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("type"), new Name("ArrayType"), "array type",
 					NodeList.of(
@@ -1629,7 +2019,12 @@ public class AllDescriptors {
 					NodeList.of(
 							param("Type componentType").build(),
 							param("NodeList<ArrayDim> dims").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("type"), new Name("IntersectionType"), "intersection type",
 					NodeList.of(
@@ -1642,7 +2037,11 @@ public class AllDescriptors {
 					),
 					NodeList.of(
 							param("NodeList<Type> types").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("type"), new Name("PrimitiveType"), "primitive type",
 					NodeList.of(
@@ -1682,7 +2081,12 @@ public class AllDescriptors {
 					NodeList.of(
 							param("NodeList<AnnotationExpr> annotations").build(),
 							param("Primitive primitive").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("type"), new Name("QualifiedType"), "qualified type",
 					NodeList.of(
@@ -1717,7 +2121,14 @@ public class AllDescriptors {
 							param("NodeOption<QualifiedType> scope").build(),
 							param("Name name").build(),
 							param("NodeOption<NodeList<Type>> typeArgs").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null,
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("type"), new Name("UnionType"), "union type",
 					NodeList.of(
@@ -1730,7 +2141,11 @@ public class AllDescriptors {
 					),
 					NodeList.of(
 							param("NodeList<Type> types").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("type"), new Name("UnknownType"), "unknown type",
 					NodeList.of(
@@ -1739,7 +2154,9 @@ public class AllDescriptors {
 					NodeList.of(
 							memberDecl("public static final LexicalShape shape = none();").build()
 					),
-					NodeList.<FormalParameter>empty(), false
+					NodeList.<FormalParameter>empty(),
+					NodeList.<Expr>empty(),
+					false
 			),
 			new TreeClassDescriptor(new Name("type"), new Name("VoidType"), "void type",
 					NodeList.of(
@@ -1748,7 +2165,9 @@ public class AllDescriptors {
 					NodeList.of(
 							memberDecl("public static final LexicalShape shape = token(LToken.Void);").build()
 					),
-					NodeList.<FormalParameter>empty(), false
+					NodeList.<FormalParameter>empty(),
+					NodeList.<Expr>empty(),
+					false
 			),
 			new TreeClassDescriptor(new Name("type"), new Name("WildcardType"), "wildcard type",
 					NodeList.of(
@@ -1766,7 +2185,13 @@ public class AllDescriptors {
 							param("NodeList<AnnotationExpr> annotations").build(),
 							param("NodeOption<ReferenceType> ext").build(),
 							param("NodeOption<ReferenceType> sup").build()
-					), false
+					),
+					NodeList.<Expr>of(
+							(Expr) null,
+							(Expr) null,
+							(Expr) null
+					),
+					false
 			),
 	};
 

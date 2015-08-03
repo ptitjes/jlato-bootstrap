@@ -54,13 +54,16 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 	private MethodDecl generateFactoryMethod(TreeClassDescriptor descriptor, boolean noNulls) {
 		NodeList<FormalParameter> params = NodeList.empty();
 		NodeList<Expr> args = NodeList.empty();
+		int index = 0;
 		for (FormalParameter param : safeList(descriptor.parameters)) {
 			Type type = param.type();
-			if (type instanceof QualifiedType) {
-				final QualifiedType qualifiedType = (QualifiedType) type;
-				final String id = qualifiedType.name().id();
 
-				switch (id) {
+			final Expr defaultValue = descriptor.defaultValues.get(index);
+			if (defaultValue != null) {
+				args = args.append(defaultValue);
+			} else if (type instanceof QualifiedType) {
+				final QualifiedType qualifiedType = (QualifiedType) type;
+				switch (qualifiedType.name().id()) {
 					case "NodeList":
 						args = args.append(
 								methodInvocationExpr()
@@ -75,18 +78,6 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 										.withScope(some(qualifiedType.name()))
 										.withTypeArgs(qualifiedType.typeArgs().get())
 										.withName(new Name("none"))
-						);
-						break;
-					case "NodeEither":
-						// Special hack for LambdaExpr.body
-						args = args.append(
-								methodInvocationExpr()
-										.withScope(some(qualifiedType.name()))
-										.withTypeArgs(qualifiedType.typeArgs().get())
-										.withName(new Name("right"))
-										.withArgs(NodeList.of(
-												methodInvocationExpr().withName(new Name("blockStmt"))
-										))
 						);
 						break;
 					default:
@@ -106,6 +97,8 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 						break;
 				}
 			}
+
+			index++;
 		}
 
 		QualifiedType resultType = qualifiedType().withName(descriptor.name);
