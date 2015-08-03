@@ -35,9 +35,14 @@ import org.jlato.tree.TreeSet;
 import org.jlato.tree.decl.CompilationUnit;
 import org.jlato.tree.decl.Decl;
 import org.jlato.tree.decl.TypeDecl;
+import org.jlato.tree.name.*;
 
 import java.io.File;
 import java.io.IOException;
+
+import static org.jlato.tree.TreeFactory.compilationUnit;
+import static org.jlato.tree.TreeFactory.packageDecl;
+import static org.jlato.tree.TreeFactory.qualifiedName;
 
 /**
  * @author Didier Villevalois
@@ -94,10 +99,15 @@ public class Bootstrap {
 		final CompilationUnit cu = treeSet.get(path);
 
 		final Pattern<? extends Decl> matcher = pattern.matcher(descriptor);
-		ImportManager importManager = new ImportManager(cu.imports());
+		ImportManager importManager = new ImportManager(makePackageName(path), cu.imports());
 		final MatchVisitor<Decl> visitor = (c, s) -> pattern.rewrite((T) (GenSettings.replace ? matcher.build() : c), importManager, descriptor);
 		final CompilationUnit newCU = cu.forAll(matcher, visitor)
 				.withImports(importManager.imports());
 		return treeSet.put(path, newCU);
+	}
+
+	private QualifiedName makePackageName(String path) {
+		final String packageName = path.substring(0, path.lastIndexOf('/')).replace('/', '.');
+		return qualifiedName(packageName);
 	}
 }

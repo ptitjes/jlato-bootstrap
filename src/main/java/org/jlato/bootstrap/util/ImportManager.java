@@ -15,12 +15,14 @@ import static org.jlato.tree.TreeFactory.importDecl;
  */
 public class ImportManager {
 
+	public final QualifiedName packageName;
 	private Set<QualifiedName> onDemandImports = new HashSet<>();
 	private Set<QualifiedName> singleImports = new HashSet<>();
 	private Set<QualifiedName> onDemandStaticImports = new HashSet<>();
 	private Set<QualifiedName> singleStaticImports = new HashSet<>();
 
-	public ImportManager(NodeList<ImportDecl> imports) {
+	public ImportManager(QualifiedName packageName, NodeList<ImportDecl> imports) {
+		this.packageName = packageName;
 		for (ImportDecl importDecl : imports) {
 			doAddImport(importDecl);
 		}

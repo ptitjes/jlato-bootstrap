@@ -5,6 +5,7 @@ import org.jlato.rewrite.MatchVisitor;
 import org.jlato.rewrite.Pattern;
 import org.jlato.tree.TreeSet;
 import org.jlato.tree.decl.*;
+import org.jlato.tree.name.*;
 
 import static org.jlato.tree.TreeFactory.compilationUnit;
 import static org.jlato.tree.TreeFactory.packageDecl;
@@ -17,22 +18,27 @@ public abstract class CompilationUnitPattern<A> {
 
 	public TreeSet<CompilationUnit> apply(TreeSet<CompilationUnit> treeSet, String path, A arg) {
 		final CompilationUnit cu = treeSet.get(path);
+		final QualifiedName packageName = makePackageName(path);
 
 		CompilationUnit newCU = cu;
 		if (cu == null || GenSettings.replace) {
-			newCU = create(path);
+			newCU = create(path, packageName);
 		}
 
-		ImportManager importManager = new ImportManager(newCU.imports());
+		ImportManager importManager = new ImportManager(packageName, newCU.imports());
 		newCU = rewrite(newCU, importManager, arg);
 		newCU.withImports(importManager.imports());
 
 		return treeSet.put(path, newCU);
 	}
 
-	private CompilationUnit create(String path) {
+	private CompilationUnit create(String path, QualifiedName packageName) {
+		return compilationUnit(packageDecl(packageName));
+	}
+
+	private QualifiedName makePackageName(String path) {
 		final String packageName = path.substring(0, path.lastIndexOf('/')).replace('/', '.');
-		return compilationUnit(packageDecl(qualifiedName(packageName)));
+		return qualifiedName(packageName);
 	}
 
 	@SuppressWarnings("unchecked")
