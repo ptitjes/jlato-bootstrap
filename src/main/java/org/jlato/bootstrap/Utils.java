@@ -141,8 +141,7 @@ public class Utils {
 			String name = ((QualifiedType) treeType).name().id();
 			return name.equals("String") ||
 					name.equals("Class") ||
-					name.equals("LToken") ||
-					name.equals("IndexedList") ||
+					name.equals("ModifierKeyword") ||
 					name.equals("Primitive") ||
 					name.endsWith("Op");
 		}

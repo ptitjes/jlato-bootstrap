@@ -83,14 +83,14 @@ public class Bootstrap {
 		treeSet = applyPattern(treeSet, "org/jlato/tree/TreeFactory.java", treeFactoryClassPattern, classDescriptors);
 
 		// Generate pure interfaces
-		final TreePureInterface treePureInterfacePattern = new TreePureInterface();
-		for (TreeInterfaceDescriptor descriptor : interfaceDescriptors) {
-			treeSet = treePureInterfacePattern.apply(treeSet, descriptor.treeFilePath().replace("tree", "tree2"), descriptor);
-		}
-		for (TreeClassDescriptor descriptor : classDescriptors) {
-			if (descriptor.customTailored) continue;
-			treeSet = treePureInterfacePattern.apply(treeSet, descriptor.treeFilePath().replace("tree", "tree2"), descriptor);
-		}
+//		final TreePureInterface treePureInterfacePattern = new TreePureInterface();
+//		for (TreeInterfaceDescriptor descriptor : interfaceDescriptors) {
+//			treeSet = treePureInterfacePattern.apply(treeSet, descriptor.treeFilePath().replace("tree", "tree2"), descriptor);
+//		}
+//		for (TreeClassDescriptor descriptor : classDescriptors) {
+//			if (descriptor.customTailored) continue;
+//			treeSet = treePureInterfacePattern.apply(treeSet, descriptor.treeFilePath().replace("tree", "tree2"), descriptor);
+//		}
 
 		treeSet.updateOnDisk(false, FormattingSettings.Default);
 	}

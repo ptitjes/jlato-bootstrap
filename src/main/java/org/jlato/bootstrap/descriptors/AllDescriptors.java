@@ -21,7 +21,7 @@ import static org.jlato.tree.TreeFactory.qualifiedName;
 public class AllDescriptors {
 
 	public static final QualifiedName TREE_INTERFACES_ROOT = qualifiedName("org.jlato.tree2");
-//	public static final QualifiedName TREE_IMPLEMENTATION_ROOT = qualifiedName("org.jlato.internal.tree");
+	//	public static final QualifiedName TREE_IMPLEMENTATION_ROOT = qualifiedName("org.jlato.internal.tree");
 	public static final QualifiedName TREE_IMPLEMENTATION_ROOT = qualifiedName("org.jlato.tree");
 
 	public static TreeTypeDescriptor get(Name name) {
@@ -714,10 +714,49 @@ public class AllDescriptors {
 					NodeList.of(
 							(QualifiedType) type("ExtendedModifier").build()
 					),
-					NodeList.<MemberDecl>empty(),
-					NodeList.<FormalParameter>empty(),
-					NodeList.<Expr>empty(),
-					true
+					NodeList.of(
+							memberDecl("public static final LexicalShape shape = token(new LSToken.Provider() {\n" +
+									"\t\tpublic LToken tokenFor(STree tree) {\n" +
+									"\t\t\tfinal ModifierKeyword keyword = ((State) tree.state).keyword;\n" +
+									"\t\t\tswitch (keyword) {\n" +
+									"\t\t\t\tcase Public:\n" +
+									"\t\t\t\t\treturn LToken.Public;\n" +
+									"\t\t\t\tcase Protected:\n" +
+									"\t\t\t\t\treturn LToken.Protected;\n" +
+									"\t\t\t\tcase Private:\n" +
+									"\t\t\t\t\treturn LToken.Private;\n" +
+									"\t\t\t\tcase Abstract:\n" +
+									"\t\t\t\t\treturn LToken.Abstract;\n" +
+									"\t\t\t\tcase Default:\n" +
+									"\t\t\t\t\treturn LToken.Default;\n" +
+									"\t\t\t\tcase Static:\n" +
+									"\t\t\t\t\treturn LToken.Static;\n" +
+									"\t\t\t\tcase Final:\n" +
+									"\t\t\t\t\treturn LToken.Final;\n" +
+									"\t\t\t\tcase Transient:\n" +
+									"\t\t\t\t\treturn LToken.Transient;\n" +
+									"\t\t\t\tcase Volatile:\n" +
+									"\t\t\t\t\treturn LToken.Volatile;\n" +
+									"\t\t\t\tcase Synchronized:\n" +
+									"\t\t\t\t\treturn LToken.Synchronized;\n" +
+									"\t\t\t\tcase Native:\n" +
+									"\t\t\t\t\treturn LToken.Native;\n" +
+									"\t\t\t\tcase StrictFP:\n" +
+									"\t\t\t\t\treturn LToken.StrictFP;\n" +
+									"\t\t\t\tdefault:\n" +
+									"\t\t\t\t\t// Can't happen by definition of enum\n" +
+									"\t\t\t\t\tthrow new IllegalStateException();\n" +
+									"\t\t\t}\n" +
+									"\t\t}\n" +
+									"\t});").build()
+					),
+					NodeList.of(
+							param("ModifierKeyword keyword").build()
+					),
+					NodeList.<Expr>of(
+							(Expr) null
+					),
+					false
 			),
 			new TreeClassDescriptor(new Name("decl"), new Name("PackageDecl"), "package declaration",
 					NodeList.of(
