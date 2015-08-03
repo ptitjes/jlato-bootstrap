@@ -68,7 +68,7 @@ public class ExtractTreeDescriptors extends TreeClassRefactoring {
 				memberDecl("public static final LexicalShape $_ = $_;")
 		)).map(m -> ((FieldDecl) m).withModifiers(NodeList.of(Modifier.Public, Modifier.Static, Modifier.Final)));
 
-		classDescriptors.add(new TreeClassDescriptor(packageName, name, makeDocumentationName(name), superInterfaces, shapes, params == null, params == null ? NodeList.empty() : params));
+		classDescriptors.add(new TreeClassDescriptor(packageName, name, makeDocumentationName(name), superInterfaces, shapes, params == null ? NodeList.empty() : params, params == null));
 
 		return decl;
 	}
@@ -120,11 +120,11 @@ public class ExtractTreeDescriptors extends TreeClassRefactoring {
 									"NodeList.<MemberDecl>empty()" :
 									descriptor.shapes.map(d -> reify(d)).mkString("NodeList.of(\n", ",\n", "\n)")
 							) + ",\n" +
-							(descriptor.customTailored ? "true" : "false") + ",\n" +
 							(descriptor.parameters.isEmpty() ?
 									"NodeList.<FormalParameter>empty()" :
 									descriptor.parameters.map(p -> reify(p)).mkString("NodeList.of(\n", ",\n", "\n)")
-							) + "\n)"
+							) + ",\n" +
+							(descriptor.customTailored ? "true" : "false") + "\n)"
 			).build();
 			System.out.print(creation);
 			System.out.println(",");

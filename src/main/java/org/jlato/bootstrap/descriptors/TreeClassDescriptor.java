@@ -22,8 +22,7 @@ public class TreeClassDescriptor extends TreeTypeDescriptor {
 	public TreeClassDescriptor(Name packageName, Name name, String description,
 	                           NodeList<QualifiedType> superInterfaces,
 	                           NodeList<MemberDecl> shapes,
-	                           boolean customTailored,
-	                           NodeList<FormalParameter> parameters) {
+	                           NodeList<FormalParameter> parameters, boolean customTailored) {
 		super(packageName, name, description, superInterfaces, shapes, parameters);
 		this.customTailored = customTailored;
 	}
