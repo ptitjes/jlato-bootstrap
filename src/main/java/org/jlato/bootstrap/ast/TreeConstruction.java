@@ -46,19 +46,18 @@ public class TreeConstruction implements DeclContribution<TreeClassDescriptor, M
 			final QualifiedType stateType = arg.stateType();
 			final QualifiedType locationType = qType("SLocation", stateType);
 
-			final Name location = new Name("location");
+			final Name location = name("location");
 
-			decl = constructorDecl()
-					.withModifiers(NodeList.of(Modifier.Private))
-					.withName(name)
-					.withParams(NodeList.of(
-							formalParameter().withId(variableDeclaratorId().withName(location)).withType(locationType)
-					))
-					.withBody(blockStmt().withStmts(NodeList.of(
+			decl = constructorDecl(name,
+					blockStmt().withStmts(NodeList.of(
 							explicitConstructorInvocationStmt()
 									.setThis(false)
 									.withArgs(NodeList.of(location))
-					)));
+					)))
+					.withModifiers(NodeList.of(Modifier.Private))
+					.withParams(NodeList.of(
+							formalParameter(locationType, variableDeclaratorId(location))
+					));
 
 			if (GenSettings.generateDocs)
 				decl = decl.insertLeadingComment(
@@ -86,18 +85,14 @@ public class TreeConstruction implements DeclContribution<TreeClassDescriptor, M
 			final QualifiedType treeType = qType("STree", stateType);
 
 			// Make STree creation expression from STrees
-			final ObjectCreationExpr sTreeCreationExpr = objectCreationExpr()
-					.withType(treeType)
+			final ObjectCreationExpr sTreeCreationExpr = objectCreationExpr(treeType)
 					.withArgs(NodeList.of(
-							objectCreationExpr().withType(stateType)
-									.withArgs(parameters.map(p -> p.id().name()))
+							objectCreationExpr(stateType).withArgs(parameters.map(p -> p.id().name()))
 					));
 
 			// Add STree factory method
-			decl = methodDecl()
+			decl = methodDecl(treeType, name("make"))
 					.withModifiers(NodeList.of(Modifier.Public, Modifier.Static))
-					.withType(treeType)
-					.withName(new Name("make"))
 					.withParams(stateParams)
 					.withBody(some(blockStmt().withStmts(NodeList.<Stmt>of(
 							returnStmt().withExpr(some(sTreeCreationExpr))
@@ -130,31 +125,27 @@ public class TreeConstruction implements DeclContribution<TreeClassDescriptor, M
 			final NodeList<FormalParameter> parameters = arg.parameters;
 
 			// Make SLocation creation expression from Trees
-			final ObjectCreationExpr sLocationCreationExpr = objectCreationExpr()
-					.withType(locationType)
+			final ObjectCreationExpr sLocationCreationExpr = objectCreationExpr(locationType)
 					.withArgs(NodeList.of(
-							methodInvocationExpr()
-									.withName(new Name("make"))
+							methodInvocationExpr(name("make"))
 									.withArgs(parameters.map(p -> {
 										Type treeType = p.type();
 										if (propertyFieldType(treeType)) return p.id().name();
-										else return methodInvocationExpr()
-												.withScope(some(new Name("TreeBase")))
+										else return methodInvocationExpr(name("treeOf"))
+												.withScope(some(name("TreeBase")))
 												.withTypeArgs(NodeList.of(treeTypeToStateType((QualifiedType) treeType)))
-												.withName(new Name("treeOf"))
 												.withArgs(NodeList.of(p.id().name()));
 									}))
 					));
 
-			decl = constructorDecl()
-					.withModifiers(NodeList.of(Modifier.Public))
-					.withName(name)
-					.withParams(parameters)
-					.withBody(blockStmt().withStmts(NodeList.of(
+			decl = constructorDecl(name,
+					blockStmt().withStmts(NodeList.of(
 							explicitConstructorInvocationStmt()
 									.setThis(false)
 									.withArgs(NodeList.of(sLocationCreationExpr))
-					)));
+					)))
+					.withModifiers(NodeList.of(Modifier.Public))
+					.withParams(parameters);
 
 			if (GenSettings.generateDocs) {
 				// TODO document the arguments

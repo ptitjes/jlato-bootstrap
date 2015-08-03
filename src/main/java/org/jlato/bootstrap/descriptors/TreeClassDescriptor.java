@@ -44,7 +44,7 @@ public class TreeClassDescriptor extends TreeTypeDescriptor {
 
 	@Override
 	public QualifiedType stateType() {
-		return qualifiedType().withScope(some(qualifiedType().withName(name))).withName(STATE_NAME);
+		return qualifiedType(STATE_NAME).withScope(some(qualifiedType(name)));
 	}
 
 	public NodeList<FormalParameter> stateParameters() {

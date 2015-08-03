@@ -31,9 +31,9 @@ import static org.jlato.tree.expr.UnaryOp.PostIncrement;
  */
 public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 
-	public static final Name STATE_NAME = new Name("State");
+	public static final Name STATE_NAME = name("State");
 	public static final QualifiedType ARBITRARY_TYPE = qType("Arbitrary");
-	public static final Name ARBITRARY_NAME = new Name("arbitrary");
+	public static final Name ARBITRARY_NAME = name("arbitrary");
 
 	private HashSet<Type> arbitraryTypes = new HashSet<>();
 
@@ -82,23 +82,20 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 		NodeList<Stmt> stmts = NodeList.empty();
 		NodeList<Stmt> loopStmts = NodeList.empty();
 
-		final Name tested = new Name("t");
+		final Name tested = name("t");
 
-		stmts = stmts.append(newVar(ARBITRARY_TYPE, ARBITRARY_NAME, objectCreationExpr().withType(ARBITRARY_TYPE)));
+		stmts = stmts.append(newVar(ARBITRARY_TYPE, ARBITRARY_NAME, objectCreationExpr(ARBITRARY_TYPE)));
 
 		loopStmts = loopStmts.appendAll(params.map(p -> newVar(p.type(), p.id().name(), arbitraryCall(ARBITRARY_NAME, p.type()))));
 		loopStmts = loopStmts.append(newVar(treeType, tested,
 				params.foldLeft(factoryCall(treeName),
-						(e, p) -> methodInvocationExpr()
-								.withScope(some(e))
-								.withName(new Name(propertySetterName(p.id().name().id(), p.type())))
-								.withArgs(NodeList.of(p.id().name()))
+						(e, p) -> methodInvocationExpr(name(propertySetterName(p.id().name().id(), p.type())))
+								.withScope(some(e)).withArgs(NodeList.of(p.id().name()))
 				)
 		));
 
-		loopStmts = loopStmts.appendAll(params.map(p -> junitAssert("assertEquals", p.id().name(), methodInvocationExpr()
-						.withScope(some(tested))
-						.withName(p.id().name()))
+		loopStmts = loopStmts.appendAll(params.map(p -> junitAssert("assertEquals", p.id().name(),
+						methodInvocationExpr(p.id().name()).withScope(some(tested)))
 		));
 
 		stmts = stmts.append(loopFor(10, loopStmts));
@@ -110,34 +107,28 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 		NodeList<Stmt> stmts = NodeList.empty();
 		NodeList<Stmt> loopStmts = NodeList.empty();
 
-		final Name tested = new Name("t");
+		final Name tested = name("t");
 
-		stmts = stmts.append(newVar(ARBITRARY_TYPE, ARBITRARY_NAME, objectCreationExpr().withType(ARBITRARY_TYPE)));
+		stmts = stmts.append(newVar(ARBITRARY_TYPE, ARBITRARY_NAME, objectCreationExpr(ARBITRARY_TYPE)));
 
 		loopStmts = loopStmts.appendAll(params.map(p -> newVar(p.type(), p.id().name(), arbitraryCall(ARBITRARY_NAME, p.type()))));
 		loopStmts = loopStmts.append(newVar(treeType, tested,
 				params.foldLeft(factoryCall(treeName),
-						(e, p) -> methodInvocationExpr()
-								.withScope(some(e))
-								.withName(new Name(propertySetterName(p.id().name().id(), p.type())))
-								.withArgs(NodeList.of(p.id().name()))
+						(e, p) -> methodInvocationExpr(name(propertySetterName(p.id().name().id(), p.type())))
+								.withScope(some(e)).withArgs(NodeList.of(p.id().name()))
 				)
 		));
 
-		loopStmts = loopStmts.appendAll(params.map(p -> junitAssert("assertEquals", p.id().name(), methodInvocationExpr()
-						.withScope(some(tested))
-						.withName(p.id().name()))
+		loopStmts = loopStmts.appendAll(params.map(p -> junitAssert("assertEquals", p.id().name(),
+						methodInvocationExpr(p.id().name()).withScope(some(tested)))
 		));
 
 		loopStmts = loopStmts.appendAll(params.map(p -> newVar(p.type(), p.id().name().withId(s -> s + "2"), arbitraryCall(ARBITRARY_NAME, p.type()))));
 		loopStmts = loopStmts.append(newVar(treeType, tested.withId(s -> s + "2"),
 				params.foldLeft((Expr) tested,
-						(e, p) -> methodInvocationExpr()
-								.withScope(some(e))
-								.withName(new Name(propertySetterName(p.id().name().id(), p.type())))
-								.withArgs(NodeList.of(
-										methodInvocationExpr()
-												.withName(new Name("mutationBy"))
+						(e, p) -> methodInvocationExpr(name(propertySetterName(p.id().name().id(), p.type())))
+								.withScope(some(e)).withArgs(NodeList.of(
+										methodInvocationExpr(name("mutationBy"))
 												.withArgs(NodeList.of(
 														p.id().name(),
 														p.id().name().withId(s -> s + "2")
@@ -148,9 +139,9 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 
 		loopStmts = loopStmts.appendAll(params.map(p -> {
 					Expr expected = p.id().name().withId(s -> s + "2");
-					return junitAssert("assertEquals", expected, methodInvocationExpr()
-							.withScope(some(tested.withId(s -> s + "2")))
-							.withName(p.id().name()));
+					return junitAssert("assertEquals", expected,
+							methodInvocationExpr(p.id().name()).withScope(some(tested.withId(s -> s + "2")))
+					);
 				}
 		));
 
@@ -163,23 +154,21 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 		NodeList<Stmt> stmts = NodeList.empty();
 		NodeList<Stmt> loopStmts = NodeList.empty();
 
-		final Name expected = new Name("expected");
-		final Name actual = new Name("actual");
+		final Name expected = name("expected");
+		final Name actual = name("actual");
 
-		stmts = stmts.append(newVar(ARBITRARY_TYPE, ARBITRARY_NAME, objectCreationExpr().withType(ARBITRARY_TYPE)));
+		stmts = stmts.append(newVar(ARBITRARY_TYPE, ARBITRARY_NAME, objectCreationExpr(ARBITRARY_TYPE)));
 
 		loopStmts = loopStmts.appendAll(params.map(p -> newVar(p.type(), p.id().name(), arbitraryCall(ARBITRARY_NAME, p.type()))));
 		loopStmts = loopStmts.append(newVar(treeType, expected,
 				params.foldLeft(factoryCall(treeName),
-						(e, p) -> methodInvocationExpr()
-								.withScope(some(e))
-								.withName(new Name(propertySetterName(p.id().name().id(), p.type())))
-								.withArgs(NodeList.of(p.id().name()))
+						(e, p) -> methodInvocationExpr(name(propertySetterName(p.id().name().id(), p.type())))
+								.withScope(some(e)).withArgs(NodeList.of(p.id().name()))
 				)
 		));
 
 		loopStmts = loopStmts.append(junitAssert("assertTrue", equals(expected, expected)));
-		loopStmts = loopStmts.append(junitAssert("assertFalse", equals(expected, LiteralExpr.nullLiteral())));
+		loopStmts = loopStmts.append(junitAssert("assertFalse", equals(expected, nullLiteralExpr())));
 
 		loopStmts = loopStmts.append(newVar(treeType, actual, factoryCall(treeName)));
 
@@ -189,14 +178,11 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 			loopStmts = loopStmts.append(junitAssert("assertNotEquals", hashCode(expected), hashCode(actual)));
 
 			loopStmts = loopStmts.append(
-					expressionStmt().withExpr(
-							assignExpr().withTarget(actual).withOp(Normal)
-									.withValue(
-											methodInvocationExpr()
-													.withScope(some(actual))
-													.withName(new Name(propertySetterName(param.id().name().id(), param.type())))
-													.withArgs(NodeList.of(param.id().name()))
-									)
+					expressionStmt(
+							assignExpr(actual, Normal,
+									methodInvocationExpr(name(propertySetterName(param.id().name().id(), param.type())))
+											.withScope(some(actual)).withArgs(NodeList.of(param.id().name()))
+							)
 					)
 			);
 		}
@@ -210,30 +196,29 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 	}
 
 	private MethodInvocationExpr equals(Expr e1, Expr e2) {
-		return methodInvocationExpr().withScope(some(e1)).withName(new Name("equals")).withArgs(NodeList.of(e2));
+		return methodInvocationExpr(name("equals")).withScope(some(e1)).withArgs(NodeList.of(e2));
 	}
 
 	private MethodInvocationExpr hashCode(Expr e) {
-		return methodInvocationExpr().withScope(some(e)).withName(new Name("hashCode"));
+		return methodInvocationExpr(name("hashCode")).withScope(some(e));
 	}
 
 	private void generateKindTestMethod(String treeName, QualifiedType treeType, NodeList<FormalParameter> params) {
 		NodeList<Stmt> stmts = NodeList.empty();
 
 		stmts = stmts.append(
-				junitAssert("assertEquals", fieldAccessExpr().withScope(some(new Name("Kind"))).withName(new Name(treeName)), methodInvocationExpr()
-						.withScope(some(factoryCall(treeName)))
-						.withName(new Name("kind")))
+				junitAssert("assertEquals",
+						fieldAccessExpr(name(treeName)).withScope(some(name("Kind"))),
+						methodInvocationExpr(name("kind")).withScope(some(factoryCall(treeName))))
 		);
 
 		kindTestClass.generateTestMethod(treeName, stmts);
 	}
 
 	private Stmt junitAssert(String assertName, Expr... arguments) {
-		return expressionStmt().withExpr(
-				methodInvocationExpr()
-						.withScope(some(new Name("Assert")))
-						.withName(new Name(assertName))
+		return expressionStmt(
+				methodInvocationExpr(name(assertName))
+						.withScope(some(name("Assert")))
 						.withArgs(new NodeList<Expr>(arguments))
 		);
 	}
@@ -245,31 +230,26 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 		final QualifiedType tType = qType("T");
 		final QualifiedType mutationType = qType("Mutation", tType);
 
-		final Name tName = new Name("t");
-		final Name beforeName = new Name("before");
-		final Name afterName = new Name("after");
+		final Name tName = name("t");
+		final Name beforeName = name("before");
+		final Name afterName = name("after");
 
 		lambdaAccessorsTestClass.addAdditionalMethod(
-				methodDecl()
+				methodDecl(mutationType, name("mutationBy"))
 						.withModifiers(NodeList.of(Modifier.Private))
-						.withTypeParams(NodeList.of(typeParameter().withName(new Name("T"))))
-						.withType(mutationType)
-						.withName(new Name("mutationBy"))
+						.withTypeParams(NodeList.of(typeParameter(name("T"))))
 						.withParams(NodeList.of(
-								formalParameter().withModifiers(NodeList.of(Modifier.Final)).withType(tType).withId(variableDeclaratorId().withName(beforeName)),
-								formalParameter().withModifiers(NodeList.of(Modifier.Final)).withType(tType).withId(variableDeclaratorId().withName(afterName))
+								formalParameter(tType, variableDeclaratorId(beforeName)).withModifiers(NodeList.of(Modifier.Final)),
+								formalParameter(tType, variableDeclaratorId(afterName)).withModifiers(NodeList.of(Modifier.Final))
 						))
 						.withBody(some(blockStmt().withStmts(NodeList.of(
 								returnStmt().withExpr(some(
-										objectCreationExpr()
-												.withType(mutationType)
+										objectCreationExpr(mutationType)
 												.withBody(some(NodeList.of(
-														methodDecl()
+														methodDecl(tType, name("mutate"))
 																.withModifiers(NodeList.of(Modifier.Public))
-																.withType(tType)
-																.withName(new Name("mutate"))
 																.withParams(NodeList.of(
-																		formalParameter().withModifiers(NodeList.of(Modifier.Final)).withType(tType).withId(variableDeclaratorId().withName(tName))
+																		formalParameter(tType, variableDeclaratorId(tName)).withModifiers(NodeList.of(Modifier.Final))
 																))
 																.withBody(some(blockStmt().withStmts(NodeList.of(
 																		junitAssert("assertEquals", beforeName, tName),
@@ -305,31 +285,29 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 		private NodeList<MethodDecl> collectedTestMethods = NodeList.empty();
 
 		public NodeList<ImportDecl> imports = NodeList.of(
-				importDecl().withName(qualifiedName("org.jlato.tree")).setOnDemand(true),
-				importDecl().withName(qualifiedName("org.jlato.tree.decl")).setOnDemand(true),
-				importDecl().withName(qualifiedName("org.jlato.tree.expr")).setOnDemand(true),
-				importDecl().withName(qualifiedName("org.jlato.tree.expr.AssignExpr.AssignOp")),
-				importDecl().withName(qualifiedName("org.jlato.tree.expr.BinaryExpr.BinaryOp")),
-				importDecl().withName(qualifiedName("org.jlato.tree.expr.UnaryExpr.UnaryOp")),
-				importDecl().withName(qualifiedName("org.jlato.tree.name")).setOnDemand(true),
-				importDecl().withName(qualifiedName("org.jlato.tree.stmt")).setOnDemand(true),
-				importDecl().withName(qualifiedName("org.jlato.tree.type")).setOnDemand(true),
-				importDecl().withName(qualifiedName("org.jlato.tree.type.PrimitiveType.Primitive")),
-				importDecl().withName(qualifiedName("org.jlato.tree.TreeFactory")).setStatic(true).setOnDemand(true),
-				importDecl().withName(qualifiedName("org.jlato.unit.util.Arbitrary")),
-				importDecl().withName(qualifiedName("org.junit")).setOnDemand(true),
-				importDecl().withName(qualifiedName("org.junit.runner.RunWith")),
-				importDecl().withName(qualifiedName("org.junit.runners.JUnit4"))
+				importDecl(qualifiedName("org.jlato.tree")).setOnDemand(true),
+				importDecl(qualifiedName("org.jlato.tree.decl")).setOnDemand(true),
+				importDecl(qualifiedName("org.jlato.tree.expr")).setOnDemand(true),
+				importDecl(qualifiedName("org.jlato.tree.expr.AssignExpr.AssignOp")),
+				importDecl(qualifiedName("org.jlato.tree.expr.BinaryExpr.BinaryOp")),
+				importDecl(qualifiedName("org.jlato.tree.expr.UnaryExpr.UnaryOp")),
+				importDecl(qualifiedName("org.jlato.tree.name")).setOnDemand(true),
+				importDecl(qualifiedName("org.jlato.tree.stmt")).setOnDemand(true),
+				importDecl(qualifiedName("org.jlato.tree.type")).setOnDemand(true),
+				importDecl(qualifiedName("org.jlato.tree.type.PrimitiveType.Primitive")),
+				importDecl(qualifiedName("org.jlato.tree.TreeFactory")).setStatic(true).setOnDemand(true),
+				importDecl(qualifiedName("org.jlato.unit.util.Arbitrary")),
+				importDecl(qualifiedName("org.junit")).setOnDemand(true),
+				importDecl(qualifiedName("org.junit.runner.RunWith")),
+				importDecl(qualifiedName("org.junit.runners.JUnit4"))
 		);
 
 		public void generateTestMethod(String name, NodeList<Stmt> stmts) {
-			MethodDecl testMethod = methodDecl()
+			MethodDecl testMethod = methodDecl(voidType(), name("test" + name))
 					.withModifiers(NodeList.of(
-							markerAnnotationExpr().withName(qualifiedName("Test")),
+							markerAnnotationExpr(qualifiedName("Test")),
 							Modifier.Public
 					))
-					.withType(voidType())
-					.withName(new Name("test" + name))
 					.withBody(some(blockStmt().withStmts(stmts)));
 			collectedTestMethods = collectedTestMethods.append(testMethod);
 		}
@@ -340,26 +318,20 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 
 		public void write() {
 			writeTestClass(packageName, className, imports,
-					classDecl()
+					classDecl(name(className))
 							.withModifiers(NodeList.of(
-									singleMemberAnnotationExpr()
-											.withName(qualifiedName("RunWith"))
-											.withMemberValue(classExpr().withType(qType("JUnit4"))),
+									singleMemberAnnotationExpr(qualifiedName("RunWith"), classExpr(qType("JUnit4"))),
 									Modifier.Public
 							))
-							.withName(new Name(className))
 							.withMembers(ms -> ms.appendAll(collectedTestMethods))
 			);
 		}
 	}
 
 	private void writeTestClass(String packageName, String className, NodeList<ImportDecl> imports, ClassDecl classDecl) {
-		CompilationUnit cu = compilationUnit()
-				.withPackageDecl(packageDecl().withName(qualifiedName(packageName)))
+		CompilationUnit cu = compilationUnit(packageDecl(qualifiedName(packageName)))
 				.withImports(imports)
-				.withTypes(NodeList.of(
-						classDecl
-				));
+				.withTypes(NodeList.of(classDecl));
 
 		try {
 			final String path = "../jlato/src/test/java/" + packageName.replace('.', '/') + "/" + className + ".java";
@@ -378,12 +350,11 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 	}
 
 	public Stmt newVar(Type type, Name name, Expr init) {
-		return expressionStmt().withExpr(
-				variableDeclarationExpr().withDeclaration(
-						localVariableDecl().withType(type)
+		return expressionStmt(
+				variableDeclarationExpr(
+						localVariableDecl(type)
 								.withVariables(NodeList.of(
-										variableDeclarator()
-												.withId(variableDeclaratorId().withName(name))
+										variableDeclarator(variableDeclaratorId(name))
 												.withInit(some(init))
 								))
 				)
@@ -391,36 +362,29 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 	}
 
 	private MethodInvocationExpr factoryCall(String name) {
-		return methodInvocationExpr().withName(new Name(lowerCaseFirst(name)));
+		return methodInvocationExpr(name(lowerCaseFirst(name)));
 	}
 
 	private Stmt loopFor(int count, NodeList<Stmt> loopStmts) {
-		final Name i = new Name("i");
-		return forStmt()
+		final Name i = name("i");
+		return forStmt(binaryExpr(i, Less, literalExpr(count)), blockStmt().withStmts(loopStmts))
 				.withInit(NodeList.of(
-						variableDeclarationExpr().withDeclaration(
-								localVariableDecl()
-										.withType(primitiveType().withPrimitive(Primitive.Int))
+						variableDeclarationExpr(
+								localVariableDecl(primitiveType(Primitive.Int))
 										.withVariables(NodeList.of(
-												variableDeclarator().withId(variableDeclaratorId().withName(i))
-														.withInit(some(LiteralExpr.of(0)))
+												variableDeclarator(variableDeclaratorId(i))
+														.withInit(some(literalExpr(0)))
 										))
 						)
 				))
-				.withCompare(
-						binaryExpr().withLeft(i).withOp(Less).withRight(LiteralExpr.of(count))
-				)
 				.withUpdate(NodeList.of(
-						unaryExpr().withOp(PostIncrement).withExpr(i)
-				))
-				.withBody(blockStmt().withStmts(loopStmts));
+						unaryExpr(PostIncrement, i)
+				));
 	}
 
 	private MethodInvocationExpr arbitraryCall(Name arbitrary, Type type) {
 		arbitraryTypes.add(type);
-		return methodInvocationExpr()
-				.withScope(some(arbitrary))
-				.withName(new Name(arbitraryGenMethodName(type)));
+		return methodInvocationExpr(name(arbitraryGenMethodName(type))).withScope(some(arbitrary));
 	}
 
 	private String arbitraryGenMethodName(Type type) {
@@ -454,37 +418,34 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 
 	private void generateArbitrary() {
 		final NodeList<ImportDecl> imports = NodeList.of(
-				importDecl().withName(qualifiedName("org.jlato.tree")).setOnDemand(true),
-				importDecl().withName(qualifiedName("org.jlato.tree.decl")).setOnDemand(true),
-				importDecl().withName(qualifiedName("org.jlato.tree.expr")).setOnDemand(true),
-				importDecl().withName(qualifiedName("org.jlato.tree.expr.AssignExpr.AssignOp")),
-				importDecl().withName(qualifiedName("org.jlato.tree.expr.BinaryExpr.BinaryOp")),
-				importDecl().withName(qualifiedName("org.jlato.tree.expr.UnaryExpr.UnaryOp")),
-				importDecl().withName(qualifiedName("org.jlato.tree.name")).setOnDemand(true),
-				importDecl().withName(qualifiedName("org.jlato.tree.stmt")).setOnDemand(true),
-				importDecl().withName(qualifiedName("org.jlato.tree.type")).setOnDemand(true),
-				importDecl().withName(qualifiedName("org.jlato.tree.type.PrimitiveType.Primitive")),
-				importDecl().withName(qualifiedName("org.jlato.tree.TreeFactory")).setStatic(true).setOnDemand(true),
-				importDecl().withName(qualifiedName("org.jlato.unit.util.Arbitrary")),
-				importDecl().withName(qualifiedName("org.junit")).setOnDemand(true),
-				importDecl().withName(qualifiedName("org.junit.runner.RunWith")),
-				importDecl().withName(qualifiedName("org.junit.runners.JUnit4"))
+				importDecl(qualifiedName("org.jlato.tree")).setOnDemand(true),
+				importDecl(qualifiedName("org.jlato.tree.decl")).setOnDemand(true),
+				importDecl(qualifiedName("org.jlato.tree.expr")).setOnDemand(true),
+				importDecl(qualifiedName("org.jlato.tree.expr.AssignExpr.AssignOp")),
+				importDecl(qualifiedName("org.jlato.tree.expr.BinaryExpr.BinaryOp")),
+				importDecl(qualifiedName("org.jlato.tree.expr.UnaryExpr.UnaryOp")),
+				importDecl(qualifiedName("org.jlato.tree.name")).setOnDemand(true),
+				importDecl(qualifiedName("org.jlato.tree.stmt")).setOnDemand(true),
+				importDecl(qualifiedName("org.jlato.tree.type")).setOnDemand(true),
+				importDecl(qualifiedName("org.jlato.tree.type.PrimitiveType.Primitive")),
+				importDecl(qualifiedName("org.jlato.tree.TreeFactory")).setStatic(true).setOnDemand(true),
+				importDecl(qualifiedName("org.jlato.unit.util.Arbitrary")),
+				importDecl(qualifiedName("org.junit")).setOnDemand(true),
+				importDecl(qualifiedName("org.junit.runner.RunWith")),
+				importDecl(qualifiedName("org.junit.runners.JUnit4"))
 		);
 
 		writeTestClass("org.jlato.unit.util", "Arbitrary", imports,
-				classDecl()
+				classDecl(name("Arbitrary"))
 						.withModifiers(NodeList.of(Modifier.Public))
-						.withName(new Name("Arbitrary"))
 						.withMembers(ms -> {
 							NodeList<? extends MemberDecl> l = NodeList.of(arbitraryTypes).map(t ->
-																	methodDecl()
-																			.withModifiers(NodeList.of(Modifier.Public))
-																			.withType(t)
-																			.withName(new Name(arbitraryGenMethodName(t)))
-																			.withBody(some(
-																					blockStmt()
-																			))
-													);
+											methodDecl(t, name(arbitraryGenMethodName(t)))
+													.withModifiers(NodeList.of(Modifier.Public))
+													.withBody(some(
+															blockStmt()
+													))
+							);
 							return ms.appendAll(l);
 						})
 		);

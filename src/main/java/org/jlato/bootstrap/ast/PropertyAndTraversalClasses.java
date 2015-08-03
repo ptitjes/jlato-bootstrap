@@ -83,75 +83,58 @@ public class PropertyAndTraversalClasses extends Utils implements DeclContributi
 
 			final Name childParamName = new Name("child");
 
-			final FormalParameter typedStateParam = formalParameter()
-					.withType(stateType)
-					.withId(variableDeclaratorId().withName(stateParamName));
-			final FormalParameter stateParam = formalParameter()
-					.withType(qualifiedType().withName(TreeClassDescriptor.STREE_STATE_NAME))
-					.withId(variableDeclaratorId().withName(stateParamName));
+			final FormalParameter typedStateParam = formalParameter(stateType, variableDeclaratorId(stateParamName));
+			final FormalParameter stateParam = formalParameter(
+					qualifiedType(TreeClassDescriptor.STREE_STATE_NAME),
+					variableDeclaratorId(stateParamName));
 
 			QualifiedType childStateType = treeTypeToStateType((QualifiedType) treeType);
 			final Type childType = qType("STree", childStateType);
 			final Type childReturnType = qType("STree", wildcardType());
-			final FormalParameter childParam = formalParameter()
-					.withType(childType)
-					.withId(variableDeclaratorId().withName(childParamName));
+			final FormalParameter childParam = formalParameter(childType, variableDeclaratorId(childParamName));
 
-			MethodDecl traverseMethod = methodDecl()
+			MethodDecl traverseMethod = methodDecl(childReturnType, new Name("doTraverse"))
 					.withModifiers(NodeList.of(overrideAnn(), Modifier.Public))
-					.withType(childReturnType)
-					.withName(new Name("doTraverse"))
 					.withParams(NodeList.of(typedStateParam))
 					.withBody(some(blockStmt().withStmts(NodeList.of(
 							returnStmt().withExpr(some(
-									fieldAccessExpr().withScope(some(stateParamName)).withName(new Name(traversalName))
+									fieldAccessExpr(new Name(traversalName)).withScope(some(stateParamName))
 							))
 					))));
 
-			MethodDecl rebuildMethod = methodDecl()
+			MethodDecl rebuildMethod = methodDecl(stateType, new Name("doRebuildParentState"))
 					.withModifiers(NodeList.of(overrideAnn(), Modifier.Public))
-					.withType(stateType)
-					.withName(new Name("doRebuildParentState"))
 					.withParams(NodeList.of(typedStateParam, childParam))
 					.withBody(some(blockStmt().withStmts(NodeList.of(
 							returnStmt().withExpr(some(
-									methodInvocationExpr()
+									methodInvocationExpr(new Name(propertySetterName(traversalName, treeType)))
 											.withScope(some(stateParamName))
-											.withName(new Name(propertySetterName(traversalName, treeType)))
 											.withArgs(NodeList.of(childParamName))
 							))
 					))));
 
-			MethodDecl leftSibling = methodDecl()
+			MethodDecl leftSibling = methodDecl(qType("STraversal"), new Name("left" + "Sibling"))
 					.withModifiers(NodeList.of(overrideAnn(), Modifier.Public))
-					.withType(qType("STraversal"))
-					.withName(new Name("left" + "Sibling"))
 					.withParams(NodeList.of(stateParam))
 					.withBody(some(blockStmt().withStmts(NodeList.of(
-							returnStmt().withExpr(some(before == null ? LiteralExpr.nullLiteral() : new Name(constantName(before))))
+							returnStmt().withExpr(some(before == null ? nullLiteralExpr() : new Name(constantName(before))))
 					))));
 
-			MethodDecl rightSibling = methodDecl()
+			MethodDecl rightSibling = methodDecl(qType("STraversal"), new Name("right" + "Sibling"))
 					.withModifiers(NodeList.of(overrideAnn(), Modifier.Public))
-					.withType(qType("STraversal"))
-					.withName(new Name("right" + "Sibling"))
 					.withParams(NodeList.of(stateParam))
 					.withBody(some(blockStmt().withStmts(NodeList.of(
-							returnStmt().withExpr(some(after == null ? LiteralExpr.nullLiteral() : new Name(constantName(after))))
+							returnStmt().withExpr(some(after == null ? nullLiteralExpr() : new Name(constantName(after))))
 					))));
 
 			QualifiedType traversalType = qType("STypeSafeTraversal", stateType, childStateType, treeType);
-			FieldDecl traversal = fieldDecl()
+			FieldDecl traversal = fieldDecl(traversalType)
 					.withModifiers(NodeList.of(Modifier.Private, Modifier.Static))
-					.withType(traversalType)
 					.withVariables(NodeList.of(
-							variableDeclarator()
-									.withId(variableDeclaratorId().withName(new Name(constantName)))
+							variableDeclarator(variableDeclaratorId(new Name(constantName)))
 									.withInit(some(
-											objectCreationExpr()
-													.withType(traversalType)
+											objectCreationExpr(traversalType)
 													.withBody(some(NodeList.of(traverseMethod, rebuildMethod, leftSibling, rightSibling)))
-
 									))
 					));
 			return traversal;
@@ -187,54 +170,42 @@ public class PropertyAndTraversalClasses extends Utils implements DeclContributi
 
 			final Name childParamName = new Name("child");
 
-			final FormalParameter typedStateParam = formalParameter()
-					.withType(stateType)
-					.withId(variableDeclaratorId().withName(stateParamName));
-			final FormalParameter stateParam = formalParameter()
-					.withType(qualifiedType().withName(TreeClassDescriptor.STREE_STATE_NAME))
-					.withId(variableDeclaratorId().withName(stateParamName));
+			final FormalParameter typedStateParam = formalParameter(stateType, variableDeclaratorId(stateParamName));
+			final FormalParameter stateParam = formalParameter(
+					qualifiedType(TreeClassDescriptor.STREE_STATE_NAME),
+					variableDeclaratorId(stateParamName));
 
 			final Name valueParamName = new Name("value");
 			final Type valueType = boxedType(param.type());
-			final FormalParameter valueParam = formalParameter()
-					.withType(valueType)
-					.withId(variableDeclaratorId().withName(valueParamName));
+			final FormalParameter valueParam = formalParameter(valueType, variableDeclaratorId(valueParamName));
 
-			MethodDecl retrieveMethod = methodDecl()
+			MethodDecl retrieveMethod = methodDecl(valueType, new Name("doRetrieve"))
 					.withModifiers(NodeList.of(overrideAnn(), Modifier.Public))
-					.withType(valueType)
-					.withName(new Name("doRetrieve"))
 					.withParams(NodeList.of(typedStateParam))
 					.withBody(some(blockStmt().withStmts(NodeList.of(
 							returnStmt().withExpr(some(
-									fieldAccessExpr().withScope(some(stateParamName)).withName(param.id().name())
+									fieldAccessExpr(param.id().name()).withScope(some(stateParamName))
 							))
 					))));
 
-			MethodDecl rebuildMethod = methodDecl()
+			MethodDecl rebuildMethod = methodDecl(stateType, new Name("doRebuildParentState"))
 					.withModifiers(NodeList.of(overrideAnn(), Modifier.Public))
-					.withType(stateType)
-					.withName(new Name("doRebuildParentState"))
 					.withParams(NodeList.of(typedStateParam, valueParam))
 					.withBody(some(blockStmt().withStmts(NodeList.of(
 							returnStmt().withExpr(some(
-									methodInvocationExpr()
+									methodInvocationExpr(new Name(propertySetterName(param)))
 											.withScope(some(stateParamName))
-											.withName(new Name(propertySetterName(param)))
 											.withArgs(NodeList.of(valueParamName))
 							))
 					))));
 
 			QualifiedType propertyType = qType("STypeSafeProperty", stateType, valueType);
-			FieldDecl property = fieldDecl()
+			FieldDecl property = fieldDecl(propertyType)
 					.withModifiers(NodeList.of(Modifier.Private, Modifier.Static))
-					.withType(propertyType)
 					.withVariables(NodeList.of(
-							variableDeclarator()
-									.withId(variableDeclaratorId().withName(new Name(constantName)))
+							variableDeclarator(variableDeclaratorId(new Name(constantName)))
 									.withInit(some(
-											objectCreationExpr()
-													.withType(propertyType)
+											objectCreationExpr(propertyType)
 													.withBody(some(NodeList.of(retrieveMethod, rebuildMethod)))
 
 									))

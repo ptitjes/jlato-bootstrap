@@ -46,7 +46,7 @@ public class ExtractTreeDescriptors extends TreeClassRefactoring {
 				memberDecl("$_ $_ ();")
 		)).map(m -> {
 			final MethodDecl methodDecl = (MethodDecl) m;
-			return formalParameter().withId(variableDeclaratorId().withName(methodDecl.name())).withType(methodDecl.type());
+			return formalParameter(methodDecl.type(), variableDeclaratorId(methodDecl.name()));
 		});
 
 		// TODO Fix parameters collection for interfaces

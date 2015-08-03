@@ -49,8 +49,7 @@ public class TreeClass extends TypePattern.OfClass<TreeClassDescriptor> {
 
 		classDecl = classDecl
 				.withExtendsClause(some(
-						qualifiedType()
-								.withName(TreeTypeDescriptor.TREE_BASE_NAME)
+						qualifiedType(TreeTypeDescriptor.TREE_BASE_NAME)
 								.withTypeArgs(some(NodeList.of(
 										arg.stateType(),
 										arg.superInterfaces.get(0),

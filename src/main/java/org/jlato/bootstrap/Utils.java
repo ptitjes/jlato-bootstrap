@@ -99,11 +99,11 @@ public class Utils {
 	}
 
 	public static AnnotationExpr overrideAnn() {
-		return markerAnnotationExpr().withName(qualifiedName("Override"));
+		return markerAnnotationExpr(qualifiedName("Override"));
 	}
 
 	public static AnnotationExpr deprecatedAnn() {
-		return markerAnnotationExpr().withName(qualifiedName("Deprecated"));
+		return markerAnnotationExpr(qualifiedName("Deprecated"));
 	}
 
 	public static NodeList<FormalParameter> deriveStateParams(NodeList<FormalParameter> treeConstructorParams) {
@@ -113,7 +113,7 @@ public class Utils {
 
 			Type stateParamType = treeTypeToSTreeType(treeType);
 			stateConstructorParams = stateConstructorParams.append(
-					formalParameter().withType(stateParamType).withId(param.id())
+					formalParameter(stateParamType, param.id())
 			);
 		}
 		return stateConstructorParams;
@@ -154,15 +154,13 @@ public class Utils {
 
 		QualifiedType stateType = null;
 		if (treeClassName.equals("NodeList")) {
-			stateType = qualifiedType().withName(new Name("SNodeListState"));
+			stateType = qualifiedType(name("SNodeListState"));
 		} else if (treeClassName.equals("NodeOption")) {
-			stateType = qualifiedType().withName(new Name("SNodeOptionState"));
+			stateType = qualifiedType(name("SNodeOptionState"));
 		} else if (treeClassName.equals("NodeEither")) {
-			stateType = qualifiedType().withName(new Name("SNodeEitherState"));
+			stateType = qualifiedType(name("SNodeEitherState"));
 		} else {
-			stateType = qualifiedType()
-					.withScope(some(treeQType))
-					.withName(NodeStatesRemoval.STATE_NAME);
+			stateType = qualifiedType(NodeStatesRemoval.STATE_NAME).withScope(some(treeQType));
 		}
 		return stateType;
 	}
@@ -172,22 +170,19 @@ public class Utils {
 	}
 
 	public static QualifiedType qType(String typeName) {
-		return TreeFactory.qualifiedType().withName(new Name(typeName));
+		return TreeFactory.qualifiedType(name(typeName));
 	}
 
 	public static QualifiedType qType(String typeName, Type typeArg) {
-		return TreeFactory.qualifiedType().withName(new Name(typeName))
-				.withTypeArgs(some(NodeList.of(typeArg)));
+		return TreeFactory.qualifiedType(name(typeName)).withTypeArgs(some(NodeList.of(typeArg)));
 	}
 
 	public static QualifiedType qType(String typeName, Type typeArg1, Type typeArg2) {
-		return TreeFactory.qualifiedType().withName(new Name(typeName))
-				.withTypeArgs(some(NodeList.of(typeArg1, typeArg2)));
+		return TreeFactory.qualifiedType(name(typeName)).withTypeArgs(some(NodeList.of(typeArg1, typeArg2)));
 	}
 
 	public static QualifiedType qType(String typeName, Type typeArg1, Type typeArg2, Type typeArg3) {
-		return TreeFactory.qualifiedType().withName(new Name(typeName))
-				.withTypeArgs(some(NodeList.of(typeArg1, typeArg2, typeArg3)));
+		return TreeFactory.qualifiedType(name(typeName)).withTypeArgs(some(NodeList.of(typeArg1, typeArg2, typeArg3)));
 	}
 
 	public static String constantToCamel(String constantName) {
@@ -224,7 +219,7 @@ public class Utils {
 	}
 
 	public static QualifiedType stateType(ClassDecl classDecl) {
-		return qualifiedType().withScope(some(qualifiedType().withName(classDecl.name()))).withName(new Name("State"));
+		return qualifiedType(name("State")).withScope(some(qualifiedType(classDecl.name())));
 	}
 
 	public static NodeList<MemberDecl> insertBeforeShapes(NodeList<MemberDecl> ts, NodeList<MemberDecl> ls) {
@@ -250,7 +245,7 @@ public class Utils {
 	public static String genDoc(FieldDecl decl, String description) {
 		StringBuilder builder = new StringBuilder();
 		builder.append("/**\n");
-		builder.append(" * " + description + "\n");
+		builder.append(" * ").append(description).append("\n");
 		builder.append(" */");
 		return builder.toString();
 	}
@@ -258,15 +253,15 @@ public class Utils {
 	public static String genDoc(MethodDecl decl, String description, String[] paramDescription, String returnDescription) {
 		StringBuilder builder = new StringBuilder();
 		builder.append("/**\n");
-		builder.append(" * " + description + "\n");
+		builder.append(" * ").append(description).append("\n");
 		builder.append(" *\n");
 		int index = 0;
 		for (FormalParameter param : decl.params()) {
-			builder.append(" * @param " + param.id() + " " + paramDescription[index] + "\n");
+			builder.append(" * @param ").append(param.id()).append(" ").append(paramDescription[index]).append("\n");
 			index++;
 		}
 		if (returnDescription != null)
-			builder.append(" * @return " + returnDescription + "\n");
+			builder.append(" * @return ").append(returnDescription).append("\n");
 		builder.append(" */");
 		return builder.toString();
 	}
@@ -274,11 +269,11 @@ public class Utils {
 	public static String genDoc(ConstructorDecl decl, String description, String[] paramDescription) {
 		StringBuilder builder = new StringBuilder();
 		builder.append("/**\n");
-		builder.append(" * " + description + "\n");
+		builder.append(" * ").append(description).append("\n");
 		builder.append(" *\n");
 		int index = 0;
 		for (FormalParameter param : decl.params()) {
-			builder.append(" * @param " + param.id() + " " + paramDescription[index] + "\n");
+			builder.append(" * @param ").append(param.id()).append(" ").append(paramDescription[index]).append("\n");
 			index++;
 		}
 		builder.append(" */");

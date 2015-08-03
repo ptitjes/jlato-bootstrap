@@ -73,28 +73,24 @@ public class StateEqualsAndHashCode implements DeclContribution<TreeClassDescrip
 
 				stmts = stmts.appendAll(params.map(p -> {
 					final Name thisField = p.id().name();
-					final FieldAccessExpr otherField = fieldAccessExpr()
-							.withScope(some(state))
-							.withName(thisField);
+					final FieldAccessExpr otherField = fieldAccessExpr(thisField).withScope(some(state));
 
 					Expr equalTest = p.type() instanceof PrimitiveType ?
-							binaryExpr().withLeft(thisField).withOp(NotEqual).withRight(otherField) :
-							unaryExpr().withOp(Not).withExpr(
-									methodInvocationExpr().withScope(some(thisField)).withName(EQUALS).withArgs(NodeList.of(otherField))
-							);
+							binaryExpr(thisField, NotEqual, otherField) :
+							unaryExpr(Not, methodInvocationExpr(EQUALS).withScope(some(thisField)).withArgs(NodeList.of(otherField)));
 
 					if (nullable(p)) {
-						equalTest = conditionalExpr()
-								.withCondition(binaryExpr().withLeft(thisField).withOp(Equal).withRight(LiteralExpr.nullLiteral()))
-								.withThenExpr(binaryExpr().withLeft(otherField).withOp(NotEqual).withRight(LiteralExpr.nullLiteral()))
-								.withElseExpr(equalTest);
+						equalTest = conditionalExpr(
+								binaryExpr(thisField, Equal, nullLiteralExpr()),
+								binaryExpr(otherField, NotEqual, nullLiteralExpr()),
+								equalTest);
 					}
 
-					return ifStmt().withCondition(equalTest).withThenStmt(returnStmt().withExpr(some(LiteralExpr.of(false))));
+					return ifStmt(equalTest, returnStmt().withExpr(some(literalExpr(false))));
 				}));
 			}
 
-			stmts = stmts.append(returnStmt().withExpr(some(LiteralExpr.of(true))));
+			stmts = stmts.append(returnStmt().withExpr(some(literalExpr(true))));
 
 			decl = decl.withBody(some(blockStmt().withStmts(stmts)));
 
@@ -145,9 +141,7 @@ public class StateEqualsAndHashCode implements DeclContribution<TreeClassDescrip
 
 				Stmt hashStmt = stmt("result = 37 * result + $h;").build(Substitution.empty().bind("h", hashExpr));
 				if (nullable(param)) {
-					hashStmt = ifStmt()
-							.withCondition(binaryExpr().withLeft(thisField).withOp(NotEqual).withRight(LiteralExpr.nullLiteral()))
-							.withThenStmt(hashStmt);
+					hashStmt = ifStmt(binaryExpr(thisField, NotEqual, nullLiteralExpr()), hashStmt);
 				}
 				stmts = stmts.append(hashStmt);
 			}

@@ -34,9 +34,8 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 
 	@Override
 	public ClassDecl rewrite(ClassDecl decl, TreeClassDescriptor[] arg) {
-		decl = classDecl()
-				.withModifiers(m -> m.append(Modifier.Public).append(Modifier.Abstract))
-				.withName(new Name("TreeFactory"));
+		decl = classDecl(new Name("TreeFactory"))
+				.withModifiers(m -> m.append(Modifier.Public).append(Modifier.Abstract));
 
 		if (GenSettings.generateDocs)
 			decl = decl.insertLeadingComment("/** A factory for tree nodes. */");
@@ -132,18 +131,16 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 				switch (qualifiedType.name().id()) {
 					case "NodeList":
 						args = args.append(
-								methodInvocationExpr()
+								methodInvocationExpr(new Name("empty"))
 										.withScope(some(qualifiedType.name()))
 										.withTypeArgs(qualifiedType.typeArgs().get())
-										.withName(new Name("empty"))
 						);
 						break;
 					case "NodeOption":
 						args = args.append(
-								methodInvocationExpr()
+								methodInvocationExpr(new Name("none"))
 										.withScope(some(qualifiedType.name()))
 										.withTypeArgs(qualifiedType.typeArgs().get())
-										.withName(new Name("none"))
 						);
 						break;
 					default:
@@ -151,7 +148,7 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 							params = params.append(param);
 							args = args.append(param.id().name());
 						} else {
-							args = args.append(LiteralExpr.nullLiteral());
+							args = args.append(nullLiteralExpr());
 						}
 						break;
 				}
@@ -159,7 +156,7 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 				Primitive primitive = ((PrimitiveType) type).primitive();
 				switch (primitive) {
 					case Boolean:
-						args = args.append(LiteralExpr.of(false));
+						args = args.append(literalExpr(false));
 						break;
 				}
 			}
@@ -167,18 +164,16 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 			index++;
 		}
 
-		QualifiedType resultType = qualifiedType().withName(descriptor.name);
+		QualifiedType resultType = qualifiedType(descriptor.name);
 		Stmt creation = returnStmt().withExpr(
-				some(objectCreationExpr().withType(resultType).withArgs(args).withBody(none()))
+				some(objectCreationExpr(resultType).withArgs(args).withBody(none()))
 		);
 
-		MethodDecl method = methodDecl()
+		MethodDecl method = methodDecl(resultType, new Name(lowerCaseFirst(descriptor.name.id())))
 				.withModifiers(m -> noNulls ?
 								m.append(Modifier.Public).append(Modifier.Static) :
 								m.append(deprecatedAnn()).append(Modifier.Public).append(Modifier.Static)
 				)
-				.withType(resultType)
-				.withName(new Name(lowerCaseFirst(descriptor.name.id())))
 				.withParams(params)
 				.withBody(some(blockStmt().withStmts(s -> s.append(creation))));
 

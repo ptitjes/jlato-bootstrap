@@ -80,14 +80,13 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 		@Override
 		protected ConstructorDecl makeDecl(ConstructorDecl decl, TreeClassDescriptor arg) {
 			final NodeList<FormalParameter> stateParameters = arg.stateParameters();
-			return constructorDecl().withName(TreeTypeDescriptor.STATE_NAME)
-					.withParams(stateParameters)
-					.withBody(blockStmt().withStmts(
-							stateParameters.map(p -> expressionStmt().withExpr(
-									assignExpr().withTarget(fieldAccessExpr().withScope(some(thisExpr())).withName(p.id().name()))
-											.withOp(Normal).withValue(p.id().name())
+			return constructorDecl(TreeTypeDescriptor.STATE_NAME,
+					blockStmt().withStmts(
+							stateParameters.map(p -> expressionStmt(
+									assignExpr(fieldAccessExpr(p.id().name()).withScope(some(thisExpr())), Normal, p.id().name())
 							))
-					));
+					))
+					.withParams(stateParameters);
 		}
 
 		@Override
@@ -306,7 +305,7 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 
 		@Override
 		protected MethodDecl makeDecl(MethodDecl decl, TreeClassDescriptor arg) {
-			final ObjectCreationExpr stateCreationExpr = objectCreationExpr().withType(arg.stateType())
+			final ObjectCreationExpr stateCreationExpr = objectCreationExpr(arg.stateType())
 					.withArgs(arg.parameters.map(p -> p.id().name()));
 
 			return decl.withBody(some(blockStmt().withStmts(NodeList.of(

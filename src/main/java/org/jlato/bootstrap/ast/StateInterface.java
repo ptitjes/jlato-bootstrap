@@ -39,9 +39,9 @@ class StateInterface extends TypePattern.OfInterface<TreeInterfaceDescriptor> {
 		boolean treeInterfaceChild = parentInterfaces.size() == 1 && parentInterfaces.get(0).name().equals(TreeTypeDescriptor.TREE_NAME);
 
 		interfaceDecl = interfaceDecl.withExtendsClause(
-				treeInterfaceChild ? NodeList.of(qualifiedType().withName(TreeTypeDescriptor.STREE_STATE_NAME)) :
+				treeInterfaceChild ? NodeList.of(qualifiedType(TreeTypeDescriptor.STREE_STATE_NAME)) :
 						parentInterfaces.map(t ->
-								qualifiedType().withScope(some(t)).withName(TreeTypeDescriptor.STATE_NAME))
+								qualifiedType(TreeTypeDescriptor.STATE_NAME).withScope(some(t)))
 		).withMembers(ms -> ms == null ? NodeList.<MemberDecl>empty() : ms);
 
 		if (GenSettings.generateDocs)

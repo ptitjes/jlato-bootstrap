@@ -44,15 +44,15 @@ public abstract class TreeTypeDescriptor {
 	public abstract String treeFilePath();
 
 	public QualifiedType type() {
-		return qualifiedType().withName(name);
+		return qualifiedType(name);
 	}
 
 	public abstract QualifiedType stateType();
 
 	public NodeList<QualifiedType> stateSuperTypes() {
 		return superInterfaces.map(tt ->
-						tt.name().equals(TREE_NAME) ? qualifiedType().withName(STREE_STATE_NAME) :
-								qualifiedType().withScope(some(qualifiedType().withName(tt.name()))).withName(STATE_NAME)
+						tt.name().equals(TREE_NAME) ? qualifiedType(STREE_STATE_NAME) :
+								qualifiedType(STATE_NAME).withScope(some(qualifiedType(tt.name())))
 		);
 	}
 

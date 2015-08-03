@@ -37,10 +37,9 @@ class StateClass extends TypePattern.OfClass<TreeClassDescriptor> {
 
 		classDecl = classDecl
 				.withExtendsClause(some(
-						qualifiedType()
-								.withName(TreeTypeDescriptor.SNODE_STATE_NAME)
+						qualifiedType(TreeTypeDescriptor.SNODE_STATE_NAME)
 								.withTypeArgs(some(NodeList.of(
-										qualifiedType().withName(TreeTypeDescriptor.STATE_NAME)
+										qualifiedType(TreeTypeDescriptor.STATE_NAME)
 								)))
 				))
 				.withImplementsClause(arg.stateSuperTypes());
