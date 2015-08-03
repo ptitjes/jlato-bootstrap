@@ -20,6 +20,10 @@ import static org.jlato.tree.TreeFactory.qualifiedName;
  */
 public class AllDescriptors {
 
+	public static final QualifiedName TREE_INTERFACES_ROOT = qualifiedName("org.jlato.tree2");
+//	public static final QualifiedName TREE_IMPLEMENTATION_ROOT = qualifiedName("org.jlato.internal.tree");
+	public static final QualifiedName TREE_IMPLEMENTATION_ROOT = qualifiedName("org.jlato.tree");
+
 	public static TreeTypeDescriptor get(Name name) {
 		return perName.get(name);
 	}
@@ -72,9 +76,9 @@ public class AllDescriptors {
 		final TreeTypeDescriptor descriptor = perName.get(name);
 		if (descriptor == null)
 			throw new IllegalArgumentException("Can't resolve name '" + name + "'");
-		if (descriptor.packageQualifiedName(importManager).equals(importManager.packageName))
+		if (descriptor.interfacePackageQualifiedName().equals(importManager.packageName))
 			return null;
-		return descriptor.qualifiedName(importManager);
+		return descriptor.interfaceQualifiedName();
 	}
 
 	private static final HashMap<Name, TreeTypeDescriptor> perName = new HashMap<>();

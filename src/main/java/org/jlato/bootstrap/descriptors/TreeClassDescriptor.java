@@ -45,17 +45,6 @@ public class TreeClassDescriptor extends TreeTypeDescriptor {
 	}
 
 	@Override
-	public QualifiedName qualifiedName(ImportManager importManager) {
-		return TreeFactory.qualifiedName(name).withQualifier(some(packageQualifiedName(importManager)));
-	}
-
-	@Override
-	public QualifiedName packageQualifiedName(ImportManager importManager) {
-		final QualifiedName treeRoot = importManager.packageName.qualifier().get();
-		return TreeFactory.qualifiedName(packageName).withQualifier(some(treeRoot));
-	}
-
-	@Override
 	public QualifiedType stateType() {
 		return qualifiedType(STATE_NAME).withScope(some(qualifiedType(name)));
 	}

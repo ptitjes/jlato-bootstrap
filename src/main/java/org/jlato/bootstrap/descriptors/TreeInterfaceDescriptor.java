@@ -29,17 +29,6 @@ public class TreeInterfaceDescriptor extends TreeTypeDescriptor {
 	}
 
 	@Override
-	public QualifiedName qualifiedName(ImportManager importManager) {
-		return TreeFactory.qualifiedName(name).withQualifier(some(packageQualifiedName(importManager)));
-	}
-
-	@Override
-	public QualifiedName packageQualifiedName(ImportManager importManager) {
-		final QualifiedName treeRoot = importManager.packageName.qualifier().get();
-		return TreeFactory.qualifiedName(packageName).withQualifier(some(treeRoot));
-	}
-
-	@Override
 	public String treeFilePath() {
 		return "org/jlato/tree/" + packageName + "/" + name + ".java";
 	}

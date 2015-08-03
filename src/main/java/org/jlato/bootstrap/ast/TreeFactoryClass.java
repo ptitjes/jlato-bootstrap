@@ -46,7 +46,7 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 		for (TreeClassDescriptor descriptor : arg) {
 			if (descriptor.customTailored) continue;
 
-			importManager.addImport(importDecl(descriptor.packageQualifiedName(importManager)).setOnDemand(true));
+			importManager.addImport(importDecl(descriptor.implementationPackageQualifiedName()).setOnDemand(true));
 
 			if (!descriptor.name.id().equals("LiteralExpr")) {
 				if (!noNullsFormHasNoParams(descriptor))

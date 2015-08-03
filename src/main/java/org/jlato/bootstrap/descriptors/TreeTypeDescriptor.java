@@ -1,7 +1,6 @@
 package org.jlato.bootstrap.descriptors;
 
-import org.jlato.bootstrap.util.ImportManager;
-import org.jlato.tree.NodeList;
+import org.jlato.tree.*;
 import org.jlato.tree.decl.FormalParameter;
 import org.jlato.tree.decl.MemberDecl;
 import org.jlato.tree.name.Name;
@@ -63,9 +62,23 @@ public abstract class TreeTypeDescriptor {
 
 	public abstract boolean isInterface();
 
-	public abstract QualifiedName packageQualifiedName(ImportManager importManager);
+	public QualifiedName interfaceQualifiedName() {
+		return TreeFactory.qualifiedName(name).withQualifier(some(interfacePackageQualifiedName()));
+	}
 
-	public abstract QualifiedName qualifiedName(ImportManager importManager);
+	public QualifiedName interfacePackageQualifiedName() {
+		final QualifiedName treeRoot = AllDescriptors.TREE_INTERFACES_ROOT;
+		return TreeFactory.qualifiedName(packageName).withQualifier(some(treeRoot));
+	}
+
+	public QualifiedName implementationQualifiedName() {
+		return TreeFactory.qualifiedName(name).withQualifier(some(implementationPackageQualifiedName()));
+	}
+
+	public QualifiedName implementationPackageQualifiedName() {
+		final QualifiedName treeRoot = AllDescriptors.TREE_IMPLEMENTATION_ROOT;
+		return TreeFactory.qualifiedName(packageName).withQualifier(some(treeRoot));
+	}
 
 	public abstract String treeFilePath();
 
