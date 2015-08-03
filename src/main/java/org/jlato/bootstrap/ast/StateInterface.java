@@ -1,53 +1,47 @@
 package org.jlato.bootstrap.ast;
 
-import org.jlato.bootstrap.GenSettings;
 import org.jlato.bootstrap.descriptors.TreeInterfaceDescriptor;
 import org.jlato.bootstrap.descriptors.TreeTypeDescriptor;
-import org.jlato.bootstrap.util.ImportManager;
+import org.jlato.bootstrap.util.DeclContribution;
 import org.jlato.bootstrap.util.TypePattern;
-import org.jlato.rewrite.Pattern;
-import org.jlato.tree.NodeList;
-import org.jlato.tree.decl.Decl;
-import org.jlato.tree.decl.InterfaceDecl;
-import org.jlato.tree.decl.MemberDecl;
-import org.jlato.tree.decl.TypeDecl;
-import org.jlato.tree.type.QualifiedType;
+import org.jlato.tree.*;
+import org.jlato.tree.decl.*;
+import org.jlato.tree.type.*;
 
-import static org.jlato.rewrite.Quotes.typeDecl;
-import static org.jlato.tree.NodeOption.some;
-import static org.jlato.tree.TreeFactory.qualifiedType;
+import java.util.Arrays;
+
+import static org.jlato.tree.NodeOption.*;
+import static org.jlato.tree.TreeFactory.*;
 
 /**
  * @author Didier Villevalois
  */
 class StateInterface extends TypePattern.OfInterface<TreeInterfaceDescriptor> {
 
-	public StateInterface() {
-		super(
+	@Override
+	protected String makeQuote(TreeInterfaceDescriptor arg) {
+		return "interface State extends ..$_ { ..$_ }";
+	}
+
+	@Override
+	protected String makeDoc(InterfaceDecl decl, TreeInterfaceDescriptor arg) {
+		return "/** A state object for " + arg.prefixedDescription() + ". */";
+	}
+
+	@Override
+	protected InterfaceDecl contributeSignature(InterfaceDecl decl, TreeInterfaceDescriptor arg) {
+		NodeList<QualifiedType> parentInterfaces = arg.superInterfaces;
+		boolean treeInterfaceChild = parentInterfaces.size() == 1 && parentInterfaces.get(0).name().equals(TreeTypeDescriptor.TREE_NAME);
+
+		return decl.withExtendsClause(
+				treeInterfaceChild ? NodeList.of(qualifiedType(TreeTypeDescriptor.STREE_STATE_NAME)) :
+						parentInterfaces.map(t ->
+								qualifiedType(TreeTypeDescriptor.STATE_NAME).withScope(some(t)))
 		);
 	}
 
 	@Override
-	public Pattern<? extends Decl> matcher(TreeInterfaceDescriptor arg) {
-		return typeDecl("interface State extends ..$_ { ..$_ }");
-	}
-
-	@Override
-	public TypeDecl rewrite(TypeDecl decl, ImportManager importManager, TreeInterfaceDescriptor arg) {
-		InterfaceDecl interfaceDecl = (InterfaceDecl) super.rewrite(decl, importManager, arg);
-
-		NodeList<QualifiedType> parentInterfaces = arg.superInterfaces;
-		boolean treeInterfaceChild = parentInterfaces.size() == 1 && parentInterfaces.get(0).name().equals(TreeTypeDescriptor.TREE_NAME);
-
-		interfaceDecl = interfaceDecl.withExtendsClause(
-				treeInterfaceChild ? NodeList.of(qualifiedType(TreeTypeDescriptor.STREE_STATE_NAME)) :
-						parentInterfaces.map(t ->
-								qualifiedType(TreeTypeDescriptor.STATE_NAME).withScope(some(t)))
-		).withMembers(ms -> ms == null ? NodeList.<MemberDecl>empty() : ms);
-
-		if (GenSettings.generateDocs)
-			interfaceDecl = interfaceDecl.insertLeadingComment("/** A state object for " + arg.prefixedDescription() + ". */");
-
-		return interfaceDecl;
+	protected Iterable<DeclContribution<TreeInterfaceDescriptor, MemberDecl>> contributions(TreeInterfaceDescriptor arg) {
+		return Arrays.asList();
 	}
 }

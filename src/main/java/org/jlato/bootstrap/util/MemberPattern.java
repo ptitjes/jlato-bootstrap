@@ -13,7 +13,7 @@ import static org.jlato.rewrite.Quotes.memberDecl;
 public abstract class MemberPattern<A, M extends MemberDecl> extends Utils implements DeclPattern<A, M> {
 
 	@Override
-	public Pattern<? extends Decl> matcher(A arg) {
+	public final Pattern<? extends Decl> matcher(A arg) {
 		return memberDecl(makeQuote(arg));
 	}
 

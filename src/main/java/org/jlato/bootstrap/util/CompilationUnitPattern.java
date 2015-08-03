@@ -15,23 +15,16 @@ import static org.jlato.tree.TreeFactory.qualifiedName;
  */
 public abstract class CompilationUnitPattern<A> {
 
-	public final DeclContribution<A, TypeDecl>[] contributions;
-
-	@SafeVarargs
-	public CompilationUnitPattern(DeclContribution<A, TypeDecl>... contributions) {
-		this.contributions = contributions;
-	}
-
 	public TreeSet<CompilationUnit> apply(TreeSet<CompilationUnit> treeSet, String path, A arg) {
 		final CompilationUnit cu = treeSet.get(path);
 
-		CompilationUnit newCU;
-		if (GenSettings.replace) {
+		CompilationUnit newCU = cu;
+		if (cu == null || GenSettings.replace) {
 			newCU = create(path);
 		}
 
 		ImportManager importManager = new ImportManager(newCU.imports());
-		newCU = rewrite(cu, importManager, arg);
+		newCU = rewrite(newCU, importManager, arg);
 		newCU.withImports(importManager.imports());
 
 		return treeSet.put(path, newCU);
@@ -44,11 +37,13 @@ public abstract class CompilationUnitPattern<A> {
 
 	@SuppressWarnings("unchecked")
 	private CompilationUnit rewrite(CompilationUnit cu, ImportManager importManager, A arg) {
-		for (DeclContribution<A, TypeDecl> contribution : contributions) {
+		for (DeclContribution<A, TypeDecl> contribution : contributions(arg)) {
 			cu = applyContribution(cu, importManager, arg, contribution);
 		}
 		return cu;
 	}
+
+	protected abstract Iterable<DeclContribution<A, TypeDecl>> contributions(A arg);
 
 	private CompilationUnit applyContribution(CompilationUnit decl, ImportManager importManager, A arg, DeclContribution<A, TypeDecl> contribution) {
 		for (DeclPattern<A, ? extends TypeDecl> declaration : contribution.declarations(arg)) {

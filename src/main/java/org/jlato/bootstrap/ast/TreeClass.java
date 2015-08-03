@@ -1,53 +1,35 @@
 package org.jlato.bootstrap.ast;
 
-import org.jlato.bootstrap.GenSettings;
 import org.jlato.bootstrap.Utils;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.descriptors.TreeTypeDescriptor;
 import org.jlato.bootstrap.util.DeclContribution;
-import org.jlato.bootstrap.util.ImportManager;
 import org.jlato.bootstrap.util.TypePattern;
-import org.jlato.rewrite.Pattern;
-import org.jlato.tree.NodeList;
-import org.jlato.tree.decl.ClassDecl;
-import org.jlato.tree.decl.Decl;
-import org.jlato.tree.decl.FieldDecl;
-import org.jlato.tree.decl.TypeDecl;
+import org.jlato.tree.*;
+import org.jlato.tree.decl.*;
 
 import java.util.Arrays;
 
-import static org.jlato.rewrite.Quotes.typeDecl;
-import static org.jlato.tree.NodeOption.some;
-import static org.jlato.tree.TreeFactory.qualifiedType;
+import static org.jlato.tree.NodeOption.*;
+import static org.jlato.tree.TreeFactory.*;
 
 /**
  * @author Didier Villevalois
  */
 public class TreeClass extends TypePattern.OfClass<TreeClassDescriptor> {
 
-	public TreeClass() {
-		super(
-				new TreeKind(),
-				new TreeConstruction(),
-//				new TreeKind(),
-				new TreeClassAccessors(),
-				a -> Arrays.asList(new StateClass()),
-				new PropertyAndTraversalClasses(),
-				DeclContribution.mergeFields(a -> a.shapes.map(m -> (FieldDecl) m))
-		);
+	@Override
+	protected String makeQuote(TreeClassDescriptor arg) {
+		return "public class " + arg.name + " extends TreeBase<..$_> implements ..$_ { ..$_ }";
 	}
 
 	@Override
-	public Pattern<? extends Decl> matcher(TreeClassDescriptor arg) {
-		return typeDecl(
-				"public class " + arg.name + " extends TreeBase<..$_> implements ..$_ { ..$_ }"
-		);
+	protected String makeDoc(ClassDecl decl, TreeClassDescriptor arg) {
+		return "/** " + Utils.upperCaseFirst(arg.prefixedDescription()) + ". */";
 	}
 
 	@Override
-	public TypeDecl rewrite(TypeDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
-		ClassDecl classDecl = (ClassDecl) super.rewrite(decl, importManager, arg);
-
+	protected ClassDecl contributeSignature(ClassDecl classDecl, TreeClassDescriptor arg) {
 		classDecl = classDecl
 				.withExtendsClause(some(
 						qualifiedType(TreeTypeDescriptor.TREE_BASE_NAME)
@@ -58,10 +40,19 @@ public class TreeClass extends TypePattern.OfClass<TreeClassDescriptor> {
 								)))
 				))
 				.withImplementsClause(arg.superInterfaces);
-
-		if (GenSettings.generateDocs)
-			classDecl = classDecl.insertLeadingComment("/** " + Utils.upperCaseFirst(arg.prefixedDescription()) + ". */");
-
 		return classDecl;
+	}
+
+	@Override
+	protected Iterable<DeclContribution<TreeClassDescriptor, MemberDecl>> contributions(TreeClassDescriptor arg) {
+		return Arrays.asList(
+				new TreeKind(),
+				new TreeConstruction(),
+//				new TreeKind(),
+				new TreeClassAccessors(),
+				a -> Arrays.asList(new StateClass()),
+				new PropertyAndTraversalClasses(),
+				DeclContribution.mergeFields(a -> a.shapes.map(m -> (FieldDecl) m))
+		);
 	}
 }

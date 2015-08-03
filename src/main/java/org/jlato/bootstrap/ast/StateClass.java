@@ -1,42 +1,35 @@
 package org.jlato.bootstrap.ast;
 
-import org.jlato.bootstrap.GenSettings;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.descriptors.TreeTypeDescriptor;
-import org.jlato.bootstrap.util.ImportManager;
+import org.jlato.bootstrap.util.DeclContribution;
 import org.jlato.bootstrap.util.TypePattern;
-import org.jlato.rewrite.Pattern;
-import org.jlato.tree.NodeList;
-import org.jlato.tree.decl.ClassDecl;
-import org.jlato.tree.decl.Decl;
-import org.jlato.tree.decl.TypeDecl;
+import org.jlato.tree.*;
+import org.jlato.tree.decl.*;
 
-import static org.jlato.rewrite.Quotes.typeDecl;
-import static org.jlato.tree.NodeOption.some;
-import static org.jlato.tree.TreeFactory.qualifiedType;
+import java.util.Arrays;
+
+import static org.jlato.tree.NodeOption.*;
+import static org.jlato.tree.TreeFactory.*;
 
 /**
  * @author Didier Villevalois
  */
 class StateClass extends TypePattern.OfClass<TreeClassDescriptor> {
 
-	public StateClass() {
-		super(
-				new StateBaseMembers(),
-				new StateEqualsAndHashCode()
-		);
+	@Override
+	protected String makeQuote(TreeClassDescriptor arg) {
+		return "public static class State extends SNodeState<..$_> implements ..$_ { ..$_ }";
 	}
 
 	@Override
-	public Pattern<? extends Decl> matcher(TreeClassDescriptor arg) {
-		return typeDecl("public static class State extends SNodeState<..$_> implements ..$_ { ..$_ }");
+	protected String makeDoc(ClassDecl decl, TreeClassDescriptor arg) {
+		return "/** A state object for " + arg.prefixedDescription() + ". */";
 	}
 
 	@Override
-	public TypeDecl rewrite(TypeDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
-		ClassDecl classDecl = (ClassDecl) super.rewrite(decl, importManager, arg);
-
-		classDecl = classDecl
+	protected ClassDecl contributeSignature(ClassDecl decl, TreeClassDescriptor arg) {
+		decl = decl
 				.withExtendsClause(some(
 						qualifiedType(TreeTypeDescriptor.SNODE_STATE_NAME)
 								.withTypeArgs(some(NodeList.of(
@@ -44,10 +37,14 @@ class StateClass extends TypePattern.OfClass<TreeClassDescriptor> {
 								)))
 				))
 				.withImplementsClause(arg.stateSuperTypes());
+		return decl;
+	}
 
-		if (GenSettings.generateDocs)
-			classDecl = classDecl.insertLeadingComment("/** A state object for " + arg.prefixedDescription() + ". */");
-
-		return classDecl;
+	@Override
+	protected Iterable<DeclContribution<TreeClassDescriptor, MemberDecl>> contributions(TreeClassDescriptor arg) {
+		return Arrays.asList(
+				new StateBaseMembers(),
+				new StateEqualsAndHashCode()
+		);
 	}
 }

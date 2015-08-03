@@ -19,12 +19,9 @@
 
 package org.jlato.bootstrap;
 
-import org.jlato.bootstrap.ast.KindEnum;
-import org.jlato.bootstrap.ast.TreeClass;
-import org.jlato.bootstrap.ast.TreeInterface;
+import org.jlato.bootstrap.ast.*;
 import org.jlato.bootstrap.descriptors.AllDescriptors;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
-import org.jlato.bootstrap.ast.TreeFactoryClass;
 import org.jlato.bootstrap.descriptors.TreeInterfaceDescriptor;
 import org.jlato.bootstrap.util.DeclPattern;
 import org.jlato.bootstrap.util.ImportManager;
@@ -79,6 +76,16 @@ public class Bootstrap {
 		// Generate TreeFactory
 		final TreeFactoryClass treeFactoryClassPattern = new TreeFactoryClass();
 		treeSet = applyPattern(treeSet, "org/jlato/tree/TreeFactory.java", treeFactoryClassPattern, classDescriptors);
+
+		// Generate pure interfaces
+		final TreePureInterface treePureInterfacePattern = new TreePureInterface();
+		for (TreeInterfaceDescriptor descriptor : interfaceDescriptors) {
+			treeSet = treePureInterfacePattern.apply(treeSet, descriptor.treeFilePath().replace("tree", "tree2"), descriptor);
+		}
+		for (TreeClassDescriptor descriptor : classDescriptors) {
+			if (descriptor.customTailored) continue;
+			treeSet = treePureInterfacePattern.apply(treeSet, descriptor.treeFilePath().replace("tree", "tree2"), descriptor);
+		}
 
 		treeSet.updateOnDisk(false, FormattingSettings.Default);
 	}

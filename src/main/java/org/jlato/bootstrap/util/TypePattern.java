@@ -1,31 +1,53 @@
 package org.jlato.bootstrap.util;
 
+import org.jlato.bootstrap.GenSettings;
+import org.jlato.bootstrap.descriptors.TreeInterfaceDescriptor;
 import org.jlato.rewrite.MatchVisitor;
 import org.jlato.rewrite.Pattern;
 import org.jlato.rewrite.TypeSafeMatcher;
 import org.jlato.tree.NodeList;
 import org.jlato.tree.decl.*;
 
+import static org.jlato.rewrite.Quotes.typeDecl;
+
 /**
  * @author Didier Villevalois
  */
 public abstract class TypePattern<A, T extends TypeDecl> implements DeclPattern<A, TypeDecl> {
 
-	public final DeclContribution<A, MemberDecl>[] contributions;
-
-	@SafeVarargs
-	public TypePattern(DeclContribution<A, MemberDecl>... contributions) {
-		this.contributions = contributions;
+	@Override
+	public final Pattern<? extends Decl> matcher(A arg) {
+		return typeDecl(makeQuote(arg));
 	}
+
+	protected abstract String makeQuote(A arg);
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public TypeDecl rewrite(TypeDecl decl, ImportManager importManager, A arg) {
-		for (DeclContribution<A, MemberDecl> contribution : contributions) {
+
+		if (GenSettings.generateDocs) {
+			final String doc = makeDoc((T) decl, arg);
+			decl = insertJavadoc((T) decl, doc);
+		}
+
+		decl = contributeSignature((T) decl, arg);
+		decl = ensureBody((T) decl);
+		for (DeclContribution<A, MemberDecl> contribution : contributions(arg)) {
 			decl = applyContribution((T) decl, importManager, arg, contribution);
 		}
 		return decl;
 	}
+
+	protected abstract Iterable<DeclContribution<A, MemberDecl>> contributions(A arg);
+
+	protected abstract String makeDoc(T decl, A arg);
+
+	protected T contributeSignature(T decl, A arg) {
+		return decl;
+	}
+
+	protected abstract T insertJavadoc(T decl, String doc);
 
 	private T applyContribution(T decl, ImportManager importManager, A arg, DeclContribution<A, MemberDecl> contribution) {
 		for (DeclPattern<A, ? extends MemberDecl> declaration : contribution.declarations(arg)) {
@@ -47,14 +69,18 @@ public abstract class TypePattern<A, T extends TypeDecl> implements DeclPattern<
 		}
 	}
 
+
 	protected abstract <M extends MemberDecl> T forAll(T type, TypeSafeMatcher<? extends M> matcher, MatchVisitor<M> visitor);
+
+	protected abstract T ensureBody(T type);
 
 	protected abstract <M extends MemberDecl> T appendMember(T type, M member);
 
 	public static abstract class OfClass<A> extends TypePattern<A, ClassDecl> {
 
-		public OfClass(DeclContribution<A, MemberDecl>... contributions) {
-			super(contributions);
+		@Override
+		protected ClassDecl insertJavadoc(ClassDecl decl, String doc) {
+			return decl.insertLeadingComment(doc);
 		}
 
 		@Override
@@ -63,15 +89,21 @@ public abstract class TypePattern<A, T extends TypeDecl> implements DeclPattern<
 		}
 
 		@Override
+		protected ClassDecl ensureBody(ClassDecl type) {
+			return type.withMembers(ms -> ms == null ? NodeList.<MemberDecl>empty() : ms);
+		}
+
+		@Override
 		protected <M extends MemberDecl> ClassDecl appendMember(ClassDecl type, M member) {
-			return type.withMembers(ms -> (ms == null ? NodeList.<MemberDecl>empty() : ms).append(member));
+			return type.withMembers(ms -> ms.append(member));
 		}
 	}
 
 	public static abstract class OfInterface<A> extends TypePattern<A, InterfaceDecl> {
 
-		public OfInterface(DeclContribution<A, MemberDecl>... contributions) {
-			super(contributions);
+		@Override
+		protected InterfaceDecl insertJavadoc(InterfaceDecl decl, String doc) {
+			return decl.insertLeadingComment(doc);
 		}
 
 		@Override
@@ -80,8 +112,13 @@ public abstract class TypePattern<A, T extends TypeDecl> implements DeclPattern<
 		}
 
 		@Override
+		protected InterfaceDecl ensureBody(InterfaceDecl type) {
+			return type.withMembers(ms -> ms == null ? NodeList.<MemberDecl>empty() : ms);
+		}
+
+		@Override
 		protected <M extends MemberDecl> InterfaceDecl appendMember(InterfaceDecl type, M member) {
-			return type.withMembers(ms -> (ms == null ? NodeList.<MemberDecl>empty() : ms).append(member));
+			return type.withMembers(ms -> ms.append(member));
 		}
 	}
 }
