@@ -15,6 +15,8 @@ import java.util.List;
 
 import static org.jlato.rewrite.Quotes.expr;
 import static org.jlato.rewrite.Quotes.memberDecl;
+import static org.jlato.tree.TreeFactory.formalParameter;
+import static org.jlato.tree.TreeFactory.variableDeclaratorId;
 
 /**
  * @author Didier Villevalois
@@ -40,8 +42,15 @@ public class ExtractTreeDescriptors extends TreeClassRefactoring {
 				memberDecl("LexicalShape $_ = $_;")
 		)).map(m -> ((FieldDecl) m).withModifiers(NodeList.empty()));
 
+		final NodeList<FormalParameter> parameters = NodeList.of(decl.findAll(
+				memberDecl("$_ $_ ();")
+		)).map(m -> {
+			final MethodDecl methodDecl = (MethodDecl) m;
+			return formalParameter().withId(variableDeclaratorId().withName(methodDecl.name())).withType(methodDecl.type());
+		});
+
 		// TODO Fix parameters collection for interfaces
-		interfaceDescriptors.add(new TreeInterfaceDescriptor(packageName, name, makeDocumentationName(name), superInterfaces, shapes, NodeList.<FormalParameter>empty()));
+		interfaceDescriptors.add(new TreeInterfaceDescriptor(packageName, name, makeDocumentationName(name), superInterfaces, shapes, parameters));
 
 		return decl;
 	}
@@ -82,6 +91,10 @@ public class ExtractTreeDescriptors extends TreeClassRefactoring {
 							(descriptor.shapes.isEmpty() ?
 									"NodeList.<MemberDecl>empty()" :
 									descriptor.shapes.map(d -> reify(d)).mkString("NodeList.of(\n", ",\n", "\n)")
+							) + ",\n" +
+							(descriptor.parameters.isEmpty() ?
+									"NodeList.<FormalParameter>empty()" :
+									descriptor.parameters.map(p -> reify(p)).mkString("NodeList.of(\n", ",\n", "\n)")
 							) + "\n)"
 			).build();
 			System.out.print(creation);
