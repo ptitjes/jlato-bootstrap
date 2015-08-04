@@ -12,7 +12,6 @@ import org.jlato.tree.NodeList;
 import org.jlato.tree.decl.*;
 import org.jlato.tree.expr.ObjectCreationExpr;
 import org.jlato.tree.name.Name;
-import org.jlato.tree.stmt.Stmt;
 import org.jlato.tree.type.QualifiedType;
 import org.jlato.tree.type.Type;
 
@@ -103,7 +102,7 @@ public class TreeConstruction implements DeclContribution<TreeClassDescriptor, M
 										Type treeType = p.type();
 										if (propertyFieldType(treeType)) return p.id().name();
 										else return methodInvocationExpr(name("treeOf"))
-												.withScope(some(name("TreeBase")))
+												.withScope(some(AllDescriptors.TD_TREE))
 												.withTypeArgs(NodeList.of(treeTypeToStateType((QualifiedType) treeType)))
 												.withArgs(NodeList.of(p.id().name()));
 									}))

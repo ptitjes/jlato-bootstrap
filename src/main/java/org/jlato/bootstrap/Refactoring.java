@@ -20,6 +20,7 @@
 package org.jlato.bootstrap;
 
 import com.github.andrewoma.dexx.collection.Iterable;
+import org.jlato.bootstrap.descriptors.AllDescriptors;
 import org.jlato.parser.ParseException;
 import org.jlato.parser.Parser;
 import org.jlato.parser.ParserConfiguration;
@@ -100,7 +101,7 @@ public class Refactoring {
 		return sorted;
 	}
 
-	private static final List<String> TREE_SUPERCLASSES = Arrays.asList("TreeBase");
+	private static final List<String> TREE_SUPERCLASSES = Arrays.asList(AllDescriptors.TD_TREE.id());
 
 	private static final List<String> EXCLUDED_CLASSES = Arrays.asList("NodeList", "NodeOption", "NodeEither", "TreeSet");
 
