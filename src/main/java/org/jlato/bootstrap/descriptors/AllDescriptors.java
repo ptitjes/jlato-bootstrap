@@ -68,9 +68,11 @@ public class AllDescriptors {
 
 	/* Base States */
 
+	public static final Name BU_TREE = name("BUTree");
 	public static final Name STREE_STATE_NAME = name("STreeState");
 	public static final Name SNODE_STATE_NAME = name("SNodeState");
 
+	public static final QualifiedName BU_TREE_QUALIFIED = qualifiedName(BU_TREE).withQualifier(some(TREE_STATES_ROOT));
 	public static final QualifiedName STREE_STATE_QUALIFIED = qualifiedName(STREE_STATE_NAME).withQualifier(some(TREE_STATES_ROOT));
 	public static final QualifiedName SNODE_STATE_QUALIFIED = qualifiedName(SNODE_STATE_NAME).withQualifier(some(TREE_STATES_ROOT));
 
@@ -777,7 +779,7 @@ public class AllDescriptors {
 					),
 					NodeList.of(
 							memberDecl("public static final LexicalShape shape = token(new LSToken.Provider() {\n" +
-									"\t\tpublic LToken tokenFor(STree tree) {\n" +
+									"\t\tpublic LToken tokenFor(" + AllDescriptors.BU_TREE + " tree) {\n" +
 									"\t\t\tfinal ModifierKeyword keyword = ((SModifier) tree.state).keyword;\n" +
 									"\t\t\tswitch (keyword) {\n" +
 									"\t\t\t\tcase Public:\n" +
@@ -1025,7 +1027,7 @@ public class AllDescriptors {
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(TARGET),\n" +
 									"\t\t\ttoken(new LSToken.Provider() {\n" +
-									"\t\t\t\tpublic LToken tokenFor(STree tree) {\n" +
+									"\t\t\t\tpublic LToken tokenFor(" + AllDescriptors.BU_TREE + " tree) {\n" +
 									"\t\t\t\t\tfinal AssignOp op = ((SAssignExpr) tree.state).op;\n" +
 									"\t\t\t\t\tswitch (op) {\n" +
 									"\t\t\t\t\t\tcase Normal:\n" +
@@ -1081,7 +1083,7 @@ public class AllDescriptors {
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(LEFT),\n" +
 									"\t\t\ttoken(new LSToken.Provider() {\n" +
-									"\t\t\t\tpublic LToken tokenFor(STree tree) {\n" +
+									"\t\t\t\tpublic LToken tokenFor(" + AllDescriptors.BU_TREE + " tree) {\n" +
 									"\t\t\t\t\tfinal BinaryOp op = ((SBinaryExpr) tree.state).op;\n" +
 									"\t\t\t\t\tswitch (op) {\n" +
 									"\t\t\t\t\t\tcase Or:\n" +
@@ -1277,7 +1279,7 @@ public class AllDescriptors {
 					),
 					NodeList.of(
 							memberDecl("public static final LexicalShape shape = token(new LSToken.Provider() {\n" +
-									"\t\tpublic LToken tokenFor(STree tree) {\n" +
+									"\t\tpublic LToken tokenFor(" + AllDescriptors.BU_TREE + " tree) {\n" +
 									"\t\t\tfinal String literalString = ((SLiteralExpr) tree.state).literalString;\n" +
 									"\t\t\treturn new LToken(0, literalString); // TODO Fix\n" +
 									"\t\t}\n" +
@@ -1529,7 +1531,7 @@ public class AllDescriptors {
 					),
 					NodeList.of(
 							memberDecl("public static final LexicalShape opShape = token(new LSToken.Provider() {\n" +
-									"\t\tpublic LToken tokenFor(STree tree) {\n" +
+									"\t\tpublic LToken tokenFor(" + AllDescriptors.BU_TREE + " tree) {\n" +
 									"\t\t\tfinal UnaryOp op = ((SUnaryExpr) tree.state).op;\n" +
 									"\t\t\tswitch (op) {\n" +
 									"\t\t\t\tcase Positive:\n" +
@@ -1555,7 +1557,7 @@ public class AllDescriptors {
 									"\t\t}\n" +
 									"\t});").build(),
 							memberDecl("public static final LexicalShape shape = alternative(new LSCondition() {\n" +
-									"\t\tpublic boolean test(STree tree) {\n" +
+									"\t\tpublic boolean test(" + AllDescriptors.BU_TREE + " tree) {\n" +
 									"\t\t\tfinal UnaryOp op = ((SUnaryExpr) tree.state).op;\n" +
 									"\t\t\treturn op.isPrefix();\n" +
 									"\t\t}\n" +
@@ -1592,7 +1594,7 @@ public class AllDescriptors {
 					),
 					NodeList.of(
 							memberDecl("public static final LexicalShape shape = token(new LSToken.Provider() {\n" +
-									"\t\tpublic LToken tokenFor(STree tree) {\n" +
+									"\t\tpublic LToken tokenFor(" + AllDescriptors.BU_TREE + " tree) {\n" +
 									"\t\t\treturn new LToken(ParserImplConstants.IDENTIFIER, ((SName) tree.state).id);\n" +
 									"\t\t}\n" +
 									"\t});").build()
@@ -1788,7 +1790,7 @@ public class AllDescriptors {
 									"\t\t\tchild(EXPR, when(some(), composite(element(), token(LToken.Dot)))),\n" +
 									"\t\t\tchild(TYPE_ARGS, org.jlato.internal.bu.type.SType.typeArgumentsShape),\n" +
 									"\t\t\ttoken(new LSToken.Provider() {\n" +
-									"\t\t\t\tpublic LToken tokenFor(STree tree) {\n" +
+									"\t\t\t\tpublic LToken tokenFor(" + AllDescriptors.BU_TREE + " tree) {\n" +
 									"\t\t\t\t\treturn ((SExplicitConstructorInvocationStmt) tree.state).isThis ? LToken.This : LToken.Super;\n" +
 									"\t\t\t\t}\n" +
 									"\t\t\t}),\n" +
@@ -2219,7 +2221,7 @@ public class AllDescriptors {
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(ANNOTATIONS, list()),\n" +
 									"\t\t\ttoken(new LSToken.Provider() {\n" +
-									"\t\t\t\tpublic LToken tokenFor(STree tree) {\n" +
+									"\t\t\t\tpublic LToken tokenFor(" + AllDescriptors.BU_TREE + " tree) {\n" +
 									"\t\t\t\t\tfinal Primitive primitive = ((SPrimitiveType) tree.state).primitive;\n" +
 									"\t\t\t\t\tswitch (primitive) {\n" +
 									"\t\t\t\t\t\tcase Boolean:\n" +

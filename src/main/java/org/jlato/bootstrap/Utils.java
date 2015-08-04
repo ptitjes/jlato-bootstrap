@@ -129,9 +129,8 @@ public class Utils {
 			boolean isInterface = descriptor != null && descriptor.isInterface();
 
 			final QualifiedType stateType = treeTypeToStateType(qualifiedType);
-			return qType("STree", isInterface ?
-					wildcardType().withExt(some(stateType)) :
-					stateType);
+			return qualifiedType(AllDescriptors.BU_TREE)
+					.withTypeArgs(some(NodeList.of(isInterface ? wildcardType().withExt(some(stateType)) : stateType)));
 		}
 	}
 
@@ -427,12 +426,7 @@ public class Utils {
 		return type instanceof QualifiedType && ((QualifiedType) type).name().id().equals("LexicalShape");
 	});
 
-	public static final TypeSafeMatcher<MethodDecl> makeMethodMatcher = methods(m -> m.name().id().equals("make"));
 	public static final TypeSafeMatcher<ConstructorDecl> publicConstructorMatcher = constructors(c -> c.modifiers().contains(Modifier.Public));
-
-	public static final TypeSafeMatcher<Expr> sTreeCreationMatcher = objectCreation(oc -> oc.type().name().id().equals("STree"));
-	public static final TypeSafeMatcher<Expr> stateCreationMatcher = objectCreation(oc -> oc.type().name().id().equals("State"));
-	public static final TypeSafeMatcher<Expr> makeCallMatcher = methodCall(mc -> mc.name().id().equals("make"));
 
 	public static abstract class MatcherImpl<T> implements TypeSafeMatcher<T> {
 		@Override

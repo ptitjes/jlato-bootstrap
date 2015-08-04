@@ -93,8 +93,10 @@ public class PropertyAndTraversalClasses extends Utils implements DeclContributi
 					variableDeclaratorId(stateParamName));
 
 			QualifiedType childStateType = treeTypeToStateType((QualifiedType) treeType);
-			final Type childType = qType("STree", childStateType);
-			final Type childReturnType = qType("STree", wildcardType());
+			final Type childType = qualifiedType(AllDescriptors.BU_TREE)
+					.withTypeArgs(some(NodeList.of(childStateType)));
+			final Type childReturnType = qualifiedType(AllDescriptors.BU_TREE)
+					.withTypeArgs(some(NodeList.of(wildcardType())));
 			final FormalParameter childParam = formalParameter(childType, variableDeclaratorId(childParamName));
 
 			MethodDecl traverseMethod = methodDecl(childReturnType, name("doTraverse"))

@@ -76,12 +76,12 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 
 		@Override
 		protected String makeQuote(TreeClassDescriptor arg) {
-			return "public static STree<" + arg.stateTypeName() + "> make(..$_) { ..$_ }";
+			return "public static " + AllDescriptors.BU_TREE + "<" + arg.stateTypeName() + "> make(..$_) { ..$_ }";
 		}
 
 		@Override
 		protected MethodDecl makeDecl(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
-			importManager.addImportByName(qualifiedName("org.jlato.internal.bu.STree"));
+			importManager.addImportByName(AllDescriptors.BU_TREE_QUALIFIED);
 			for (FormalParameter parameter : arg.parameters) {
 				if (!propertyFieldType(parameter.type())) {
 					final QualifiedType type = (QualifiedType) parameter.type();
@@ -92,15 +92,16 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 			final NodeList<FormalParameter> parameters = arg.parameters;
 			final NodeList<FormalParameter> stateParams = arg.stateParameters();
 			final QualifiedType stateType = arg.stateType();
-			final QualifiedType treeType = qType("STree", stateType);
+			final QualifiedType treeType = qualifiedType(AllDescriptors.BU_TREE)
+					.withTypeArgs(some(NodeList.of(stateType)));
 
-			// Make STree creation expression from STrees
+			// Make BUTree creation expression from STrees
 			final ObjectCreationExpr sTreeCreationExpr = objectCreationExpr(treeType)
 					.withArgs(NodeList.of(
 							objectCreationExpr(stateType).withArgs(parameters.map(p -> p.id().name()))
 					));
 
-			// Add STree factory method
+			// Add BUTree factory method
 			return methodDecl(treeType, name("make"))
 					.withModifiers(NodeList.of(Modifier.Public, Modifier.Static))
 					.withParams(stateParams)
@@ -322,7 +323,7 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 
 		@Override
 		protected FieldDecl makeDecl(FieldDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
-			importManager.addImportByName(qualifiedName("org.jlato.internal.bu.STree"));
+			importManager.addImportByName(AllDescriptors.BU_TREE_QUALIFIED);
 			for (FormalParameter parameter : arg.parameters) {
 				final Type paramType = parameter.type();
 				if (!propertyFieldType(paramType)) {

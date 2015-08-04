@@ -42,7 +42,7 @@ public class TreeKind implements DeclContribution<TreeClassDescriptor, MemberDec
 		public MethodDecl rewrite(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
 			importManager.addImportByName(qualifiedName("org.jlato.tree.Kind"));
 
-			// Add STree factory method
+			// Add BUTree factory method
 			decl = decl.withBody(some(blockStmt().withStmts(NodeList.of(
 					stmt("return Kind." + arg.name + ";").build()
 			))));
