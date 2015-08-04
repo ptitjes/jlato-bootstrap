@@ -18,7 +18,6 @@ import java.util.List;
 
 import static org.jlato.rewrite.Quotes.memberDecl;
 import static org.jlato.rewrite.Quotes.stmt;
-import static org.jlato.tree.NodeOption.some;
 import static org.jlato.tree.TreeFactory.*;
 
 /**
@@ -56,7 +55,7 @@ public class TreeClassAccessors implements DeclContribution<TreeClassDescriptor,
 		protected MethodDecl makeDecl(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
 			AllDescriptors.addImports(importManager, param.type());
 
-			return decl.withBody(some(blockStmt().withStmts(NodeList.of(
+			return decl.withBody(some(blockStmt().withStmts(listOf(
 					stmt("return location.safe" + (propertyFieldType(param.type()) ? "Property" : "Traversal") + "(" + arg.stateTypeName() + "." + constantName(param) + ");").build()
 			))));
 		}
@@ -88,7 +87,7 @@ public class TreeClassAccessors implements DeclContribution<TreeClassDescriptor,
 		protected MethodDecl makeDecl(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
 			AllDescriptors.addImports(importManager, param.type());
 
-			return decl.withBody(some(blockStmt().withStmts(NodeList.of(
+			return decl.withBody(some(blockStmt().withStmts(listOf(
 					stmt("return location.safe" + (propertyFieldType(param.type()) ? "Property" : "Traversal") + "Replace(" + arg.stateTypeName() + "." + constantName(param) + ", " + param.id().name() + ");").build()
 			))));
 		}
@@ -121,7 +120,7 @@ public class TreeClassAccessors implements DeclContribution<TreeClassDescriptor,
 			AllDescriptors.addImports(importManager, param.type());
 			importManager.addImportByName(qualifiedName("org.jlato.util.Mutation"));
 
-			return decl.withBody(some(blockStmt().withStmts(NodeList.of(
+			return decl.withBody(some(blockStmt().withStmts(listOf(
 					stmt("return location.safe" + (propertyFieldType(param.type()) ? "Property" : "Traversal") + "Mutate(" + arg.stateTypeName() + "." + constantName(param) + ", mutation);").build()
 			))));
 		}

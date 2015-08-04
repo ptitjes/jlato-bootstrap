@@ -25,7 +25,6 @@ import java.util.Arrays;
 import static org.jlato.rewrite.Quotes.expr;
 import static org.jlato.rewrite.Quotes.memberDecl;
 import static org.jlato.rewrite.Quotes.stmt;
-import static org.jlato.tree.NodeOption.some;
 import static org.jlato.tree.TreeFactory.*;
 import static org.jlato.tree.TreeFactory.returnStmt;
 import static org.jlato.tree.expr.BinaryOp.Equal;
@@ -57,9 +56,9 @@ public class StateEqualsAndHashCode implements DeclContribution<TreeClassDescrip
 		public MethodDecl rewrite(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
 			final NodeList<FormalParameter> params = arg.parameters;
 
-			NodeList<Stmt> stmts = NodeList.empty();
+			NodeList<Stmt> stmts = emptyList();
 
-			stmts = stmts.appendAll(NodeList.of(
+			stmts = stmts.appendAll(listOf(
 					stmt("if (this == o)\nreturn true;").build(),
 					stmt("if (o == null || getClass() != o.getClass())\nreturn false;").build()
 			));
@@ -77,7 +76,7 @@ public class StateEqualsAndHashCode implements DeclContribution<TreeClassDescrip
 
 					Expr equalTest = p.type() instanceof PrimitiveType ?
 							binaryExpr(thisField, NotEqual, otherField) :
-							unaryExpr(Not, methodInvocationExpr(EQUALS).withScope(some(thisField)).withArgs(NodeList.of(otherField)));
+							unaryExpr(Not, methodInvocationExpr(EQUALS).withScope(some(thisField)).withArgs(listOf(otherField)));
 
 					if (nullable(p)) {
 						equalTest = conditionalExpr(
@@ -115,7 +114,7 @@ public class StateEqualsAndHashCode implements DeclContribution<TreeClassDescrip
 
 		@Override
 		public MethodDecl rewrite(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
-			NodeList<Stmt> stmts = NodeList.empty();
+			NodeList<Stmt> stmts = emptyList();
 
 			stmts = stmts.append(stmt("int result = 17;").build());
 

@@ -9,18 +9,17 @@ import org.jlato.rewrite.Pattern;
 import org.jlato.tree.NodeList;
 import org.jlato.tree.decl.*;
 import org.jlato.tree.expr.Expr;
-import org.jlato.tree.name.Name;
 import org.jlato.tree.stmt.Stmt;
 import org.jlato.tree.type.Primitive;
 import org.jlato.tree.type.PrimitiveType;
 import org.jlato.tree.type.QualifiedType;
 import org.jlato.tree.type.Type;
+import org.jlato.util.Function0;
+import org.jlato.util.Function1;
 
 import static org.jlato.rewrite.Quotes.expr;
 import static org.jlato.rewrite.Quotes.memberDecl;
 import static org.jlato.rewrite.Quotes.typeDecl;
-import static org.jlato.tree.NodeOption.none;
-import static org.jlato.tree.NodeOption.some;
 import static org.jlato.tree.TreeFactory.*;
 
 /**
@@ -42,8 +41,36 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 			decl = decl.insertLeadingComment("/** A factory for tree nodes. */");
 
 		importManager.addImport(importDecl(qualifiedName("org.jlato.internal.bu.Literals")));
+		importManager.addImport(importDecl(qualifiedName("org.jlato.internal.td.coll")).setOnDemand(true));
 
-		NodeList<MemberDecl> factoryMethods = NodeList.empty();
+		NodeList<MemberDecl> factoryMethods = emptyList();
+
+		factoryMethods = factoryMethods.append(memberDecl("public static <T extends Tree> NodeOption<T> none() {\n" +
+				"\t\treturn TDNodeOption.none();\n" +
+				"\t}").build());
+
+		factoryMethods = factoryMethods.append(memberDecl("public static <T extends Tree> NodeOption<T> some(T t) {\n" +
+				"\t\treturn TDNodeOption.some(t);\n" +
+				"\t}").build());
+
+		factoryMethods = factoryMethods.append(memberDecl("public static <T extends Tree> NodeOption<T> optionOf(T t) {\n" +
+				"\t\treturn TDNodeOption.of(t);\n" +
+				"\t}").build());
+
+		factoryMethods = factoryMethods.append(memberDecl("public static <TL extends Tree, TR extends Tree> NodeEither<TL, TR> left(TL t) {\n" +
+				"\t\treturn TDNodeEither.<TL, TR>left(t);\n" +
+				"\t}").build());
+
+		factoryMethods = factoryMethods.append(memberDecl("public static <TL extends Tree, TR extends Tree> NodeEither<TL, TR> right(TR t) {\n" +
+				"\t\treturn TDNodeEither.<TL, TR>right(t);\n" +
+				"\t}").build());
+
+		factoryMethods = factoryMethods.append(memberDecl("public static <T extends Tree> NodeList<T> emptyList() {\n" +
+				"\t\treturn TDNodeList.empty();\n" +
+				"\t}").build());
+
+		for (int i = 1; i <= 23; i++) factoryMethods = factoryMethods.append(generateNodeListOf(i));
+
 		for (TreeClassDescriptor descriptor : arg) {
 			importManager.addImport(importDecl(descriptor.classPackageName()).setOnDemand(true));
 
@@ -58,7 +85,7 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 						"\t\tfinal String[] split = nameString.split(\"\\\\.\");\n" +
 						"\t\tQualifiedName name = null;\n" +
 						"\t\tfor (String part : split) {\n" +
-						"\t\t\tname = new TDQualifiedName(NodeOption.of(name), new TDName(part));\n" +
+						"\t\t\tname = new TDQualifiedName(optionOf(name), new TDName(part));\n" +
 						"\t\t}\n" +
 						"\t\treturn name;\n" +
 						"\t}").build());
@@ -93,6 +120,24 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 		return decl.withMembers(factoryMethods);
 	}
 
+	private MemberDecl generateNodeListOf(int count) {
+		return memberDecl("public static <T extends Tree> NodeList<T> listOf(" + makeIteratedString(count, i -> "T t" + i) + ") {\n" +
+				"\t\treturn TDNodeList.of(" + makeIteratedString(count, i -> "t" + i) + ");\n" +
+				"\t}").build();
+	}
+
+	private String makeIteratedString(int count, Function1<Integer, String> gen) {
+		StringBuilder builder = new StringBuilder();
+		boolean first = true;
+		for (int i = 1; i <= count; i++) {
+			if (first) first = false;
+			else builder.append(", ");
+
+			builder.append(gen.apply(i));
+		}
+		return builder.toString();
+	}
+
 	private boolean noNullsFormHasNoParams(TreeClassDescriptor descriptor) {
 		int count = 0;
 		int index = 0;
@@ -120,8 +165,8 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 	}
 
 	private MethodDecl generateFactoryMethod(TreeClassDescriptor descriptor, boolean noNulls) {
-		NodeList<FormalParameter> params = NodeList.empty();
-		NodeList<Expr> args = NodeList.empty();
+		NodeList<FormalParameter> params = emptyList();
+		NodeList<Expr> args = emptyList();
 		int index = 0;
 		for (FormalParameter param : safeList(descriptor.parameters)) {
 			Type type = param.type();
@@ -133,18 +178,10 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 				final QualifiedType qualifiedType = (QualifiedType) type;
 				switch (qualifiedType.name().id()) {
 					case "NodeList":
-						args = args.append(
-								methodInvocationExpr(name("empty"))
-										.withScope(some(qualifiedType.name()))
-										.withTypeArgs(qualifiedType.typeArgs().get())
-						);
+						args = args.append(expr("TreeFactory.<" + ((QualifiedType) type).typeArgs().get().get(0) + ">emptyList()").build());
 						break;
 					case "NodeOption":
-						args = args.append(
-								methodInvocationExpr(name("none"))
-										.withScope(some(qualifiedType.name()))
-										.withTypeArgs(qualifiedType.typeArgs().get())
-						);
+						args = args.append(expr("TreeFactory.<" + ((QualifiedType) type).typeArgs().get().get(0) + ">none()").build());
 						break;
 					default:
 						if (noNulls) {

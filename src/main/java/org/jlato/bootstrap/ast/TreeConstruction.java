@@ -18,7 +18,7 @@ import org.jlato.tree.type.Type;
 import java.util.Arrays;
 
 import static org.jlato.rewrite.Quotes.*;
-import static org.jlato.tree.NodeOption.some;
+
 import static org.jlato.tree.TreeFactory.*;
 
 /**
@@ -46,18 +46,18 @@ public class TreeConstruction implements DeclContribution<TreeClassDescriptor, M
 
 			final Name name = arg.name;
 			final QualifiedType stateType = arg.stateType();
-			final QualifiedType locationType = qualifiedType(AllDescriptors.TD_LOCATION).withTypeArgs(some(NodeList.of(stateType)));
+			final QualifiedType locationType = qualifiedType(AllDescriptors.TD_LOCATION).withTypeArgs(some(listOf(stateType)));
 
 			final Name location = name("location");
 
 			decl = constructorDecl(arg.className(),
-					blockStmt().withStmts(NodeList.of(
+					blockStmt().withStmts(listOf(
 							explicitConstructorInvocationStmt()
 									.setThis(false)
-									.withArgs(NodeList.of(location))
+									.withArgs(listOf(location))
 					)))
-					.withModifiers(NodeList.of(Modifier.Public))
-					.withParams(NodeList.of(
+					.withModifiers(listOf(Modifier.Public))
+					.withParams(listOf(
 							formalParameter(locationType, variableDeclaratorId(location))
 					));
 
@@ -90,12 +90,12 @@ public class TreeConstruction implements DeclContribution<TreeClassDescriptor, M
 
 			final Name name = arg.name;
 			final QualifiedType stateType = arg.stateType();
-			final QualifiedType locationType = qualifiedType(AllDescriptors.TD_LOCATION).withTypeArgs(some(NodeList.of(stateType)));
+			final QualifiedType locationType = qualifiedType(AllDescriptors.TD_LOCATION).withTypeArgs(some(listOf(stateType)));
 			final NodeList<FormalParameter> parameters = arg.parameters;
 
 			// Make TDLocation creation expression from Trees
 			final ObjectCreationExpr tdLocationCreationExpr = objectCreationExpr(locationType)
-					.withArgs(NodeList.of(
+					.withArgs(listOf(
 							methodInvocationExpr(name("make"))
 									.withScope(some(arg.stateTypeName()))
 									.withArgs(parameters.map(p -> {
@@ -103,18 +103,18 @@ public class TreeConstruction implements DeclContribution<TreeClassDescriptor, M
 										if (propertyFieldType(treeType)) return p.id().name();
 										else return methodInvocationExpr(name("treeOf"))
 												.withScope(some(AllDescriptors.TD_TREE))
-												.withTypeArgs(NodeList.of(treeTypeToStateType((QualifiedType) treeType)))
-												.withArgs(NodeList.of(p.id().name()));
+												.withTypeArgs(listOf(treeTypeToStateType((QualifiedType) treeType)))
+												.withArgs(listOf(p.id().name()));
 									}))
 					));
 
 			decl = constructorDecl(arg.className(),
-					blockStmt().withStmts(NodeList.of(
+					blockStmt().withStmts(listOf(
 							explicitConstructorInvocationStmt()
 									.setThis(false)
-									.withArgs(NodeList.of(tdLocationCreationExpr))
+									.withArgs(listOf(tdLocationCreationExpr))
 					)))
-					.withModifiers(NodeList.of(Modifier.Public))
+					.withModifiers(listOf(Modifier.Public))
 					.withParams(parameters);
 
 			if (GenSettings.generateDocs) {

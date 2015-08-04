@@ -18,9 +18,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.HashSet;
 
-import static org.jlato.tree.NodeOption.some;
 import static org.jlato.tree.TreeFactory.*;
 import static org.jlato.tree.expr.AssignOp.Normal;
 import static org.jlato.tree.expr.BinaryOp.Less;
@@ -55,7 +55,7 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 		if (params == null) return decl;
 
 		if (decl.name().id().equals("CompilationUnit")) {
-			NodeList<FormalParameter> preprocessed = NodeList.empty();
+			NodeList<FormalParameter> preprocessed = emptyList();
 			for (FormalParameter param : params) {
 				if (!param.id().name().id().equals("preamble"))
 					preprocessed = preprocessed.append(param);
@@ -79,8 +79,8 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 	}
 
 	private void generateAccessorsTestMethod(String treeName, QualifiedType treeType, NodeList<FormalParameter> params) {
-		NodeList<Stmt> stmts = NodeList.empty();
-		NodeList<Stmt> loopStmts = NodeList.empty();
+		NodeList<Stmt> stmts = emptyList();
+		NodeList<Stmt> loopStmts = emptyList();
 
 		final Name tested = name("t");
 
@@ -90,7 +90,7 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 		loopStmts = loopStmts.append(newVar(treeType, tested,
 				params.foldLeft(factoryCall(treeName),
 						(e, p) -> methodInvocationExpr(name(propertySetterName(p.id().name().id(), p.type())))
-								.withScope(some(e)).withArgs(NodeList.of(p.id().name()))
+								.withScope(some(e)).withArgs(listOf(p.id().name()))
 				)
 		));
 
@@ -104,8 +104,8 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 	}
 
 	private void generateLambdaAccessorsTestMethod(String treeName, QualifiedType treeType, NodeList<FormalParameter> params) {
-		NodeList<Stmt> stmts = NodeList.empty();
-		NodeList<Stmt> loopStmts = NodeList.empty();
+		NodeList<Stmt> stmts = emptyList();
+		NodeList<Stmt> loopStmts = emptyList();
 
 		final Name tested = name("t");
 
@@ -115,7 +115,7 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 		loopStmts = loopStmts.append(newVar(treeType, tested,
 				params.foldLeft(factoryCall(treeName),
 						(e, p) -> methodInvocationExpr(name(propertySetterName(p.id().name().id(), p.type())))
-								.withScope(some(e)).withArgs(NodeList.of(p.id().name()))
+								.withScope(some(e)).withArgs(listOf(p.id().name()))
 				)
 		));
 
@@ -127,9 +127,9 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 		loopStmts = loopStmts.append(newVar(treeType, tested.withId(s -> s + "2"),
 				params.foldLeft((Expr) tested,
 						(e, p) -> methodInvocationExpr(name(propertySetterName(p.id().name().id(), p.type())))
-								.withScope(some(e)).withArgs(NodeList.of(
+								.withScope(some(e)).withArgs(listOf(
 										methodInvocationExpr(name("mutationBy"))
-												.withArgs(NodeList.of(
+												.withArgs(listOf(
 														p.id().name(),
 														p.id().name().withId(s -> s + "2")
 												))
@@ -151,8 +151,8 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 	}
 
 	private void generateEqualsHashTestMethod(String treeName, QualifiedType treeType, NodeList<FormalParameter> params) {
-		NodeList<Stmt> stmts = NodeList.empty();
-		NodeList<Stmt> loopStmts = NodeList.empty();
+		NodeList<Stmt> stmts = emptyList();
+		NodeList<Stmt> loopStmts = emptyList();
 
 		final Name expected = name("expected");
 		final Name actual = name("actual");
@@ -163,7 +163,7 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 		loopStmts = loopStmts.append(newVar(treeType, expected,
 				params.foldLeft(factoryCall(treeName),
 						(e, p) -> methodInvocationExpr(name(propertySetterName(p.id().name().id(), p.type())))
-								.withScope(some(e)).withArgs(NodeList.of(p.id().name()))
+								.withScope(some(e)).withArgs(listOf(p.id().name()))
 				)
 		));
 
@@ -181,7 +181,7 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 					expressionStmt(
 							assignExpr(actual, Normal,
 									methodInvocationExpr(name(propertySetterName(param.id().name().id(), param.type())))
-											.withScope(some(actual)).withArgs(NodeList.of(param.id().name()))
+											.withScope(some(actual)).withArgs(listOf(param.id().name()))
 							)
 					)
 			);
@@ -196,7 +196,7 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 	}
 
 	private MethodInvocationExpr equals(Expr e1, Expr e2) {
-		return methodInvocationExpr(name("equals")).withScope(some(e1)).withArgs(NodeList.of(e2));
+		return methodInvocationExpr(name("equals")).withScope(some(e1)).withArgs(listOf(e2));
 	}
 
 	private MethodInvocationExpr hashCode(Expr e) {
@@ -204,7 +204,7 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 	}
 
 	private void generateKindTestMethod(String treeName, QualifiedType treeType, NodeList<FormalParameter> params) {
-		NodeList<Stmt> stmts = NodeList.empty();
+		NodeList<Stmt> stmts = emptyList();
 
 		stmts = stmts.append(
 				junitAssert("assertEquals",
@@ -219,7 +219,7 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 		return expressionStmt(
 				methodInvocationExpr(name(assertName))
 						.withScope(some(name("Assert")))
-						.withArgs(new NodeList<Expr>(arguments))
+						.withArgs(listOf(Arrays.asList(arguments)))
 		);
 	}
 
@@ -236,22 +236,22 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 
 		lambdaAccessorsTestClass.addAdditionalMethod(
 				methodDecl(mutationType, name("mutationBy"))
-						.withModifiers(NodeList.of(Modifier.Private))
-						.withTypeParams(NodeList.of(typeParameter(name("T"))))
-						.withParams(NodeList.of(
-								formalParameter(tType, variableDeclaratorId(beforeName)).withModifiers(NodeList.of(Modifier.Final)),
-								formalParameter(tType, variableDeclaratorId(afterName)).withModifiers(NodeList.of(Modifier.Final))
+						.withModifiers(listOf(Modifier.Private))
+						.withTypeParams(listOf(typeParameter(name("T"))))
+						.withParams(listOf(
+								formalParameter(tType, variableDeclaratorId(beforeName)).withModifiers(listOf(Modifier.Final)),
+								formalParameter(tType, variableDeclaratorId(afterName)).withModifiers(listOf(Modifier.Final))
 						))
-						.withBody(some(blockStmt().withStmts(NodeList.of(
+						.withBody(some(blockStmt().withStmts(listOf(
 								returnStmt().withExpr(some(
 										objectCreationExpr(mutationType)
-												.withBody(some(NodeList.of(
+												.withBody(some(listOf(
 														methodDecl(tType, name("mutate"))
-																.withModifiers(NodeList.of(Modifier.Public))
-																.withParams(NodeList.of(
-																		formalParameter(tType, variableDeclaratorId(tName)).withModifiers(NodeList.of(Modifier.Final))
+																.withModifiers(listOf(Modifier.Public))
+																.withParams(listOf(
+																		formalParameter(tType, variableDeclaratorId(tName)).withModifiers(listOf(Modifier.Final))
 																))
-																.withBody(some(blockStmt().withStmts(NodeList.of(
+																.withBody(some(blockStmt().withStmts(listOf(
 																		junitAssert("assertEquals", beforeName, tName),
 																		returnStmt().withExpr(some(afterName))
 																))))
@@ -282,9 +282,9 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 			this.className = className;
 		}
 
-		private NodeList<MethodDecl> collectedTestMethods = NodeList.empty();
+		private NodeList<MethodDecl> collectedTestMethods = emptyList();
 
-		public NodeList<ImportDecl> imports = NodeList.of(
+		public NodeList<ImportDecl> imports = listOf(
 				importDecl(qualifiedName("org.jlato.tree")).setOnDemand(true),
 				importDecl(qualifiedName("org.jlato.tree.decl")).setOnDemand(true),
 				importDecl(qualifiedName("org.jlato.tree.expr")).setOnDemand(true),
@@ -304,7 +304,7 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 
 		public void generateTestMethod(String name, NodeList<Stmt> stmts) {
 			MethodDecl testMethod = methodDecl(voidType(), name("test" + name))
-					.withModifiers(NodeList.of(
+					.withModifiers(listOf(
 							markerAnnotationExpr(qualifiedName("Test")),
 							Modifier.Public
 					))
@@ -319,7 +319,7 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 		public void write() {
 			writeTestClass(packageName, className, imports,
 					classDecl(name(className))
-							.withModifiers(NodeList.of(
+							.withModifiers(listOf(
 									singleMemberAnnotationExpr(qualifiedName("RunWith"), classExpr(qType("JUnit4"))),
 									Modifier.Public
 							))
@@ -331,7 +331,7 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 	private void writeTestClass(String packageName, String className, NodeList<ImportDecl> imports, ClassDecl classDecl) {
 		CompilationUnit cu = compilationUnit(packageDecl(qualifiedName(packageName)))
 				.withImports(imports)
-				.withTypes(NodeList.of(classDecl));
+				.withTypes(listOf(classDecl));
 
 		try {
 			final String path = "../jlato/src/test/java/" + packageName.replace('.', '/') + "/" + className + ".java";
@@ -353,7 +353,7 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 		return expressionStmt(
 				variableDeclarationExpr(
 						localVariableDecl(type)
-								.withVariables(NodeList.of(
+								.withVariables(listOf(
 										variableDeclarator(variableDeclaratorId(name))
 												.withInit(some(init))
 								))
@@ -368,16 +368,16 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 	private Stmt loopFor(int count, NodeList<Stmt> loopStmts) {
 		final Name i = name("i");
 		return forStmt(binaryExpr(i, Less, literalExpr(count)), blockStmt().withStmts(loopStmts))
-				.withInit(NodeList.of(
+				.withInit(listOf(
 						variableDeclarationExpr(
 								localVariableDecl(primitiveType(Primitive.Int))
-										.withVariables(NodeList.of(
+										.withVariables(listOf(
 												variableDeclarator(variableDeclaratorId(i))
 														.withInit(some(literalExpr(0)))
 										))
 						)
 				))
-				.withUpdate(NodeList.of(
+				.withUpdate(listOf(
 						unaryExpr(PostIncrement, i)
 				));
 	}
@@ -417,7 +417,7 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 	}
 
 	private void generateArbitrary() {
-		final NodeList<ImportDecl> imports = NodeList.of(
+		final NodeList<ImportDecl> imports = listOf(
 				importDecl(qualifiedName("org.jlato.tree")).setOnDemand(true),
 				importDecl(qualifiedName("org.jlato.tree.decl")).setOnDemand(true),
 				importDecl(qualifiedName("org.jlato.tree.expr")).setOnDemand(true),
@@ -437,11 +437,11 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 
 		writeTestClass("org.jlato.unit.util", "Arbitrary", imports,
 				classDecl(name("Arbitrary"))
-						.withModifiers(NodeList.of(Modifier.Public))
+						.withModifiers(listOf(Modifier.Public))
 						.withMembers(ms -> {
-							NodeList<? extends MemberDecl> l = NodeList.of(arbitraryTypes).map(t ->
+							NodeList<? extends MemberDecl> l = listOf(arbitraryTypes).map(t ->
 											methodDecl(t, name(arbitraryGenMethodName(t)))
-													.withModifiers(NodeList.of(Modifier.Public))
+													.withModifiers(listOf(Modifier.Public))
 													.withBody(some(
 															blockStmt()
 													))

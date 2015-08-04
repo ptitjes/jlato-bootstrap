@@ -9,7 +9,6 @@ import org.jlato.tree.name.Name;
 import org.jlato.tree.name.QualifiedName;
 import org.jlato.tree.type.QualifiedType;
 
-import static org.jlato.tree.NodeOption.some;
 import static org.jlato.tree.TreeFactory.qualifiedType;
 
 /**

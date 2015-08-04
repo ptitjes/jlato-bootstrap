@@ -38,7 +38,7 @@ public class StateClass extends TypePattern.OfClass<TreeClassDescriptor> {
 
 		return decl
 				.withExtendsClause(some(
-						qualifiedType(AllDescriptors.S_NODE).withTypeArgs(some(NodeList.of(arg.stateType())))
+						qualifiedType(AllDescriptors.S_NODE).withTypeArgs(some(listOf(arg.stateType())))
 				))
 				.withImplementsClause(superStateInterfaceNames.map(n -> qualifiedType(n.name())));
 	}

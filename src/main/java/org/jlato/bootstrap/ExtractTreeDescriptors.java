@@ -3,9 +3,7 @@ package org.jlato.bootstrap;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.descriptors.TreeInterfaceDescriptor;
 import org.jlato.parser.ParseException;
-import org.jlato.tree.NodeList;
-import org.jlato.tree.Tree;
-import org.jlato.tree.TreeSet;
+import org.jlato.tree.*;
 import org.jlato.tree.decl.*;
 import org.jlato.tree.expr.Expr;
 import org.jlato.tree.name.Name;
@@ -15,8 +13,7 @@ import java.util.List;
 
 import static org.jlato.rewrite.Quotes.expr;
 import static org.jlato.rewrite.Quotes.memberDecl;
-import static org.jlato.tree.TreeFactory.formalParameter;
-import static org.jlato.tree.TreeFactory.variableDeclaratorId;
+import static org.jlato.tree.TreeFactory.*;
 
 /**
  * @author Didier Villevalois
@@ -38,11 +35,11 @@ public class ExtractTreeDescriptors extends TreeClassRefactoring {
 
 		final NodeList<QualifiedType> superInterfaces = decl.extendsClause();
 
-		final NodeList<MemberDecl> shapes = NodeList.of(decl.findAll(
+		final NodeList<MemberDecl> shapes = listOf(decl.findAll(
 				memberDecl("LexicalShape $_ = $_;")
-		)).map(m -> ((FieldDecl) m).withModifiers(NodeList.empty()));
+		)).map(m -> ((FieldDecl) m).withModifiers(emptyList()));
 
-		final NodeList<FormalParameter> parameters = NodeList.of(decl.findAll(
+		final NodeList<FormalParameter> parameters = listOf(decl.findAll(
 				memberDecl("$_ $_ ();")
 		)).map(m -> {
 			final MethodDecl methodDecl = (MethodDecl) m;
@@ -64,14 +61,14 @@ public class ExtractTreeDescriptors extends TreeClassRefactoring {
 
 		final NodeList<QualifiedType> superInterfaces = decl.implementsClause();
 
-		final NodeList<MemberDecl> shapes = NodeList.of(decl.findAll(
+		final NodeList<MemberDecl> shapes = listOf(decl.findAll(
 				memberDecl("public static final LexicalShape $_ = $_;")
-		)).map(m -> ((FieldDecl) m).withModifiers(NodeList.of(Modifier.Public, Modifier.Static, Modifier.Final)));
+		)).map(m -> ((FieldDecl) m).withModifiers(listOf(Modifier.Public, Modifier.Static, Modifier.Final)));
 
 		classDescriptors.add(new TreeClassDescriptor(packageName, name, makeDocumentationName(name),
 				superInterfaces, shapes,
-				params == null ? NodeList.empty() : params,
-				params == null ? NodeList.empty() : params.map(p -> null),
+				params == null ? emptyList() : params,
+				params == null ? emptyList() : params.map(p -> null),
 				params == null));
 
 		return decl;
@@ -90,15 +87,15 @@ public class ExtractTreeDescriptors extends TreeClassRefactoring {
 							"\"" + descriptor.description + "\",\n" +
 							(descriptor.superInterfaces.isEmpty() ?
 									"NodeList.<QualifiedType>empty()" :
-									descriptor.superInterfaces.map(t -> reify(t)).mkString("NodeList.of(\n", ",\n", "\n)")
+									descriptor.superInterfaces.map(t -> reify(t)).mkString("listOf(\n", ",\n", "\n)")
 							) + ",\n" +
 							(descriptor.shapes.isEmpty() ?
 									"NodeList.<MemberDecl>empty()" :
-									descriptor.shapes.map(d -> reify(d)).mkString("NodeList.of(\n", ",\n", "\n)")
+									descriptor.shapes.map(d -> reify(d)).mkString("listOf(\n", ",\n", "\n)")
 							) + ",\n" +
 							(descriptor.parameters.isEmpty() ?
 									"NodeList.<FormalParameter>empty()" :
-									descriptor.parameters.map(p -> reify(p)).mkString("NodeList.of(\n", ",\n", "\n)")
+									descriptor.parameters.map(p -> reify(p)).mkString("listOf(\n", ",\n", "\n)")
 							) + "\n)"
 			).build();
 			System.out.print(creation);
@@ -118,15 +115,15 @@ public class ExtractTreeDescriptors extends TreeClassRefactoring {
 							"\"" + descriptor.description + "\",\n" +
 							(descriptor.superInterfaces.isEmpty() ?
 									"NodeList.<QualifiedType>empty()" :
-									descriptor.superInterfaces.map(t -> reify(t)).mkString("NodeList.of(\n", ",\n", "\n)")
+									descriptor.superInterfaces.map(t -> reify(t)).mkString("listOf(\n", ",\n", "\n)")
 							) + ",\n" +
 							(descriptor.shapes.isEmpty() ?
 									"NodeList.<MemberDecl>empty()" :
-									descriptor.shapes.map(d -> reify(d)).mkString("NodeList.of(\n", ",\n", "\n)")
+									descriptor.shapes.map(d -> reify(d)).mkString("listOf(\n", ",\n", "\n)")
 							) + ",\n" +
 							(descriptor.parameters.isEmpty() ?
 									"NodeList.<FormalParameter>empty()" :
-									descriptor.parameters.map(p -> reify(p)).mkString("NodeList.of(\n", ",\n", "\n)")
+									descriptor.parameters.map(p -> reify(p)).mkString("listOf(\n", ",\n", "\n)")
 							) + ",\n" +
 							(descriptor.defaultValues.isEmpty() ?
 									"NodeList.<Expr>empty()" :

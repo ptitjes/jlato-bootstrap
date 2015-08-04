@@ -10,9 +10,10 @@ import org.jlato.tree.type.QualifiedType;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.jlato.tree.NodeOption.some;
+
 import static org.jlato.tree.TreeFactory.name;
 import static org.jlato.tree.TreeFactory.qualifiedType;
+import static org.jlato.tree.TreeFactory.some;
 
 /**
  * @author Didier Villevalois

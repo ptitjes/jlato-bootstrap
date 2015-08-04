@@ -18,7 +18,6 @@ import org.jlato.util.Function1;
 
 import java.util.Iterator;
 
-import static org.jlato.tree.NodeOption.some;
 import static org.jlato.tree.TreeFactory.*;
 
 /**
@@ -107,7 +106,7 @@ public class Utils {
 	}
 
 	public static NodeList<FormalParameter> deriveStateParams(NodeList<FormalParameter> treeConstructorParams) {
-		NodeList<FormalParameter> stateConstructorParams = NodeList.empty();
+		NodeList<FormalParameter> stateConstructorParams = emptyList();
 		for (FormalParameter param : treeConstructorParams) {
 			Type treeType = param.type();
 
@@ -130,7 +129,7 @@ public class Utils {
 
 			final QualifiedType stateType = treeTypeToStateType(qualifiedType);
 			return qualifiedType(AllDescriptors.BU_TREE)
-					.withTypeArgs(some(NodeList.of(isInterface ? wildcardType().withExt(some(stateType)) : stateType)));
+					.withTypeArgs(some(listOf(isInterface ? wildcardType().withExt(some(stateType)) : stateType)));
 		}
 	}
 
@@ -172,7 +171,7 @@ public class Utils {
 	}
 
 	public static <T extends Tree> NodeList<T> safeList(NodeList<T> list) {
-		return list == null ? NodeList.<T>empty() : list;
+		return list == null ? emptyList() : list;
 	}
 
 	public static QualifiedType qType(String typeName) {
@@ -180,15 +179,15 @@ public class Utils {
 	}
 
 	public static QualifiedType qType(String typeName, Type typeArg) {
-		return TreeFactory.qualifiedType(name(typeName)).withTypeArgs(some(NodeList.of(typeArg)));
+		return TreeFactory.qualifiedType(name(typeName)).withTypeArgs(some(listOf(typeArg)));
 	}
 
 	public static QualifiedType qType(String typeName, Type typeArg1, Type typeArg2) {
-		return TreeFactory.qualifiedType(name(typeName)).withTypeArgs(some(NodeList.of(typeArg1, typeArg2)));
+		return TreeFactory.qualifiedType(name(typeName)).withTypeArgs(some(listOf(typeArg1, typeArg2)));
 	}
 
 	public static QualifiedType qType(String typeName, Type typeArg1, Type typeArg2, Type typeArg3) {
-		return TreeFactory.qualifiedType(name(typeName)).withTypeArgs(some(NodeList.of(typeArg1, typeArg2, typeArg3)));
+		return TreeFactory.qualifiedType(name(typeName)).withTypeArgs(some(listOf(typeArg1, typeArg2, typeArg3)));
 	}
 
 	public static String constantToCamel(String constantName) {

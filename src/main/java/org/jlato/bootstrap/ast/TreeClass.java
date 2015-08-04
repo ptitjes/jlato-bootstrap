@@ -36,13 +36,13 @@ public class TreeClass extends TypePattern.OfClass<TreeClassDescriptor> {
 		classDecl = classDecl
 				.withExtendsClause(some(
 						qualifiedType(AllDescriptors.TD_TREE)
-								.withTypeArgs(some(NodeList.of(
+								.withTypeArgs(some(listOf(
 										arg.stateType(),
 										arg.superInterfaces.get(0),
 										arg.interfaceType()
 								)))
 				))
-				.withImplementsClause(NodeList.of(arg.interfaceType()));
+				.withImplementsClause(listOf(arg.interfaceType()));
 
 		importManager.addImportByName(AllDescriptors.TD_TREE_QUALIFIED);
 		AllDescriptors.addImports(importManager, arg.superInterfaces.get(0));

@@ -16,9 +16,7 @@ import java.util.Arrays;
 
 import static org.jlato.rewrite.Quotes.memberDecl;
 import static org.jlato.rewrite.Quotes.stmt;
-import static org.jlato.tree.NodeOption.some;
-import static org.jlato.tree.TreeFactory.blockStmt;
-import static org.jlato.tree.TreeFactory.qualifiedName;
+import static org.jlato.tree.TreeFactory.*;
 
 /**
  * @author Didier Villevalois
@@ -43,7 +41,7 @@ public class TreeKind implements DeclContribution<TreeClassDescriptor, MemberDec
 			importManager.addImportByName(qualifiedName("org.jlato.tree.Kind"));
 
 			// Add BUTree factory method
-			decl = decl.withBody(some(blockStmt().withStmts(NodeList.of(
+			decl = decl.withBody(some(blockStmt().withStmts(listOf(
 					stmt("return Kind." + arg.name + ";").build()
 			))));
 

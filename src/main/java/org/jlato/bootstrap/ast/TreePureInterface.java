@@ -13,10 +13,7 @@ import org.jlato.tree.type.*;
 
 import java.util.Arrays;
 
-import static org.jlato.tree.NodeOption.some;
-import static org.jlato.tree.TreeFactory.name;
-import static org.jlato.tree.TreeFactory.qualifiedName;
-import static org.jlato.tree.TreeFactory.qualifiedType;
+import static org.jlato.tree.TreeFactory.*;
 
 /**
  * @author Didier Villevalois
@@ -46,7 +43,7 @@ public class TreePureInterface extends CompilationUnitPattern<TreeTypeDescriptor
 								if (!arg.isInterface()) {
 									importManager.addImportByName(qualifiedName("org.jlato.tree.TreeCombinators"));
 									parentInterfaces = parentInterfaces.append(
-											qualifiedType(name("TreeCombinators")).withTypeArgs(some(NodeList.of(
+											qualifiedType(name("TreeCombinators")).withTypeArgs(some(listOf(
 													arg.interfaceType()
 											)))
 									);

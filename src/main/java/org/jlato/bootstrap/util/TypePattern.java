@@ -8,6 +8,7 @@ import org.jlato.tree.NodeList;
 import org.jlato.tree.decl.*;
 
 import static org.jlato.rewrite.Quotes.typeDecl;
+import static org.jlato.tree.TreeFactory.emptyList;
 
 /**
  * @author Didier Villevalois
@@ -89,7 +90,7 @@ public abstract class TypePattern<A, T extends TypeDecl> implements DeclPattern<
 
 		@Override
 		protected ClassDecl ensureBody(ClassDecl type) {
-			return type.withMembers(ms -> ms == null ? NodeList.<MemberDecl>empty() : ms);
+			return type.withMembers(ms -> ms == null ? emptyList() : ms);
 		}
 
 		@Override
@@ -112,7 +113,7 @@ public abstract class TypePattern<A, T extends TypeDecl> implements DeclPattern<
 
 		@Override
 		protected InterfaceDecl ensureBody(InterfaceDecl type) {
-			return type.withMembers(ms -> ms == null ? NodeList.<MemberDecl>empty() : ms);
+			return type.withMembers(ms -> ms == null ? emptyList() : ms);
 		}
 
 		@Override

@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.jlato.rewrite.Quotes.*;
-import static org.jlato.tree.NodeOption.some;
 import static org.jlato.tree.TreeFactory.*;
 
 /**
@@ -162,17 +161,17 @@ public class AllDescriptors {
 
 	public static final TreeInterfaceDescriptor[] ALL_INTERFACES = new TreeInterfaceDescriptor[]{
 			new TreeInterfaceDescriptor(name("decl"), name("Decl"), "declaration",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Node").build()
 					),
-					NodeList.<MemberDecl>empty(),
-					NodeList.<FormalParameter>empty()
+					emptyList(),
+					emptyList()
 			),
 			new TreeInterfaceDescriptor(name("decl"), name("ExtendedModifier"), "extended modifier",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Node").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("LexicalShape singleLineShape = list(\n" +
 									"\t\t\tnone().withSpacingAfter(space())\n" +
 									"\t);").build(),
@@ -190,13 +189,13 @@ public class AllDescriptors {
 									"\t\t\t)\n" +
 									"\t);").build()
 					),
-					NodeList.<FormalParameter>empty()
+					emptyList()
 			),
 			new TreeInterfaceDescriptor(name("decl"), name("MemberDecl"), "member declaration",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Decl").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("LexicalShape bodyShape = list(true,\n" +
 									"\t\t\talternative(empty(),\n" +
 									"\t\t\t\t\ttoken(LToken.BraceLeft)\n" +
@@ -221,25 +220,25 @@ public class AllDescriptors {
 									"\t\t\tnone().withSpacingAfter(spacing(ClassBody_AfterMembers))\n" +
 									"\t);").build()
 					),
-					NodeList.<FormalParameter>empty()
+					emptyList()
 			),
 			new TreeInterfaceDescriptor(name("decl"), name("TypeDecl"), "type declaration",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("MemberDecl").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("LexicalShape listShape = list(\n" +
 									"\t\t\tnone().withSpacingAfter(spacing(CompilationUnit_BetweenTopLevelDecl))\n" +
 									"\t);").build()
 					),
-					NodeList.<FormalParameter>empty()
+					emptyList()
 			),
 			new TreeInterfaceDescriptor(name("expr"), name("AnnotationExpr"), "annotation expression",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Expr").build(),
 							(QualifiedType) type("ExtendedModifier").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("LexicalShape singleLineAnnotationsShape = list(\n" +
 									"\t\t\tnone(),\n" +
 									"\t\t\tnone().withSpacingAfter(space()),\n" +
@@ -256,15 +255,15 @@ public class AllDescriptors {
 									"\t\t\tnone().withSpacingAfter(newLine())\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("QualifiedName name").build()
 					)
 			),
 			new TreeInterfaceDescriptor(name("expr"), name("Expr"), "expression",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Node").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("LexicalShape argumentsShape = list(true,\n" +
 									"\t\t\ttoken(LToken.ParenthesisLeft),\n" +
 									"\t\t\ttoken(LToken.Comma).withSpacingAfter(space()),\n" +
@@ -274,29 +273,29 @@ public class AllDescriptors {
 									"\t\t\ttoken(LToken.Comma).withSpacingAfter(space())\n" +
 									"\t);").build()
 					),
-					NodeList.<FormalParameter>empty()
+					emptyList()
 			),
 			new TreeInterfaceDescriptor(name("stmt"), name("Stmt"), "statement",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Node").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("LexicalShape listShape = list(none().withSpacingAfter(newLine()));").build()
 					),
-					NodeList.<FormalParameter>empty()
+					emptyList()
 			),
 			new TreeInterfaceDescriptor(name("type"), name("ReferenceType"), "reference type",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Type").build()
 					),
-					NodeList.<MemberDecl>empty(),
-					NodeList.<FormalParameter>empty()
+					emptyList(),
+					emptyList()
 			),
 			new TreeInterfaceDescriptor(name("type"), name("Type"), "type",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Node").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("LexicalShape typeArgumentsShape = list(\n" +
 									"\t\t\ttoken(LToken.Less),\n" +
 									"\t\t\ttoken(LToken.Comma).withSpacingAfter(space()),\n" +
@@ -310,17 +309,17 @@ public class AllDescriptors {
 							memberDecl("LexicalShape intersectionShape = list(token(LToken.BinAnd).withSpacing(space(), space()));").build(),
 							memberDecl("LexicalShape unionShape = list(token(LToken.BinOr).withSpacing(space(), space()));").build()
 					),
-					NodeList.<FormalParameter>empty()
+					emptyList()
 			),
 	};
 
 
 	public static final TreeClassDescriptor[] ALL_CLASSES = new TreeClassDescriptor[]{
 			new TreeClassDescriptor(name("decl"), name("AnnotationDecl"), "annotation type declaration",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("TypeDecl").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(MODIFIERS, SExtendedModifier.multiLineShape),\n" +
 									"\t\t\ttoken(LToken.At), token(LToken.Interface).withSpacingAfter(space()),\n" +
@@ -328,12 +327,12 @@ public class AllDescriptors {
 									"\t\t\tchild(MEMBERS, SMemberDecl.bodyShape)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("NodeList<ExtendedModifier> modifiers").build(),
 							param("Name name").build(),
 							param("NodeList<MemberDecl> members").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null,
 							(Expr) null
@@ -341,10 +340,10 @@ public class AllDescriptors {
 					false
 			),
 			new TreeClassDescriptor(name("decl"), name("AnnotationMemberDecl"), "annotation type member declaration",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("MemberDecl").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape defaultValShape = composite(token(LToken.Default).withSpacingBefore(space()), element());").build(),
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(MODIFIERS, SExtendedModifier.multiLineShape),\n" +
@@ -354,14 +353,14 @@ public class AllDescriptors {
 									"\t\t\ttoken(LToken.SemiColon)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("NodeList<ExtendedModifier> modifiers").build(),
 							param("Type type").build(),
 							param("Name name").build(),
 							param("NodeList<ArrayDim> dims").build(),
 							param("NodeOption<Expr> defaultValue").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null,
 							(Expr) null,
@@ -371,29 +370,29 @@ public class AllDescriptors {
 					false
 			),
 			new TreeClassDescriptor(name("decl"), name("ArrayDim"), "array dimension",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Node").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(ANNOTATIONS, org.jlato.internal.bu.expr.SAnnotationExpr.singleLineAnnotationsShapeWithSpaceBefore),\n" +
 									"\t\t\ttoken(LToken.BracketLeft), token(LToken.BracketRight)\n" +
 									"\t);").build(),
 							memberDecl("public static final LexicalShape listShape = list();").build()
 					),
-					NodeList.of(
+					listOf(
 							param("NodeList<AnnotationExpr> annotations").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("decl"), name("ClassDecl"), "class declaration",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("TypeDecl").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(MODIFIERS, SExtendedModifier.multiLineShape),\n" +
 									"\t\t\tkeyword(LToken.Class),\n" +
@@ -406,7 +405,7 @@ public class AllDescriptors {
 									"\t\t\tchild(MEMBERS, SMemberDecl.bodyShape)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("NodeList<ExtendedModifier> modifiers").build(),
 							param("Name name").build(),
 							param("NodeList<TypeParameter> typeParams").build(),
@@ -414,7 +413,7 @@ public class AllDescriptors {
 							param("NodeList<QualifiedType> implementsClause").build(),
 							param("NodeList<MemberDecl> members").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null,
 							(Expr) null,
@@ -425,10 +424,10 @@ public class AllDescriptors {
 					false
 			),
 			new TreeClassDescriptor(name("decl"), name("CompilationUnit"), "compilation unit",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Node").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(PACKAGE_DECL).withSpacingAfter(spacing(CompilationUnit_AfterPackageDecl)),\n" +
 									"\t\t\tchild(IMPORTS, SImportDecl.listShape),\n" +
@@ -436,12 +435,12 @@ public class AllDescriptors {
 									"\t\t\tnone().withSpacingAfter(newLine())\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("PackageDecl packageDecl").build(),
 							param("NodeList<ImportDecl> imports").build(),
 							param("NodeList<TypeDecl> types").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null,
 							(Expr) null
@@ -449,10 +448,10 @@ public class AllDescriptors {
 					false
 			),
 			new TreeClassDescriptor(name("decl"), name("ConstructorDecl"), "constructor declaration",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("MemberDecl").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(MODIFIERS, SExtendedModifier.multiLineShape),\n" +
 									"\t\t\tchild(TYPE_PARAMS, STypeParameter.listShape),\n" +
@@ -464,7 +463,7 @@ public class AllDescriptors {
 									"\t\t\tnone().withSpacingAfter(space()), child(BODY)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("NodeList<ExtendedModifier> modifiers").build(),
 							param("NodeList<TypeParameter> typeParams").build(),
 							param("Name name").build(),
@@ -472,7 +471,7 @@ public class AllDescriptors {
 							param("NodeList<QualifiedType> throwsClause").build(),
 							param("BlockStmt body").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null,
 							(Expr) null,
@@ -483,32 +482,32 @@ public class AllDescriptors {
 					false
 			),
 			new TreeClassDescriptor(name("decl"), name("EmptyMemberDecl"), "empty member declaration",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("MemberDecl").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = token(LToken.SemiColon);").build()
 					),
-					NodeList.<FormalParameter>empty(),
-					NodeList.<Expr>empty(),
+					emptyList(),
+					emptyList(),
 					false
 			),
 			new TreeClassDescriptor(name("decl"), name("EmptyTypeDecl"), "empty type declaration",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("TypeDecl").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = token(LToken.SemiColon);").build()
 					),
-					NodeList.<FormalParameter>empty(),
-					NodeList.<Expr>empty(),
+					emptyList(),
+					emptyList(),
 					false
 			),
 			new TreeClassDescriptor(name("decl"), name("EnumConstantDecl"), "enum constant declaration",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("MemberDecl").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(MODIFIERS, org.jlato.internal.bu.decl.SExtendedModifier.multiLineShape),\n" +
 									"\t\t\tchild(NAME),\n" +
@@ -523,13 +522,13 @@ public class AllDescriptors {
 									"\t\t\tnull\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("NodeList<ExtendedModifier> modifiers").build(),
 							param("Name name").build(),
 							param("NodeOption<NodeList<Expr>> args").build(),
 							param("NodeOption<NodeList<MemberDecl>> classBody").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null,
 							(Expr) null,
@@ -538,10 +537,10 @@ public class AllDescriptors {
 					false
 			),
 			new TreeClassDescriptor(name("decl"), name("EnumDecl"), "enum declaration",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("TypeDecl").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(MODIFIERS, SExtendedModifier.multiLineShape),\n" +
 									"\t\t\tkeyword(LToken.Enum),\n" +
@@ -566,7 +565,7 @@ public class AllDescriptors {
 									"\t\t\t\t\t.withIndentationBefore(unIndent(TYPE_BODY))\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("NodeList<ExtendedModifier> modifiers").build(),
 							param("Name name").build(),
 							param("NodeList<QualifiedType> implementsClause").build(),
@@ -574,7 +573,7 @@ public class AllDescriptors {
 							param("boolean trailingComma").build(),
 							param("NodeList<MemberDecl> members").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null,
 							(Expr) null,
@@ -585,10 +584,10 @@ public class AllDescriptors {
 					false
 			),
 			new TreeClassDescriptor(name("decl"), name("FieldDecl"), "field declaration",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("MemberDecl").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(MODIFIERS, SExtendedModifier.multiLineShape),\n" +
 									"\t\t\tchild(TYPE),\n" +
@@ -596,12 +595,12 @@ public class AllDescriptors {
 									"\t\t\ttoken(LToken.SemiColon)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("NodeList<ExtendedModifier> modifiers").build(),
 							param("Type type").build(),
 							param("NodeList<VariableDeclarator> variables").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null,
 							(Expr) null
@@ -609,10 +608,10 @@ public class AllDescriptors {
 					false
 			),
 			new TreeClassDescriptor(name("decl"), name("FormalParameter"), "formal parameter",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Node").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(MODIFIERS, SExtendedModifier.singleLineShape),\n" +
 									"\t\t\tchild(TYPE),\n" +
@@ -626,13 +625,13 @@ public class AllDescriptors {
 									"\t\t\tnone()\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("NodeList<ExtendedModifier> modifiers").build(),
 							param("Type type").build(),
 							param("boolean isVarArgs").build(),
 							param("VariableDeclaratorId id").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null,
 							(Expr) null,
@@ -641,10 +640,10 @@ public class AllDescriptors {
 					false
 			),
 			new TreeClassDescriptor(name("decl"), name("ImportDecl"), "import declaration",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Node").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tkeyword(LToken.Import),\n" +
 									"\t\t\twhen(data(STATIC), keyword(LToken.Static)),\n" +
@@ -658,12 +657,12 @@ public class AllDescriptors {
 									"\t\t\tnone().withSpacingAfter(spacing(CompilationUnit_AfterImports))\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("QualifiedName name").build(),
 							param("boolean isStatic").build(),
 							param("boolean isOnDemand").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null,
 							(Expr) null
@@ -671,30 +670,30 @@ public class AllDescriptors {
 					false
 			),
 			new TreeClassDescriptor(name("decl"), name("InitializerDecl"), "initializer declaration",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("MemberDecl").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(MODIFIERS, SExtendedModifier.multiLineShape),\n" +
 									"\t\t\tchild(BODY)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("NodeList<ExtendedModifier> modifiers").build(),
 							param("BlockStmt body").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("decl"), name("InterfaceDecl"), "interface declaration",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("TypeDecl").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(MODIFIERS, SExtendedModifier.multiLineShape),\n" +
 									"\t\t\tkeyword(LToken.Interface),\n" +
@@ -704,14 +703,14 @@ public class AllDescriptors {
 									"\t\t\tchild(MEMBERS, SMemberDecl.bodyShape)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("NodeList<ExtendedModifier> modifiers").build(),
 							param("Name name").build(),
 							param("NodeList<TypeParameter> typeParams").build(),
 							param("NodeList<QualifiedType> extendsClause").build(),
 							param("NodeList<MemberDecl> members").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null,
 							(Expr) null,
@@ -721,22 +720,22 @@ public class AllDescriptors {
 					false
 			),
 			new TreeClassDescriptor(name("decl"), name("LocalVariableDecl"), "local variable declaration",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Decl").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(MODIFIERS, SExtendedModifier.singleLineShape),\n" +
 									"\t\t\tchild(TYPE),\n" +
 									"\t\t\tchild(VARIABLES, SVariableDeclarator.listShape).withSpacingBefore(space())\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("NodeList<ExtendedModifier> modifiers").build(),
 							param("Type type").build(),
 							param("NodeList<VariableDeclarator> variables").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null,
 							(Expr) null
@@ -744,10 +743,10 @@ public class AllDescriptors {
 					false
 			),
 			new TreeClassDescriptor(name("decl"), name("MethodDecl"), "method declaration",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("MemberDecl").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(MODIFIERS, SExtendedModifier.multiLineShape),\n" +
 									"\t\t\tchild(TYPE_PARAMS, STypeParameter.listShape),\n" +
@@ -765,7 +764,7 @@ public class AllDescriptors {
 									"\t\t\t))\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("NodeList<ExtendedModifier> modifiers").build(),
 							param("NodeList<TypeParameter> typeParams").build(),
 							param("Type type").build(),
@@ -775,7 +774,7 @@ public class AllDescriptors {
 							param("NodeList<QualifiedType> throwsClause").build(),
 							param("NodeOption<BlockStmt> body").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null,
 							(Expr) null,
@@ -788,10 +787,10 @@ public class AllDescriptors {
 					false
 			),
 			new TreeClassDescriptor(name("decl"), name("Modifier"), "modifier",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("ExtendedModifier").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = token(new LSToken.Provider() {\n" +
 									"\t\tpublic LToken tokenFor(" + AllDescriptors.BU_TREE + " tree) {\n" +
 									"\t\t\tfinal ModifierKeyword keyword = ((SModifier) tree.state).keyword;\n" +
@@ -827,19 +826,19 @@ public class AllDescriptors {
 									"\t\t}\n" +
 									"\t});").build()
 					),
-					NodeList.of(
+					listOf(
 							param("ModifierKeyword keyword").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("decl"), name("PackageDecl"), "package declaration",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Node").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(ANNOTATIONS, list()),\n" +
 									"\t\t\tkeyword(LToken.Package),\n" +
@@ -847,21 +846,21 @@ public class AllDescriptors {
 									"\t\t\ttoken(LToken.SemiColon)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("NodeList<AnnotationExpr> annotations").build(),
 							param("QualifiedName name").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("decl"), name("TypeParameter"), "type parameter",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Node").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape boundsShape = list(\n" +
 									"\t\t\tkeyword(LToken.Extends),\n" +
 									"\t\t\ttoken(LToken.BinAnd).withSpacing(space(), space()),\n" +
@@ -878,12 +877,12 @@ public class AllDescriptors {
 									"\t\t\ttoken(LToken.Greater).withSpacingAfter(space())\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("NodeList<AnnotationExpr> annotations").build(),
 							param("Name name").build(),
 							param("NodeList<Type> bounds").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null,
 							(Expr) null
@@ -891,10 +890,10 @@ public class AllDescriptors {
 					false
 			),
 			new TreeClassDescriptor(name("decl"), name("VariableDeclarator"), "variable declarator",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Node").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape initializerShape = composite(\n" +
 									"\t\t\ttoken(LToken.Assign).withSpacing(space(), space()),\n" +
 									"\t\t\telement()\n" +
@@ -905,61 +904,61 @@ public class AllDescriptors {
 									"\t);").build(),
 							memberDecl("public static final LexicalShape listShape = list(none(), token(LToken.Comma).withSpacingAfter(space()), none());").build()
 					),
-					NodeList.of(
+					listOf(
 							param("VariableDeclaratorId id").build(),
 							param("NodeOption<Expr> init").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("decl"), name("VariableDeclaratorId"), "variable declarator identifier",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Node").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(NAME),\n" +
 									"\t\t\tchild(DIMS, list())\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("Name name").build(),
 							param("NodeList<ArrayDim> dims").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("expr"), name("ArrayAccessExpr"), "array access expression",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Expr").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(NAME),\n" +
 									"\t\t\ttoken(LToken.BracketLeft), child(INDEX), token(LToken.BracketRight)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("Expr name").build(),
 							param("Expr index").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("expr"), name("ArrayCreationExpr"), "array creation expression",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Expr").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\ttoken(LToken.New),\n" +
 									"\t\t\tchild(TYPE),\n" +
@@ -970,13 +969,13 @@ public class AllDescriptors {
 									"\t\t\t))\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("Type type").build(),
 							param("NodeList<ArrayDimExpr> dimExprs").build(),
 							param("NodeList<ArrayDim> dims").build(),
 							param("NodeOption<ArrayInitializerExpr> init").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null,
 							(Expr) null,
@@ -985,31 +984,31 @@ public class AllDescriptors {
 					false
 			),
 			new TreeClassDescriptor(name("expr"), name("ArrayDimExpr"), "array dimension expression",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Node").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(ANNOTATIONS, org.jlato.internal.bu.expr.SAnnotationExpr.singleLineAnnotationsShapeWithSpaceBefore),\n" +
 									"\t\t\ttoken(LToken.BracketLeft), child(EXPR), token(LToken.BracketRight)\n" +
 									"\t);").build(),
 							memberDecl("public static final LexicalShape listShape = list();").build()
 					),
-					NodeList.of(
+					listOf(
 							param("NodeList<AnnotationExpr> annotations").build(),
 							param("Expr expr").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("expr"), name("ArrayInitializerExpr"), "array initializer expression",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Expr").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\talternative(childIs(VALUES, not(empty())), composite(\n" +
 									"\t\t\t\t\ttoken(LToken.BraceLeft).withSpacingAfter(space()),\n" +
@@ -1023,21 +1022,21 @@ public class AllDescriptors {
 									"\t\t\t))\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("NodeList<Expr> values").build(),
 							param("boolean trailingComma").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("expr"), name("AssignExpr"), "assignment expression",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Expr").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(TARGET),\n" +
 									"\t\t\ttoken(new LSToken.Provider() {\n" +
@@ -1077,12 +1076,12 @@ public class AllDescriptors {
 									"\t\t\tchild(VALUE)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("Expr target").build(),
 							param("AssignOp op").build(),
 							param("Expr value").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null,
 							(Expr) null
@@ -1090,10 +1089,10 @@ public class AllDescriptors {
 					false
 			),
 			new TreeClassDescriptor(name("expr"), name("BinaryExpr"), "binary expression",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Expr").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(LEFT),\n" +
 									"\t\t\ttoken(new LSToken.Provider() {\n" +
@@ -1147,12 +1146,12 @@ public class AllDescriptors {
 									"\t\t\tchild(RIGHT)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("Expr left").build(),
 							param("BinaryOp op").build(),
 							param("Expr right").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null,
 							(Expr) null
@@ -1160,47 +1159,47 @@ public class AllDescriptors {
 					false
 			),
 			new TreeClassDescriptor(name("expr"), name("CastExpr"), "cast expression",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Expr").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\ttoken(LToken.ParenthesisLeft), child(TYPE), token(LToken.ParenthesisRight).withSpacingAfter(space()), child(EXPR)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("Type type").build(),
 							param("Expr expr").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("expr"), name("ClassExpr"), "'class' expression",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Expr").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(TYPE),\n" +
 									"\t\t\ttoken(LToken.Dot), token(LToken.Class)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("Type type").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("expr"), name("ConditionalExpr"), "conditional expression",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Expr").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(CONDITION),\n" +
 									"\t\t\ttoken(LToken.QuestionMark).withSpacing(space(), space()),\n" +
@@ -1209,12 +1208,12 @@ public class AllDescriptors {
 									"\t\t\tchild(ELSE_EXPR)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("Expr condition").build(),
 							param("Expr thenExpr").build(),
 							param("Expr elseExpr").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null,
 							(Expr) null
@@ -1222,51 +1221,51 @@ public class AllDescriptors {
 					false
 			),
 			new TreeClassDescriptor(name("expr"), name("FieldAccessExpr"), "field access expression",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Expr").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(SCOPE, when(some(), composite(element(), token(LToken.Dot)))),\n" +
 									"\t\t\tchild(NAME)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("NodeOption<Expr> scope").build(),
 							param("Name name").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("expr"), name("InstanceOfExpr"), "'instanceof' expression",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Expr").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(EXPR),\n" +
 									"\t\t\tkeyword(LToken.InstanceOf),\n" +
 									"\t\t\tchild(TYPE)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("Expr expr").build(),
 							param("Type type").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("expr"), name("LambdaExpr"), "lambda expression",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Expr").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\twhen(data(PARENS), token(LToken.ParenthesisLeft)),\n" +
 									"\t\t\tchild(PARAMS, SExpr.listShape),\n" +
@@ -1275,23 +1274,23 @@ public class AllDescriptors {
 									"\t\t\tchild(BODY, leftOrRight())\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("NodeList<FormalParameter> params").build(),
 							param("boolean hasParens").build(),
 							param("NodeEither<Expr, BlockStmt> body").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) expr("true").build(),
-							(Expr) expr("NodeEither.<Expr, BlockStmt>right(blockStmt())").build()
+							(Expr) expr("TreeFactory.<Expr, BlockStmt>right(blockStmt())").build()
 					),
 					false
 			),
 			new TreeClassDescriptor(name("expr"), name("LiteralExpr"), "literal expression",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Expr").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = token(new LSToken.Provider() {\n" +
 									"\t\tpublic LToken tokenFor(" + AllDescriptors.BU_TREE + " tree) {\n" +
 									"\t\t\tfinal String literalString = ((SLiteralExpr) tree.state).literalString;\n" +
@@ -1299,59 +1298,59 @@ public class AllDescriptors {
 									"\t\t}\n" +
 									"\t});").build()
 					),
-					NodeList.of(
+					listOf(
 							param("Class<?> literalClass").build(),
 							param("String literalString").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null
 					),
 					true
 			),
 			new TreeClassDescriptor(name("expr"), name("MarkerAnnotationExpr"), "marker annotation expression",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("AnnotationExpr").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\ttoken(LToken.At), child(NAME)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("QualifiedName name").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("expr"), name("MemberValuePair"), "annotation member value pair",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Node").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(NAME),\n" +
 									"\t\t\ttoken(LToken.Assign).withSpacing(space(), space()),\n" +
 									"\t\t\tchild(VALUE)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("Name name").build(),
 							param("Expr value").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("expr"), name("MethodInvocationExpr"), "method invocation expression",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Expr").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(SCOPE, when(some(), composite(element(), token(LToken.Dot)))),\n" +
 									"\t\t\tchild(TYPE_ARGS, org.jlato.internal.bu.type.SType.typeArgumentsShape),\n" +
@@ -1359,13 +1358,13 @@ public class AllDescriptors {
 									"\t\t\tchild(ARGS, SExpr.argumentsShape)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("NodeOption<Expr> scope").build(),
 							param("NodeList<Type> typeArgs").build(),
 							param("Name name").build(),
 							param("NodeList<Expr> args").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null,
 							(Expr) null,
@@ -1374,10 +1373,10 @@ public class AllDescriptors {
 					false
 			),
 			new TreeClassDescriptor(name("expr"), name("MethodReferenceExpr"), "method reference expression",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Expr").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(SCOPE),\n" +
 									"\t\t\ttoken(LToken.DoubleColon),\n" +
@@ -1385,12 +1384,12 @@ public class AllDescriptors {
 									"\t\t\tchild(NAME)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("Expr scope").build(),
 							param("NodeList<Type> typeArgs").build(),
 							param("Name name").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null,
 							(Expr) null
@@ -1398,10 +1397,10 @@ public class AllDescriptors {
 					false
 			),
 			new TreeClassDescriptor(name("expr"), name("NormalAnnotationExpr"), "normal annotation expression",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("AnnotationExpr").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\ttoken(LToken.At), child(NAME),\n" +
 									"\t\t\ttoken(LToken.ParenthesisLeft),\n" +
@@ -1409,21 +1408,21 @@ public class AllDescriptors {
 									"\t\t\ttoken(LToken.ParenthesisRight)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("QualifiedName name").build(),
 							param("NodeList<MemberValuePair> pairs").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("expr"), name("ObjectCreationExpr"), "object creation expression",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Expr").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(SCOPE, when(some(), composite(element(), token(LToken.Dot)))),\n" +
 									"\t\t\ttoken(LToken.New).withSpacingAfter(space()),\n" +
@@ -1433,14 +1432,14 @@ public class AllDescriptors {
 									"\t\t\tchild(BODY, when(some(), element(org.jlato.internal.bu.decl.SMemberDecl.bodyShape)))\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("NodeOption<Expr> scope").build(),
 							param("NodeList<Type> typeArgs").build(),
 							param("QualifiedType type").build(),
 							param("NodeList<Expr> args").build(),
 							param("NodeOption<NodeList<MemberDecl>> body").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null,
 							(Expr) null,
@@ -1450,27 +1449,27 @@ public class AllDescriptors {
 					false
 			),
 			new TreeClassDescriptor(name("expr"), name("ParenthesizedExpr"), "parenthesized expression",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Expr").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\ttoken(LToken.ParenthesisLeft), child(INNER), token(LToken.ParenthesisRight)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("Expr inner").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("expr"), name("SingleMemberAnnotationExpr"), "single member annotation expression",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("AnnotationExpr").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\ttoken(LToken.At), child(NAME),\n" +
 									"\t\t\ttoken(LToken.ParenthesisLeft),\n" +
@@ -1478,72 +1477,72 @@ public class AllDescriptors {
 									"\t\t\ttoken(LToken.ParenthesisRight)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("QualifiedName name").build(),
 							param("Expr memberValue").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("expr"), name("SuperExpr"), "'super' expression",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Expr").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(CLASS_EXPR, when(some(), composite(element(), token(LToken.Dot)))),\n" +
 									"\t\t\ttoken(LToken.Super)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("NodeOption<Expr> classExpr").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("expr"), name("ThisExpr"), "'this' expression",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Expr").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(CLASS_EXPR, when(some(), composite(element(), token(LToken.Dot)))),\n" +
 									"\t\t\ttoken(LToken.This)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("NodeOption<Expr> classExpr").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("expr"), name("TypeExpr"), "type expression",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Expr").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = child(TYPE);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("Type type").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("expr"), name("UnaryExpr"), "unary expression",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Expr").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape opShape = token(new LSToken.Provider() {\n" +
 									"\t\tpublic LToken tokenFor(" + AllDescriptors.BU_TREE + " tree) {\n" +
 									"\t\t\tfinal UnaryOp op = ((SUnaryExpr) tree.state).op;\n" +
@@ -1577,75 +1576,75 @@ public class AllDescriptors {
 									"\t\t}\n" +
 									"\t}, composite(opShape, child(EXPR)), composite(child(EXPR), opShape));").build()
 					),
-					NodeList.of(
+					listOf(
 							param("UnaryOp op").build(),
 							param("Expr expr").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("expr"), name("VariableDeclarationExpr"), "variable declaration expression",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Expr").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = child(DECLARATION);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("LocalVariableDecl declaration").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("name"), name("Name"), "name",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Expr").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = token(new LSToken.Provider() {\n" +
 									"\t\tpublic LToken tokenFor(" + AllDescriptors.BU_TREE + " tree) {\n" +
 									"\t\t\treturn new LToken(ParserImplConstants.IDENTIFIER, ((SName) tree.state).id);\n" +
 									"\t\t}\n" +
 									"\t});").build()
 					),
-					NodeList.of(
+					listOf(
 							param("String id").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("name"), name("QualifiedName"), "qualified name",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Node").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(QUALIFIER, when(some(), composite(element(), token(LToken.Dot)))),\n" +
 									"\t\t\tchild(NAME)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("NodeOption<QualifiedName> qualifier").build(),
 							param("Name name").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("stmt"), name("AssertStmt"), "'assert' statement",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Stmt").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tkeyword(LToken.Assert),\n" +
 									"\t\t\tchild(CHECK),\n" +
@@ -1655,21 +1654,21 @@ public class AllDescriptors {
 									"\t\t\ttoken(LToken.SemiColon)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("Expr check").build(),
 							param("NodeOption<Expr> msg").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("stmt"), name("BlockStmt"), "block statement",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Stmt").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = alternative(childIs(STMTS, not(empty())),\n" +
 									"\t\t\tcomposite(\n" +
 									"\t\t\t\t\ttoken(LToken.BraceLeft)\n" +
@@ -1689,38 +1688,38 @@ public class AllDescriptors {
 									"\t\t\t)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("NodeList<Stmt> stmts").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("stmt"), name("BreakStmt"), "'break' statement",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Stmt").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\ttoken(LToken.Break),\n" +
 									"\t\t\tchild(ID, when(some(), element().withSpacingBefore(space()))),\n" +
 									"\t\t\ttoken(LToken.SemiColon)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("NodeOption<Name> id").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("stmt"), name("CatchClause"), "catch clause",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Node").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tkeyword(LToken.Catch),\n" +
 									"\t\t\ttoken(LToken.ParenthesisLeft).withSpacingBefore(space()),\n" +
@@ -1730,40 +1729,40 @@ public class AllDescriptors {
 									"\t);").build(),
 							memberDecl("public static final LexicalShape listShape = list();").build()
 					),
-					NodeList.of(
+					listOf(
 							param("FormalParameter except").build(),
 							param("BlockStmt catchBlock").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("stmt"), name("ContinueStmt"), "'continue' statement",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Stmt").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\ttoken(LToken.Continue),\n" +
 									"\t\t\tchild(ID, when(some(), element().withSpacingBefore(space()))),\n" +
 									"\t\t\ttoken(LToken.SemiColon)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("NodeOption<Name> id").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("stmt"), name("DoStmt"), "'do-while' statement",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Stmt").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tkeyword(LToken.Do),\n" +
 									"\t\t\tchild(BODY),\n" +
@@ -1774,32 +1773,32 @@ public class AllDescriptors {
 									"\t\t\ttoken(LToken.SemiColon)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("Stmt body").build(),
 							param("Expr condition").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("stmt"), name("EmptyStmt"), "empty statement",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Stmt").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = token(LToken.SemiColon);").build()
 					),
-					NodeList.<FormalParameter>empty(),
-					NodeList.<Expr>empty(),
+					emptyList(),
+					emptyList(),
 					false
 			),
 			new TreeClassDescriptor(name("stmt"), name("ExplicitConstructorInvocationStmt"), "explicit constructor invocation statement",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Stmt").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(EXPR, when(some(), composite(element(), token(LToken.Dot)))),\n" +
 									"\t\t\tchild(TYPE_ARGS, org.jlato.internal.bu.type.SType.typeArgumentsShape),\n" +
@@ -1812,13 +1811,13 @@ public class AllDescriptors {
 									"\t\t\ttoken(LToken.SemiColon)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("NodeList<Type> typeArgs").build(),
 							param("boolean isThis").build(),
 							param("NodeOption<Expr> expr").build(),
 							param("NodeList<Expr> args").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null,
 							(Expr) null,
@@ -1827,27 +1826,27 @@ public class AllDescriptors {
 					false
 			),
 			new TreeClassDescriptor(name("stmt"), name("ExpressionStmt"), "expression statement",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Stmt").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(EXPR), token(LToken.SemiColon)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("Expr expr").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("stmt"), name("ForStmt"), "'for' statement",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Stmt").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tkeyword(LToken.For), token(LToken.ParenthesisLeft).withSpacingBefore(space()),\n" +
 									"\t\t\tchild(INIT, list(token(LToken.Comma).withSpacingAfter(space()))),\n" +
@@ -1859,13 +1858,13 @@ public class AllDescriptors {
 									"\t\t\tchild(BODY)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("NodeList<Expr> init").build(),
 							param("Expr compare").build(),
 							param("NodeList<Expr> update").build(),
 							param("Stmt body").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null,
 							(Expr) null,
@@ -1874,10 +1873,10 @@ public class AllDescriptors {
 					false
 			),
 			new TreeClassDescriptor(name("stmt"), name("ForeachStmt"), "\"enhanced\" 'for' statement",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Stmt").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tkeyword(LToken.For), token(LToken.ParenthesisLeft).withSpacingBefore(space()),\n" +
 									"\t\t\tchild(VAR),\n" +
@@ -1887,12 +1886,12 @@ public class AllDescriptors {
 									"\t\t\tchild(BODY)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("VariableDeclarationExpr var").build(),
 							param("Expr iterable").build(),
 							param("Stmt body").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null,
 							(Expr) null
@@ -1900,10 +1899,10 @@ public class AllDescriptors {
 					false
 			),
 			new TreeClassDescriptor(name("stmt"), name("IfStmt"), "'if' statement",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Stmt").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tkeyword(LToken.If),\n" +
 									"\t\t\ttoken(LToken.ParenthesisLeft),\n" +
@@ -1948,12 +1947,12 @@ public class AllDescriptors {
 									"\t\t\t)))\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("Expr condition").build(),
 							param("Stmt thenStmt").build(),
 							param("NodeOption<Stmt> elseStmt").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null,
 							(Expr) null
@@ -1961,10 +1960,10 @@ public class AllDescriptors {
 					false
 			),
 			new TreeClassDescriptor(name("stmt"), name("LabeledStmt"), "labeled statement",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Stmt").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tnone().withIndentationAfter(indent(IndentationContext.LABEL)),\n" +
 									"\t\t\tchild(LABEL),\n" +
@@ -1973,40 +1972,40 @@ public class AllDescriptors {
 									"\t\t\tchild(STMT)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("Name label").build(),
 							param("Stmt stmt").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("stmt"), name("ReturnStmt"), "'return' statement",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Stmt").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\ttoken(LToken.Return),\n" +
 									"\t\t\tchild(EXPR, when(some(), element().withSpacingBefore(space()))),\n" +
 									"\t\t\ttoken(LToken.SemiColon)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("NodeOption<Expr> expr").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("stmt"), name("SwitchCase"), "'switch' case",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Node").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(LABEL, alternative(some(),\n" +
 									"\t\t\t\t\tcomposite(keyword(LToken.Case), element()),\n" +
@@ -2019,21 +2018,21 @@ public class AllDescriptors {
 									"\t);").build(),
 							memberDecl("public static final LexicalShape listShape = list(none().withSpacingAfter(newLine()));").build()
 					),
-					NodeList.of(
+					listOf(
 							param("NodeOption<Expr> label").build(),
 							param("NodeList<Stmt> stmts").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("stmt"), name("SwitchStmt"), "'switch' statement",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Stmt").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\ttoken(LToken.Switch),\n" +
 									"\t\t\ttoken(LToken.ParenthesisLeft).withSpacingBefore(spacing(SwitchStmt_AfterSwitchKeyword)),\n" +
@@ -2059,21 +2058,21 @@ public class AllDescriptors {
 									"\t\t\t)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("Expr selector").build(),
 							param("NodeList<SwitchCase> cases").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("stmt"), name("SynchronizedStmt"), "'synchronized' statement",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Stmt").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\ttoken(LToken.Synchronized),\n" +
 									"\t\t\ttoken(LToken.ParenthesisLeft).withSpacingBefore(space()),\n" +
@@ -2082,38 +2081,38 @@ public class AllDescriptors {
 									"\t\t\tchild(BLOCK)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("Expr expr").build(),
 							param("BlockStmt block").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("stmt"), name("ThrowStmt"), "'throw' statement",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Stmt").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tkeyword(LToken.Throw), child(EXPR), token(LToken.SemiColon)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("Expr expr").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("stmt"), name("TryStmt"), "'try' statement",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Stmt").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tkeyword(LToken.Try),\n" +
 									"\t\t\twhen(childIs(RESOURCES, not(empty())),\n" +
@@ -2134,14 +2133,14 @@ public class AllDescriptors {
 									"\t\t\t))\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("NodeList<VariableDeclarationExpr> resources").build(),
 							param("boolean trailingSemiColon").build(),
 							param("BlockStmt tryBlock").build(),
 							param("NodeList<CatchClause> catchs").build(),
 							param("NodeOption<BlockStmt> finallyBlock").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null,
 							(Expr) null,
@@ -2151,27 +2150,27 @@ public class AllDescriptors {
 					false
 			),
 			new TreeClassDescriptor(name("stmt"), name("TypeDeclarationStmt"), "type declaration statement",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Stmt").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(TYPE_DECL)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("TypeDecl typeDecl").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("stmt"), name("WhileStmt"), "'while' statement",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Stmt").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tkeyword(LToken.While),\n" +
 									"\t\t\ttoken(LToken.ParenthesisLeft).withSpacingBefore(space()),\n" +
@@ -2180,58 +2179,58 @@ public class AllDescriptors {
 									"\t\t\tchild(BODY)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("Expr condition").build(),
 							param("Stmt body").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("type"), name("ArrayType"), "array type",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("ReferenceType").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(COMPONENT_TYPE),\n" +
 									"\t\t\tchild(DIMS, list())\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("Type componentType").build(),
 							param("NodeList<ArrayDim> dims").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("type"), name("IntersectionType"), "intersection type",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Type").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(TYPES, org.jlato.internal.bu.type.SType.intersectionShape)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("NodeList<Type> types").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("type"), name("PrimitiveType"), "primitive type",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Type").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(ANNOTATIONS, list()),\n" +
 									"\t\t\ttoken(new LSToken.Provider() {\n" +
@@ -2262,21 +2261,21 @@ public class AllDescriptors {
 									"\t\t\t})\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("NodeList<AnnotationExpr> annotations").build(),
 							param("Primitive primitive").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("type"), name("QualifiedType"), "qualified type",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("ReferenceType").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape scopeShape = composite(element(), token(LToken.Dot));").build(),
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(SCOPE, when(some(), scopeShape)),\n" +
@@ -2300,13 +2299,13 @@ public class AllDescriptors {
 									"\t\t\tnull\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("NodeList<AnnotationExpr> annotations").build(),
 							param("NodeOption<QualifiedType> scope").build(),
 							param("Name name").build(),
 							param("NodeOption<NodeList<Type>> typeArgs").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null,
 							(Expr) null,
@@ -2315,49 +2314,49 @@ public class AllDescriptors {
 					false
 			),
 			new TreeClassDescriptor(name("type"), name("UnionType"), "union type",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Type").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(TYPES, org.jlato.internal.bu.type.SType.unionShape)\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("NodeList<Type> types").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null
 					),
 					false
 			),
 			new TreeClassDescriptor(name("type"), name("UnknownType"), "unknown type",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Type").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = none();").build()
 					),
-					NodeList.<FormalParameter>empty(),
-					NodeList.<Expr>empty(),
+					emptyList(),
+					emptyList(),
 					false
 			),
 			new TreeClassDescriptor(name("type"), name("VoidType"), "void type",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Type").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = token(LToken.Void);").build()
 					),
-					NodeList.<FormalParameter>empty(),
-					NodeList.<Expr>empty(),
+					emptyList(),
+					emptyList(),
 					false
 			),
 			new TreeClassDescriptor(name("type"), name("WildcardType"), "wildcard type",
-					NodeList.of(
+					listOf(
 							(QualifiedType) type("Type").build()
 					),
-					NodeList.of(
+					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(ANNOTATIONS, org.jlato.internal.bu.expr.SAnnotationExpr.singleLineAnnotationsShape),\n" +
 									"\t\t\ttoken(LToken.QuestionMark),\n" +
@@ -2365,12 +2364,12 @@ public class AllDescriptors {
 									"\t\t\tchild(SUP, when(some(), composite(keyword(LToken.Super), element())))\n" +
 									"\t);").build()
 					),
-					NodeList.of(
+					listOf(
 							param("NodeList<AnnotationExpr> annotations").build(),
 							param("NodeOption<ReferenceType> ext").build(),
 							param("NodeOption<ReferenceType> sup").build()
 					),
-					NodeList.<Expr>of(
+					listOf(
 							(Expr) null,
 							(Expr) null,
 							(Expr) null

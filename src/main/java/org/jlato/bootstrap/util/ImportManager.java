@@ -1,14 +1,13 @@
 package org.jlato.bootstrap.util;
 
-import org.jlato.tree.NodeList;
-import org.jlato.tree.NodeOption;
-import org.jlato.tree.decl.ImportDecl;
-import org.jlato.tree.name.QualifiedName;
+import org.jlato.tree.*;
+import org.jlato.tree.decl.*;
+import org.jlato.tree.name.*;
 import org.jlato.util.Function1;
 
 import java.util.*;
 
-import static org.jlato.tree.TreeFactory.importDecl;
+import static org.jlato.tree.TreeFactory.*;
 
 /**
  * @author Didier Villevalois
@@ -42,10 +41,10 @@ public class ImportManager {
 		if (!sortedStaticImports.isEmpty())
 			sortedStaticImports.set(0, sortedStaticImports.get(0).insertNewLineBefore());
 
-		return NodeList.<ImportDecl>empty()
-				.appendAll(NodeList.of(sortedImports))
-				.appendAll(NodeList.of(sortedJavaImports))
-				.appendAll(NodeList.of(sortedStaticImports));
+		return TreeFactory.<ImportDecl>emptyList()
+				.appendAll(listOf(sortedImports))
+				.appendAll(listOf(sortedJavaImports))
+				.appendAll(listOf(sortedStaticImports));
 	}
 
 	private boolean otherImport(String name) {
@@ -64,9 +63,9 @@ public class ImportManager {
 	                                            boolean isStatic, Function1<String, Boolean> filter) {
 		final ArrayList<ImportDecl> sortedImports = new ArrayList<>();
 		filterAddAll(sortedImports, filter,
-				NodeList.of(onDemandImports).<ImportDecl>map((QualifiedName n) -> importDecl(n).setOnDemand(true).setStatic(isStatic)));
+				listOf(onDemandImports).<ImportDecl>map((QualifiedName n) -> importDecl(n).setOnDemand(true).setStatic(isStatic)));
 		filterAddAll(sortedImports, filter,
-				NodeList.of(singleImports).<ImportDecl>map((QualifiedName n) -> importDecl(n).setOnDemand(false).setStatic(isStatic)));
+				listOf(singleImports).<ImportDecl>map((QualifiedName n) -> importDecl(n).setOnDemand(false).setStatic(isStatic)));
 		sortedImports.sort(NAME_COMPARATOR);
 		return sortedImports;
 	}

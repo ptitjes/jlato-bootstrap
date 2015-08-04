@@ -9,9 +9,7 @@ import org.jlato.tree.NodeList;
 import org.jlato.tree.decl.*;
 
 import static org.jlato.rewrite.Quotes.typeDecl;
-import static org.jlato.tree.TreeFactory.enumConstantDecl;
-import static org.jlato.tree.TreeFactory.enumDecl;
-import static org.jlato.tree.TreeFactory.name;
+import static org.jlato.tree.TreeFactory.*;
 
 /**
  * @author Didier Villevalois
@@ -26,7 +24,7 @@ public class KindEnum implements DeclPattern<TreeClassDescriptor[], EnumDecl> {
 	@Override
 	public EnumDecl rewrite(EnumDecl decl, ImportManager importManager, TreeClassDescriptor[] arg) {
 		decl = enumDecl(name("Kind"))
-				.withModifiers(NodeList.of(Modifier.Public));
+				.withModifiers(listOf(Modifier.Public));
 
 		for (TreeClassDescriptor descriptor : arg) {
 			decl = decl.withEnumConstants(cs -> {
