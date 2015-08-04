@@ -39,7 +39,7 @@ import org.jlato.tree.name.*;
 import java.io.File;
 import java.io.IOException;
 
-import static org.jlato.tree.TreeFactory.*;
+import static org.jlato.tree.Trees.*;
 
 /**
  * @author Didier Villevalois
@@ -97,9 +97,9 @@ public class Bootstrap {
 		final KindEnum kindEnumPattern = new KindEnum();
 		treeSet = applyPattern(treeSet, "org/jlato/tree/Kind.java", kindEnumPattern, classDescriptors);
 
-		// Generate TreeFactory
+		// Generate Trees
 		final TreeFactoryClass treeFactoryClassPattern = new TreeFactoryClass();
-		treeSet = applyPattern(treeSet, "org/jlato/tree/TreeFactory.java", treeFactoryClassPattern, classDescriptors);
+		treeSet = applyPattern(treeSet, "org/jlato/tree/Trees.java", treeFactoryClassPattern, classDescriptors);
 
 		treeSet.updateOnDisk(false, FormattingSettings.Default);
 	}

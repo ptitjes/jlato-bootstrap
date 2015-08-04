@@ -21,7 +21,7 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.HashSet;
 
-import static org.jlato.tree.TreeFactory.*;
+import static org.jlato.tree.Trees.*;
 import static org.jlato.tree.expr.AssignOp.Normal;
 import static org.jlato.tree.expr.BinaryOp.Less;
 import static org.jlato.tree.expr.UnaryOp.PostIncrement;
@@ -295,7 +295,7 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 				importDecl(qualifiedName("org.jlato.tree.stmt")).setOnDemand(true),
 				importDecl(qualifiedName("org.jlato.tree.type")).setOnDemand(true),
 				importDecl(qualifiedName("org.jlato.tree.type.PrimitiveType.Primitive")),
-				importDecl(qualifiedName("org.jlato.tree.TreeFactory")).setStatic(true).setOnDemand(true),
+				importDecl(qualifiedName("org.jlato.tree.Trees")).setStatic(true).setOnDemand(true),
 				importDecl(qualifiedName("org.jlato.unit.util.Arbitrary")),
 				importDecl(qualifiedName("org.junit")).setOnDemand(true),
 				importDecl(qualifiedName("org.junit.runner.RunWith")),
@@ -428,7 +428,7 @@ public class NodeAccessorsUnitTests extends TreeClassRefactoring {
 				importDecl(qualifiedName("org.jlato.tree.stmt")).setOnDemand(true),
 				importDecl(qualifiedName("org.jlato.tree.type")).setOnDemand(true),
 				importDecl(qualifiedName("org.jlato.tree.type.PrimitiveType.Primitive")),
-				importDecl(qualifiedName("org.jlato.tree.TreeFactory")).setStatic(true).setOnDemand(true),
+				importDecl(qualifiedName("org.jlato.tree.Trees")).setStatic(true).setOnDemand(true),
 				importDecl(qualifiedName("org.jlato.unit.util.Arbitrary")),
 				importDecl(qualifiedName("org.junit")).setOnDemand(true),
 				importDecl(qualifiedName("org.junit.runner.RunWith")),

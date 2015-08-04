@@ -16,7 +16,7 @@ import java.util.Arrays;
 
 import static org.jlato.rewrite.Quotes.memberDecl;
 import static org.jlato.rewrite.Quotes.stmt;
-import static org.jlato.tree.TreeFactory.*;
+import static org.jlato.tree.Trees.*;
 
 /**
  * @author Didier Villevalois

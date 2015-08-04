@@ -12,7 +12,7 @@ import org.jlato.tree.decl.*;
 import java.util.Arrays;
 
 import static org.jlato.tree.NodeOption.*;
-import static org.jlato.tree.TreeFactory.*;
+import static org.jlato.tree.Trees.*;
 
 /**
  * @author Didier Villevalois

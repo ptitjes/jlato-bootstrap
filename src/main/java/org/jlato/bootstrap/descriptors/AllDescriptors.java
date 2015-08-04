@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.jlato.rewrite.Quotes.*;
-import static org.jlato.tree.TreeFactory.*;
+import static org.jlato.tree.Trees.*;
 
 /**
  * @author Didier Villevalois
@@ -1282,7 +1282,7 @@ public class AllDescriptors {
 					listOf(
 							(Expr) null,
 							(Expr) expr("true").build(),
-							(Expr) expr("TreeFactory.<Expr, BlockStmt>right(blockStmt())").build()
+							(Expr) expr("Trees.<Expr, BlockStmt>right(blockStmt())").build()
 					),
 					false
 			),

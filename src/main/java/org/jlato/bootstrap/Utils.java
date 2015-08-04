@@ -18,7 +18,7 @@ import org.jlato.util.Function1;
 
 import java.util.Iterator;
 
-import static org.jlato.tree.TreeFactory.*;
+import static org.jlato.tree.Trees.*;
 
 /**
  * @author Didier Villevalois
@@ -175,19 +175,19 @@ public class Utils {
 	}
 
 	public static QualifiedType qType(String typeName) {
-		return TreeFactory.qualifiedType(name(typeName));
+		return Trees.qualifiedType(name(typeName));
 	}
 
 	public static QualifiedType qType(String typeName, Type typeArg) {
-		return TreeFactory.qualifiedType(name(typeName)).withTypeArgs(some(listOf(typeArg)));
+		return Trees.qualifiedType(name(typeName)).withTypeArgs(some(listOf(typeArg)));
 	}
 
 	public static QualifiedType qType(String typeName, Type typeArg1, Type typeArg2) {
-		return TreeFactory.qualifiedType(name(typeName)).withTypeArgs(some(listOf(typeArg1, typeArg2)));
+		return Trees.qualifiedType(name(typeName)).withTypeArgs(some(listOf(typeArg1, typeArg2)));
 	}
 
 	public static QualifiedType qType(String typeName, Type typeArg1, Type typeArg2, Type typeArg3) {
-		return TreeFactory.qualifiedType(name(typeName)).withTypeArgs(some(listOf(typeArg1, typeArg2, typeArg3)));
+		return Trees.qualifiedType(name(typeName)).withTypeArgs(some(listOf(typeArg1, typeArg2, typeArg3)));
 	}
 
 	public static String constantToCamel(String constantName) {

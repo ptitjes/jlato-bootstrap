@@ -16,7 +16,7 @@ import org.jlato.tree.type.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.jlato.tree.TreeFactory.*;
+import static org.jlato.tree.Trees.*;
 
 /**
  * @author Didier Villevalois

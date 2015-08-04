@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.jlato.tree.TreeFactory.qualifiedName;
+import static org.jlato.tree.Trees.qualifiedName;
 
 /**
  * @author Didier Villevalois

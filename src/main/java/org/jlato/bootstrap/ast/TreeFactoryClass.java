@@ -14,13 +14,12 @@ import org.jlato.tree.type.Primitive;
 import org.jlato.tree.type.PrimitiveType;
 import org.jlato.tree.type.QualifiedType;
 import org.jlato.tree.type.Type;
-import org.jlato.util.Function0;
 import org.jlato.util.Function1;
 
 import static org.jlato.rewrite.Quotes.expr;
 import static org.jlato.rewrite.Quotes.memberDecl;
 import static org.jlato.rewrite.Quotes.typeDecl;
-import static org.jlato.tree.TreeFactory.*;
+import static org.jlato.tree.Trees.*;
 
 /**
  * @author Didier Villevalois
@@ -29,12 +28,12 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 
 	@Override
 	public Pattern<? extends Decl> matcher(TreeClassDescriptor[] arg) {
-		return typeDecl("public abstract class TreeFactory { ..$_ }");
+		return typeDecl("public abstract class Trees { ..$_ }");
 	}
 
 	@Override
 	public ClassDecl rewrite(ClassDecl decl, ImportManager importManager, TreeClassDescriptor[] arg) {
-		decl = classDecl(name("TreeFactory"))
+		decl = classDecl(name("Trees"))
 				.withModifiers(m -> m.append(Modifier.Public).append(Modifier.Abstract));
 
 		if (GenSettings.generateDocs)
@@ -67,6 +66,10 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 
 		factoryMethods = factoryMethods.append(memberDecl("public static <T extends Tree> NodeList<T> emptyList() {\n" +
 				"\t\treturn TDNodeList.empty();\n" +
+				"\t}").build());
+
+		factoryMethods = factoryMethods.append(memberDecl("public static <T extends Tree> NodeList<T> listOf(Iterable<T> ts) {\n" +
+				"\t\treturn TDNodeList.of(ts);\n" +
 				"\t}").build());
 
 		for (int i = 1; i <= 23; i++) factoryMethods = factoryMethods.append(generateNodeListOf(i));
@@ -178,10 +181,10 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 				final QualifiedType qualifiedType = (QualifiedType) type;
 				switch (qualifiedType.name().id()) {
 					case "NodeList":
-						args = args.append(expr("TreeFactory.<" + ((QualifiedType) type).typeArgs().get().get(0) + ">emptyList()").build());
+						args = args.append(expr("Trees.<" + ((QualifiedType) type).typeArgs().get().get(0) + ">emptyList()").build());
 						break;
 					case "NodeOption":
-						args = args.append(expr("TreeFactory.<" + ((QualifiedType) type).typeArgs().get().get(0) + ">none()").build());
+						args = args.append(expr("Trees.<" + ((QualifiedType) type).typeArgs().get().get(0) + ">none()").build());
 						break;
 					default:
 						if (noNulls) {

@@ -2,14 +2,14 @@ package org.jlato.bootstrap.descriptors;
 
 import org.jlato.bootstrap.util.ImportManager;
 import org.jlato.tree.NodeList;
-import org.jlato.tree.TreeFactory;
+import org.jlato.tree.Trees;
 import org.jlato.tree.decl.FormalParameter;
 import org.jlato.tree.decl.MemberDecl;
 import org.jlato.tree.name.Name;
 import org.jlato.tree.name.QualifiedName;
 import org.jlato.tree.type.QualifiedType;
 
-import static org.jlato.tree.TreeFactory.qualifiedType;
+import static org.jlato.tree.Trees.qualifiedType;
 
 /**
  * @author Didier Villevalois

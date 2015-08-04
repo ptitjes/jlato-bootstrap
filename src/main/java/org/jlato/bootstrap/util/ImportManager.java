@@ -7,7 +7,7 @@ import org.jlato.util.Function1;
 
 import java.util.*;
 
-import static org.jlato.tree.TreeFactory.*;
+import static org.jlato.tree.Trees.*;
 
 /**
  * @author Didier Villevalois
@@ -41,7 +41,7 @@ public class ImportManager {
 		if (!sortedStaticImports.isEmpty())
 			sortedStaticImports.set(0, sortedStaticImports.get(0).insertNewLineBefore());
 
-		return TreeFactory.<ImportDecl>emptyList()
+		return Trees.<ImportDecl>emptyList()
 				.appendAll(listOf(sortedImports))
 				.appendAll(listOf(sortedJavaImports))
 				.appendAll(listOf(sortedStaticImports));

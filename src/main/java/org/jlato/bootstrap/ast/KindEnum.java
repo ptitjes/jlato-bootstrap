@@ -9,7 +9,7 @@ import org.jlato.tree.NodeList;
 import org.jlato.tree.decl.*;
 
 import static org.jlato.rewrite.Quotes.typeDecl;
-import static org.jlato.tree.TreeFactory.*;
+import static org.jlato.tree.Trees.*;
 
 /**
  * @author Didier Villevalois

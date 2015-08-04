@@ -2,7 +2,7 @@ package org.jlato.bootstrap.descriptors;
 
 import org.jlato.bootstrap.Utils;
 import org.jlato.tree.NodeList;
-import org.jlato.tree.TreeFactory;
+import org.jlato.tree.Trees;
 import org.jlato.tree.decl.FormalParameter;
 import org.jlato.tree.decl.MemberDecl;
 import org.jlato.tree.expr.Expr;
@@ -10,7 +10,7 @@ import org.jlato.tree.name.Name;
 import org.jlato.tree.name.QualifiedName;
 import org.jlato.tree.type.QualifiedType;
 
-import static org.jlato.tree.TreeFactory.*;
+import static org.jlato.tree.Trees.*;
 
 /**
  * @author Didier Villevalois
@@ -45,11 +45,11 @@ public class TreeClassDescriptor extends TreeTypeDescriptor {
 	}
 
 	public QualifiedName classPackageName() {
-		return TreeFactory.qualifiedName(packageName).withQualifier(some(AllDescriptors.TREE_CLASSES_ROOT));
+		return Trees.qualifiedName(packageName).withQualifier(some(AllDescriptors.TREE_CLASSES_ROOT));
 	}
 
 	public QualifiedName classQualifiedName() {
-		return TreeFactory.qualifiedName(className()).withQualifier(some(classPackageName()));
+		return Trees.qualifiedName(className()).withQualifier(some(classPackageName()));
 	}
 
 	public String classFilePath() {

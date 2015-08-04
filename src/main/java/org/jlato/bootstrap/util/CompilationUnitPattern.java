@@ -9,9 +9,9 @@ import org.jlato.tree.name.*;
 
 import java.util.Arrays;
 
-import static org.jlato.tree.TreeFactory.compilationUnit;
-import static org.jlato.tree.TreeFactory.packageDecl;
-import static org.jlato.tree.TreeFactory.qualifiedName;
+import static org.jlato.tree.Trees.compilationUnit;
+import static org.jlato.tree.Trees.packageDecl;
+import static org.jlato.tree.Trees.qualifiedName;
 
 /**
  * @author Didier Villevalois
