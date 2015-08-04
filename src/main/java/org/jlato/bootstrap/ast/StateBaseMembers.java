@@ -176,13 +176,13 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 	public static class DoInstantiateMethod extends MemberPattern.OfMethod<TreeClassDescriptor> {
 		@Override
 		protected String makeQuote(TreeClassDescriptor arg) {
-			return "@Override\nprotected Tree doInstantiate(SLocation<" + arg.stateType() + "> location) { ..$_ }";
+			return "@Override\nprotected Tree doInstantiate(" + AllDescriptors.TD_LOCATION + "<" + arg.stateType() + "> location) { ..$_ }";
 		}
 
 		@Override
 		protected MethodDecl makeDecl(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
-			importManager.addImportByName(qualifiedName("org.jlato.internal.td.SLocation"));
-			importManager.addImportByName(qualifiedName("org.jlato.tree.Tree"));
+			importManager.addImportByName(AllDescriptors.TD_LOCATION_QUALIFIED);
+			importManager.addImportByName(AllDescriptors.TREE_QUALIFIED);
 			importManager.addImportByName(arg.classQualifiedName());
 
 			return decl.withBody(some(blockStmt().withStmts(NodeList.of(

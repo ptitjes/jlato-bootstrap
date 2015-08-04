@@ -21,7 +21,7 @@ public class TreeClass extends TypePattern.OfClass<TreeClassDescriptor> {
 
 	@Override
 	protected String makeQuote(TreeClassDescriptor arg) {
-		return "public class " + arg.className() + " extends TreeBase<..$_> implements ..$_ { ..$_ }";
+		return "public class " + arg.className() + " extends " + AllDescriptors.TD_TREE + "<..$_> implements ..$_ { ..$_ }";
 	}
 
 	@Override
@@ -44,7 +44,7 @@ public class TreeClass extends TypePattern.OfClass<TreeClassDescriptor> {
 				))
 				.withImplementsClause(NodeList.of(arg.interfaceType()));
 
-		importManager.addImportByName(qualifiedName("org.jlato.internal.td.TreeBase"));
+		importManager.addImportByName(AllDescriptors.TD_TREE_QUALIFIED);
 		AllDescriptors.addImports(importManager, arg.superInterfaces.get(0));
 		AllDescriptors.addImports(importManager, arg.interfaceType());
 		return classDecl;

@@ -48,11 +48,31 @@ public class AllDescriptors {
 			name("expr"), name("expr"), name("expr"), name("type"), name("decl")
 	);
 
+	/* Base Interfaces */
+
 	public static final Name TREE_NAME = name("Tree");
 	public static final Name NODE_NAME = name("Node");
+
+	public static final QualifiedName TREE_QUALIFIED = qualifiedName(TREE_NAME).withQualifier(some(TREE_INTERFACES_ROOT));
+	public static final QualifiedName NODE_QUALIFIED = qualifiedName(NODE_NAME).withQualifier(some(TREE_INTERFACES_ROOT));
+
+	/* Base Classes */
+
 	public static final Name TD_TREE = name("TDTree");
+	public static final Name TD_LOCATION = name("TDLocation");
+	public static final Name TD_CONTEXT = name("TDContext");
+
+	public static final QualifiedName TD_TREE_QUALIFIED = qualifiedName(TD_TREE).withQualifier(some(TREE_CLASSES_ROOT));
+	public static final QualifiedName TD_LOCATION_QUALIFIED = qualifiedName(TD_LOCATION).withQualifier(some(TREE_CLASSES_ROOT));
+	public static final QualifiedName TD_CONTEXT_QUALIFIED = qualifiedName(TD_CONTEXT).withQualifier(some(TREE_CLASSES_ROOT));
+
+	/* Base States */
+
 	public static final Name STREE_STATE_NAME = name("STreeState");
 	public static final Name SNODE_STATE_NAME = name("SNodeState");
+
+	public static final QualifiedName STREE_STATE_QUALIFIED = qualifiedName(STREE_STATE_NAME).withQualifier(some(TREE_STATES_ROOT));
+	public static final QualifiedName SNODE_STATE_QUALIFIED = qualifiedName(SNODE_STATE_NAME).withQualifier(some(TREE_STATES_ROOT));
 
 	public static TreeTypeDescriptor get(Name name) {
 		return perName.get(name);

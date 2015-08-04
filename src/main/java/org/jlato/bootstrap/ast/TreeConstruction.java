@@ -37,16 +37,16 @@ public class TreeConstruction implements DeclContribution<TreeClassDescriptor, M
 	public static class TreePrivateConstructor extends Utils implements DeclPattern<TreeClassDescriptor, ConstructorDecl> {
 		@Override
 		public Pattern<? extends Decl> matcher(TreeClassDescriptor arg) {
-			return memberDecl("public " + arg.className() + "(SLocation<" + arg.name + ".State> location) { ..$_ }");
+			return memberDecl("public " + arg.className() + "(" + AllDescriptors.TD_LOCATION + "<" + arg.name + ".State> location) { ..$_ }");
 		}
 
 		@Override
 		public ConstructorDecl rewrite(ConstructorDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
-			importManager.addImportByName(qualifiedName("org.jlato.internal.td.SLocation"));
+			importManager.addImportByName(AllDescriptors.TD_LOCATION_QUALIFIED);
 
 			final Name name = arg.name;
 			final QualifiedType stateType = arg.stateType();
-			final QualifiedType locationType = qType("SLocation", stateType);
+			final QualifiedType locationType = qualifiedType(AllDescriptors.TD_LOCATION).withTypeArgs(some(NodeList.of(stateType)));
 
 			final Name location = name("location");
 
@@ -90,11 +90,11 @@ public class TreeConstruction implements DeclContribution<TreeClassDescriptor, M
 
 			final Name name = arg.name;
 			final QualifiedType stateType = arg.stateType();
-			final QualifiedType locationType = qType("SLocation", stateType);
+			final QualifiedType locationType = qualifiedType(AllDescriptors.TD_LOCATION).withTypeArgs(some(NodeList.of(stateType)));
 			final NodeList<FormalParameter> parameters = arg.parameters;
 
-			// Make SLocation creation expression from Trees
-			final ObjectCreationExpr sLocationCreationExpr = objectCreationExpr(locationType)
+			// Make TDLocation creation expression from Trees
+			final ObjectCreationExpr tdLocationCreationExpr = objectCreationExpr(locationType)
 					.withArgs(NodeList.of(
 							methodInvocationExpr(name("make"))
 									.withScope(some(arg.stateTypeName()))
@@ -112,7 +112,7 @@ public class TreeConstruction implements DeclContribution<TreeClassDescriptor, M
 					blockStmt().withStmts(NodeList.of(
 							explicitConstructorInvocationStmt()
 									.setThis(false)
-									.withArgs(NodeList.of(sLocationCreationExpr))
+									.withArgs(NodeList.of(tdLocationCreationExpr))
 					)))
 					.withModifiers(NodeList.of(Modifier.Public))
 					.withParams(parameters);
