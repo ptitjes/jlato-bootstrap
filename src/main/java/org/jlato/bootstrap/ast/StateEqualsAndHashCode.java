@@ -66,7 +66,7 @@ public class StateEqualsAndHashCode implements DeclContribution<TreeClassDescrip
 
 			if (!params.isEmpty()) {
 				stmts = stmts.append(
-						stmt("State state = (State) o;").build()
+						stmt(arg.stateTypeName() + " state = (" + arg.stateTypeName() + ") o;").build()
 				);
 
 				final Name state = new Name("state");

@@ -120,19 +120,43 @@ public class Utils {
 	}
 
 	public static Type treeTypeToSTreeType(Type treeType) {
-		Type stateParamType;
 		if (propertyFieldType(treeType)) {
-			stateParamType = treeType;
+			return treeType;
 		} else {
-			Type stateType = treeTypeToStateType((QualifiedType) treeType);
-			final Name name = ((QualifiedType) treeType).name();
-			final TreeTypeDescriptor descriptor = AllDescriptors.get(name);
-			if (descriptor != null && descriptor.isInterface()) {
-				stateType = wildcardType().withExt(some((ReferenceType) stateType));
-			}
-			stateParamType = qType("STree", stateType);
+			final QualifiedType qualifiedType = (QualifiedType) treeType;
+
+			final TreeTypeDescriptor descriptor = AllDescriptors.get(qualifiedType.name());
+			boolean isInterface = descriptor != null && descriptor.isInterface();
+
+			final QualifiedType stateType = treeTypeToStateType(qualifiedType);
+			return qType("STree", isInterface ?
+					wildcardType().withExt(some(stateType)) :
+					stateType);
 		}
-		return stateParamType;
+	}
+
+	public static Type treeTypeToStateType(Type treeType) {
+		if (propertyFieldType(treeType)) {
+			return treeType;
+		} else {
+			return treeTypeToStateType((QualifiedType) treeType);
+		}
+	}
+
+	public static QualifiedType treeTypeToStateType(QualifiedType treeType) {
+		final Name name = treeType.name();
+		final String id = name.id();
+		switch (id) {
+			case "NodeList":
+				return qualifiedType(name("SNodeListState"));
+			case "NodeOption":
+				return qualifiedType(name("SNodeOptionState"));
+			case "NodeEither":
+				return qualifiedType(name("SNodeEitherState"));
+			default:
+				final TreeTypeDescriptor descriptor = AllDescriptors.get(name);
+				return descriptor.stateType();
+		}
 	}
 
 	public static boolean propertyFieldType(Type treeType) {
@@ -146,22 +170,6 @@ public class Utils {
 					name.endsWith("Op");
 		}
 		return false;
-	}
-
-	public static QualifiedType treeTypeToStateType(QualifiedType treeQType) {
-		String treeClassName = treeQType.name().id();
-
-		QualifiedType stateType = null;
-		if (treeClassName.equals("NodeList")) {
-			stateType = qualifiedType(name("SNodeListState"));
-		} else if (treeClassName.equals("NodeOption")) {
-			stateType = qualifiedType(name("SNodeOptionState"));
-		} else if (treeClassName.equals("NodeEither")) {
-			stateType = qualifiedType(name("SNodeEitherState"));
-		} else {
-			stateType = qualifiedType(NodeStatesRemoval.STATE_NAME).withScope(some(treeQType));
-		}
-		return stateType;
 	}
 
 	public static <T extends Tree> NodeList<T> safeList(NodeList<T> list) {

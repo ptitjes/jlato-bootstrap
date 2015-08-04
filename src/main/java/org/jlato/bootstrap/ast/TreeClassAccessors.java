@@ -2,10 +2,12 @@ package org.jlato.bootstrap.ast;
 
 import org.jlato.bootstrap.GenSettings;
 import org.jlato.bootstrap.Utils;
+import org.jlato.bootstrap.descriptors.AllDescriptors;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.util.DeclContribution;
 import org.jlato.bootstrap.util.DeclPattern;
 import org.jlato.bootstrap.util.ImportManager;
+import org.jlato.bootstrap.util.MemberPattern;
 import org.jlato.rewrite.Pattern;
 import org.jlato.tree.NodeList;
 import org.jlato.tree.decl.*;
@@ -37,7 +39,7 @@ public class TreeClassAccessors implements DeclContribution<TreeClassDescriptor,
 		return decls;
 	}
 
-	public static class Accessor extends Utils implements DeclPattern<TreeClassDescriptor, MethodDecl> {
+	public static class Accessor extends MemberPattern.OfMethod<TreeClassDescriptor> {
 
 		private final FormalParameter param;
 
@@ -46,31 +48,30 @@ public class TreeClassAccessors implements DeclContribution<TreeClassDescriptor,
 		}
 
 		@Override
-		public Pattern<? extends Decl> matcher(TreeClassDescriptor arg) {
-			return memberDecl("public " + param.type() + " " + param.id().name() + "() { ..$_ }");
+		protected String makeQuote(TreeClassDescriptor arg) {
+			return "public " + param.type() + " " + param.id().name() + "() { ..$_ }";
 		}
 
 		@Override
-		public MethodDecl rewrite(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
+		protected MethodDecl makeDecl(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
+			AllDescriptors.addImports(importManager, param.type());
 
-			decl = decl.withBody(some(blockStmt().withStmts(NodeList.of(
-					stmt("return location.safe" + (propertyFieldType(param.type()) ? "Property" : "Traversal") + "(" + constantName(param) + ");").build()
+			return decl.withBody(some(blockStmt().withStmts(NodeList.of(
+					stmt("return location.safe" + (propertyFieldType(param.type()) ? "Property" : "Traversal") + "(" + arg.stateTypeName() + "." + constantName(param) + ");").build()
 			))));
+		}
 
-			if (GenSettings.generateDocs)
-				decl = decl.insertLeadingComment(
-						genDoc(decl,
-								"Returns the " + param.id().name() + " of this " + arg.description + ".",
-								new String[]{},
-								"the " + param.id().name() + " of this " + arg.description + "."
-						)
-				);
-
-			return decl;
+		@Override
+		protected String makeDoc(MethodDecl decl, TreeClassDescriptor arg) {
+			return genDoc(decl,
+					"Returns the " + param.id().name() + " of this " + arg.description + ".",
+					new String[]{},
+					"the " + param.id().name() + " of this " + arg.description + "."
+			);
 		}
 	}
 
-	public static class Mutator extends Utils implements DeclPattern<TreeClassDescriptor, MethodDecl> {
+	public static class Mutator extends MemberPattern.OfMethod<TreeClassDescriptor> {
 
 		private final FormalParameter param;
 
@@ -79,31 +80,30 @@ public class TreeClassAccessors implements DeclContribution<TreeClassDescriptor,
 		}
 
 		@Override
-		public Pattern<? extends Decl> matcher(TreeClassDescriptor arg) {
-			return memberDecl("public " + arg.name + " " + propertySetterName(param) + "(" + param + ") { ..$_ }");
+		protected String makeQuote(TreeClassDescriptor arg) {
+			return "public " + arg.name + " " + propertySetterName(param) + "(" + param + ") { ..$_ }";
 		}
 
 		@Override
-		public MethodDecl rewrite(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
+		protected MethodDecl makeDecl(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
+			AllDescriptors.addImports(importManager, param.type());
 
-			decl = decl.withBody(some(blockStmt().withStmts(NodeList.of(
-					stmt("return location.safe" + (propertyFieldType(param.type()) ? "Property" : "Traversal") + "Replace(" + constantName(param) + ", " + param.id().name() + ");").build()
+			return decl.withBody(some(blockStmt().withStmts(NodeList.of(
+					stmt("return location.safe" + (propertyFieldType(param.type()) ? "Property" : "Traversal") + "Replace(" + arg.stateTypeName() + "." + constantName(param) + ", " + param.id().name() + ");").build()
 			))));
+		}
 
-			if (GenSettings.generateDocs)
-				decl = decl.insertLeadingComment(
-						genDoc(decl,
-								"Returns the " + param.id().name() + " of this " + arg.description + ".",
-								new String[]{},
-								"the " + param.id().name() + " of this " + arg.description + "."
-						)
-				);
-
-			return decl;
+		@Override
+		protected String makeDoc(MethodDecl decl, TreeClassDescriptor arg) {
+			return genDoc(decl,
+					"Returns the " + param.id().name() + " of this " + arg.description + ".",
+					new String[]{},
+					"the " + param.id().name() + " of this " + arg.description + "."
+			);
 		}
 	}
 
-	public static class LambdaMutator extends Utils implements DeclPattern<TreeClassDescriptor, MethodDecl> {
+	public static class LambdaMutator extends MemberPattern.OfMethod<TreeClassDescriptor> {
 
 		private final FormalParameter param;
 
@@ -112,27 +112,27 @@ public class TreeClassAccessors implements DeclContribution<TreeClassDescriptor,
 		}
 
 		@Override
-		public Pattern<? extends Decl> matcher(TreeClassDescriptor arg) {
-			return memberDecl("public " + arg.name + " " + propertySetterName(param) + "(Mutation<" + boxedType(param.type()) + "> mutation) { ..$_ }");
+		protected String makeQuote(TreeClassDescriptor arg) {
+			return "public " + arg.name + " " + propertySetterName(param) + "(Mutation<" + boxedType(param.type()) + "> mutation) { ..$_ }";
 		}
 
 		@Override
-		public MethodDecl rewrite(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
+		protected MethodDecl makeDecl(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
+			AllDescriptors.addImports(importManager, param.type());
+			importManager.addImportByName(qualifiedName("org.jlato.util.Mutation"));
 
-			decl = decl.withBody(some(blockStmt().withStmts(NodeList.of(
-					stmt("return location.safe" + (propertyFieldType(param.type()) ? "Property" : "Traversal") + "Mutate(" + constantName(param) + ", mutation);").build()
+			return decl.withBody(some(blockStmt().withStmts(NodeList.of(
+					stmt("return location.safe" + (propertyFieldType(param.type()) ? "Property" : "Traversal") + "Mutate(" + arg.stateTypeName() + "." + constantName(param) + ", mutation);").build()
 			))));
+		}
 
-			if (GenSettings.generateDocs)
-				decl = decl.insertLeadingComment(
-						genDoc(decl,
-								"Mutates the " + param.id().name() + " of this " + arg.description + ".",
-								new String[]{"the mutation object"},
-								"the mutated " + arg.description + "."
-						)
-				);
-
-			return decl;
+		@Override
+		protected String makeDoc(MethodDecl decl, TreeClassDescriptor arg) {
+			return genDoc(decl,
+					"Mutates the " + param.id().name() + " of this " + arg.description + ".",
+					new String[]{"the mutation object"},
+					"the mutated " + arg.description + "."
+			);
 		}
 	}
 }

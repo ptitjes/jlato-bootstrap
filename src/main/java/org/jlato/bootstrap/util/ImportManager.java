@@ -93,6 +93,7 @@ public class ImportManager {
 
 	public void addImport(ImportDecl importDecl) {
 		final QualifiedName name = importDecl.name();
+		if (packageName.equals(name.qualifier().get())) return;
 
 		if (importDecl.isStatic()) {
 			if (importDecl.isOnDemand()) {

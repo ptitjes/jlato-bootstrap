@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.jlato.tree.NodeOption.some;
+import static org.jlato.tree.TreeFactory.name;
 import static org.jlato.tree.TreeFactory.qualifiedType;
 
 /**
@@ -20,24 +21,7 @@ public abstract class TreeTypeDescriptor {
 
 	public static final Name TREE_NAME = new Name("Tree");
 
-	public static final Name NODE_LIST = new Name("NodeList");
-	public static final Name NODE_OPTION = new Name("NodeOption");
-	public static final Name NODE_EITHER = new Name("NodeEither");
-	public static final Name TREE_SET = new Name("TreeSet");
-	public static final List<Name> NODE_CONTAINERS = Arrays.asList(
-			NODE_LIST, NODE_EITHER, NODE_OPTION, TREE_SET
-	);
-
-	public static final Name ASSIGN_OP = new Name("AssignOp");
-	public static final Name BINARY_OP = new Name("BinaryOp");
-	public static final Name UNARY_OP = new Name("UnaryOp");
-	public static final Name PRIMITIVE = new Name("Primitive");
-	public static final List<Name> VALUE_ENUMS = Arrays.asList(
-			ASSIGN_OP, BINARY_OP, UNARY_OP, PRIMITIVE
-	);
-
 	public static final Name TREE_BASE_NAME = new Name("TreeBase");
-	public static final Name STATE_NAME = new Name("State");
 	public static final Name STREE_STATE_NAME = new Name("STreeState");
 	public static final Name SNODE_STATE_NAME = new Name("SNodeState");
 
@@ -62,37 +46,45 @@ public abstract class TreeTypeDescriptor {
 
 	public abstract boolean isInterface();
 
+	public Name interfaceName() {
+		return name;
+	}
+
+	public QualifiedType interfaceType() {
+		return qualifiedType(interfaceName());
+	}
+
+	public QualifiedName interfacePackageName() {
+		return TreeFactory.qualifiedName(packageName).withQualifier(some(AllDescriptors.TREE_INTERFACES_ROOT));
+	}
+
 	public QualifiedName interfaceQualifiedName() {
-		return TreeFactory.qualifiedName(name).withQualifier(some(interfacePackageQualifiedName()));
+		return TreeFactory.qualifiedName(interfaceName()).withQualifier(some(interfacePackageName()));
 	}
 
-	public QualifiedName interfacePackageQualifiedName() {
-		final QualifiedName treeRoot = AllDescriptors.TREE_INTERFACES_ROOT;
-		return TreeFactory.qualifiedName(packageName).withQualifier(some(treeRoot));
+	public String interfaceFilePath() {
+		return AllDescriptors.TREE_INTERFACES_PATH + "/" + packageName + "/" + interfaceName() + ".java";
 	}
 
-	public QualifiedName implementationQualifiedName() {
-		return TreeFactory.qualifiedName(name).withQualifier(some(implementationPackageQualifiedName()));
+	public Name stateTypeName() {
+		return name("S" + name);
 	}
 
-	public QualifiedName implementationPackageQualifiedName() {
-		final QualifiedName treeRoot = AllDescriptors.TREE_IMPLEMENTATION_ROOT;
-		return TreeFactory.qualifiedName(packageName).withQualifier(some(treeRoot));
+	public QualifiedType stateType() {
+		return qualifiedType(stateTypeName());
 	}
 
-	public abstract String treeFilePath();
 
-	public QualifiedType type() {
-		return qualifiedType(name);
+	public QualifiedName stateTypePackageName() {
+		return TreeFactory.qualifiedName(packageName).withQualifier(some(AllDescriptors.TREE_STATES_ROOT));
 	}
 
-	public abstract QualifiedType stateType();
+	public QualifiedName stateTypeQualifiedName() {
+		return TreeFactory.qualifiedName(stateTypeName()).withQualifier(some(stateTypePackageName()));
+	}
 
-	public NodeList<QualifiedType> stateSuperTypes() {
-		return superInterfaces.map(tt ->
-						tt.name().equals(TREE_NAME) ? qualifiedType(STREE_STATE_NAME) :
-								qualifiedType(STATE_NAME).withScope(some(qualifiedType(tt.name())))
-		);
+	public String stateTypeFilePath() {
+		return AllDescriptors.TREE_STATES_PATH + "/" + packageName + "/" + stateTypeName() + ".java";
 	}
 
 	public String prefixedDescription() {

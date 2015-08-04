@@ -35,9 +35,9 @@ public class TreeInterface extends TypePattern.OfInterface<TreeInterfaceDescript
 	@Override
 	protected Iterable<DeclContribution<TreeInterfaceDescriptor, MemberDecl>> contributions(TreeInterfaceDescriptor arg) {
 		return Arrays.asList(
-				new TreeInterfaceAccessors(),
-				a -> Arrays.asList(new StateInterface()),
-				DeclContribution.mergeFields(a -> a.shapes.map(m -> (FieldDecl) m))
+				new TreeInterfaceAccessors()//,
+//				a -> Arrays.asList(new StateInterface()),
+//				DeclContribution.mergeFields(a -> a.shapes.map(m -> (FieldDecl) m))
 		);
 	}
 }

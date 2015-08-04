@@ -1,6 +1,7 @@
 package org.jlato.bootstrap.ast;
 
 import org.jlato.bootstrap.Utils;
+import org.jlato.bootstrap.descriptors.AllDescriptors;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.descriptors.TreeTypeDescriptor;
 import org.jlato.bootstrap.util.DeclContribution;
@@ -10,7 +11,9 @@ import org.jlato.bootstrap.util.MemberPattern;
 import org.jlato.tree.NodeList;
 import org.jlato.tree.decl.*;
 import org.jlato.tree.expr.ObjectCreationExpr;
-import org.jlato.tree.name.Name;
+import org.jlato.tree.name.*;
+import org.jlato.tree.stmt.*;
+import org.jlato.tree.type.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,6 +33,8 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 	public Iterable<DeclPattern<TreeClassDescriptor, ? extends MemberDecl>> declarations(TreeClassDescriptor arg) {
 		List<DeclPattern<TreeClassDescriptor, ? extends MemberDecl>> decls = new ArrayList<>();
 
+		decls.add(new MakeMethod());
+
 		for (FormalParameter parameter : arg.parameters) {
 			decls.addAll(Arrays.asList(
 					new Field(parameter)
@@ -37,16 +42,14 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 		}
 
 		decls.add(new Constructor());
-//		decls.add(new KindMethod());
+		decls.add(new KindMethod());
 
 		for (FormalParameter parameter : arg.parameters) {
 			decls.addAll(Arrays.asList(
-//					new Accessor(parameter),
+					new Accessor(parameter),
 					new Mutator(parameter)
 			));
 		}
-
-		decls.add(new KindMethod());
 
 		decls.add(new DoInstantiateMethod());
 		decls.add(new ShapeMethod());
@@ -69,21 +72,69 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 		return decls;
 	}
 
+	public static class MakeMethod extends MemberPattern.OfMethod<TreeClassDescriptor> {
+
+		@Override
+		protected String makeQuote(TreeClassDescriptor arg) {
+			return "public static STree<" + arg.stateTypeName() + "> make(..$_) { ..$_ }";
+		}
+
+		@Override
+		protected MethodDecl makeDecl(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
+			importManager.addImportByName(qualifiedName("org.jlato.internal.bu.STree"));
+			for (FormalParameter parameter : arg.parameters) {
+				if (!propertyFieldType(parameter.type())) {
+					final QualifiedType type = (QualifiedType) parameter.type();
+					importManager.addImportByName(AllDescriptors.asStateTypeQualifiedName(type.name()));
+				}
+			}
+
+			final NodeList<FormalParameter> parameters = arg.parameters;
+			final NodeList<FormalParameter> stateParams = arg.stateParameters();
+			final QualifiedType stateType = arg.stateType();
+			final QualifiedType treeType = qType("STree", stateType);
+
+			// Make STree creation expression from STrees
+			final ObjectCreationExpr sTreeCreationExpr = objectCreationExpr(treeType)
+					.withArgs(NodeList.of(
+							objectCreationExpr(stateType).withArgs(parameters.map(p -> p.id().name()))
+					));
+
+			// Add STree factory method
+			return methodDecl(treeType, name("make"))
+					.withModifiers(NodeList.of(Modifier.Public, Modifier.Static))
+					.withParams(stateParams)
+					.withBody(some(blockStmt().withStmts(NodeList.<Stmt>of(
+							returnStmt().withExpr(some(sTreeCreationExpr))
+					))));
+		}
+
+		@Override
+		protected String makeDoc(MethodDecl decl, TreeClassDescriptor arg) {
+			return genDoc(decl,
+					"Compares this state object to the specified object.",
+					new String[]{"the object to compare this state with."},
+					"<code>true</code> if the specified object is equal to this state, <code>false</code> otherwise."
+			);
+		}
+	}
+
 	public static class Constructor extends MemberPattern.OfConstructor<TreeClassDescriptor> {
 		@Override
 		protected String makeQuote(TreeClassDescriptor arg) {
-			return TreeTypeDescriptor.STATE_NAME + "(..$_) { ..$_ }";
+			return "public " + arg.stateTypeName() + "(..$_) { ..$_ }";
 		}
 
 		@Override
 		protected ConstructorDecl makeDecl(ConstructorDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
 			final NodeList<FormalParameter> stateParameters = arg.stateParameters();
-			return constructorDecl(TreeTypeDescriptor.STATE_NAME,
+			return constructorDecl(arg.stateTypeName(),
 					blockStmt().withStmts(
 							stateParameters.map(p -> expressionStmt(
 									assignExpr(fieldAccessExpr(p.id().name()).withScope(some(thisExpr())), Normal, p.id().name())
 							))
 					))
+					.withModifiers(NodeList.of(Modifier.Public))
 					.withParams(stateParameters);
 		}
 
@@ -105,6 +156,8 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 
 		@Override
 		protected MethodDecl makeDecl(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
+			importManager.addImportByName(qualifiedName("org.jlato.tree.Kind"));
+
 			return decl.withBody(some(blockStmt().withStmts(NodeList.of(
 					stmt("return Kind." + arg.name + ";").build()
 			))));
@@ -123,13 +176,17 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 	public static class DoInstantiateMethod extends MemberPattern.OfMethod<TreeClassDescriptor> {
 		@Override
 		protected String makeQuote(TreeClassDescriptor arg) {
-			return "@Override\nprotected Tree doInstantiate(SLocation<" + arg.name + ".State> location) { ..$_ }";
+			return "@Override\nprotected Tree doInstantiate(SLocation<" + arg.stateType() + "> location) { ..$_ }";
 		}
 
 		@Override
 		protected MethodDecl makeDecl(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
+			importManager.addImportByName(qualifiedName("org.jlato.internal.td.SLocation"));
+			importManager.addImportByName(qualifiedName("org.jlato.tree.Tree"));
+			importManager.addImportByName(arg.classQualifiedName());
+
 			return decl.withBody(some(blockStmt().withStmts(NodeList.of(
-					stmt("return new " + arg.name + "(location);").build()
+					stmt("return new " + arg.className() + "(location);").build()
 			))));
 		}
 
@@ -151,6 +208,19 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 
 		@Override
 		protected MethodDecl makeDecl(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
+			// FIXME Imports for the mergeFields directive below
+			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes")).setOnDemand(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.LexicalShape")).setOnDemand(true).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.LSCondition")).setOnDemand(true).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.bu.LToken")));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.IndentationContext")));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.SpacingLocation")));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.IndentationContext")).setOnDemand(true).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.SpacingLocation")).setOnDemand(true).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.SpacingConstraint")).setOnDemand(true).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.IndentationConstraint")).setOnDemand(true).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.parser.ParserImplConstants")));
+
 			return decl.withBody(some(blockStmt().withStmts(NodeList.of(
 					stmt("return shape;").build()
 			))));
@@ -183,6 +253,8 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 
 		@Override
 		protected MethodDecl makeDecl(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
+			importManager.addImportByName(qualifiedName("org.jlato.internal.bu.STraversal"));
+
 			return decl.withBody(some(blockStmt().withStmts(NodeList.of(
 					stmt("return " + (param == null ? "null" : constantName(param)) + ";").build()
 			))));
@@ -213,6 +285,9 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 
 		@Override
 		protected MethodDecl makeDecl(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
+			if (params.size() == 1) importManager.addImportByName(qualifiedName("java.util.Collections"));
+			else importManager.addImportByName(qualifiedName("java.util.Arrays"));
+
 			return decl.withBody(some(blockStmt().withStmts(NodeList.of(
 					params.size() == 1 ?
 							stmt("return Collections.<SProperty>singleton(" + constantName(params.first()) + ");").build() :
@@ -247,6 +322,19 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 
 		@Override
 		protected FieldDecl makeDecl(FieldDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
+			importManager.addImportByName(qualifiedName("org.jlato.internal.bu.STree"));
+			for (FormalParameter parameter : arg.parameters) {
+				final Type paramType = parameter.type();
+				if (!propertyFieldType(paramType)) {
+					importManager.addImportByName(AllDescriptors.asStateTypeQualifiedName(((QualifiedType) paramType).name()));
+				} else if (paramType instanceof QualifiedType) {
+					final QualifiedName qualifiedName = AllDescriptors.resolve(((QualifiedType) paramType).name());
+					if (qualifiedName != null) {
+						importManager.addImportByName(qualifiedName);
+					}
+				}
+			}
+
 			return decl;
 		}
 

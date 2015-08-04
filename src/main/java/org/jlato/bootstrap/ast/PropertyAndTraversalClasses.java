@@ -1,6 +1,7 @@
 package org.jlato.bootstrap.ast;
 
 import org.jlato.bootstrap.Utils;
+import org.jlato.bootstrap.descriptors.AllDescriptors;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.util.DeclContribution;
 import org.jlato.bootstrap.util.DeclPattern;
@@ -67,11 +68,16 @@ public class PropertyAndTraversalClasses extends Utils implements DeclContributi
 
 		@Override
 		protected String makeQuote(TreeClassDescriptor arg) {
-			return "private static STypeSafeTraversal<..$_> " + constantName(param) + " = $_;";
+			return "public static STypeSafeTraversal<..$_> " + constantName(param) + " = $_;";
 		}
 
 		@Override
 		protected FieldDecl makeDecl(FieldDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
+			importManager.addImportByName(qualifiedName("org.jlato.internal.bu.STreeState"));
+			importManager.addImportByName(qualifiedName("org.jlato.internal.bu.STraversal"));
+			importManager.addImportByName(qualifiedName("org.jlato.internal.bu.STypeSafeTraversal"));
+			AllDescriptors.addImports(importManager, param.type());
+
 			Type treeType = param.type();
 			String traversalName = param.id().name().id();
 			String constantName = constantName(traversalName, treeType);
@@ -127,7 +133,7 @@ public class PropertyAndTraversalClasses extends Utils implements DeclContributi
 
 			QualifiedType traversalType = qType("STypeSafeTraversal", stateType, childStateType, treeType);
 			FieldDecl traversal = fieldDecl(traversalType)
-					.withModifiers(NodeList.of(Modifier.Private, Modifier.Static))
+					.withModifiers(NodeList.of(Modifier.Public, Modifier.Static))
 					.withVariables(NodeList.of(
 							variableDeclarator(variableDeclaratorId(new Name(constantName)))
 									.withInit(some(
@@ -154,11 +160,14 @@ public class PropertyAndTraversalClasses extends Utils implements DeclContributi
 
 		@Override
 		protected String makeQuote(TreeClassDescriptor arg) {
-			return "private static STypeSafeProperty<..$_> " + constantName(param) + " = $_;";
+			return "public static STypeSafeProperty<..$_> " + constantName(param) + " = $_;";
 		}
 
 		@Override
 		protected FieldDecl makeDecl(FieldDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
+			importManager.addImportByName(qualifiedName("org.jlato.internal.bu.SProperty"));
+			importManager.addImportByName(qualifiedName("org.jlato.internal.bu.STypeSafeProperty"));
+
 			Type treeType = param.type();
 			String traversalName = param.id().name().id();
 			String constantName = constantName(traversalName, treeType);
@@ -199,7 +208,7 @@ public class PropertyAndTraversalClasses extends Utils implements DeclContributi
 
 			QualifiedType propertyType = qType("STypeSafeProperty", stateType, valueType);
 			FieldDecl property = fieldDecl(propertyType)
-					.withModifiers(NodeList.of(Modifier.Private, Modifier.Static))
+					.withModifiers(NodeList.of(Modifier.Public, Modifier.Static))
 					.withVariables(NodeList.of(
 							variableDeclarator(variableDeclaratorId(new Name(constantName)))
 									.withInit(some(

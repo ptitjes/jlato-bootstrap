@@ -8,12 +8,14 @@ import org.jlato.tree.expr.Expr;
 import org.jlato.tree.name.*;
 import org.jlato.tree.type.*;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import static org.jlato.bootstrap.descriptors.TreeTypeDescriptor.*;
 import static org.jlato.rewrite.Quotes.*;
 import static org.jlato.tree.NodeOption.some;
-import static org.jlato.tree.TreeFactory.qualifiedName;
+import static org.jlato.tree.TreeFactory.*;
 
 /**
  * @author Didier Villevalois
@@ -21,15 +23,47 @@ import static org.jlato.tree.TreeFactory.qualifiedName;
 public class AllDescriptors {
 
 	public static final String TREE_INTERFACES_PATH = "org/jlato/tree";
-	public static final String TREE_IMPLEMENTATION_PATH = "org/jlato/internal/impl";
+	public static final String TREE_CLASSES_PATH = "org/jlato/internal/td";
+	public static final String TREE_STATES_PATH = "org/jlato/internal/bu";
 	public static final QualifiedName TREE_INTERFACES_ROOT = qualifiedName(TREE_INTERFACES_PATH.replace('/', '.'));
-	public static final QualifiedName TREE_IMPLEMENTATION_ROOT = qualifiedName(TREE_IMPLEMENTATION_PATH.replace('/', '.'));
+	public static final QualifiedName TREE_CLASSES_ROOT = qualifiedName(TREE_CLASSES_PATH.replace('/', '.'));
+	public static final QualifiedName TREE_STATES_ROOT = qualifiedName(TREE_STATES_PATH.replace('/', '.'));
 
-//	public static final QualifiedName TREE_INTERFACES_ROOT = qualifiedName("org.jlato.tree2");
-//	public static final QualifiedName TREE_IMPLEMENTATION_ROOT = qualifiedName("org.jlato.tree");
+	public static final Name NODE_LIST = new Name("NodeList");
+	public static final Name NODE_OPTION = new Name("NodeOption");
+	public static final Name NODE_EITHER = new Name("NodeEither");
+	public static final Name TREE_SET = new Name("TreeSet");
+	public static final List<Name> NODE_CONTAINERS = Arrays.asList(
+			NODE_LIST, NODE_EITHER, NODE_OPTION, TREE_SET
+	);
+
+	public static final Name ASSIGN_OP = new Name("AssignOp");
+	public static final Name BINARY_OP = new Name("BinaryOp");
+	public static final Name UNARY_OP = new Name("UnaryOp");
+	public static final Name PRIMITIVE = new Name("Primitive");
+	public static final Name MODIFIER_KEYWORD = new Name("ModifierKeyword");
+	public static final List<Name> VALUE_ENUMS = Arrays.asList(
+			ASSIGN_OP, BINARY_OP, UNARY_OP, PRIMITIVE, MODIFIER_KEYWORD
+	);
+	public static final List<Name> VALUE_ENUMS_PKG = Arrays.asList(
+			name("expr"), name("expr"), name("expr"), name("type"), name("decl")
+	);
 
 	public static TreeTypeDescriptor get(Name name) {
 		return perName.get(name);
+	}
+
+	public static QualifiedName asStateTypeQualifiedName(Name name) {
+		if (name.equals(TREE_NAME)) {
+			return qualifiedName(name("S" + name + "State")).withQualifier(some(TREE_STATES_ROOT));
+		} else if (NODE_CONTAINERS.contains(name)) {
+			return qualifiedName(name("S" + name + "State")).withQualifier(some(TREE_STATES_ROOT));
+		}
+
+		final TreeTypeDescriptor descriptor = perName.get(name);
+		if (descriptor == null)
+			throw new IllegalArgumentException("Can't resolve name '" + name + "'");
+		return descriptor.stateTypeQualifiedName();
 	}
 
 	public static void addImports(ImportManager importManager, NodeList<? extends Type> types) {
@@ -41,7 +75,7 @@ public class AllDescriptors {
 	public static void addImports(ImportManager importManager, Type type) {
 		if (type instanceof QualifiedType) {
 			final QualifiedType qualifiedType = (QualifiedType) type;
-			final QualifiedName resolved = resolve(importManager, qualifiedType.name());
+			final QualifiedName resolved = resolve(qualifiedType.name());
 			if (resolved != null) importManager.addImportByName(resolved);
 
 			final NodeOption<QualifiedType> scope = qualifiedType.scope();
@@ -64,9 +98,8 @@ public class AllDescriptors {
 		}
 	}
 
-	public static QualifiedName resolve(ImportManager importManager, Name name) {
-		final QualifiedName packageName = importManager.packageName;
-		final QualifiedName treeRoot = packageName.qualifier().get();
+	public static QualifiedName resolve(Name name) {
+		final QualifiedName treeRoot = TREE_INTERFACES_ROOT;
 
 		final String id = name.id();
 		if (id.equals("Class") || id.equals("String")) {
@@ -74,14 +107,13 @@ public class AllDescriptors {
 		} else if (name.equals(TREE_NAME) || NODE_CONTAINERS.contains(name)) {
 			return qualifiedName(name).withQualifier(some(treeRoot));
 		} else if (VALUE_ENUMS.contains(name)) {
-			return null;
+			final Name pkg = VALUE_ENUMS_PKG.get(VALUE_ENUMS.indexOf(name));
+			return qualifiedName(name).withQualifier(some(qualifiedName(pkg).withQualifier(some(treeRoot))));
 		}
 
 		final TreeTypeDescriptor descriptor = perName.get(name);
 		if (descriptor == null)
 			throw new IllegalArgumentException("Can't resolve name '" + name + "'");
-		if (descriptor.interfacePackageQualifiedName().equals(importManager.packageName))
-			return null;
 		return descriptor.interfaceQualifiedName();
 	}
 
@@ -249,10 +281,10 @@ public class AllDescriptors {
 					),
 					NodeList.of(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
-									"\t\t\tchild(MODIFIERS, ExtendedModifier.multiLineShape),\n" +
+									"\t\t\tchild(MODIFIERS, SExtendedModifier.multiLineShape),\n" +
 									"\t\t\ttoken(LToken.At), token(LToken.Interface).withSpacingAfter(space()),\n" +
 									"\t\t\tchild(NAME),\n" +
-									"\t\t\tchild(MEMBERS, MemberDecl.bodyShape)\n" +
+									"\t\t\tchild(MEMBERS, SMemberDecl.bodyShape)\n" +
 									"\t);").build()
 					),
 					NodeList.of(
@@ -274,7 +306,7 @@ public class AllDescriptors {
 					NodeList.of(
 							memberDecl("public static final LexicalShape defaultValShape = composite(token(LToken.Default).withSpacingBefore(space()), element());").build(),
 							memberDecl("public static final LexicalShape shape = composite(\n" +
-									"\t\t\tchild(MODIFIERS, ExtendedModifier.multiLineShape),\n" +
+									"\t\t\tchild(MODIFIERS, SExtendedModifier.multiLineShape),\n" +
 									"\t\t\tchild(TYPE), child(NAME),\n" +
 									"\t\t\ttoken(LToken.ParenthesisLeft), token(LToken.ParenthesisRight),\n" +
 									"\t\t\tchild(DEFAULT_VALUE, when(some(), defaultValShape)),\n" +
@@ -303,7 +335,7 @@ public class AllDescriptors {
 					),
 					NodeList.of(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
-									"\t\t\tchild(ANNOTATIONS, AnnotationExpr.singleLineAnnotationsShapeWithSpaceBefore),\n" +
+									"\t\t\tchild(ANNOTATIONS, org.jlato.internal.bu.expr.SAnnotationExpr.singleLineAnnotationsShapeWithSpaceBefore),\n" +
 									"\t\t\ttoken(LToken.BracketLeft), token(LToken.BracketRight)\n" +
 									"\t);").build(),
 							memberDecl("public static final LexicalShape listShape = list();").build()
@@ -322,15 +354,15 @@ public class AllDescriptors {
 					),
 					NodeList.of(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
-									"\t\t\tchild(MODIFIERS, ExtendedModifier.multiLineShape),\n" +
+									"\t\t\tchild(MODIFIERS, SExtendedModifier.multiLineShape),\n" +
 									"\t\t\tkeyword(LToken.Class),\n" +
 									"\t\t\tchild(NAME),\n" +
-									"\t\t\tchild(TYPE_PARAMS, TypeParameter.listShape),\n" +
+									"\t\t\tchild(TYPE_PARAMS, STypeParameter.listShape),\n" +
 									"\t\t\tchild(EXTENDS_CLAUSE, when(some(),\n" +
 									"\t\t\t\t\tcomposite(keyword(LToken.Extends), element())\n" +
 									"\t\t\t)),\n" +
-									"\t\t\tchild(IMPLEMENTS_CLAUSE, QualifiedType.implementsClauseShape),\n" +
-									"\t\t\tchild(MEMBERS, MemberDecl.bodyShape)\n" +
+									"\t\t\tchild(IMPLEMENTS_CLAUSE, org.jlato.internal.bu.type.SQualifiedType.implementsClauseShape),\n" +
+									"\t\t\tchild(MEMBERS, SMemberDecl.bodyShape)\n" +
 									"\t);").build()
 					),
 					NodeList.of(
@@ -358,8 +390,8 @@ public class AllDescriptors {
 					NodeList.of(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(PACKAGE_DECL).withSpacingAfter(spacing(CompilationUnit_AfterPackageDecl)),\n" +
-									"\t\t\tchild(IMPORTS, ImportDecl.listShape),\n" +
-									"\t\t\tchild(TYPES, TypeDecl.listShape),\n" +
+									"\t\t\tchild(IMPORTS, SImportDecl.listShape),\n" +
+									"\t\t\tchild(TYPES, STypeDecl.listShape),\n" +
 									"\t\t\tnone().withSpacingAfter(newLine())\n" +
 									"\t);").build()
 					),
@@ -381,13 +413,13 @@ public class AllDescriptors {
 					),
 					NodeList.of(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
-									"\t\t\tchild(MODIFIERS, ExtendedModifier.multiLineShape),\n" +
-									"\t\t\tchild(TYPE_PARAMS, TypeParameter.listShape),\n" +
+									"\t\t\tchild(MODIFIERS, SExtendedModifier.multiLineShape),\n" +
+									"\t\t\tchild(TYPE_PARAMS, STypeParameter.listShape),\n" +
 									"\t\t\tchild(NAME),\n" +
 									"\t\t\ttoken(LToken.ParenthesisLeft),\n" +
-									"\t\t\tchild(PARAMS, FormalParameter.listShape),\n" +
+									"\t\t\tchild(PARAMS, SFormalParameter.listShape),\n" +
 									"\t\t\ttoken(LToken.ParenthesisRight),\n" +
-									"\t\t\tchild(THROWS_CLAUSE, QualifiedType.throwsClauseShape),\n" +
+									"\t\t\tchild(THROWS_CLAUSE, org.jlato.internal.bu.type.SQualifiedType.throwsClauseShape),\n" +
 									"\t\t\tnone().withSpacingAfter(space()), child(BODY)\n" +
 									"\t);").build()
 					),
@@ -437,11 +469,11 @@ public class AllDescriptors {
 					),
 					NodeList.of(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
-									"\t\t\tchild(MODIFIERS, ExtendedModifier.multiLineShape),\n" +
+									"\t\t\tchild(MODIFIERS, org.jlato.internal.bu.decl.SExtendedModifier.multiLineShape),\n" +
 									"\t\t\tchild(NAME),\n" +
-									"\t\t\tchild(ARGS, when(some(), element(Expr.argumentsShape))),\n" +
+									"\t\t\tchild(ARGS, when(some(), element(org.jlato.internal.bu.expr.SExpr.argumentsShape))),\n" +
 									"\t\t\tchild(CLASS_BODY, when(some(),\n" +
-									"\t\t\t\t\telement(MemberDecl.bodyShape).withSpacingAfter(spacing(EnumConstant_AfterBody))\n" +
+									"\t\t\t\t\telement(org.jlato.internal.bu.decl.SMemberDecl.bodyShape).withSpacingAfter(spacing(EnumConstant_AfterBody))\n" +
 									"\t\t\t))\n" +
 									"\t);").build(),
 							memberDecl("public static final LexicalShape listShape = list(\n" +
@@ -470,14 +502,14 @@ public class AllDescriptors {
 					),
 					NodeList.of(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
-									"\t\t\tchild(MODIFIERS, ExtendedModifier.multiLineShape),\n" +
+									"\t\t\tchild(MODIFIERS, SExtendedModifier.multiLineShape),\n" +
 									"\t\t\tkeyword(LToken.Enum),\n" +
 									"\t\t\tchild(NAME),\n" +
-									"\t\t\tchild(IMPLEMENTS_CLAUSE, QualifiedType.implementsClauseShape),\n" +
+									"\t\t\tchild(IMPLEMENTS_CLAUSE, org.jlato.internal.bu.type.SQualifiedType.implementsClauseShape),\n" +
 									"\t\t\ttoken(LToken.BraceLeft)\n" +
 									"\t\t\t\t\t.withSpacingBefore(space())\n" +
 									"\t\t\t\t\t.withIndentationAfter(indent(TYPE_BODY)),\n" +
-									"\t\t\tchild(ENUM_CONSTANTS, EnumConstantDecl.listShape),\n" +
+									"\t\t\tchild(ENUM_CONSTANTS, SEnumConstantDecl.listShape),\n" +
 									"\t\t\twhen(data(TRAILING_COMMA), token(LToken.Comma).withSpacingAfter(spacing(EnumBody_BetweenConstants))),\n" +
 									"\t\t\twhen(childIs(MEMBERS, empty()),\n" +
 									"\t\t\t\t\talternative(childIs(ENUM_CONSTANTS, empty()),\n" +
@@ -488,7 +520,7 @@ public class AllDescriptors {
 									"\t\t\twhen(childIs(MEMBERS, not(empty())),\n" +
 									"\t\t\t\t\ttoken(LToken.SemiColon).withSpacingAfter(spacing(EnumBody_AfterConstants))\n" +
 									"\t\t\t),\n" +
-									"\t\t\tchild(MEMBERS, MemberDecl.membersShape),\n" +
+									"\t\t\tchild(MEMBERS, SMemberDecl.membersShape),\n" +
 									"\t\t\ttoken(LToken.BraceRight)\n" +
 									"\t\t\t\t\t.withIndentationBefore(unIndent(TYPE_BODY))\n" +
 									"\t);").build()
@@ -517,9 +549,9 @@ public class AllDescriptors {
 					),
 					NodeList.of(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
-									"\t\t\tchild(MODIFIERS, ExtendedModifier.multiLineShape),\n" +
+									"\t\t\tchild(MODIFIERS, SExtendedModifier.multiLineShape),\n" +
 									"\t\t\tchild(TYPE),\n" +
-									"\t\t\tchild(VARIABLES, VariableDeclarator.listShape).withSpacingBefore(space()),\n" +
+									"\t\t\tchild(VARIABLES, SVariableDeclarator.listShape).withSpacingBefore(space()),\n" +
 									"\t\t\ttoken(LToken.SemiColon)\n" +
 									"\t);").build()
 					),
@@ -541,7 +573,7 @@ public class AllDescriptors {
 					),
 					NodeList.of(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
-									"\t\t\tchild(MODIFIERS, ExtendedModifier.singleLineShape),\n" +
+									"\t\t\tchild(MODIFIERS, SExtendedModifier.singleLineShape),\n" +
 									"\t\t\tchild(TYPE),\n" +
 									"\t\t\twhen(data(VAR_ARGS), token(LToken.Ellipsis)),\n" +
 									"\t\t\twhen(not(childIs(TYPE, withKind(Kind.UnknownType))), none().withSpacingAfter(space())),\n" +
@@ -603,7 +635,7 @@ public class AllDescriptors {
 					),
 					NodeList.of(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
-									"\t\t\tchild(MODIFIERS, ExtendedModifier.multiLineShape),\n" +
+									"\t\t\tchild(MODIFIERS, SExtendedModifier.multiLineShape),\n" +
 									"\t\t\tchild(BODY)\n" +
 									"\t);").build()
 					),
@@ -623,12 +655,12 @@ public class AllDescriptors {
 					),
 					NodeList.of(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
-									"\t\t\tchild(MODIFIERS, ExtendedModifier.multiLineShape),\n" +
+									"\t\t\tchild(MODIFIERS, SExtendedModifier.multiLineShape),\n" +
 									"\t\t\tkeyword(LToken.Interface),\n" +
 									"\t\t\tchild(NAME),\n" +
-									"\t\t\tchild(TYPE_PARAMS, TypeParameter.listShape),\n" +
-									"\t\t\tchild(EXTENDS_CLAUSE, QualifiedType.extendsClauseShape),\n" +
-									"\t\t\tchild(MEMBERS, MemberDecl.bodyShape)\n" +
+									"\t\t\tchild(TYPE_PARAMS, STypeParameter.listShape),\n" +
+									"\t\t\tchild(EXTENDS_CLAUSE, org.jlato.internal.bu.type.SQualifiedType.extendsClauseShape),\n" +
+									"\t\t\tchild(MEMBERS, SMemberDecl.bodyShape)\n" +
 									"\t);").build()
 					),
 					NodeList.of(
@@ -653,9 +685,9 @@ public class AllDescriptors {
 					),
 					NodeList.of(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
-									"\t\t\tchild(MODIFIERS, ExtendedModifier.singleLineShape),\n" +
+									"\t\t\tchild(MODIFIERS, SExtendedModifier.singleLineShape),\n" +
 									"\t\t\tchild(TYPE),\n" +
-									"\t\t\tchild(VARIABLES, VariableDeclarator.listShape).withSpacingBefore(space())\n" +
+									"\t\t\tchild(VARIABLES, SVariableDeclarator.listShape).withSpacingBefore(space())\n" +
 									"\t);").build()
 					),
 					NodeList.of(
@@ -676,16 +708,16 @@ public class AllDescriptors {
 					),
 					NodeList.of(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
-									"\t\t\tchild(MODIFIERS, ExtendedModifier.multiLineShape),\n" +
-									"\t\t\tchild(TYPE_PARAMS, TypeParameter.listShape),\n" +
+									"\t\t\tchild(MODIFIERS, SExtendedModifier.multiLineShape),\n" +
+									"\t\t\tchild(TYPE_PARAMS, STypeParameter.listShape),\n" +
 									"\t\t\tchild(TYPE),\n" +
 									"\t\t\tnone().withSpacingAfter(space()),\n" +
 									"\t\t\tchild(NAME),\n" +
 									"\t\t\ttoken(LToken.ParenthesisLeft),\n" +
-									"\t\t\tchild(PARAMS, FormalParameter.listShape),\n" +
+									"\t\t\tchild(PARAMS, SFormalParameter.listShape),\n" +
 									"\t\t\ttoken(LToken.ParenthesisRight),\n" +
-									"\t\t\tchild(DIMS, ArrayDim.listShape),\n" +
-									"\t\t\tchild(THROWS_CLAUSE, QualifiedType.throwsClauseShape),\n" +
+									"\t\t\tchild(DIMS, SArrayDim.listShape),\n" +
+									"\t\t\tchild(THROWS_CLAUSE, org.jlato.internal.bu.type.SQualifiedType.throwsClauseShape),\n" +
 									"\t\t\tchild(BODY, alternative(some(),\n" +
 									"\t\t\t\t\telement().withSpacingBefore(space()),\n" +
 									"\t\t\t\t\ttoken(LToken.SemiColon)\n" +
@@ -721,7 +753,7 @@ public class AllDescriptors {
 					NodeList.of(
 							memberDecl("public static final LexicalShape shape = token(new LSToken.Provider() {\n" +
 									"\t\tpublic LToken tokenFor(STree tree) {\n" +
-									"\t\t\tfinal ModifierKeyword keyword = ((State) tree.state).keyword;\n" +
+									"\t\t\tfinal ModifierKeyword keyword = ((SModifier) tree.state).keyword;\n" +
 									"\t\t\tswitch (keyword) {\n" +
 									"\t\t\t\tcase Public:\n" +
 									"\t\t\t\t\treturn LToken.Public;\n" +
@@ -917,7 +949,7 @@ public class AllDescriptors {
 					),
 					NodeList.of(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
-									"\t\t\tchild(ANNOTATIONS, AnnotationExpr.singleLineAnnotationsShapeWithSpaceBefore),\n" +
+									"\t\t\tchild(ANNOTATIONS, org.jlato.internal.bu.expr.SAnnotationExpr.singleLineAnnotationsShapeWithSpaceBefore),\n" +
 									"\t\t\ttoken(LToken.BracketLeft), child(EXPR), token(LToken.BracketRight)\n" +
 									"\t);").build(),
 							memberDecl("public static final LexicalShape listShape = list();").build()
@@ -940,7 +972,7 @@ public class AllDescriptors {
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\talternative(childIs(VALUES, not(empty())), composite(\n" +
 									"\t\t\t\t\ttoken(LToken.BraceLeft).withSpacingAfter(space()),\n" +
-									"\t\t\t\t\tchild(VALUES, Expr.listShape),\n" +
+									"\t\t\t\t\tchild(VALUES, SExpr.listShape),\n" +
 									"\t\t\t\t\twhen(data(TRAILING_COMMA), token(LToken.Comma)),\n" +
 									"\t\t\t\t\ttoken(LToken.BraceRight).withSpacingBefore(space())\n" +
 									"\t\t\t), composite(\n" +
@@ -969,7 +1001,7 @@ public class AllDescriptors {
 									"\t\t\tchild(TARGET),\n" +
 									"\t\t\ttoken(new LSToken.Provider() {\n" +
 									"\t\t\t\tpublic LToken tokenFor(STree tree) {\n" +
-									"\t\t\t\t\tfinal AssignOp op = ((State) tree.state).op;\n" +
+									"\t\t\t\t\tfinal AssignOp op = ((SAssignExpr) tree.state).op;\n" +
 									"\t\t\t\t\tswitch (op) {\n" +
 									"\t\t\t\t\t\tcase Normal:\n" +
 									"\t\t\t\t\t\t\treturn LToken.Assign;\n" +
@@ -1025,7 +1057,7 @@ public class AllDescriptors {
 									"\t\t\tchild(LEFT),\n" +
 									"\t\t\ttoken(new LSToken.Provider() {\n" +
 									"\t\t\t\tpublic LToken tokenFor(STree tree) {\n" +
-									"\t\t\t\t\tfinal BinaryOp op = ((State) tree.state).op;\n" +
+									"\t\t\t\t\tfinal BinaryOp op = ((SBinaryExpr) tree.state).op;\n" +
 									"\t\t\t\t\tswitch (op) {\n" +
 									"\t\t\t\t\t\tcase Or:\n" +
 									"\t\t\t\t\t\t\treturn LToken.Or;\n" +
@@ -1196,7 +1228,7 @@ public class AllDescriptors {
 					NodeList.of(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\twhen(data(PARENS), token(LToken.ParenthesisLeft)),\n" +
-									"\t\t\tchild(PARAMS, Expr.listShape),\n" +
+									"\t\t\tchild(PARAMS, SExpr.listShape),\n" +
 									"\t\t\twhen(data(PARENS), token(LToken.ParenthesisRight)),\n" +
 									"\t\t\ttoken(LToken.Arrow).withSpacing(space(), space()),\n" +
 									"\t\t\tchild(BODY, leftOrRight())\n" +
@@ -1221,20 +1253,20 @@ public class AllDescriptors {
 					NodeList.of(
 							memberDecl("public static final LexicalShape shape = token(new LSToken.Provider() {\n" +
 									"\t\tpublic LToken tokenFor(STree tree) {\n" +
-									"\t\t\tfinal String literalString = ((State) tree.state).literalString;\n" +
+									"\t\t\tfinal String literalString = ((SLiteralExpr) tree.state).literalString;\n" +
 									"\t\t\treturn new LToken(0, literalString); // TODO Fix\n" +
 									"\t\t}\n" +
 									"\t});").build()
 					),
 					NodeList.of(
-							param("Class<T> literalClass").build(),
+							param("Class<?> literalClass").build(),
 							param("String literalString").build()
 					),
 					NodeList.<Expr>of(
 							(Expr) null,
 							(Expr) null
 					),
-					false
+					true
 			),
 			new TreeClassDescriptor(new Name("expr"), new Name("MarkerAnnotationExpr"), "marker annotation expression",
 					NodeList.of(
@@ -1281,9 +1313,9 @@ public class AllDescriptors {
 					NodeList.of(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(SCOPE, when(some(), composite(element(), token(LToken.Dot)))),\n" +
-									"\t\t\tchild(TYPE_ARGS, Type.typeArgumentsShape),\n" +
+									"\t\t\tchild(TYPE_ARGS, org.jlato.internal.bu.type.SType.typeArgumentsShape),\n" +
 									"\t\t\tchild(NAME),\n" +
-									"\t\t\tchild(ARGS, Expr.argumentsShape)\n" +
+									"\t\t\tchild(ARGS, SExpr.argumentsShape)\n" +
 									"\t);").build()
 					),
 					NodeList.of(
@@ -1308,7 +1340,7 @@ public class AllDescriptors {
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(SCOPE),\n" +
 									"\t\t\ttoken(LToken.DoubleColon),\n" +
-									"\t\t\tchild(TYPE_ARGS, Type.typeArgumentsShape),\n" +
+									"\t\t\tchild(TYPE_ARGS, org.jlato.internal.bu.type.SType.typeArgumentsShape),\n" +
 									"\t\t\tchild(NAME)\n" +
 									"\t);").build()
 					),
@@ -1354,10 +1386,10 @@ public class AllDescriptors {
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(SCOPE, when(some(), composite(element(), token(LToken.Dot)))),\n" +
 									"\t\t\ttoken(LToken.New).withSpacingAfter(space()),\n" +
-									"\t\t\tchild(TYPE_ARGS, Type.typeArgumentsShape),\n" +
+									"\t\t\tchild(TYPE_ARGS, org.jlato.internal.bu.type.SType.typeArgumentsShape),\n" +
 									"\t\t\tchild(TYPE),\n" +
-									"\t\t\tchild(ARGS, Expr.argumentsShape),\n" +
-									"\t\t\tchild(BODY, when(some(), element(MemberDecl.bodyShape)))\n" +
+									"\t\t\tchild(ARGS, SExpr.argumentsShape),\n" +
+									"\t\t\tchild(BODY, when(some(), element(org.jlato.internal.bu.decl.SMemberDecl.bodyShape)))\n" +
 									"\t);").build()
 					),
 					NodeList.of(
@@ -1473,7 +1505,7 @@ public class AllDescriptors {
 					NodeList.of(
 							memberDecl("public static final LexicalShape opShape = token(new LSToken.Provider() {\n" +
 									"\t\tpublic LToken tokenFor(STree tree) {\n" +
-									"\t\t\tfinal UnaryOp op = ((State) tree.state).op;\n" +
+									"\t\t\tfinal UnaryOp op = ((SUnaryExpr) tree.state).op;\n" +
 									"\t\t\tswitch (op) {\n" +
 									"\t\t\t\tcase Positive:\n" +
 									"\t\t\t\t\treturn LToken.Plus;\n" +
@@ -1499,7 +1531,7 @@ public class AllDescriptors {
 									"\t});").build(),
 							memberDecl("public static final LexicalShape shape = alternative(new LSCondition() {\n" +
 									"\t\tpublic boolean test(STree tree) {\n" +
-									"\t\t\tfinal UnaryOp op = ((State) tree.state).op;\n" +
+									"\t\t\tfinal UnaryOp op = ((SUnaryExpr) tree.state).op;\n" +
 									"\t\t\treturn op.isPrefix();\n" +
 									"\t\t}\n" +
 									"\t}, composite(opShape, child(EXPR)), composite(child(EXPR), opShape));").build()
@@ -1536,7 +1568,7 @@ public class AllDescriptors {
 					NodeList.of(
 							memberDecl("public static final LexicalShape shape = token(new LSToken.Provider() {\n" +
 									"\t\tpublic LToken tokenFor(STree tree) {\n" +
-									"\t\t\treturn new LToken(ParserImplConstants.IDENTIFIER, ((State) tree.state).id);\n" +
+									"\t\t\treturn new LToken(ParserImplConstants.IDENTIFIER, ((SName) tree.state).id);\n" +
 									"\t\t}\n" +
 									"\t});").build()
 					),
@@ -1729,13 +1761,13 @@ public class AllDescriptors {
 					NodeList.of(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(EXPR, when(some(), composite(element(), token(LToken.Dot)))),\n" +
-									"\t\t\tchild(TYPE_ARGS, Type.typeArgumentsShape),\n" +
+									"\t\t\tchild(TYPE_ARGS, org.jlato.internal.bu.type.SType.typeArgumentsShape),\n" +
 									"\t\t\ttoken(new LSToken.Provider() {\n" +
 									"\t\t\t\tpublic LToken tokenFor(STree tree) {\n" +
-									"\t\t\t\t\treturn ((State) tree.state).isThis ? LToken.This : LToken.Super;\n" +
+									"\t\t\t\t\treturn ((SExplicitConstructorInvocationStmt) tree.state).isThis ? LToken.This : LToken.Super;\n" +
 									"\t\t\t\t}\n" +
 									"\t\t\t}),\n" +
-									"\t\t\tchild(ARGS, Expr.argumentsShape),\n" +
+									"\t\t\tchild(ARGS, org.jlato.internal.bu.expr.SExpr.argumentsShape),\n" +
 									"\t\t\ttoken(LToken.SemiColon)\n" +
 									"\t);").build()
 					),
@@ -1941,7 +1973,7 @@ public class AllDescriptors {
 									"\t\t\t)),\n" +
 									"\t\t\ttoken(LToken.Colon).withSpacingAfter(newLine()),\n" +
 									"\t\t\tnone().withIndentationAfter(indent(BLOCK)),\n" +
-									"\t\t\tchild(STMTS, Stmt.listShape),\n" +
+									"\t\t\tchild(STMTS, SStmt.listShape),\n" +
 									"\t\t\tnone().withIndentationBefore(unIndent(BLOCK))\n" +
 									"\t);").build(),
 							memberDecl("public static final LexicalShape listShape = list(none().withSpacingAfter(newLine()));").build()
@@ -1971,7 +2003,7 @@ public class AllDescriptors {
 									"\t\t\t\t\t\t\ttoken(LToken.BraceLeft)\n" +
 									"\t\t\t\t\t\t\t\t\t.withSpacingAfter(newLine())\n" +
 									"\t\t\t\t\t\t\t\t\t.withIndentationAfter(indent(BLOCK)),\n" +
-									"\t\t\t\t\t\t\tchild(CASES, SwitchCase.listShape),\n" +
+									"\t\t\t\t\t\t\tchild(CASES, SSwitchCase.listShape),\n" +
 									"\t\t\t\t\t\t\ttoken(LToken.BraceRight)\n" +
 									"\t\t\t\t\t\t\t\t\t.withIndentationBefore(unIndent(BLOCK))\n" +
 									"\t\t\t\t\t\t\t\t\t.withSpacingBefore(newLine())\n" +
@@ -2055,7 +2087,7 @@ public class AllDescriptors {
 									"\t\t\t\t\t)\n" +
 									"\t\t\t),\n" +
 									"\t\t\tchild(TRY_BLOCK),\n" +
-									"\t\t\tchild(CATCHS, CatchClause.listShape),\n" +
+									"\t\t\tchild(CATCHS, SCatchClause.listShape),\n" +
 									"\t\t\tchild(FINALLY_BLOCK, when(some(),\n" +
 									"\t\t\t\t\tcomposite(keyword(LToken.Finally), element())\n" +
 									"\t\t\t))\n" +
@@ -2143,7 +2175,7 @@ public class AllDescriptors {
 					),
 					NodeList.of(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
-									"\t\t\tchild(TYPES, Type.intersectionShape)\n" +
+									"\t\t\tchild(TYPES, org.jlato.internal.bu.type.SType.intersectionShape)\n" +
 									"\t);").build()
 					),
 					NodeList.of(
@@ -2163,7 +2195,7 @@ public class AllDescriptors {
 									"\t\t\tchild(ANNOTATIONS, list()),\n" +
 									"\t\t\ttoken(new LSToken.Provider() {\n" +
 									"\t\t\t\tpublic LToken tokenFor(STree tree) {\n" +
-									"\t\t\t\t\tfinal Primitive primitive = ((State) tree.state).primitive;\n" +
+									"\t\t\t\t\tfinal Primitive primitive = ((SPrimitiveType) tree.state).primitive;\n" +
 									"\t\t\t\t\tswitch (primitive) {\n" +
 									"\t\t\t\t\t\tcase Boolean:\n" +
 									"\t\t\t\t\t\t\treturn LToken.Boolean;\n" +
@@ -2207,9 +2239,9 @@ public class AllDescriptors {
 							memberDecl("public static final LexicalShape scopeShape = composite(element(), token(LToken.Dot));").build(),
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(SCOPE, when(some(), scopeShape)),\n" +
-									"\t\t\tchild(ANNOTATIONS, AnnotationExpr.singleLineAnnotationsShape),\n" +
+									"\t\t\tchild(ANNOTATIONS, org.jlato.internal.bu.expr.SAnnotationExpr.singleLineAnnotationsShape),\n" +
 									"\t\t\tchild(NAME),\n" +
-									"\t\t\tchild(TYPE_ARGS, when(some(), element(Type.typeArgumentsOrDiamondShape)))\n" +
+									"\t\t\tchild(TYPE_ARGS, when(some(), element(org.jlato.internal.bu.type.SType.typeArgumentsOrDiamondShape)))\n" +
 									"\t);").build(),
 							memberDecl("public static final LexicalShape extendsClauseShape = list(\n" +
 									"\t\t\tkeyword(LToken.Extends),\n" +
@@ -2247,7 +2279,7 @@ public class AllDescriptors {
 					),
 					NodeList.of(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
-									"\t\t\tchild(TYPES, Type.unionShape)\n" +
+									"\t\t\tchild(TYPES, org.jlato.internal.bu.type.SType.unionShape)\n" +
 									"\t);").build()
 					),
 					NodeList.of(
@@ -2286,7 +2318,7 @@ public class AllDescriptors {
 					),
 					NodeList.of(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
-									"\t\t\tchild(ANNOTATIONS, AnnotationExpr.singleLineAnnotationsShape),\n" +
+									"\t\t\tchild(ANNOTATIONS, org.jlato.internal.bu.expr.SAnnotationExpr.singleLineAnnotationsShape),\n" +
 									"\t\t\ttoken(LToken.QuestionMark),\n" +
 									"\t\t\tchild(EXT, when(some(), composite(keyword(LToken.Extends), element()))),\n" +
 									"\t\t\tchild(SUP, when(some(), composite(keyword(LToken.Super), element())))\n" +

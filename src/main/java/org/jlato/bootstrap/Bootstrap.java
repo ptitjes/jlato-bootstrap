@@ -23,6 +23,7 @@ import org.jlato.bootstrap.ast.*;
 import org.jlato.bootstrap.descriptors.AllDescriptors;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.descriptors.TreeInterfaceDescriptor;
+import org.jlato.bootstrap.util.CompilationUnitPattern;
 import org.jlato.bootstrap.util.DeclPattern;
 import org.jlato.bootstrap.util.ImportManager;
 import org.jlato.parser.ParseException;
@@ -31,18 +32,14 @@ import org.jlato.parser.ParserConfiguration;
 import org.jlato.printer.FormattingSettings;
 import org.jlato.rewrite.MatchVisitor;
 import org.jlato.rewrite.Pattern;
-import org.jlato.tree.TreeSet;
-import org.jlato.tree.decl.CompilationUnit;
-import org.jlato.tree.decl.Decl;
-import org.jlato.tree.decl.TypeDecl;
+import org.jlato.tree.*;
+import org.jlato.tree.decl.*;
 import org.jlato.tree.name.*;
 
 import java.io.File;
 import java.io.IOException;
 
-import static org.jlato.tree.TreeFactory.compilationUnit;
-import static org.jlato.tree.TreeFactory.packageDecl;
-import static org.jlato.tree.TreeFactory.qualifiedName;
+import static org.jlato.tree.TreeFactory.*;
 
 /**
  * @author Didier Villevalois
@@ -62,16 +59,38 @@ public class Bootstrap {
 		final TreeClassDescriptor[] classDescriptors = AllDescriptors.ALL_CLASSES;
 
 		// Generate Tree interfaces
-		final TreeInterface treeInterfacePattern = new TreeInterface();
+//		final TreeInterface treeInterfacePattern = new TreeInterface();
+//		for (TreeInterfaceDescriptor descriptor : interfaceDescriptors) {
+//			treeSet = applyPattern(treeSet, descriptor.treeFilePath(), treeInterfacePattern, descriptor);
+//		}
+
+		// Generate pure interfaces
+		final TreePureInterface treeInterfacePattern = new TreePureInterface();
 		for (TreeInterfaceDescriptor descriptor : interfaceDescriptors) {
-			treeSet = applyPattern(treeSet, descriptor.treeFilePath(), treeInterfacePattern, descriptor);
+			treeSet = treeInterfacePattern.apply(treeSet, descriptor.interfaceFilePath(), descriptor);
+		}
+		for (TreeClassDescriptor descriptor : classDescriptors) {
+			if (descriptor.customTailored) continue;
+			treeSet = treeInterfacePattern.apply(treeSet, descriptor.interfaceFilePath(), descriptor);
 		}
 
 		// Generate Tree classes
-		final TreeClass treeClassPattern = new TreeClass();
+		final CompilationUnitPattern<TreeClassDescriptor> treeClassPattern = CompilationUnitPattern.of(new TreeClass());
 		for (TreeClassDescriptor descriptor : classDescriptors) {
 			if (descriptor.customTailored) continue;
-			treeSet = applyPattern(treeSet, descriptor.treeFilePath(), treeClassPattern, descriptor);
+			treeSet = treeClassPattern.apply(treeSet, descriptor.classFilePath(), descriptor);
+		}
+
+		// Generate State interfaces
+		final CompilationUnitPattern<TreeInterfaceDescriptor> stateInterfacePattern = CompilationUnitPattern.of(new StateInterface());
+		for (TreeInterfaceDescriptor descriptor : interfaceDescriptors) {
+			treeSet = stateInterfacePattern.apply(treeSet, descriptor.stateTypeFilePath(), descriptor);
+		}
+		// Generate State classes
+		final CompilationUnitPattern<TreeClassDescriptor> stateClassPattern = CompilationUnitPattern.of(new StateClass());
+		for (TreeClassDescriptor descriptor : classDescriptors) {
+//			if (descriptor.customTailored) continue;
+			treeSet = stateClassPattern.apply(treeSet, descriptor.stateTypeFilePath(), descriptor);
 		}
 
 		// Generate Kind enum
@@ -81,16 +100,6 @@ public class Bootstrap {
 		// Generate TreeFactory
 		final TreeFactoryClass treeFactoryClassPattern = new TreeFactoryClass();
 		treeSet = applyPattern(treeSet, "org/jlato/tree/TreeFactory.java", treeFactoryClassPattern, classDescriptors);
-
-		// Generate pure interfaces
-//		final TreePureInterface treePureInterfacePattern = new TreePureInterface();
-//		for (TreeInterfaceDescriptor descriptor : interfaceDescriptors) {
-//			treeSet = treePureInterfacePattern.apply(treeSet, descriptor.treeFilePath().replace("tree", "tree2"), descriptor);
-//		}
-//		for (TreeClassDescriptor descriptor : classDescriptors) {
-//			if (descriptor.customTailored) continue;
-//			treeSet = treePureInterfacePattern.apply(treeSet, descriptor.treeFilePath().replace("tree", "tree2"), descriptor);
-//		}
 
 		treeSet.updateOnDisk(false, FormattingSettings.Default);
 	}

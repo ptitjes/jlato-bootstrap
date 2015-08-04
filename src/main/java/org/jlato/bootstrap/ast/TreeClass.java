@@ -1,6 +1,7 @@
 package org.jlato.bootstrap.ast;
 
 import org.jlato.bootstrap.Utils;
+import org.jlato.bootstrap.descriptors.AllDescriptors;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.descriptors.TreeTypeDescriptor;
 import org.jlato.bootstrap.util.DeclContribution;
@@ -21,7 +22,7 @@ public class TreeClass extends TypePattern.OfClass<TreeClassDescriptor> {
 
 	@Override
 	protected String makeQuote(TreeClassDescriptor arg) {
-		return "public class " + arg.name + " extends TreeBase<..$_> implements ..$_ { ..$_ }";
+		return "public class " + arg.className() + " extends TreeBase<..$_> implements ..$_ { ..$_ }";
 	}
 
 	@Override
@@ -31,16 +32,22 @@ public class TreeClass extends TypePattern.OfClass<TreeClassDescriptor> {
 
 	@Override
 	protected ClassDecl contributeSignature(ClassDecl classDecl, ImportManager importManager, TreeClassDescriptor arg) {
+		importManager.addImportByName(arg.stateTypeQualifiedName());
+
 		classDecl = classDecl
 				.withExtendsClause(some(
 						qualifiedType(TreeTypeDescriptor.TREE_BASE_NAME)
 								.withTypeArgs(some(NodeList.of(
 										arg.stateType(),
 										arg.superInterfaces.get(0),
-										arg.type()
+										arg.interfaceType()
 								)))
 				))
-				.withImplementsClause(arg.superInterfaces);
+				.withImplementsClause(NodeList.of(arg.interfaceType()));
+
+		importManager.addImportByName(qualifiedName("org.jlato.internal.td.TreeBase"));
+		AllDescriptors.addImports(importManager, arg.superInterfaces.get(0));
+		AllDescriptors.addImports(importManager, arg.interfaceType());
 		return classDecl;
 	}
 
@@ -50,10 +57,10 @@ public class TreeClass extends TypePattern.OfClass<TreeClassDescriptor> {
 				new TreeKind(),
 				new TreeConstruction(),
 //				new TreeKind(),
-				new TreeClassAccessors(),
-				a -> Arrays.asList(new StateClass()),
-				new PropertyAndTraversalClasses(),
-				DeclContribution.mergeFields(a -> a.shapes.map(m -> (FieldDecl) m))
+				new TreeClassAccessors()//,
+//				a -> Arrays.asList(new StateClass()),
+//				new PropertyAndTraversalClasses(),
+//				DeclContribution.mergeFields(a -> a.shapes.map(m -> (FieldDecl) m))
 		);
 	}
 }

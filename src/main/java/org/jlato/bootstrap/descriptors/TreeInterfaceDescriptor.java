@@ -27,14 +27,4 @@ public class TreeInterfaceDescriptor extends TreeTypeDescriptor {
 	public boolean isInterface() {
 		return true;
 	}
-
-	@Override
-	public String treeFilePath() {
-		return "org/jlato/tree/" + packageName + "/" + name + ".java";
-	}
-
-	@Override
-	public QualifiedType stateType() {
-		return qualifiedType(STATE_NAME).withScope(some(qualifiedType(name)));
-	}
 }

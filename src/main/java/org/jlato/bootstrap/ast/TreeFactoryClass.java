@@ -16,6 +16,7 @@ import org.jlato.tree.type.PrimitiveType;
 import org.jlato.tree.type.QualifiedType;
 import org.jlato.tree.type.Type;
 
+import static org.jlato.rewrite.Quotes.expr;
 import static org.jlato.rewrite.Quotes.memberDecl;
 import static org.jlato.rewrite.Quotes.typeDecl;
 import static org.jlato.tree.NodeOption.none;
@@ -44,9 +45,7 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 
 		NodeList<MemberDecl> factoryMethods = NodeList.empty();
 		for (TreeClassDescriptor descriptor : arg) {
-			if (descriptor.customTailored) continue;
-
-			importManager.addImport(importDecl(descriptor.implementationPackageQualifiedName()).setOnDemand(true));
+			importManager.addImport(importDecl(descriptor.classPackageName()).setOnDemand(true));
 
 			if (!descriptor.name.id().equals("LiteralExpr")) {
 				if (!noNullsFormHasNoParams(descriptor))
@@ -59,34 +58,34 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 						"\t\tfinal String[] split = nameString.split(\"\\\\.\");\n" +
 						"\t\tQualifiedName name = null;\n" +
 						"\t\tfor (String part : split) {\n" +
-						"\t\t\tname = new QualifiedName(NodeOption.of(name), new Name(part));\n" +
+						"\t\t\tname = new TDQualifiedName(NodeOption.of(name), new TDName(part));\n" +
 						"\t\t}\n" +
 						"\t\treturn name;\n" +
 						"\t}").build());
 			} else if (descriptor.name.id().equals("LiteralExpr")) {
 				factoryMethods = factoryMethods.append(memberDecl("public static LiteralExpr<Void> nullLiteralExpr() {\n" +
-						"\treturn new LiteralExpr<Void>(Void.class, Literals.from(Void.class, null));\n" +
+						"\treturn new TDLiteralExpr<Void>(Void.class, Literals.from(Void.class, null));\n" +
 						"}").build());
 				factoryMethods = factoryMethods.append(memberDecl("public static LiteralExpr<Boolean> literalExpr(boolean value) {\n" +
-						"\treturn new LiteralExpr<Boolean>(Boolean.class, Literals.from(Boolean.class, value));\n" +
+						"\treturn new TDLiteralExpr<Boolean>(Boolean.class, Literals.from(Boolean.class, value));\n" +
 						"}").build());
 				factoryMethods = factoryMethods.append(memberDecl("public static LiteralExpr<Integer> literalExpr(int value) {\n" +
-						"\treturn new LiteralExpr<Integer>(Integer.class, Literals.from(Integer.class, value));\n" +
+						"\treturn new TDLiteralExpr<Integer>(Integer.class, Literals.from(Integer.class, value));\n" +
 						"}").build());
 				factoryMethods = factoryMethods.append(memberDecl("public static LiteralExpr<Long> literalExpr(long value) {\n" +
-						"\treturn new LiteralExpr<Long>(Long.class, Literals.from(Long.class, value));\n" +
+						"\treturn new TDLiteralExpr<Long>(Long.class, Literals.from(Long.class, value));\n" +
 						"}").build());
 				factoryMethods = factoryMethods.append(memberDecl("public static LiteralExpr<Float> literalExpr(float value) {\n" +
-						"\treturn new LiteralExpr<Float>(Float.class, Literals.from(Float.class, value));\n" +
+						"\treturn new TDLiteralExpr<Float>(Float.class, Literals.from(Float.class, value));\n" +
 						"}").build());
 				factoryMethods = factoryMethods.append(memberDecl("public static LiteralExpr<Double> literalExpr(double value) {\n" +
-						"\treturn new LiteralExpr<Double>(Double.class, Literals.from(Double.class, value));\n" +
+						"\treturn new TDLiteralExpr<Double>(Double.class, Literals.from(Double.class, value));\n" +
 						"}").build());
 				factoryMethods = factoryMethods.append(memberDecl("public static LiteralExpr<Character> literalExpr(char value) {\n" +
-						"\treturn new LiteralExpr<Character>(Character.class, Literals.from(Character.class, value));\n" +
+						"\treturn new TDLiteralExpr<Character>(Character.class, Literals.from(Character.class, value));\n" +
 						"}").build());
 				factoryMethods = factoryMethods.append(memberDecl("public static LiteralExpr<String> literalExpr(String value) {\n" +
-						"\treturn new LiteralExpr<String>(String.class, Literals.from(String.class, value));\n" +
+						"\treturn new TDLiteralExpr<String>(String.class, Literals.from(String.class, value));\n" +
 						"}").build());
 			}
 		}
@@ -152,7 +151,7 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 							params = params.append(param);
 							args = args.append(param.id().name());
 						} else {
-							args = args.append(nullLiteralExpr());
+							args = args.append(expr("(" + param.type() + ") null").build());
 						}
 						break;
 				}
@@ -168,7 +167,7 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 			index++;
 		}
 
-		QualifiedType resultType = qualifiedType(descriptor.name);
+		QualifiedType resultType = descriptor.classType();
 		Stmt creation = returnStmt().withExpr(
 				some(objectCreationExpr(resultType).withArgs(args).withBody(none()))
 		);

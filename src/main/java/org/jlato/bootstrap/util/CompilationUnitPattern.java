@@ -7,6 +7,8 @@ import org.jlato.tree.TreeSet;
 import org.jlato.tree.decl.*;
 import org.jlato.tree.name.*;
 
+import java.util.Arrays;
+
 import static org.jlato.tree.TreeFactory.compilationUnit;
 import static org.jlato.tree.TreeFactory.packageDecl;
 import static org.jlato.tree.TreeFactory.qualifiedName;
@@ -69,5 +71,16 @@ public abstract class CompilationUnitPattern<A> {
 			final T type = matcher.build();
 			return cu.withTypes(ts -> ts.append(pattern.rewrite(type, importManager, arg)));
 		}
+	}
+
+	public static <A> CompilationUnitPattern<A> of(DeclPattern<A, TypeDecl> typePattern) {
+		return new CompilationUnitPattern<A>() {
+			@Override
+			protected Iterable<DeclContribution<A, TypeDecl>> contributions(A arg) {
+				return Arrays.asList(
+						a -> Arrays.asList(typePattern)
+				);
+			}
+		};
 	}
 }
