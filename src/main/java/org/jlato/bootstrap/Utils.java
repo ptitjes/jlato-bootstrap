@@ -147,11 +147,11 @@ public class Utils {
 		final String id = name.id();
 		switch (id) {
 			case "NodeList":
-				return qualifiedType(name("SNodeListState"));
+				return qualifiedType(AllDescriptors.S_NODE_LIST);
 			case "NodeOption":
-				return qualifiedType(name("SNodeOptionState"));
+				return qualifiedType(AllDescriptors.S_NODE_OPTION);
 			case "NodeEither":
-				return qualifiedType(name("SNodeEitherState"));
+				return qualifiedType(AllDescriptors.S_NODE_EITHER);
 			default:
 				final TreeTypeDescriptor descriptor = AllDescriptors.get(name);
 				return descriptor.stateType();

@@ -43,7 +43,7 @@ public class StateInterface extends TypePattern.OfInterface<TreeInterfaceDescrip
 		importManager.addImport(importDecl(qualifiedName("org.jlato.printer.SpacingConstraint")).setOnDemand(true).setStatic(true));
 		importManager.addImport(importDecl(qualifiedName("org.jlato.printer.IndentationConstraint")).setOnDemand(true).setStatic(true));
 		importManager.addImport(importDecl(qualifiedName("org.jlato.tree.Kind")));
-		importManager.addImport(importDecl(qualifiedName("org.jlato.internal.bu.SNodeListState")));
+		importManager.addImport(importDecl(AllDescriptors.S_NODE_LIST_QUALIFIED));
 
 		NodeList<QualifiedName> superStateInterfaceNames = arg.superInterfaces.map(t -> AllDescriptors.asStateTypeQualifiedName(t.name()));
 

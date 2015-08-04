@@ -21,7 +21,7 @@ public class StateClass extends TypePattern.OfClass<TreeClassDescriptor> {
 
 	@Override
 	protected String makeQuote(TreeClassDescriptor arg) {
-		return "public class " + arg.stateTypeName() + " extends SNodeState<..$_> implements ..$_ { ..$_ }";
+		return "public class " + arg.stateTypeName() + " extends " + AllDescriptors.S_NODE + "<..$_> implements ..$_ { ..$_ }";
 	}
 
 	@Override
@@ -33,12 +33,12 @@ public class StateClass extends TypePattern.OfClass<TreeClassDescriptor> {
 	protected ClassDecl contributeSignature(ClassDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
 		NodeList<QualifiedName> superStateInterfaceNames = arg.superInterfaces.map(t -> AllDescriptors.asStateTypeQualifiedName(t.name()));
 
-		importManager.addImportByName(qualifiedName("org.jlato.internal.bu.SNodeState"));
+		importManager.addImportByName(AllDescriptors.S_NODE_QUALIFIED);
 		importManager.addImportsByName(superStateInterfaceNames);
 
 		return decl
 				.withExtendsClause(some(
-						qualifiedType(AllDescriptors.SNODE_STATE_NAME).withTypeArgs(some(NodeList.of(arg.stateType())))
+						qualifiedType(AllDescriptors.S_NODE).withTypeArgs(some(NodeList.of(arg.stateType())))
 				))
 				.withImplementsClause(superStateInterfaceNames.map(n -> qualifiedType(n.name())));
 	}

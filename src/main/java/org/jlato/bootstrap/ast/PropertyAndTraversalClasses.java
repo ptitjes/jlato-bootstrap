@@ -73,7 +73,7 @@ public class PropertyAndTraversalClasses extends Utils implements DeclContributi
 
 		@Override
 		protected FieldDecl makeDecl(FieldDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
-			importManager.addImportByName(qualifiedName("org.jlato.internal.bu.STreeState"));
+			importManager.addImportByName(AllDescriptors.S_TREE_QUALIFIED);
 			importManager.addImportByName(qualifiedName("org.jlato.internal.bu.STraversal"));
 			importManager.addImportByName(qualifiedName("org.jlato.internal.bu.STypeSafeTraversal"));
 			AllDescriptors.addImports(importManager, param.type());

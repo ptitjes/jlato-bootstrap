@@ -70,11 +70,21 @@ public class AllDescriptors {
 
 	public static final Name BU_TREE = name("BUTree");
 	public static final Name S_TREE = name("STree");
-	public static final Name SNODE_STATE_NAME = name("SNodeState");
+	public static final Name S_NODE = name("SNode");
+
+	public static final Name S_NODE_LIST = name("S" + NODE_LIST);
+	public static final Name S_NODE_OPTION = name("S" + NODE_OPTION);
+	public static final Name S_NODE_EITHER = name("S" + NODE_EITHER);
+	public static final Name S_TREE_SET = name("S" + TREE_SET);
 
 	public static final QualifiedName BU_TREE_QUALIFIED = qualifiedName(BU_TREE).withQualifier(some(TREE_STATES_ROOT));
 	public static final QualifiedName S_TREE_QUALIFIED = qualifiedName(S_TREE).withQualifier(some(TREE_STATES_ROOT));
-	public static final QualifiedName SNODE_STATE_QUALIFIED = qualifiedName(SNODE_STATE_NAME).withQualifier(some(TREE_STATES_ROOT));
+	public static final QualifiedName S_NODE_QUALIFIED = qualifiedName(S_NODE).withQualifier(some(TREE_STATES_ROOT));
+
+	public static final QualifiedName S_NODE_LIST_QUALIFIED = qualifiedName(S_NODE_LIST).withQualifier(some(TREE_STATES_ROOT));
+	public static final QualifiedName S_NODE_OPTION_QUALIFIED = qualifiedName(S_NODE_OPTION).withQualifier(some(TREE_STATES_ROOT));
+	public static final QualifiedName S_NODE_EITHER_QUALIFIED = qualifiedName(S_NODE_EITHER).withQualifier(some(TREE_STATES_ROOT));
+	public static final QualifiedName S_TREE_SET_QUALIFIED = qualifiedName(S_TREE_SET).withQualifier(some(TREE_STATES_ROOT));
 
 	public static TreeTypeDescriptor get(Name name) {
 		return perName.get(name);
@@ -82,9 +92,9 @@ public class AllDescriptors {
 
 	public static QualifiedName asStateTypeQualifiedName(Name name) {
 		if (name.equals(TREE_NAME) || name.equals(NODE_NAME)) {
-			return qualifiedName(name("S" + "Tree" + "State")).withQualifier(some(TREE_STATES_ROOT));
+			return qualifiedName(S_TREE).withQualifier(some(TREE_STATES_ROOT));
 		} else if (NODE_CONTAINERS.contains(name)) {
-			return qualifiedName(name("S" + name + "State")).withQualifier(some(TREE_STATES_ROOT));
+			return qualifiedName(name("S" + name)).withQualifier(some(TREE_STATES_ROOT));
 		}
 
 		final TreeTypeDescriptor descriptor = perName.get(name);
@@ -170,7 +180,7 @@ public class AllDescriptors {
 									"\t\t\t\t\tnone().withSpacingAfter(newLine())\n" +
 									"\t\t\t),\n" +
 									"\t\t\talternative(\n" +
-									"\t\t\t\t\tchildHas(SNodeListState.lastTraversal(), withKind(Kind.Modifier)),\n" +
+									"\t\t\t\t\tchildHas(" + AllDescriptors.S_NODE_LIST + ".lastTraversal(), withKind(Kind.Modifier)),\n" +
 									"\t\t\t\t\tnone().withSpacingAfter(space()),\n" +
 									"\t\t\t\t\tnone().withSpacingAfter(newLine())\n" +
 									"\t\t\t)\n" +
