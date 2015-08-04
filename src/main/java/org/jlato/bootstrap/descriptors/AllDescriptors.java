@@ -69,11 +69,11 @@ public class AllDescriptors {
 	/* Base States */
 
 	public static final Name BU_TREE = name("BUTree");
-	public static final Name STREE_STATE_NAME = name("STreeState");
+	public static final Name S_TREE = name("STree");
 	public static final Name SNODE_STATE_NAME = name("SNodeState");
 
 	public static final QualifiedName BU_TREE_QUALIFIED = qualifiedName(BU_TREE).withQualifier(some(TREE_STATES_ROOT));
-	public static final QualifiedName STREE_STATE_QUALIFIED = qualifiedName(STREE_STATE_NAME).withQualifier(some(TREE_STATES_ROOT));
+	public static final QualifiedName S_TREE_QUALIFIED = qualifiedName(S_TREE).withQualifier(some(TREE_STATES_ROOT));
 	public static final QualifiedName SNODE_STATE_QUALIFIED = qualifiedName(SNODE_STATE_NAME).withQualifier(some(TREE_STATES_ROOT));
 
 	public static TreeTypeDescriptor get(Name name) {

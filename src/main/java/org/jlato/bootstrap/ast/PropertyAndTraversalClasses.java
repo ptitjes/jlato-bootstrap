@@ -89,7 +89,7 @@ public class PropertyAndTraversalClasses extends Utils implements DeclContributi
 
 			final FormalParameter typedStateParam = formalParameter(stateType, variableDeclaratorId(stateParamName));
 			final FormalParameter stateParam = formalParameter(
-					qualifiedType(AllDescriptors.STREE_STATE_NAME),
+					qualifiedType(AllDescriptors.S_TREE),
 					variableDeclaratorId(stateParamName));
 
 			QualifiedType childStateType = treeTypeToStateType((QualifiedType) treeType);
@@ -181,7 +181,7 @@ public class PropertyAndTraversalClasses extends Utils implements DeclContributi
 
 			final FormalParameter typedStateParam = formalParameter(stateType, variableDeclaratorId(stateParamName));
 			final FormalParameter stateParam = formalParameter(
-					qualifiedType(AllDescriptors.STREE_STATE_NAME),
+					qualifiedType(AllDescriptors.S_TREE),
 					variableDeclaratorId(stateParamName));
 
 			final Name valueParamName = name("value");

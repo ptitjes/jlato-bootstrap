@@ -224,30 +224,6 @@ public class Utils {
 		return name.substring(0, 1).toUpperCase() + name.substring(1);
 	}
 
-	public static QualifiedType stateType(ClassDecl classDecl) {
-		return qualifiedType(name("State")).withScope(some(qualifiedType(classDecl.name())));
-	}
-
-	public static NodeList<MemberDecl> insertBeforeShapes(NodeList<MemberDecl> ts, NodeList<MemberDecl> ls) {
-		NodeList<MemberDecl> newTs = NodeList.empty();
-		boolean inserted = false;
-		for (MemberDecl t : ts) {
-			if (!inserted) {
-				if (constantShapeMatcher.match(t) != null) {
-					newTs = newTs.appendAll(ls);
-					inserted = true;
-				}
-			}
-			newTs = newTs.append(t);
-		}
-
-		if (!inserted) {
-			newTs = newTs.appendAll(ls);
-		}
-
-		return newTs;
-	}
-
 	public static String genDoc(FieldDecl decl, String description) {
 		StringBuilder builder = new StringBuilder();
 		builder.append("/**\n");
@@ -288,69 +264,6 @@ public class Utils {
 
 	// Matchers
 
-	public static TypeSafeMatcher<FieldDecl> traversalConstantMatcher() {
-		return new MatcherImpl<FieldDecl>() {
-			@Override
-			public Substitution match(Object o, Substitution substitution) {
-				if (!(o instanceof FieldDecl)) return null;
-				FieldDecl fieldDecl = (FieldDecl) o;
-				Type type = fieldDecl.type();
-				if (type instanceof PrimitiveType) return null;
-				QualifiedType qualifiedType = (QualifiedType) type;
-				String typeName = qualifiedType.name().id();
-				if (!(typeName.equals("STraversal") || typeName.equals("STypeSafeTraversal"))) return null;
-				return substitution;
-			}
-		};
-	}
-
-	public static TypeSafeMatcher<FieldDecl> propertyConstantMatcher() {
-		return new MatcherImpl<FieldDecl>() {
-			@Override
-			public Substitution match(Object o, Substitution substitution) {
-				if (!(o instanceof FieldDecl)) return null;
-				FieldDecl fieldDecl = (FieldDecl) o;
-				Type type = fieldDecl.type();
-				if (type instanceof PrimitiveType) return null;
-				QualifiedType qualifiedType = (QualifiedType) type;
-				String typeName = qualifiedType.name().id();
-				if (!(typeName.equals("SProperty") || typeName.equals("STypeSafeProperty"))) return null;
-				return substitution;
-			}
-		};
-	}
-
-	public static TypeSafeMatcher<ClassDecl> stateClassMatcher() {
-		return new MatcherImpl<ClassDecl>() {
-			@Override
-			public Substitution match(Object o, Substitution substitution) {
-				if (!(o instanceof ClassDecl)) return null;
-				ClassDecl decl = (ClassDecl) o;
-				NodeOption<QualifiedType> extendsClause = decl.extendsClause();
-				if (extendsClause.isNone()) return null;
-				QualifiedType type = extendsClause.get();
-				if (!type.name().id().equals("SNodeState")) return null;
-				return substitution;
-			}
-		};
-	}
-
-	public static TypeSafeMatcher<InterfaceDecl> stateInterfaceMatcher() {
-		return new MatcherImpl<InterfaceDecl>() {
-			@Override
-			public Substitution match(Object o, Substitution substitution) {
-				if (!(o instanceof InterfaceDecl)) return null;
-				InterfaceDecl decl = (InterfaceDecl) o;
-				NodeList<QualifiedType> extendsClause = decl.extendsClause();
-				if (extendsClause.isEmpty()) return null;
-				QualifiedType type = extendsClause.get(0);
-				String typeName = type.name().id();
-				if (!(typeName.equals("STreeState") || typeName.equals("State"))) return null;
-				return substitution;
-			}
-		};
-	}
-
 	public static TypeSafeMatcher<ConstructorDecl> constructors(final Function1<ConstructorDecl, Boolean> predicate) {
 		return new MatcherImpl<ConstructorDecl>() {
 			@Override
@@ -362,69 +275,6 @@ public class Utils {
 			}
 		};
 	}
-
-	public static TypeSafeMatcher<MethodDecl> methods(final Function1<MethodDecl, Boolean> predicate) {
-		return new MatcherImpl<MethodDecl>() {
-			@Override
-			public Substitution match(Object o, Substitution substitution) {
-				if (!(o instanceof MethodDecl)) return null;
-				MethodDecl decl = (MethodDecl) o;
-				if (!predicate.apply(decl)) return null;
-				return substitution;
-			}
-		};
-	}
-
-	public static TypeSafeMatcher<FieldDecl> fields(final Function1<FieldDecl, Boolean> predicate) {
-		return new MatcherImpl<FieldDecl>() {
-			@Override
-			public Substitution match(Object o, Substitution substitution) {
-				if (!(o instanceof FieldDecl)) return null;
-				FieldDecl decl = (FieldDecl) o;
-				if (!predicate.apply(decl)) return null;
-				return substitution;
-			}
-		};
-	}
-
-	public static TypeSafeMatcher<Expr> objectCreation(Function1<ObjectCreationExpr, Boolean> predicate) {
-		return new TypeSafeMatcher<Expr>() {
-			@Override
-			public Substitution match(Object o) {
-				return match(o, Substitution.empty());
-			}
-
-			@Override
-			public Substitution match(Object o, Substitution substitution) {
-				if (!(o instanceof ObjectCreationExpr)) return null;
-				ObjectCreationExpr expr = (ObjectCreationExpr) o;
-				if (!predicate.apply(expr)) return null;
-				return substitution;
-			}
-		};
-	}
-
-	public static TypeSafeMatcher<Expr> methodCall(java.util.function.Predicate<MethodInvocationExpr> predicate) {
-		return new TypeSafeMatcher<Expr>() {
-			@Override
-			public Substitution match(Object o) {
-				return match(o, Substitution.empty());
-			}
-
-			@Override
-			public Substitution match(Object o, Substitution substitution) {
-				if (!(o instanceof MethodInvocationExpr)) return null;
-				MethodInvocationExpr expr = (MethodInvocationExpr) o;
-				if (!predicate.test(expr)) return null;
-				return substitution;
-			}
-		};
-	}
-
-	public static final TypeSafeMatcher<FieldDecl> constantShapeMatcher = fields(f -> {
-		Type type = f.type();
-		return type instanceof QualifiedType && ((QualifiedType) type).name().id().equals("LexicalShape");
-	});
 
 	public static final TypeSafeMatcher<ConstructorDecl> publicConstructorMatcher = constructors(c -> c.modifiers().contains(Modifier.Public));
 
