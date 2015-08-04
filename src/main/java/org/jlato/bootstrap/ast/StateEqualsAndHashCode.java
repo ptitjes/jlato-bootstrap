@@ -51,7 +51,7 @@ public class StateEqualsAndHashCode implements DeclContribution<TreeClassDescrip
 			return memberDecl("@Override\npublic boolean equals(Object o) { ..$_ }");
 		}
 
-		public static final Name EQUALS = new Name("equals");
+		public static final Name EQUALS = name("equals");
 
 		@Override
 		public MethodDecl rewrite(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
@@ -69,7 +69,7 @@ public class StateEqualsAndHashCode implements DeclContribution<TreeClassDescrip
 						stmt(arg.stateTypeName() + " state = (" + arg.stateTypeName() + ") o;").build()
 				);
 
-				final Name state = new Name("state");
+				final Name state = name("state");
 
 				stmts = stmts.appendAll(params.map(p -> {
 					final Name thisField = p.id().name();

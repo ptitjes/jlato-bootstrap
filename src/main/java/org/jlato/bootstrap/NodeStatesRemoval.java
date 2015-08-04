@@ -5,12 +5,14 @@ import org.jlato.tree.TreeSet;
 import org.jlato.tree.decl.*;
 import org.jlato.tree.name.Name;
 
+import static org.jlato.tree.TreeFactory.name;
+
 /**
  * @author Didier Villevalois
  */
 public class NodeStatesRemoval extends TreeClassRefactoring {
 
-	public static final Name STATE_NAME = new Name("State");
+	public static final Name STATE_NAME = name("State");
 
 	@Override
 	public TreeSet<CompilationUnit> initialize(TreeSet<CompilationUnit> treeSet, TreeTypeHierarchy hierarchy) {

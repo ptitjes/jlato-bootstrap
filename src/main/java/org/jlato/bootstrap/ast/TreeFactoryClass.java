@@ -35,7 +35,7 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 
 	@Override
 	public ClassDecl rewrite(ClassDecl decl, ImportManager importManager, TreeClassDescriptor[] arg) {
-		decl = classDecl(new Name("TreeFactory"))
+		decl = classDecl(name("TreeFactory"))
 				.withModifiers(m -> m.append(Modifier.Public).append(Modifier.Abstract));
 
 		if (GenSettings.generateDocs)
@@ -134,14 +134,14 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 				switch (qualifiedType.name().id()) {
 					case "NodeList":
 						args = args.append(
-								methodInvocationExpr(new Name("empty"))
+								methodInvocationExpr(name("empty"))
 										.withScope(some(qualifiedType.name()))
 										.withTypeArgs(qualifiedType.typeArgs().get())
 						);
 						break;
 					case "NodeOption":
 						args = args.append(
-								methodInvocationExpr(new Name("none"))
+								methodInvocationExpr(name("none"))
 										.withScope(some(qualifiedType.name()))
 										.withTypeArgs(qualifiedType.typeArgs().get())
 						);
@@ -172,7 +172,7 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 				some(objectCreationExpr(resultType).withArgs(args).withBody(none()))
 		);
 
-		MethodDecl method = methodDecl(resultType, new Name(lowerCaseFirst(descriptor.name.id())))
+		MethodDecl method = methodDecl(descriptor.interfaceType(), name(lowerCaseFirst(descriptor.name.id())))
 				.withModifiers(m -> noNulls ?
 								m.append(Modifier.Public).append(Modifier.Static) :
 								m.append(deprecatedAnn()).append(Modifier.Public).append(Modifier.Static)

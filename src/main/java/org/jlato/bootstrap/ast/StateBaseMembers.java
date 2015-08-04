@@ -292,7 +292,7 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 					params.size() == 1 ?
 							stmt("return Collections.<SProperty>singleton(" + constantName(params.first()) + ");").build() :
 							stmt("return Arrays.<SProperty>asList(" +
-									params.map(p -> new Name(constantName(p))).mkString("", ", ", "")
+									params.map(p -> name(constantName(p))).mkString("", ", ", "")
 									+ ");").build()
 			))));
 		}

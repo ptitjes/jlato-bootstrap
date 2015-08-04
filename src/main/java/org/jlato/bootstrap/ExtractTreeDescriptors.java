@@ -85,8 +85,8 @@ public class ExtractTreeDescriptors extends TreeClassRefactoring {
 		System.out.println("public static final TreeInterfaceDescriptor[] ALL_INTERFACES = new TreeInterfaceDescriptor[] {");
 		for (TreeInterfaceDescriptor descriptor : interfaceDescriptors) {
 			final Expr creation = expr(
-					"new TreeInterfaceDescriptor(new Name(\"" + descriptor.packageName + "\"), " +
-							"new Name(\"" + descriptor.name + "\"), " +
+					"new TreeInterfaceDescriptor(name(\"" + descriptor.packageName + "\"), " +
+							"name(\"" + descriptor.name + "\"), " +
 							"\"" + descriptor.description + "\",\n" +
 							(descriptor.superInterfaces.isEmpty() ?
 									"NodeList.<QualifiedType>empty()" :
@@ -113,8 +113,8 @@ public class ExtractTreeDescriptors extends TreeClassRefactoring {
 		System.out.println("public static final TreeClassDescriptor[] ALL_CLASSES = new TreeClassDescriptor[] {");
 		for (TreeClassDescriptor descriptor : classDescriptors) {
 			final Expr creation = expr(
-					"new TreeClassDescriptor(new Name(\"" + descriptor.packageName + "\"), " +
-							"new Name(\"" + descriptor.name + "\"), " +
+					"new TreeClassDescriptor(name(\"" + descriptor.packageName + "\"), " +
+							"name(\"" + descriptor.name + "\"), " +
 							"\"" + descriptor.description + "\",\n" +
 							(descriptor.superInterfaces.isEmpty() ?
 									"NodeList.<QualifiedType>empty()" :
