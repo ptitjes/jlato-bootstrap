@@ -2,7 +2,6 @@ package org.jlato.bootstrap.ast;
 
 import org.jlato.bootstrap.descriptors.AllDescriptors;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
-import org.jlato.bootstrap.descriptors.TreeTypeDescriptor;
 import org.jlato.bootstrap.util.DeclContribution;
 import org.jlato.bootstrap.util.ImportManager;
 import org.jlato.bootstrap.util.TypePattern;
@@ -39,7 +38,7 @@ public class StateClass extends TypePattern.OfClass<TreeClassDescriptor> {
 
 		return decl
 				.withExtendsClause(some(
-						qualifiedType(TreeTypeDescriptor.SNODE_STATE_NAME).withTypeArgs(some(NodeList.of(arg.stateType())))
+						qualifiedType(AllDescriptors.SNODE_STATE_NAME).withTypeArgs(some(NodeList.of(arg.stateType())))
 				))
 				.withImplementsClause(superStateInterfaceNames.map(n -> qualifiedType(n.name())));
 	}

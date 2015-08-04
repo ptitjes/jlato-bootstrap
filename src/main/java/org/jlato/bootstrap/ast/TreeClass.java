@@ -3,7 +3,6 @@ package org.jlato.bootstrap.ast;
 import org.jlato.bootstrap.Utils;
 import org.jlato.bootstrap.descriptors.AllDescriptors;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
-import org.jlato.bootstrap.descriptors.TreeTypeDescriptor;
 import org.jlato.bootstrap.util.DeclContribution;
 import org.jlato.bootstrap.util.ImportManager;
 import org.jlato.bootstrap.util.TypePattern;
@@ -36,7 +35,7 @@ public class TreeClass extends TypePattern.OfClass<TreeClassDescriptor> {
 
 		classDecl = classDecl
 				.withExtendsClause(some(
-						qualifiedType(TreeTypeDescriptor.TREE_BASE_NAME)
+						qualifiedType(AllDescriptors.TREE_BASE_NAME)
 								.withTypeArgs(some(NodeList.of(
 										arg.stateType(),
 										arg.superInterfaces.get(0),

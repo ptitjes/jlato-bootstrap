@@ -19,13 +19,6 @@ import static org.jlato.tree.TreeFactory.qualifiedType;
  */
 public abstract class TreeTypeDescriptor {
 
-	public static final Name TREE_NAME = name("Tree");
-	public static final Name NODE_NAME = name("Node");
-
-	public static final Name TREE_BASE_NAME = name("TreeBase");
-	public static final Name STREE_STATE_NAME = name("STreeState");
-	public static final Name SNODE_STATE_NAME = name("SNodeState");
-
 	public final Name packageName;
 	public final Name name;
 	public final String description;
