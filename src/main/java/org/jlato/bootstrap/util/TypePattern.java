@@ -1,11 +1,13 @@
 package org.jlato.bootstrap.util;
 
 import org.jlato.bootstrap.GenSettings;
+import org.jlato.bootstrap.Utils;
 import org.jlato.rewrite.MatchVisitor;
 import org.jlato.rewrite.Pattern;
 import org.jlato.rewrite.TypeSafeMatcher;
-import org.jlato.tree.NodeList;
 import org.jlato.tree.decl.*;
+
+import java.util.Collections;
 
 import static org.jlato.rewrite.Quotes.typeDecl;
 import static org.jlato.tree.Trees.emptyList;
@@ -13,7 +15,7 @@ import static org.jlato.tree.Trees.emptyList;
 /**
  * @author Didier Villevalois
  */
-public abstract class TypePattern<A, T extends TypeDecl> implements DeclPattern<A, TypeDecl> {
+public abstract class TypePattern<A, T extends TypeDecl> extends Utils implements DeclPattern<A, TypeDecl> {
 
 	@Override
 	public final Pattern<? extends Decl> matcher(A arg) {
@@ -28,18 +30,25 @@ public abstract class TypePattern<A, T extends TypeDecl> implements DeclPattern<
 
 		if (GenSettings.generateDocs) {
 			final String doc = makeDoc((T) decl, arg);
-			decl = insertJavadoc((T) decl, doc);
+			if (doc != null) decl = insertJavadoc((T) decl, doc);
 		}
 
 		decl = contributeSignature((T) decl, importManager, arg);
 		decl = ensureBody((T) decl);
+		decl = contributeBody((T) decl, importManager, arg);
 		for (DeclContribution<A, MemberDecl> contribution : contributions(arg)) {
 			decl = applyContribution((T) decl, importManager, arg, contribution);
 		}
 		return decl;
 	}
 
-	protected abstract Iterable<DeclContribution<A, MemberDecl>> contributions(A arg);
+	protected T contributeBody(T decl, ImportManager importManager, A arg) {
+		return decl;
+	}
+
+	protected Iterable<DeclContribution<A, MemberDecl>> contributions(A arg) {
+		return Collections.emptyList();
+	}
 
 	protected abstract String makeDoc(T decl, A arg);
 

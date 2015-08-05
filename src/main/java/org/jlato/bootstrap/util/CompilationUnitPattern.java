@@ -1,12 +1,18 @@
 package org.jlato.bootstrap.util;
 
 import org.jlato.bootstrap.GenSettings;
+import org.jlato.parser.ParseException;
+import org.jlato.parser.Parser;
+import org.jlato.parser.ParserConfiguration;
+import org.jlato.printer.FormattingSettings;
+import org.jlato.printer.Printer;
 import org.jlato.rewrite.MatchVisitor;
 import org.jlato.rewrite.Pattern;
 import org.jlato.tree.TreeSet;
 import org.jlato.tree.decl.*;
 import org.jlato.tree.name.*;
 
+import java.io.*;
 import java.util.Arrays;
 
 import static org.jlato.tree.Trees.compilationUnit;
@@ -20,6 +26,31 @@ public abstract class CompilationUnitPattern<A> {
 
 	public TreeSet<CompilationUnit> apply(TreeSet<CompilationUnit> treeSet, String path, A arg) {
 		final CompilationUnit cu = treeSet.get(path);
+		CompilationUnit newCU = applyPattern(cu, path, arg);
+		return treeSet.put(path, newCU);
+	}
+
+	public void apply(String basePath, String path, A arg) throws ParseException, IOException {
+		String fullPath = basePath + (basePath.endsWith("/") ? "" : "/") + path;
+		File file = new File(fullPath);
+
+		CompilationUnit cu = null;
+		if (!file.exists()) {
+			file.getParentFile().mkdirs();
+			file.createNewFile();
+		} else {
+			cu = new Parser(ParserConfiguration.Default.preserveWhitespaces(true)).parse(file, "UTF-8");
+		}
+
+		CompilationUnit newCU = applyPattern(cu, path, arg);
+
+		final PrintWriter writer = new PrintWriter(new FileWriter(file));
+		final Printer printer = new Printer(writer, false, FormattingSettings.Default);
+		printer.print(newCU);
+		writer.close();
+	}
+
+	private CompilationUnit applyPattern(CompilationUnit cu, String path, A arg) {
 		final QualifiedName packageName = makePackageName(path);
 
 		CompilationUnit newCU = cu;
@@ -30,8 +61,7 @@ public abstract class CompilationUnitPattern<A> {
 		ImportManager importManager = new ImportManager(packageName, newCU.imports());
 		newCU = rewrite(newCU, importManager, arg);
 		newCU = newCU.withImports(importManager.imports());
-
-		return treeSet.put(path, newCU);
+		return newCU;
 	}
 
 	private CompilationUnit create(String path, QualifiedName packageName) {

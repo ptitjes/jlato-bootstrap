@@ -168,10 +168,12 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 	}
 
 	private MethodDecl generateFactoryMethod(TreeClassDescriptor descriptor, boolean noNulls) {
+		boolean castNeeded = descriptor.parameters.size() == 1;
+
 		NodeList<FormalParameter> params = emptyList();
 		NodeList<Expr> args = emptyList();
 		int index = 0;
-		for (FormalParameter param : safeList(descriptor.parameters)) {
+		for (FormalParameter param : descriptor.parameters) {
 			Type type = param.type();
 
 			final Expr defaultValue = descriptor.defaultValues.get(index);
@@ -191,7 +193,7 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 							params = params.append(param);
 							args = args.append(param.id().name());
 						} else {
-							args = args.append(expr("(" + param.type() + ") null").build());
+							args = args.append(expr((castNeeded ? "(" + param.type() + ") " : "") + "null").build());
 						}
 						break;
 				}
@@ -213,10 +215,7 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 		);
 
 		MethodDecl method = methodDecl(descriptor.interfaceType(), name(lowerCaseFirst(descriptor.name.id())))
-				.withModifiers(m -> noNulls ?
-								m.append(Modifier.Public).append(Modifier.Static) :
-								m.append(deprecatedAnn()).append(Modifier.Public).append(Modifier.Static)
-				)
+				.withModifiers(m -> m.append(Modifier.Public).append(Modifier.Static))
 				.withParams(params)
 				.withBody(some(blockStmt().withStmts(s -> s.append(creation))));
 

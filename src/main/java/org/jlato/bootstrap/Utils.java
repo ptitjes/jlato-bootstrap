@@ -1,7 +1,9 @@
 package org.jlato.bootstrap;
 
 import org.jlato.bootstrap.descriptors.AllDescriptors;
+import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.descriptors.TreeTypeDescriptor;
+import org.jlato.bootstrap.util.ImportManager;
 import org.jlato.rewrite.Substitution;
 import org.jlato.rewrite.TypeSafeMatcher;
 import org.jlato.tree.*;
@@ -12,13 +14,17 @@ import org.jlato.tree.expr.MethodInvocationExpr;
 import org.jlato.tree.expr.ObjectCreationExpr;
 import org.jlato.tree.name.Name;
 import org.jlato.tree.name.QualifiedName;
-import org.jlato.tree.stmt.ForeachStmt;
+import org.jlato.tree.stmt.*;
 import org.jlato.tree.type.*;
 import org.jlato.util.Function1;
 
+import java.util.Arrays;
 import java.util.Iterator;
 
 import static org.jlato.tree.Trees.*;
+import static org.jlato.tree.Trees.listOf;
+import static org.jlato.tree.expr.BinaryOp.Less;
+import static org.jlato.tree.expr.UnaryOp.PostIncrement;
 
 /**
  * @author Didier Villevalois
@@ -259,6 +265,91 @@ public class Utils {
 		}
 		builder.append(" */");
 		return builder.toString();
+	}
+
+	public static Stmt junitAssert(String assertName, Expr... arguments) {
+		return expressionStmt(
+				methodInvocationExpr(name(assertName))
+						.withScope(some(name("Assert")))
+						.withArgs(listOf(Arrays.asList(arguments)))
+		);
+	}
+
+	public static Stmt newVarStmt(Type type, Name name, Expr init) {
+		return expressionStmt(
+				variableDeclarationExpr(
+						localVariableDecl(type)
+								.withVariables(listOf(
+										variableDeclarator(variableDeclaratorId(name))
+												.withInit(some(init))
+								))
+				)
+		);
+	}
+
+	public static MethodInvocationExpr hashCode(Expr e) {
+		return methodInvocationExpr(name("hashCode")).withScope(some(e));
+	}
+
+	public static MethodInvocationExpr equals(Expr e1, Expr e2) {
+		return methodInvocationExpr(name("equals")).withScope(some(e1)).withArgs(listOf(e2));
+	}
+
+	public Stmt loopFor(int count, NodeList<Stmt> loopStmts) {
+		final Name i = name("i");
+		return forStmt(binaryExpr(i, Less, literalExpr(count)), blockStmt().withStmts(loopStmts))
+				.withInit(listOf(
+						variableDeclarationExpr(
+								localVariableDecl(primitiveType(Primitive.Int))
+										.withVariables(listOf(
+												variableDeclarator(variableDeclaratorId(i))
+														.withInit(some(literalExpr(0)))
+										))
+						)
+				))
+				.withUpdate(listOf(
+						unaryExpr(PostIncrement, i)
+				));
+	}
+
+	public static Expr factoryCall(TreeClassDescriptor descriptor, ImportManager importManager) {
+		importManager.addImportByName(qualifiedName("org.jlato.tree.Trees"));
+		return methodInvocationExpr(name(lowerCaseFirst(descriptor.name.id())))
+				.withScope(some(name("Trees")));
+	}
+
+
+	public static MethodInvocationExpr arbitraryCall(Name arbitrary, Type type) {
+		return methodInvocationExpr(name(arbitraryGenMethodName(type))).withScope(some(arbitrary));
+	}
+
+	public static String arbitraryGenMethodName(Type type) {
+		return "arbitrary" + arbitraryDesc(type);
+	}
+
+	private static String arbitraryDesc(Type type) {
+		String arbitraryDesc = "";
+		if (type instanceof PrimitiveType) {
+			arbitraryDesc = upperCaseFirst(((PrimitiveType) type).primitive().toString());
+		} else if (type instanceof QualifiedType) {
+			final QualifiedType qualifiedType = (QualifiedType) type;
+			String shortName = qualifiedType.name().id();
+
+			if (shortName.startsWith("Node")) {
+				shortName = shortName.substring(4);
+			}
+
+			if (qualifiedType.typeArgs().isNone()) {
+				arbitraryDesc = shortName;
+			} else {
+				StringBuilder builder = new StringBuilder();
+				for (Type ta : qualifiedType.typeArgs().get()) {
+					builder.append(arbitraryDesc(ta));
+				}
+				arbitraryDesc = shortName + builder.toString();
+			}
+		}
+		return arbitraryDesc;
 	}
 
 	// Matchers

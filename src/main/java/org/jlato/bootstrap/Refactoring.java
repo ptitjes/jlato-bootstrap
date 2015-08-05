@@ -46,6 +46,7 @@ public class Refactoring {
 
 	public void generate() throws IOException, ParseException {
 		TreeClassRefactoring refactoring = new ExtractTreeDescriptors();
+//		TreeClassRefactoring refactoring = new BootstrapUnitTests();
 
 		refactorTreeClasses(refactoring);
 	}
