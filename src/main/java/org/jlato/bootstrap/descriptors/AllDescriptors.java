@@ -477,7 +477,7 @@ public class AllDescriptors {
 							(Expr) null,
 							(Expr) null,
 							(Expr) null,
-							(Expr) null
+							(Expr) expr("Trees.blockStmt()").build()
 					),
 					false
 			),
