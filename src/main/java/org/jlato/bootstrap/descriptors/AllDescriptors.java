@@ -1720,14 +1720,14 @@ public class AllDescriptors {
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tkeyword(LToken.Catch),\n" +
 									"\t\t\ttoken(LToken.ParenthesisLeft).withSpacingBefore(space()),\n" +
-									"\t\t\tchild(EXCEPT),\n" +
+									"\t\t\tchild(PARAM),\n" +
 									"\t\t\ttoken(LToken.ParenthesisRight).withSpacingAfter(space()),\n" +
 									"\t\t\tchild(CATCH_BLOCK)\n" +
 									"\t);").build(),
 							memberDecl("public static final LexicalShape listShape = list();").build()
 					),
 					listOf(
-							param("FormalParameter except").build(),
+							param("FormalParameter param").build(),
 							param("BlockStmt catchBlock").build()
 					),
 					listOf(
