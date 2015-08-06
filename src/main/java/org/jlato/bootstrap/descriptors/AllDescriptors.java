@@ -551,14 +551,15 @@ public class AllDescriptors {
 									"\t\t\t\t\t.withIndentationAfter(indent(TYPE_BODY)),\n" +
 									"\t\t\tchild(ENUM_CONSTANTS, SEnumConstantDecl.listShape),\n" +
 									"\t\t\twhen(data(TRAILING_COMMA), token(LToken.Comma).withSpacingAfter(spacing(EnumBody_BetweenConstants))),\n" +
-									"\t\t\twhen(childIs(MEMBERS, empty()),\n" +
+									"\t\t\talternative(childIs(MEMBERS, empty()),\n" +
 									"\t\t\t\t\talternative(childIs(ENUM_CONSTANTS, empty()),\n" +
 									"\t\t\t\t\t\t\tnone().withSpacingAfter(newLine()),\n" +
 									"\t\t\t\t\t\t\tnone().withSpacingAfter(spacing(EnumBody_AfterConstants))\n" +
+									"\t\t\t\t\t),\n" +
+									"\t\t\t\t\talternative(childIs(ENUM_CONSTANTS, empty()),\n" +
+									"\t\t\t\t\t\t\tnone(),\n" +
+									"\t\t\t\t\t\t\ttoken(LToken.SemiColon).withSpacingAfter(spacing(EnumBody_AfterConstants))\n" +
 									"\t\t\t\t\t)\n" +
-									"\t\t\t),\n" +
-									"\t\t\twhen(childIs(MEMBERS, not(empty())),\n" +
-									"\t\t\t\t\ttoken(LToken.SemiColon).withSpacingAfter(spacing(EnumBody_AfterConstants))\n" +
 									"\t\t\t),\n" +
 									"\t\t\tchild(MEMBERS, SMemberDecl.membersShape),\n" +
 									"\t\t\ttoken(LToken.BraceRight)\n" +
@@ -648,7 +649,8 @@ public class AllDescriptors {
 									"\t\t\tkeyword(LToken.Import),\n" +
 									"\t\t\twhen(data(STATIC), keyword(LToken.Static)),\n" +
 									"\t\t\tchild(NAME),\n" +
-									"\t\t\twhen(data(ON_DEMAND), composite(token(LToken.Dot), token(LToken.Times))),\n" +
+									"\t\t\twhen(data(ON_DEMAND), token(LToken.Dot)),\n" +
+									"\t\t\twhen(data(ON_DEMAND), token(LToken.Times)),\n" +
 									"\t\t\ttoken(LToken.SemiColon)\n" +
 									"\t);").build(),
 							memberDecl("public static final LexicalShape listShape = list(\n" +
@@ -1010,16 +1012,16 @@ public class AllDescriptors {
 					),
 					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
-									"\t\t\talternative(childIs(VALUES, not(empty())), composite(\n" +
+									"\t\t\talternative(childIs(VALUES, not(empty())),\n" +
 									"\t\t\t\t\ttoken(LToken.BraceLeft).withSpacingAfter(space()),\n" +
-									"\t\t\t\t\tchild(VALUES, SExpr.listShape),\n" +
-									"\t\t\t\t\twhen(data(TRAILING_COMMA), token(LToken.Comma)),\n" +
-									"\t\t\t\t\ttoken(LToken.BraceRight).withSpacingBefore(space())\n" +
-									"\t\t\t), composite(\n" +
-									"\t\t\t\t\ttoken(LToken.BraceLeft),\n" +
-									"\t\t\t\t\twhen(data(TRAILING_COMMA), token(LToken.Comma)),\n" +
+									"\t\t\t\t\ttoken(LToken.BraceLeft)\n" +
+									"\t\t\t),\n" +
+									"\t\t\tchild(VALUES, SExpr.listShape),\n" +
+									"\t\t\twhen(data(TRAILING_COMMA), token(LToken.Comma)),\n" +
+									"\t\t\talternative(childIs(VALUES, not(empty())),\n" +
+									"\t\t\t\t\ttoken(LToken.BraceRight).withSpacingBefore(space()),\n" +
 									"\t\t\t\t\ttoken(LToken.BraceRight)\n" +
-									"\t\t\t))\n" +
+									"\t\t\t)\n" +
 									"\t);").build()
 					),
 					listOf(
@@ -1669,20 +1671,15 @@ public class AllDescriptors {
 							(QualifiedType) type("Stmt").build()
 					),
 					listOf(
-							memberDecl("public static final LexicalShape shape = alternative(childIs(STMTS, not(empty())),\n" +
-									"\t\t\tcomposite(\n" +
-									"\t\t\t\t\ttoken(LToken.BraceLeft)\n" +
-									"\t\t\t\t\t\t\t.withSpacingAfter(newLine())\n" +
-									"\t\t\t\t\t\t\t.withIndentationAfter(indent(BLOCK)),\n" +
-									"\t\t\t\t\tchild(STMTS, listShape),\n" +
+							memberDecl("public static final LexicalShape shape = composite(\n" +
+									"\t\t\ttoken(LToken.BraceLeft)\n" +
+									"\t\t\t\t\t.withSpacingAfter(newLine())\n" +
+									"\t\t\t\t\t.withIndentationAfter(indent(BLOCK)),\n" +
+									"\t\t\tchild(STMTS, listShape),\n" +
+									"\t\t\talternative(childIs(STMTS, not(empty())),\n" +
 									"\t\t\t\t\ttoken(LToken.BraceRight)\n" +
 									"\t\t\t\t\t\t\t.withIndentationBefore(unIndent(BLOCK))\n" +
-									"\t\t\t\t\t\t\t.withSpacingBefore(newLine())\n" +
-									"\t\t\t),\n" +
-									"\t\t\tcomposite(\n" +
-									"\t\t\t\t\ttoken(LToken.BraceLeft)\n" +
-									"\t\t\t\t\t\t\t.withSpacingAfter(newLine())\n" +
-									"\t\t\t\t\t\t\t.withIndentationAfter(indent(BLOCK)),\n" +
+									"\t\t\t\t\t\t\t.withSpacingBefore(newLine()),\n" +
 									"\t\t\t\t\ttoken(LToken.BraceRight)\n" +
 									"\t\t\t\t\t\t\t.withIndentationBefore(unIndent(BLOCK))\n" +
 									"\t\t\t)\n" +
@@ -2038,23 +2035,16 @@ public class AllDescriptors {
 									"\t\t\ttoken(LToken.ParenthesisLeft).withSpacingBefore(spacing(SwitchStmt_AfterSwitchKeyword)),\n" +
 									"\t\t\tchild(SELECTOR),\n" +
 									"\t\t\ttoken(LToken.ParenthesisRight).withSpacingAfter(space()),\n" +
+									"\t\t\ttoken(LToken.BraceLeft)\n" +
+									"\t\t\t\t\t.withSpacingAfter(newLine())\n" +
+									"\t\t\t\t\t.withIndentationAfter(indent(BLOCK)),\n" +
+									"\t\t\tchild(CASES, SSwitchCase.listShape),\n" +
 									"\t\t\talternative(childIs(CASES, not(empty())),\n" +
-									"\t\t\t\t\tcomposite(\n" +
-									"\t\t\t\t\t\t\ttoken(LToken.BraceLeft)\n" +
-									"\t\t\t\t\t\t\t\t\t.withSpacingAfter(newLine())\n" +
-									"\t\t\t\t\t\t\t\t\t.withIndentationAfter(indent(BLOCK)),\n" +
-									"\t\t\t\t\t\t\tchild(CASES, SSwitchCase.listShape),\n" +
-									"\t\t\t\t\t\t\ttoken(LToken.BraceRight)\n" +
-									"\t\t\t\t\t\t\t\t\t.withIndentationBefore(unIndent(BLOCK))\n" +
-									"\t\t\t\t\t\t\t\t\t.withSpacingBefore(newLine())\n" +
-									"\t\t\t\t\t),\n" +
-									"\t\t\t\t\tcomposite(\n" +
-									"\t\t\t\t\t\t\ttoken(LToken.BraceLeft)\n" +
-									"\t\t\t\t\t\t\t\t\t.withSpacingAfter(newLine())\n" +
-									"\t\t\t\t\t\t\t\t\t.withIndentationAfter(indent(BLOCK)),\n" +
-									"\t\t\t\t\t\t\ttoken(LToken.BraceRight)\n" +
-									"\t\t\t\t\t\t\t\t\t.withIndentationBefore(unIndent(BLOCK))\n" +
-									"\t\t\t\t\t)\n" +
+									"\t\t\t\t\ttoken(LToken.BraceRight)\n" +
+									"\t\t\t\t\t\t\t.withIndentationBefore(unIndent(BLOCK))\n" +
+									"\t\t\t\t\t\t\t.withSpacingBefore(newLine()),\n" +
+									"\t\t\t\t\ttoken(LToken.BraceRight)\n" +
+									"\t\t\t\t\t\t\t.withIndentationBefore(unIndent(BLOCK))\n" +
 									"\t\t\t)\n" +
 									"\t);").build()
 					),
@@ -2116,15 +2106,15 @@ public class AllDescriptors {
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tkeyword(LToken.Try),\n" +
 									"\t\t\twhen(childIs(RESOURCES, not(empty())),\n" +
-									"\t\t\t\t\tcomposite(\n" +
-									"\t\t\t\t\t\t\ttoken(LToken.ParenthesisLeft)\n" +
-									"\t\t\t\t\t\t\t\t\t.withIndentationAfter(indent(TRY_RESOURCES)),\n" +
-									"\t\t\t\t\t\t\tchild(RESOURCES, list(token(LToken.SemiColon).withSpacingAfter(newLine()))),\n" +
-									"\t\t\t\t\t\t\twhen(data(TRAILING_SEMI_COLON), token(LToken.SemiColon)),\n" +
-									"\t\t\t\t\t\t\ttoken(LToken.ParenthesisRight)\n" +
-									"\t\t\t\t\t\t\t\t\t.withIndentationBefore(unIndent(TRY_RESOURCES))\n" +
-									"\t\t\t\t\t\t\t\t\t.withSpacingAfter(space())\n" +
-									"\t\t\t\t\t)\n" +
+									"\t\t\t\t\ttoken(LToken.ParenthesisLeft)\n" +
+									"\t\t\t\t\t\t\t.withIndentationAfter(indent(TRY_RESOURCES))\n" +
+									"\t\t\t),\n" +
+									"\t\t\tchild(RESOURCES, list(token(LToken.SemiColon).withSpacingAfter(newLine()))),\n" +
+									"\t\t\twhen(childIs(RESOURCES, not(empty())), when(data(TRAILING_SEMI_COLON), token(LToken.SemiColon))),\n" +
+									"\t\t\twhen(childIs(RESOURCES, not(empty())),\n" +
+									"\t\t\t\t\ttoken(LToken.ParenthesisRight)\n" +
+									"\t\t\t\t\t\t\t.withIndentationBefore(unIndent(TRY_RESOURCES))\n" +
+									"\t\t\t\t\t\t\t.withSpacingAfter(space())\n" +
 									"\t\t\t),\n" +
 									"\t\t\tchild(TRY_BLOCK),\n" +
 									"\t\t\tchild(CATCHS, SCatchClause.listShape),\n" +

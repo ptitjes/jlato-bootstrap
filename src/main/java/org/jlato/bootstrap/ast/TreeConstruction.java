@@ -29,15 +29,15 @@ public class TreeConstruction implements DeclContribution<TreeClassDescriptor, M
 	@Override
 	public Iterable<DeclPattern<TreeClassDescriptor, ? extends MemberDecl>> declarations(TreeClassDescriptor arg) {
 		return Arrays.asList(
-				new TreePrivateConstructor(),
-				new TreePublicConstructor()
+				new TreeLocationConstructor(),
+				new TreeStandardConstructor()
 		);
 	}
 
-	public static class TreePrivateConstructor extends Utils implements DeclPattern<TreeClassDescriptor, ConstructorDecl> {
+	public static class TreeLocationConstructor extends Utils implements DeclPattern<TreeClassDescriptor, ConstructorDecl> {
 		@Override
 		public Pattern<? extends Decl> matcher(TreeClassDescriptor arg) {
-			return memberDecl("public " + arg.className() + "(" + AllDescriptors.TD_LOCATION + "<" + arg.name + ".State> location) { ..$_ }");
+			return memberDecl("public " + arg.className() + "(" + AllDescriptors.TD_LOCATION + "<" + arg.stateType() + "> location) { ..$_ }");
 		}
 
 		@Override
@@ -50,16 +50,16 @@ public class TreeConstruction implements DeclContribution<TreeClassDescriptor, M
 
 			final Name location = name("location");
 
-			decl = constructorDecl(arg.className(),
-					blockStmt().withStmts(listOf(
-							explicitConstructorInvocationStmt()
-									.setThis(false)
-									.withArgs(listOf(location))
-					)))
+			decl = constructorDecl(arg.className())
 					.withModifiers(listOf(Modifier.Public))
 					.withParams(listOf(
 							formalParameter(locationType, variableDeclaratorId(location))
-					));
+					))
+					.withBody(blockStmt().withStmts(listOf(
+							explicitConstructorInvocationStmt()
+									.setThis(false)
+									.withArgs(listOf(location))
+					)));
 
 			if (GenSettings.generateDocs)
 				decl = decl.insertLeadingComment(
@@ -73,7 +73,7 @@ public class TreeConstruction implements DeclContribution<TreeClassDescriptor, M
 		}
 	}
 
-	public static class TreePublicConstructor extends Utils implements DeclPattern<TreeClassDescriptor, ConstructorDecl> {
+	public static class TreeStandardConstructor extends Utils implements DeclPattern<TreeClassDescriptor, ConstructorDecl> {
 		@Override
 		public Pattern<? extends Decl> matcher(TreeClassDescriptor arg) {
 			return memberDecl("public " + arg.className() + "(" + arg.parameters.mkString("", ", ", "") + ") { ..$_ }");
@@ -108,14 +108,14 @@ public class TreeConstruction implements DeclContribution<TreeClassDescriptor, M
 									}))
 					));
 
-			decl = constructorDecl(arg.className(),
-					blockStmt().withStmts(listOf(
+			decl = constructorDecl(arg.className())
+					.withModifiers(listOf(Modifier.Public))
+					.withParams(parameters)
+					.withBody(blockStmt().withStmts(listOf(
 							explicitConstructorInvocationStmt()
 									.setThis(false)
 									.withArgs(listOf(tdLocationCreationExpr))
-					)))
-					.withModifiers(listOf(Modifier.Public))
-					.withParams(parameters);
+					)));
 
 			if (GenSettings.generateDocs) {
 				// TODO document the arguments
