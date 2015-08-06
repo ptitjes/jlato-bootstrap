@@ -45,7 +45,7 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 
 		for (FormalParameter parameter : arg.parameters) {
 			decls.addAll(Arrays.asList(
-					new Accessor(parameter),
+//					new Accessor(parameter),
 					new Mutator(parameter)
 			));
 		}
