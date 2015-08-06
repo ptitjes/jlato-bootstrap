@@ -223,7 +223,7 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 			method = method.insertLeadingComment(
 					genDoc(method,
 							"Creates " + descriptor.prefixedDescription() + ".",
-							new String[0],
+							paramDoc(params, p -> "the " + makeDocumentationName(p.id().name()) + " child tree."),
 							"the new " + descriptor.description + " instance."
 					)
 			);

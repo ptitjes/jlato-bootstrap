@@ -112,9 +112,9 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 		@Override
 		protected String makeDoc(MethodDecl decl, TreeClassDescriptor arg) {
 			return genDoc(decl,
-					"Compares this state object to the specified object.",
-					new String[]{"the object to compare this state with."},
-					"<code>true</code> if the specified object is equal to this state, <code>false</code> otherwise."
+					"Creates a <code>BUTree</code> with a new " + arg.description + ".",
+					paramDoc(arg.parameters, p -> "the " + makeDocumentationName(p.id().name()) + " child <code>BUTree</code>."),
+					"the new <code>BUTree</code> with " + arg.prefixedDescription() + "."
 			);
 		}
 	}
@@ -142,7 +142,7 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 		protected String makeDoc(ConstructorDecl decl, TreeClassDescriptor arg) {
 			return genDoc(decl,
 					"Constructs " + arg.prefixedDescription() + " state.",
-					arg.parameterDescriptions()
+					paramDoc(arg.parameters, p -> "the " + makeDocumentationName(p.id().name()) + " child <code>BUTree</code>.")
 			);
 		}
 	}
@@ -193,9 +193,9 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 		@Override
 		protected String makeDoc(MethodDecl decl, TreeClassDescriptor arg) {
 			return genDoc(decl,
-					"Builds a facade for this " + arg.description + " state.",
-					new String[]{},
-					"a facade for this " + arg.description + " state."
+					"Builds " + arg.prefixedDescription() + " facade for the specified " + arg.description + " <code>TDLocation</code>.",
+					new String[]{"the " + arg.description + " <code>TDLocation</code>."},
+					arg.prefixedDescription() + " facade for the specified " + arg.description + " <code>TDLocation</code>."
 			);
 		}
 	}
@@ -341,7 +341,7 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 		@Override
 		protected String makeDoc(FieldDecl decl, TreeClassDescriptor arg) {
 			return genDoc(decl,
-					"The " + param.id().name() + " of this " + arg.description + " state."
+					"The " + makeDocumentationName(param.id().name()) + " of this " + arg.description + " state."
 			);
 		}
 	}
@@ -369,9 +369,9 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 		@Override
 		protected String makeDoc(MethodDecl decl, TreeClassDescriptor arg) {
 			return genDoc(decl,
-					"Returns the " + param.id().name() + " of this " + arg.description + " state.",
+					"Returns the " + makeDocumentationName(param.id().name()) + " of this " + arg.description + " state.",
 					new String[]{},
-					"the " + param.id().name() + " of this " + arg.description + " state."
+					"the " + makeDocumentationName(param.id().name()) + " of this " + arg.description + " state."
 			);
 		}
 	}
@@ -402,9 +402,9 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 		@Override
 		protected String makeDoc(MethodDecl decl, TreeClassDescriptor arg) {
 			return genDoc(decl,
-					"Returns the " + param.id().name() + " of this " + arg.description + ".",
-					new String[]{},
-					"the " + param.id().name() + " of this " + arg.description + "."
+					"Replaces the " + makeDocumentationName(param.id().name()) + " of this " + arg.description + " state.",
+					new String[]{"the replacement for the " + makeDocumentationName(param.id().name()) + " of this " + arg.description + " state."},
+					"the resulting mutated " + arg.description + " state."
 			);
 		}
 	}

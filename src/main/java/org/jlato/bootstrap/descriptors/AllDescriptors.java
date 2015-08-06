@@ -1712,7 +1712,7 @@ public class AllDescriptors {
 					),
 					false
 			),
-			new TreeClassDescriptor(name("stmt"), name("CatchClause"), "catch clause",
+			new TreeClassDescriptor(name("stmt"), name("CatchClause"), "'catch' clause",
 					listOf(
 							(QualifiedType) type("Node").build()
 					),

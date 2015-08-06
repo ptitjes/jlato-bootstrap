@@ -1,22 +1,17 @@
 package org.jlato.bootstrap.ast;
 
-import org.jlato.bootstrap.GenSettings;
-import org.jlato.bootstrap.Utils;
 import org.jlato.bootstrap.descriptors.AllDescriptors;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.util.DeclContribution;
 import org.jlato.bootstrap.util.DeclPattern;
 import org.jlato.bootstrap.util.ImportManager;
 import org.jlato.bootstrap.util.MemberPattern;
-import org.jlato.rewrite.Pattern;
-import org.jlato.tree.NodeList;
 import org.jlato.tree.decl.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.jlato.rewrite.Quotes.memberDecl;
 import static org.jlato.rewrite.Quotes.stmt;
 import static org.jlato.tree.Trees.*;
 
@@ -62,11 +57,7 @@ public class TreeClassAccessors implements DeclContribution<TreeClassDescriptor,
 
 		@Override
 		protected String makeDoc(MethodDecl decl, TreeClassDescriptor arg) {
-			return genDoc(decl,
-					"Returns the " + param.id().name() + " of this " + arg.description + ".",
-					new String[]{},
-					"the " + param.id().name() + " of this " + arg.description + "."
-			);
+			return facadeAccessorDoc(decl, arg, param);
 		}
 	}
 
@@ -94,11 +85,7 @@ public class TreeClassAccessors implements DeclContribution<TreeClassDescriptor,
 
 		@Override
 		protected String makeDoc(MethodDecl decl, TreeClassDescriptor arg) {
-			return genDoc(decl,
-					"Returns the " + param.id().name() + " of this " + arg.description + ".",
-					new String[]{},
-					"the " + param.id().name() + " of this " + arg.description + "."
-			);
+			return facadeMutatorDoc(decl, arg, param);
 		}
 	}
 
@@ -127,11 +114,7 @@ public class TreeClassAccessors implements DeclContribution<TreeClassDescriptor,
 
 		@Override
 		protected String makeDoc(MethodDecl decl, TreeClassDescriptor arg) {
-			return genDoc(decl,
-					"Mutates the " + param.id().name() + " of this " + arg.description + ".",
-					new String[]{"the mutation object"},
-					"the mutated " + arg.description + "."
-			);
+			return facadeLambdaMutatorDoc(decl, arg, param);
 		}
 	}
 }

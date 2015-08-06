@@ -122,8 +122,8 @@ public class TreeConstruction implements DeclContribution<TreeClassDescriptor, M
 
 				decl = decl.insertLeadingComment(
 						genDoc(decl,
-								"Creates " + arg.prefixedDescription() + " with the specified content.",
-								new String[]{"the object to compare this state with."}
+								"Creates " + arg.prefixedDescription() + " with the specified child trees.",
+								paramDoc(parameters, p -> "the " + makeDocumentationName(p.id().name()) + " child tree.")
 						)
 				);
 			}

@@ -54,11 +54,7 @@ public class TreePureInterfaceAccessors implements DeclContribution<TreeTypeDesc
 
 		@Override
 		protected String makeDoc(MethodDecl decl, TreeTypeDescriptor arg) {
-			return genDoc(decl,
-					"Returns the " + param.id().name() + " of this " + arg.description + ".",
-					new String[]{},
-					"the " + param.id().name() + " of this " + arg.description + "."
-			);
+			return facadeAccessorDoc(decl, arg, param);
 		}
 	}
 
@@ -83,11 +79,7 @@ public class TreePureInterfaceAccessors implements DeclContribution<TreeTypeDesc
 
 		@Override
 		protected String makeDoc(MethodDecl decl, TreeTypeDescriptor arg) {
-			return genDoc(decl,
-					"Returns the " + param.id().name() + " of this " + arg.description + ".",
-					new String[]{},
-					"the " + param.id().name() + " of this " + arg.description + "."
-			);
+			return facadeMutatorDoc(decl, arg, param);
 		}
 	}
 
@@ -113,11 +105,7 @@ public class TreePureInterfaceAccessors implements DeclContribution<TreeTypeDesc
 
 		@Override
 		protected String makeDoc(MethodDecl decl, TreeTypeDescriptor arg) {
-			return genDoc(decl,
-					"Mutates the " + param.id().name() + " of this " + arg.description + ".",
-					new String[]{"the mutation object"},
-					"the mutated " + arg.description + "."
-			);
+			return facadeLambdaMutatorDoc(decl, arg, param);
 		}
 	}
 }

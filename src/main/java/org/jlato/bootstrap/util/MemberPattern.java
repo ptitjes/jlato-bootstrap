@@ -25,7 +25,7 @@ public abstract class MemberPattern<A, M extends MemberDecl> extends Utils imple
 
 		if (GenSettings.generateDocs) {
 			final String doc = makeDoc(decl, arg);
-			decl = insertJavadoc(decl, doc);
+			if (doc != null) decl = insertJavadoc(decl, doc);
 		}
 
 		return decl;

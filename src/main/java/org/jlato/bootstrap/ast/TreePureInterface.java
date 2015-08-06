@@ -13,6 +13,7 @@ import org.jlato.tree.type.*;
 
 import java.util.Arrays;
 
+import static org.jlato.rewrite.Quotes.memberDecl;
 import static org.jlato.tree.Trees.*;
 
 /**
@@ -32,7 +33,7 @@ public class TreePureInterface extends CompilationUnitPattern<TreeTypeDescriptor
 
 							@Override
 							protected String makeDoc(InterfaceDecl decl, TreeTypeDescriptor arg) {
-								return "/** " + Utils.upperCaseFirst(arg.prefixedDescription()) + ". */";
+								return "/**\n" + " * " + Utils.upperCaseFirst(arg.prefixedDescription()) + ".\n */";
 							}
 
 							@Override
@@ -50,6 +51,31 @@ public class TreePureInterface extends CompilationUnitPattern<TreeTypeDescriptor
 								}
 
 								return decl.withExtendsClause(parentInterfaces);
+							}
+
+							@Override
+							protected InterfaceDecl contributeBody(InterfaceDecl decl, ImportManager importManager, TreeTypeDescriptor arg) {
+								decl = super.contributeBody(decl, importManager, arg);
+
+								if (arg.name.id().equals("Modifier")) {
+									importManager.addImport(importDecl(qualifiedName("org.jlato.tree.Trees.modifier")).setStatic(true));
+									decl = decl.withMembers(ms -> ms.appendAll(listOf(
+											memberDecl("\tModifier Public = modifier(ModifierKeyword.Public);").build(),
+											memberDecl("Modifier Protected = modifier(ModifierKeyword.Protected);").build(),
+											memberDecl("Modifier Private = modifier(ModifierKeyword.Private);").build(),
+											memberDecl("Modifier Abstract = modifier(ModifierKeyword.Abstract);").build(),
+											memberDecl("Modifier Default = modifier(ModifierKeyword.Default);").build(),
+											memberDecl("Modifier Static = modifier(ModifierKeyword.Static);").build(),
+											memberDecl("Modifier Final = modifier(ModifierKeyword.Final);").build(),
+											memberDecl("Modifier Transient = modifier(ModifierKeyword.Transient);").build(),
+											memberDecl("Modifier Volatile = modifier(ModifierKeyword.Volatile);").build(),
+											memberDecl("Modifier Synchronized = modifier(ModifierKeyword.Synchronized);").build(),
+											memberDecl("Modifier Native = modifier(ModifierKeyword.Native);").build(),
+											memberDecl("Modifier StrictFP = modifier(ModifierKeyword.StrictFP);").build()
+									)));
+								}
+
+								return decl;
 							}
 
 							@Override

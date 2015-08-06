@@ -18,8 +18,10 @@ import org.jlato.tree.stmt.*;
 import org.jlato.tree.type.*;
 import org.jlato.util.Function1;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 import static org.jlato.tree.Trees.*;
 import static org.jlato.tree.Trees.listOf;
@@ -232,39 +234,59 @@ public class Utils {
 	public static String genDoc(FieldDecl decl, String description) {
 		StringBuilder builder = new StringBuilder();
 		builder.append("/**\n");
-		builder.append(" * ").append(description).append("\n");
-		builder.append(" */");
+		builder.append("* ").append(description).append("\n");
+		builder.append("*/");
 		return builder.toString();
 	}
 
 	public static String genDoc(MethodDecl decl, String description, String[] paramDescription, String returnDescription) {
 		StringBuilder builder = new StringBuilder();
 		builder.append("/**\n");
-		builder.append(" * ").append(description).append("\n");
-		builder.append(" *\n");
+		builder.append("* ").append(description).append("\n");
+		builder.append("*\n");
+		appendParamsDoc(decl.params(), paramDescription, builder);
+		if (returnDescription != null)
+			builder.append("* @return ").append(returnDescription).append("\n");
+		builder.append("*/");
+		return builder.toString();
+	}
+
+	private static void appendParamsDoc(NodeList<FormalParameter> parameters, String[] paramDescription, StringBuilder builder) {
+		int maxNameLength = 0;
+		for (FormalParameter param : parameters) {
+			Name name = param.id().name();
+			int length = name.id().length();
+			maxNameLength = Math.max(maxNameLength, length);
+		}
+
 		int index = 0;
-		for (FormalParameter param : decl.params()) {
-			builder.append(" * @param ").append(param.id()).append(" ").append(paramDescription[index]).append("\n");
+		for (FormalParameter param : parameters) {
+			Name name = param.id().name();
+			builder.append("* @param ").append(name);
+			for (int i = 0; i < maxNameLength - name.id().length(); i++) {
+				builder.append(' ');
+			}
+			builder.append(' ').append(paramDescription[index]).append("\n");
 			index++;
 		}
-		if (returnDescription != null)
-			builder.append(" * @return ").append(returnDescription).append("\n");
-		builder.append(" */");
-		return builder.toString();
 	}
 
 	public static String genDoc(ConstructorDecl decl, String description, String[] paramDescription) {
 		StringBuilder builder = new StringBuilder();
 		builder.append("/**\n");
-		builder.append(" * ").append(description).append("\n");
-		builder.append(" *\n");
-		int index = 0;
-		for (FormalParameter param : decl.params()) {
-			builder.append(" * @param ").append(param.id()).append(" ").append(paramDescription[index]).append("\n");
-			index++;
-		}
-		builder.append(" */");
+		builder.append("* ").append(description).append("\n");
+		builder.append("*\n");
+		appendParamsDoc(decl.params(), paramDescription, builder);
+		builder.append("*/");
 		return builder.toString();
+	}
+
+	public static String[] paramDoc(NodeList<FormalParameter> params, Function1<FormalParameter, String> f) {
+		List<String> docs = new ArrayList();
+		for (FormalParameter param : params) {
+			docs.add(f.apply(param));
+		}
+		return docs.toArray(new String[params.size()]);
 	}
 
 	public static Stmt junitAssert(String assertName, Expr... arguments) {
@@ -293,6 +315,183 @@ public class Utils {
 
 	public static MethodInvocationExpr equals(Expr e1, Expr e2) {
 		return methodInvocationExpr(name("equals")).withScope(some(e1)).withArgs(listOf(e2));
+	}
+
+	public static String makeDocumentationName(Name name) {
+		List<String> words = extractWords(name.id());
+
+		StringBuilder buffer = new StringBuilder();
+		boolean first = true;
+		for (String word : words) {
+			if (!first) {
+				buffer.append(" ");
+			} else first = false;
+
+			word = mapWord(word);
+			buffer.append(word);
+		}
+
+		return mapDocumentation(buffer.toString());
+	}
+
+	private static String mapWord(String word) {
+		switch (word) {
+			case "foreach":
+				return "\\\"enhanced\\\" 'for'";
+			case "do":
+				return "'do-while'";
+			case "while":
+			case "for":
+			case "if":
+			case "switch":
+			case "try":
+			case "catch":
+			case "finally":
+			case "throw":
+			case "throws":
+			case "synchronized":
+			case "return":
+			case "continue":
+			case "break":
+			case "assert":
+
+			case "this":
+			case "super":
+			case "extends":
+			case "implements":
+				return "'" + word + "'";
+
+			case "ext":
+				return "upper bound";
+			case "sup":
+				return "lower bound";
+
+			case "decl":
+				return "declaration";
+			case "decls":
+				return "declarations";
+			case "stmt":
+				return "statement";
+			case "stmts":
+				return "statements";
+			case "expr":
+				return "expression";
+			case "exprs":
+				return "expressions";
+
+			case "dim":
+				return "dimension";
+			case "dims":
+				return "dimensions";
+			case "id":
+				return "identifier";
+			case "param":
+				return "parameter";
+			case "params":
+				return "parameters";
+			case "imports":
+				return "import declarations";
+		}
+		return word;
+	}
+
+	private static String mapDocumentation(String documentation) {
+		switch (documentation) {
+			case "class expression":
+				return "'class' expression";
+			case "instance of expression":
+				return "'instanceof' expression";
+			case "member value pair":
+				return "annotation member value pair";
+			case "assign expression":
+				return "assignment expression";
+			case "annotation declaration":
+				return "annotation type declaration";
+			case "annotation member declaration":
+				return "annotation type member declaration";
+			case "is var args":
+				return "is a variadic parameter";
+			case "has parens":
+				return "has its arguments parenthesized";
+			case "trailing comma":
+				return "has a trailing comma";
+			case "trailing semi colon":
+				return "has a trailing semi-colon for its resources";
+			case "is on demand":
+				return "is on-demand";
+		}
+		return documentation;
+	}
+
+	private static List<String> extractWords(String name) {
+		List<String> words = new ArrayList<>();
+		StringBuilder buffer = new StringBuilder();
+		boolean first = true;
+		for (char c : name.toCharArray()) {
+			if (Character.isUpperCase(c) && !first) {
+				words.add(buffer.toString());
+				buffer = new StringBuilder();
+			}
+			if (first) first = false;
+
+			buffer.append(Character.toLowerCase(c));
+		}
+		words.add(buffer.toString());
+		return words;
+	}
+
+	protected static String facadeAccessorDoc(MethodDecl decl, TreeTypeDescriptor arg, FormalParameter param) {
+		Type type = param.type();
+		if (type instanceof PrimitiveType &&
+				((PrimitiveType) type).primitive() == Primitive.Boolean) {
+			return genDoc(decl,
+					"Tests whether this " + arg.description + " " + makeDocumentationName(param.id().name()) + ".",
+					new String[]{},
+					"<code>true</code> if this " + arg.description + " " + makeDocumentationName(param.id().name()) + ", <code>false</code> otherwise."
+			);
+		} else {
+			return genDoc(decl,
+					"Returns the " + makeDocumentationName(param.id().name()) + " of this " + arg.description + ".",
+					new String[]{},
+					"the " + makeDocumentationName(param.id().name()) + " of this " + arg.description + "."
+			);
+		}
+	}
+
+	protected static String facadeMutatorDoc(MethodDecl decl, TreeTypeDescriptor arg, FormalParameter param) {
+		Type type = param.type();
+		if (type instanceof PrimitiveType &&
+				((PrimitiveType) type).primitive() == Primitive.Boolean) {
+			return genDoc(decl,
+					"Sets whether this " + arg.description + " " + makeDocumentationName(param.id().name()) + ".",
+					new String[]{"<code>true</code> if this " + arg.description + " " + makeDocumentationName(param.id().name()) + ", <code>false</code> otherwise."},
+					"the resulting mutated " + arg.description + "."
+			);
+		} else {
+			return genDoc(decl,
+					"Replaces the " + makeDocumentationName(param.id().name()) + " of this " + arg.description + ".",
+					new String[]{"the replacement for the " + makeDocumentationName(param.id().name()) + " of this " + arg.description + "."},
+					"the resulting mutated " + arg.description + "."
+			);
+		}
+	}
+
+	protected static String facadeLambdaMutatorDoc(MethodDecl decl, TreeTypeDescriptor arg, FormalParameter param) {
+		Type type = param.type();
+		if (type instanceof PrimitiveType &&
+				((PrimitiveType) type).primitive() == Primitive.Boolean) {
+			return genDoc(decl,
+					"Mutates whether this " + arg.description + " " + makeDocumentationName(param.id().name()) + ".",
+					new String[]{"the mutation to apply to whether this " + arg.description + " " + makeDocumentationName(param.id().name()) + "."},
+					"the resulting mutated " + arg.description + "."
+			);
+		} else {
+			return genDoc(decl,
+					"Mutates the " + makeDocumentationName(param.id().name()) + " of this " + arg.description + ".",
+					new String[]{"the mutation to apply to the " + makeDocumentationName(param.id().name()) + " of this " + arg.description + "."},
+					"the resulting mutated " + arg.description + "."
+			);
+		}
 	}
 
 	public Stmt loopFor(int count, NodeList<Stmt> loopStmts) {
