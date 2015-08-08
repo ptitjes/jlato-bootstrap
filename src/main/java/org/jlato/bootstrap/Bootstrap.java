@@ -58,12 +58,6 @@ public class Bootstrap {
 		final TreeInterfaceDescriptor[] interfaceDescriptors = AllDescriptors.ALL_INTERFACES;
 		final TreeClassDescriptor[] classDescriptors = AllDescriptors.ALL_CLASSES;
 
-		// Generate Tree interfaces
-//		final TreeInterface treeInterfacePattern = new TreeInterface();
-//		for (TreeInterfaceDescriptor descriptor : interfaceDescriptors) {
-//			treeSet = applyPattern(treeSet, descriptor.treeFilePath(), treeInterfacePattern, descriptor);
-//		}
-
 		// Generate pure interfaces
 		final TreePureInterface treeInterfacePattern = new TreePureInterface();
 		for (TreeInterfaceDescriptor descriptor : interfaceDescriptors) {
@@ -89,7 +83,6 @@ public class Bootstrap {
 		// Generate State classes
 		final CompilationUnitPattern<TreeClassDescriptor> stateClassPattern = CompilationUnitPattern.of(new StateClass());
 		for (TreeClassDescriptor descriptor : classDescriptors) {
-//			if (descriptor.customTailored) continue;
 			treeSet = stateClassPattern.apply(treeSet, descriptor.stateTypeFilePath(), descriptor);
 		}
 
