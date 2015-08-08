@@ -52,7 +52,8 @@ public class Bootstrap {
 
 	public void generate() throws IOException, ParseException {
 		Parser parser = new Parser(ParserConfiguration.Default.preserveWhitespaces(true));
-		File rootDirectory = new File("../jlato/src/main/java");
+		String pathToJLaTo = System.getProperty("path.to.jlato");
+		File rootDirectory = new File(pathToJLaTo + "src/main/java");
 		TreeSet<CompilationUnit> treeSet = parser.parseAll(rootDirectory, "UTF-8");
 
 		final TreeInterfaceDescriptor[] interfaceDescriptors = AllDescriptors.ALL_INTERFACES;
