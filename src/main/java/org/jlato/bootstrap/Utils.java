@@ -178,6 +178,14 @@ public class Utils {
 		return false;
 	}
 
+	public static boolean nameFieldType(Type treeType) {
+		if (treeType instanceof QualifiedType) {
+			String name = ((QualifiedType) treeType).name().id();
+			return name.equals("Name");
+		}
+		return false;
+	}
+
 	public static <T extends Tree> NodeList<T> safeList(NodeList<T> list) {
 		return list == null ? emptyList() : list;
 	}

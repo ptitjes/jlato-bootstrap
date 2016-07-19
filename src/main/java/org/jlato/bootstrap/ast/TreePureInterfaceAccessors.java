@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.jlato.bootstrap.Utils.nameFieldType;
 import static org.jlato.tree.Trees.qualifiedName;
 
 /**
@@ -29,6 +30,10 @@ public class TreePureInterfaceAccessors implements DeclContribution<TreeTypeDesc
 					new Mutator(parameter),
 					new LambdaMutator(parameter)
 			));
+			final Type paramType = parameter.type();
+			if (nameFieldType(paramType)) {
+				decls.add(new NameStringMutator(parameter));
+			}
 		}
 		return decls;
 	}
@@ -69,6 +74,31 @@ public class TreePureInterfaceAccessors implements DeclContribution<TreeTypeDesc
 		@Override
 		protected String makeQuote(TreeTypeDescriptor arg) {
 			return arg.name + " " + propertySetterName(param) + "(" + param + ");";
+		}
+
+		@Override
+		protected MethodDecl makeDecl(MethodDecl decl, ImportManager importManager, TreeTypeDescriptor arg) {
+			AllDescriptors.addImports(importManager, param.type());
+			return decl;
+		}
+
+		@Override
+		protected String makeDoc(MethodDecl decl, TreeTypeDescriptor arg) {
+			return facadeMutatorDoc(decl, arg, param);
+		}
+	}
+
+	public static class NameStringMutator extends MemberPattern.OfMethod<TreeTypeDescriptor> {
+
+		private final FormalParameter param;
+
+		public NameStringMutator(FormalParameter param) {
+			this.param = param;
+		}
+
+		@Override
+		protected String makeQuote(TreeTypeDescriptor arg) {
+			return arg.name + " " + propertySetterName(param) + "(" + param.withType(qType("String")) + ");";
 		}
 
 		@Override

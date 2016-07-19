@@ -7,11 +7,13 @@ import org.jlato.bootstrap.util.DeclPattern;
 import org.jlato.bootstrap.util.ImportManager;
 import org.jlato.bootstrap.util.MemberPattern;
 import org.jlato.tree.decl.*;
+import org.jlato.tree.type.Type;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.jlato.bootstrap.Utils.nameFieldType;
 import static org.jlato.rewrite.Quotes.stmt;
 import static org.jlato.tree.Trees.*;
 
@@ -29,6 +31,10 @@ public class TreeClassAccessors implements DeclContribution<TreeClassDescriptor,
 					new Mutator(parameter),
 					new LambdaMutator(parameter)
 			));
+			final Type paramType = parameter.type();
+			if (nameFieldType(paramType)) {
+				decls.add(new NameStringMutator(parameter));
+			}
 		}
 		return decls;
 	}
@@ -80,6 +86,34 @@ public class TreeClassAccessors implements DeclContribution<TreeClassDescriptor,
 
 			return decl.withBody(some(blockStmt().withStmts(listOf(
 					stmt("return location.safe" + (propertyFieldType(param.type()) ? "Property" : "Traversal") + "Replace(" + arg.stateTypeName() + "." + constantName(param) + ", " + param.id().name() + ");").build()
+			))));
+		}
+
+		@Override
+		protected String makeDoc(MethodDecl decl, TreeClassDescriptor arg) {
+			return facadeMutatorDoc(decl, arg, param);
+		}
+	}
+
+	public static class NameStringMutator extends MemberPattern.OfMethod<TreeClassDescriptor> {
+
+		private final FormalParameter param;
+
+		public NameStringMutator(FormalParameter param) {
+			this.param = param;
+		}
+
+		@Override
+		protected String makeQuote(TreeClassDescriptor arg) {
+			return "public " + arg.name + " " + propertySetterName(param) + "(" + param.withType(qType("String")) + ") { ..$_ }";
+		}
+
+		@Override
+		protected MethodDecl makeDecl(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
+			importManager.addImportByName(qualifiedName("org.jlato.tree.Trees"));
+
+			return decl.withBody(some(blockStmt().withStmts(listOf(
+					stmt("return location.safe" + (propertyFieldType(param.type()) ? "Property" : "Traversal") + "Replace(" + arg.stateTypeName() + "." + constantName(param) + ", Trees.name(" + param.id().name() + "));").build()
 			))));
 		}
 

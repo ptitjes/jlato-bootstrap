@@ -38,10 +38,13 @@ public class StateInterface extends TypePattern.OfInterface<TreeInterfaceDescrip
 		importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.LexicalShape")).setOnDemand(true).setStatic(true));
 		importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.LSCondition")).setOnDemand(true).setStatic(true));
 		importManager.addImport(importDecl(qualifiedName("org.jlato.internal.bu.LToken")));
+		importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.IndentationContext")));
+		importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.SpacingLocation")));
 		importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.IndentationContext")).setOnDemand(true).setStatic(true));
 		importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.SpacingLocation")).setOnDemand(true).setStatic(true));
 		importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.SpacingConstraint")).setOnDemand(true).setStatic(true));
 		importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.IndentationConstraint")).setOnDemand(true).setStatic(true));
+		importManager.addImport(importDecl(qualifiedName("org.jlato.parser.ParserImplConstants")));
 		importManager.addImport(importDecl(qualifiedName("org.jlato.tree.Kind")));
 		importManager.addImport(importDecl(AllDescriptors.S_NODE_LIST_QUALIFIED));
 
