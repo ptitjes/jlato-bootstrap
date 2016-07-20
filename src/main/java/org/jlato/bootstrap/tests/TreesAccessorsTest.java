@@ -5,6 +5,7 @@ import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.util.ImportManager;
 import org.jlato.tree.*;
 import org.jlato.tree.decl.*;
+import org.jlato.tree.expr.Expr;
 import org.jlato.tree.name.*;
 import org.jlato.tree.stmt.*;
 
@@ -55,11 +56,31 @@ public class TreesAccessorsTest extends TestPattern {
 		));
 
 		loopStmts = loopStmts.appendAll(params.map(p ->
-						junitAssert("assertEquals",
-								p.id().name(),
-								methodInvocationExpr(p.id().name()).withScope(some(tested))
-						)
+				junitAssert("assertEquals",
+						p.id().name(),
+						methodInvocationExpr(p.id().name()).withScope(some(tested))
+				)
 		));
+
+		if (params.exists(p -> nameFieldType(p.type()))) {
+			NodeList<FormalParameter> nameParameters = params.filter(p -> nameFieldType(p.type()));
+
+			loopStmts = loopStmts.append(assignVarStmt(descriptor.interfaceType(), tested,
+					nameParameters.foldLeft((Expr) tested,
+							(e, p) -> methodInvocationExpr(name(propertySetterName(p)))
+									.withScope(some(e)).withArgs(listOf(
+											methodInvocationExpr(name("id")).withScope(some(p.id().name()))
+									))
+					)
+			));
+
+			loopStmts = loopStmts.appendAll(nameParameters.map(p ->
+					junitAssert("assertEquals",
+							p.id().name(),
+							methodInvocationExpr(p.id().name()).withScope(some(tested))
+					)
+			));
+		}
 
 		stmts = stmts.append(loopFor(10, loopStmts));
 		return stmts;

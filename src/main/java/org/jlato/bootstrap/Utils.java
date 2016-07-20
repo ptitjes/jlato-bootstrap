@@ -8,10 +8,7 @@ import org.jlato.rewrite.Substitution;
 import org.jlato.rewrite.TypeSafeMatcher;
 import org.jlato.tree.*;
 import org.jlato.tree.decl.*;
-import org.jlato.tree.expr.AnnotationExpr;
-import org.jlato.tree.expr.Expr;
-import org.jlato.tree.expr.MethodInvocationExpr;
-import org.jlato.tree.expr.ObjectCreationExpr;
+import org.jlato.tree.expr.*;
 import org.jlato.tree.name.Name;
 import org.jlato.tree.name.QualifiedName;
 import org.jlato.tree.stmt.*;
@@ -314,6 +311,12 @@ public class Utils {
 												.withInit(some(init))
 								))
 				)
+		);
+	}
+
+	public static Stmt assignVarStmt(Type type, Name name, Expr init) {
+		return expressionStmt(
+				assignExpr(name, AssignOp.Normal, init)
 		);
 	}
 

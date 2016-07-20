@@ -12,7 +12,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.jlato.rewrite.Quotes.*;
+import static org.jlato.rewrite.Quotes.memberDecl;
+import static org.jlato.rewrite.Quotes.param;
+import static org.jlato.rewrite.Quotes.expr;
+import static org.jlato.rewrite.Quotes.type;
 import static org.jlato.tree.Trees.*;
 
 /**
