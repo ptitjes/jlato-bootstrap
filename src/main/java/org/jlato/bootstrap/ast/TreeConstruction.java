@@ -46,7 +46,7 @@ public class TreeConstruction implements DeclContribution<TreeClassDescriptor, M
 
 			final Name name = arg.name;
 			final QualifiedType stateType = arg.stateType();
-			final QualifiedType locationType = qualifiedType(AllDescriptors.TD_LOCATION).withTypeArgs(some(listOf(stateType)));
+			final QualifiedType locationType = qualifiedType(AllDescriptors.TD_LOCATION).withTypeArgs(listOf(stateType));
 
 			final Name location = name("location");
 
@@ -90,19 +90,19 @@ public class TreeConstruction implements DeclContribution<TreeClassDescriptor, M
 
 			final Name name = arg.name;
 			final QualifiedType stateType = arg.stateType();
-			final QualifiedType locationType = qualifiedType(AllDescriptors.TD_LOCATION).withTypeArgs(some(listOf(stateType)));
+			final QualifiedType locationType = qualifiedType(AllDescriptors.TD_LOCATION).withTypeArgs(listOf(stateType));
 			final NodeList<FormalParameter> parameters = arg.parameters;
 
 			// Make TDLocation creation expression from Trees
 			final ObjectCreationExpr tdLocationCreationExpr = objectCreationExpr(locationType)
 					.withArgs(listOf(
 							methodInvocationExpr(name("make"))
-									.withScope(some(arg.stateTypeName()))
+									.withScope(arg.stateTypeName())
 									.withArgs(parameters.map(p -> {
 										Type treeType = p.type();
 										if (propertyFieldType(treeType)) return p.id().name();
 										else return methodInvocationExpr(name("treeOf"))
-												.withScope(some(AllDescriptors.TD_TREE))
+												.withScope(AllDescriptors.TD_TREE)
 												.withTypeArgs(listOf(treeTypeToStateType((QualifiedType) treeType)))
 												.withArgs(listOf(p.id().name()));
 									}))

@@ -72,11 +72,11 @@ public class StateEqualsAndHashCode implements DeclContribution<TreeClassDescrip
 
 				stmts = stmts.appendAll(params.map(p -> {
 					final Name thisField = p.id().name();
-					final FieldAccessExpr otherField = fieldAccessExpr(thisField).withScope(some(state));
+					final FieldAccessExpr otherField = fieldAccessExpr(thisField).withScope(state);
 
 					Expr equalTest = p.type() instanceof PrimitiveType ?
 							binaryExpr(thisField, NotEqual, otherField) :
-							unaryExpr(Not, methodInvocationExpr(EQUALS).withScope(some(thisField)).withArgs(listOf(otherField)));
+							unaryExpr(Not, methodInvocationExpr(EQUALS).withScope(thisField).withArgs(listOf(otherField)));
 
 					if (nullable(p)) {
 						equalTest = conditionalExpr(
@@ -85,13 +85,13 @@ public class StateEqualsAndHashCode implements DeclContribution<TreeClassDescrip
 								equalTest);
 					}
 
-					return ifStmt(equalTest, returnStmt().withExpr(some(literalExpr(false))));
+					return ifStmt(equalTest, returnStmt().withExpr(literalExpr(false)));
 				}));
 			}
 
-			stmts = stmts.append(returnStmt().withExpr(some(literalExpr(true))));
+			stmts = stmts.append(returnStmt().withExpr(literalExpr(true)));
 
-			decl = decl.withBody(some(blockStmt().withStmts(stmts)));
+			decl = decl.withBody(blockStmt().withStmts(stmts));
 
 			if (GenSettings.generateDocs)
 				decl = decl.insertLeadingComment(
@@ -147,7 +147,7 @@ public class StateEqualsAndHashCode implements DeclContribution<TreeClassDescrip
 
 			stmts = stmts.append(stmt("return result;").build());
 
-			decl = decl.withBody(some(blockStmt().withStmts(stmts)));
+			decl = decl.withBody(blockStmt().withStmts(stmts));
 
 			if (GenSettings.generateDocs)
 				decl = decl.insertLeadingComment(

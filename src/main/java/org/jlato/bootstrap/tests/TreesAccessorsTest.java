@@ -54,14 +54,14 @@ public class TreesAccessorsTest extends TestPattern {
 		loopStmts = loopStmts.append(newVarStmt(descriptor.interfaceType(), tested,
 				params.foldLeft(factoryCall(descriptor, importManager),
 						(e, p) -> methodInvocationExpr(name(propertySetterName(p)))
-								.withScope(some(e)).withArgs(listOf(p.id().name()))
+								.withScope(e).withArgs(listOf(p.id().name()))
 				)
 		));
 
 		loopStmts = loopStmts.appendAll(params.map(p ->
 				junitAssert("assertEquals",
 						p.id().name(),
-						methodInvocationExpr(p.id().name()).withScope(some(tested))
+						methodInvocationExpr(p.id().name()).withScope(tested)
 				)
 		));
 
@@ -71,8 +71,8 @@ public class TreesAccessorsTest extends TestPattern {
 			loopStmts = loopStmts.append(assignVarStmt(descriptor.interfaceType(), tested,
 					nameParameters.foldLeft((Expr) tested,
 							(e, p) -> methodInvocationExpr(name(propertySetterName(p)))
-									.withScope(some(e)).withArgs(listOf(
-											methodInvocationExpr(name("id")).withScope(some(p.id().name()))
+									.withScope(e).withArgs(listOf(
+											methodInvocationExpr(name("id")).withScope(p.id().name())
 									))
 					)
 			));
@@ -80,7 +80,7 @@ public class TreesAccessorsTest extends TestPattern {
 			loopStmts = loopStmts.appendAll(nameParameters.map(p ->
 					junitAssert("assertEquals",
 							p.id().name(),
-							methodInvocationExpr(p.id().name()).withScope(some(tested))
+							methodInvocationExpr(p.id().name()).withScope(tested)
 					)
 			));
 		}
@@ -91,8 +91,8 @@ public class TreesAccessorsTest extends TestPattern {
 			loopStmts = loopStmts.append(assignVarStmt(descriptor.interfaceType(), tested,
 					optionParameters.foldLeft((Expr) tested,
 							(e, p) -> methodInvocationExpr(name(propertySetterName(p)))
-									.withScope(some(e)).withArgs(listOf(
-											methodInvocationExpr(name("get")).withScope(some(p.id().name()))
+									.withScope(e).withArgs(listOf(
+											methodInvocationExpr(name("get")).withScope(p.id().name())
 									))
 					)
 			));
@@ -100,21 +100,21 @@ public class TreesAccessorsTest extends TestPattern {
 			loopStmts = loopStmts.appendAll(optionParameters.map(p ->
 					junitAssert("assertEquals",
 							p.id().name(),
-							methodInvocationExpr(p.id().name()).withScope(some(tested))
+							methodInvocationExpr(p.id().name()).withScope(tested)
 					)
 			));
 
 			loopStmts = loopStmts.append(assignVarStmt(descriptor.interfaceType(), tested,
 					optionParameters.foldLeft((Expr) tested,
 							(e, p) -> methodInvocationExpr(name(propertySetterName(p, "No")))
-									.withScope(some(e)).withArgs(emptyList())
+									.withScope(e).withArgs(emptyList())
 					)
 			));
 
 			loopStmts = loopStmts.appendAll(optionParameters.map(p ->
 					junitAssert("assertEquals",
 							Quotes.expr("Trees.<" + firstTypeArg(p) + ">none()").build(),
-							methodInvocationExpr(p.id().name()).withScope(some(tested))
+							methodInvocationExpr(p.id().name()).withScope(tested)
 					)
 			));
 		}

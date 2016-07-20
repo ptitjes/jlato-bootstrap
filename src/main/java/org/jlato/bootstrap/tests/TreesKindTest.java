@@ -32,10 +32,10 @@ public class TreesKindTest extends TestPattern {
 	protected NodeList<Stmt> testStatementsFor(TreeClassDescriptor descriptor, ImportManager importManager) {
 		return listOf(
 				junitAssert("assertEquals",
-						fieldAccessExpr(descriptor.name).withScope(some(name("Kind"))),
-						methodInvocationExpr(name("kind")).withScope(some(
+						fieldAccessExpr(descriptor.name).withScope(name("Kind")),
+						methodInvocationExpr(name("kind")).withScope(
 								factoryCall(descriptor, importManager)
-						))
+						)
 				)
 		);
 	}

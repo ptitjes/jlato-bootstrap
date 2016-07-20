@@ -41,9 +41,9 @@ public class TreeKind implements DeclContribution<TreeClassDescriptor, MemberDec
 			importManager.addImportByName(qualifiedName("org.jlato.tree.Kind"));
 
 			// Add BUTree factory method
-			decl = decl.withBody(some(blockStmt().withStmts(listOf(
+			decl = decl.withBody(blockStmt().withStmts(listOf(
 					stmt("return Kind." + arg.name + ";").build()
-			))));
+			)));
 
 			if (GenSettings.generateDocs)
 				decl = decl.insertLeadingComment(

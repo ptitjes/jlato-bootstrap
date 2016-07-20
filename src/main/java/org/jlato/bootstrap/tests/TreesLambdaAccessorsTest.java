@@ -15,7 +15,6 @@ import org.jlato.tree.type.*;
 
 import static org.jlato.tree.Trees.*;
 import static org.jlato.tree.Trees.methodInvocationExpr;
-import static org.jlato.tree.Trees.some;
 
 /**
  * @author Didier Villevalois
@@ -51,22 +50,22 @@ public class TreesLambdaAccessorsTest extends TestPattern {
 						formalParameter(tType, variableDeclaratorId(beforeName)).withModifiers(listOf(Modifier.Final)),
 						formalParameter(tType, variableDeclaratorId(afterName)).withModifiers(listOf(Modifier.Final))
 				))
-				.withBody(some(blockStmt().withStmts(listOf(
-						returnStmt().withExpr(some(
+				.withBody(blockStmt().withStmts(listOf(
+						returnStmt().withExpr(
 								objectCreationExpr(mutationType)
-										.withBody(some(listOf(
+										.withBody(listOf(
 												methodDecl(tType, name("mutate"))
 														.withModifiers(listOf(Modifier.Public))
 														.withParams(listOf(
 																formalParameter(tType, variableDeclaratorId(tName)).withModifiers(listOf(Modifier.Final))
 														))
-														.withBody(some(blockStmt().withStmts(listOf(
+														.withBody(blockStmt().withStmts(listOf(
 																junitAssert("assertEquals", beforeName, tName),
-																returnStmt().withExpr(some(afterName))
-														))))
-										)))
-						))
-				))));
+																returnStmt().withExpr(afterName)
+														)))
+										))
+						)
+				)));
 
 		return decl.withMembers(ms -> ms.append(mutationBy));
 	}
@@ -94,19 +93,19 @@ public class TreesLambdaAccessorsTest extends TestPattern {
 		loopStmts = loopStmts.append(newVarStmt(descriptor.interfaceType(), tested,
 				params.foldLeft(factoryCall(descriptor, importManager),
 						(e, p) -> methodInvocationExpr(name(propertySetterName(p.id().name().id(), p.type())))
-								.withScope(some(e)).withArgs(listOf(p.id().name()))
+								.withScope(e).withArgs(listOf(p.id().name()))
 				)
 		));
 
 		loopStmts = loopStmts.appendAll(params.map(p -> junitAssert("assertEquals", p.id().name(),
-						methodInvocationExpr(p.id().name()).withScope(some(tested)))
+						methodInvocationExpr(p.id().name()).withScope(tested))
 		));
 
 		loopStmts = loopStmts.appendAll(params.map(p -> newVarStmt(p.type(), p.id().name().withId(s -> s + "2"), Utils.arbitraryCall(ARBITRARY_VAR, p.type()))));
 		loopStmts = loopStmts.append(newVarStmt(descriptor.interfaceType(), tested.withId(s -> s + "2"),
 				params.<Expr>foldLeft(tested,
 						(e, p) -> methodInvocationExpr(name(propertySetterName(p.id().name().id(), p.type())))
-								.withScope(some(e)).withArgs(listOf(
+								.withScope(e).withArgs(listOf(
 										methodInvocationExpr(name("mutationBy"))
 												.withArgs(listOf(
 														p.id().name(),
@@ -119,7 +118,7 @@ public class TreesLambdaAccessorsTest extends TestPattern {
 		loopStmts = loopStmts.appendAll(params.map(p -> {
 					Expr expected = p.id().name().withId(s -> s + "2");
 					return junitAssert("assertEquals", expected,
-							methodInvocationExpr(p.id().name()).withScope(some(tested.withId(s -> s + "2")))
+							methodInvocationExpr(p.id().name()).withScope(tested.withId(s -> s + "2"))
 					);
 				}
 		));

@@ -13,7 +13,6 @@ import java.util.List;
 
 import static org.jlato.tree.Trees.name;
 import static org.jlato.tree.Trees.qualifiedType;
-import static org.jlato.tree.Trees.some;
 
 /**
  * @author Didier Villevalois
@@ -50,11 +49,11 @@ public abstract class TreeTypeDescriptor {
 	}
 
 	public QualifiedName interfacePackageName() {
-		return Trees.qualifiedName(packageName).withQualifier(some(AllDescriptors.TREE_INTERFACES_ROOT));
+		return Trees.qualifiedName(packageName).withQualifier(AllDescriptors.TREE_INTERFACES_ROOT);
 	}
 
 	public QualifiedName interfaceQualifiedName() {
-		return Trees.qualifiedName(interfaceName()).withQualifier(some(interfacePackageName()));
+		return Trees.qualifiedName(interfaceName()).withQualifier(interfacePackageName());
 	}
 
 	public String interfaceFilePath() {
@@ -71,11 +70,11 @@ public abstract class TreeTypeDescriptor {
 
 
 	public QualifiedName stateTypePackageName() {
-		return Trees.qualifiedName(packageName).withQualifier(some(AllDescriptors.TREE_STATES_ROOT));
+		return Trees.qualifiedName(packageName).withQualifier(AllDescriptors.TREE_STATES_ROOT);
 	}
 
 	public QualifiedName stateTypeQualifiedName() {
-		return Trees.qualifiedName(stateTypeName()).withQualifier(some(stateTypePackageName()));
+		return Trees.qualifiedName(stateTypeName()).withQualifier(stateTypePackageName());
 	}
 
 	public String stateTypeFilePath() {

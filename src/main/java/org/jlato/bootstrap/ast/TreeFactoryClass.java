@@ -48,8 +48,8 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 				"\t\treturn TDNodeOption.none();\n" +
 				"\t}").build());
 
-		factoryMethods = factoryMethods.append(memberDecl("public static <T extends Tree> NodeOption<T> some(T t) {\n" +
-				"\t\treturn TDNodeOption.some(t);\n" +
+		factoryMethods = factoryMethods.append(memberDecl("public static <T extends Tree> NodeOption<T> T t {\n" +
+				"\t\treturn TDNodeOption.t;\n" +
 				"\t}").build());
 
 		factoryMethods = factoryMethods.append(memberDecl("public static <T extends Tree> NodeOption<T> optionOf(T t) {\n" +
@@ -211,13 +211,13 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 
 		QualifiedType resultType = descriptor.classType();
 		Stmt creation = returnStmt().withExpr(
-				some(objectCreationExpr(resultType).withArgs(args).withBody(none()))
+				objectCreationExpr(resultType).withArgs(args).withNoBody()
 		);
 
 		MethodDecl method = methodDecl(descriptor.interfaceType(), name(lowerCaseFirst(descriptor.name.id())))
 				.withModifiers(m -> m.append(Modifier.Public).append(Modifier.Static))
 				.withParams(params)
-				.withBody(some(blockStmt().withStmts(s -> s.append(creation))));
+				.withBody(blockStmt().withStmts(s -> s.append(creation)));
 
 		if (GenSettings.generateDocs)
 			method = method.insertLeadingComment(

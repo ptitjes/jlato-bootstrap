@@ -47,9 +47,9 @@ public abstract class TestPattern extends TypePattern.OfClass<TreeClassDescripto
 							markerAnnotationExpr(qualifiedName("Test")),
 							Modifier.Public
 					))
-					.withBody(some(blockStmt().withStmts(
+					.withBody(blockStmt().withStmts(
 							testStatementsFor(descriptor, importManager)
-					))));
+					)));
 		}
 
 		return classDecl(name(testName()))

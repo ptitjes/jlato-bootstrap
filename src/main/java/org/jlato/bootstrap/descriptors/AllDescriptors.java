@@ -57,8 +57,8 @@ public class AllDescriptors {
 	public static final Name TREE_NAME = name("Tree");
 	public static final Name NODE_NAME = name("Node");
 
-	public static final QualifiedName TREE_QUALIFIED = qualifiedName(TREE_NAME).withQualifier(some(TREE_INTERFACES_ROOT));
-	public static final QualifiedName NODE_QUALIFIED = qualifiedName(NODE_NAME).withQualifier(some(TREE_INTERFACES_ROOT));
+	public static final QualifiedName TREE_QUALIFIED = qualifiedName(TREE_NAME).withQualifier(TREE_INTERFACES_ROOT);
+	public static final QualifiedName NODE_QUALIFIED = qualifiedName(NODE_NAME).withQualifier(TREE_INTERFACES_ROOT);
 
 	/* Base Classes */
 
@@ -66,9 +66,9 @@ public class AllDescriptors {
 	public static final Name TD_LOCATION = name("TDLocation");
 	public static final Name TD_CONTEXT = name("TDContext");
 
-	public static final QualifiedName TD_TREE_QUALIFIED = qualifiedName(TD_TREE).withQualifier(some(TREE_CLASSES_ROOT));
-	public static final QualifiedName TD_LOCATION_QUALIFIED = qualifiedName(TD_LOCATION).withQualifier(some(TREE_CLASSES_ROOT));
-	public static final QualifiedName TD_CONTEXT_QUALIFIED = qualifiedName(TD_CONTEXT).withQualifier(some(TREE_CLASSES_ROOT));
+	public static final QualifiedName TD_TREE_QUALIFIED = qualifiedName(TD_TREE).withQualifier(TREE_CLASSES_ROOT);
+	public static final QualifiedName TD_LOCATION_QUALIFIED = qualifiedName(TD_LOCATION).withQualifier(TREE_CLASSES_ROOT);
+	public static final QualifiedName TD_CONTEXT_QUALIFIED = qualifiedName(TD_CONTEXT).withQualifier(TREE_CLASSES_ROOT);
 
 	/* Base States */
 
@@ -76,9 +76,9 @@ public class AllDescriptors {
 	public static final Name S_TREE = name("STree");
 	public static final Name S_NODE = name("SNode");
 
-	public static final QualifiedName BU_TREE_QUALIFIED = qualifiedName(BU_TREE).withQualifier(some(TREE_STATES_ROOT));
-	public static final QualifiedName S_TREE_QUALIFIED = qualifiedName(S_TREE).withQualifier(some(TREE_STATES_ROOT));
-	public static final QualifiedName S_NODE_QUALIFIED = qualifiedName(S_NODE).withQualifier(some(TREE_STATES_ROOT));
+	public static final QualifiedName BU_TREE_QUALIFIED = qualifiedName(BU_TREE).withQualifier(TREE_STATES_ROOT);
+	public static final QualifiedName S_TREE_QUALIFIED = qualifiedName(S_TREE).withQualifier(TREE_STATES_ROOT);
+	public static final QualifiedName S_NODE_QUALIFIED = qualifiedName(S_NODE).withQualifier(TREE_STATES_ROOT);
 
 	/* Collections States */
 
@@ -87,10 +87,10 @@ public class AllDescriptors {
 	public static final Name S_NODE_EITHER = name("S" + NODE_EITHER);
 	public static final Name S_TREE_SET = name("S" + TREE_SET);
 
-	public static final QualifiedName S_NODE_LIST_QUALIFIED = qualifiedName(S_NODE_LIST).withQualifier(some(TREE_COLL_STATES_ROOT));
-	public static final QualifiedName S_NODE_OPTION_QUALIFIED = qualifiedName(S_NODE_OPTION).withQualifier(some(TREE_COLL_STATES_ROOT));
-	public static final QualifiedName S_NODE_EITHER_QUALIFIED = qualifiedName(S_NODE_EITHER).withQualifier(some(TREE_COLL_STATES_ROOT));
-	public static final QualifiedName S_TREE_SET_QUALIFIED = qualifiedName(S_TREE_SET).withQualifier(some(TREE_COLL_STATES_ROOT));
+	public static final QualifiedName S_NODE_LIST_QUALIFIED = qualifiedName(S_NODE_LIST).withQualifier(TREE_COLL_STATES_ROOT);
+	public static final QualifiedName S_NODE_OPTION_QUALIFIED = qualifiedName(S_NODE_OPTION).withQualifier(TREE_COLL_STATES_ROOT);
+	public static final QualifiedName S_NODE_EITHER_QUALIFIED = qualifiedName(S_NODE_EITHER).withQualifier(TREE_COLL_STATES_ROOT);
+	public static final QualifiedName S_TREE_SET_QUALIFIED = qualifiedName(S_TREE_SET).withQualifier(TREE_COLL_STATES_ROOT);
 
 	public static TreeTypeDescriptor get(Name name) {
 		return perName.get(name);
@@ -98,9 +98,9 @@ public class AllDescriptors {
 
 	public static QualifiedName asStateTypeQualifiedName(Name name) {
 		if (name.equals(TREE_NAME) || name.equals(NODE_NAME)) {
-			return qualifiedName(S_TREE).withQualifier(some(TREE_STATES_ROOT));
+			return qualifiedName(S_TREE).withQualifier(TREE_STATES_ROOT);
 		} else if (NODE_CONTAINERS.contains(name)) {
-			return qualifiedName(name("S" + name)).withQualifier(some(TREE_COLL_STATES_ROOT));
+			return qualifiedName(name("S" + name)).withQualifier(TREE_COLL_STATES_ROOT);
 		}
 
 		final TreeTypeDescriptor descriptor = perName.get(name);
@@ -148,10 +148,10 @@ public class AllDescriptors {
 		if (id.equals("Class") || id.equals("String")) {
 			return null;
 		} else if (name.equals(TREE_NAME) || name.equals(NODE_NAME) || NODE_CONTAINERS.contains(name)) {
-			return qualifiedName(name).withQualifier(some(treeRoot));
+			return qualifiedName(name).withQualifier(treeRoot);
 		} else if (VALUE_ENUMS.contains(name)) {
 			final Name pkg = VALUE_ENUMS_PKG.get(VALUE_ENUMS.indexOf(name));
-			return qualifiedName(name).withQualifier(some(qualifiedName(pkg).withQualifier(some(treeRoot))));
+			return qualifiedName(name).withQualifier(qualifiedName(pkg).withQualifier(treeRoot));
 		}
 
 		final TreeTypeDescriptor descriptor = perName.get(name);

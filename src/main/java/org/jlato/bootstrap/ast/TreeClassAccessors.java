@@ -61,9 +61,9 @@ public class TreeClassAccessors implements DeclContribution<TreeClassDescriptor,
 		protected MethodDecl makeDecl(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
 			AllDescriptors.addImports(importManager, param.type());
 
-			return decl.withBody(some(blockStmt().withStmts(listOf(
+			return decl.withBody(blockStmt().withStmts(listOf(
 					stmt("return location.safe" + (propertyFieldType(param.type()) ? "Property" : "Traversal") + "(" + arg.stateTypeName() + "." + constantName(param) + ");").build()
-			))));
+			)));
 		}
 
 		@Override
@@ -89,9 +89,9 @@ public class TreeClassAccessors implements DeclContribution<TreeClassDescriptor,
 		protected MethodDecl makeDecl(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
 			AllDescriptors.addImports(importManager, param.type());
 
-			return decl.withBody(some(blockStmt().withStmts(listOf(
+			return decl.withBody(blockStmt().withStmts(listOf(
 					stmt("return location.safe" + (propertyFieldType(param.type()) ? "Property" : "Traversal") + "Replace(" + arg.stateTypeName() + "." + constantName(param) + ", " + param.id().name() + ");").build()
-			))));
+			)));
 		}
 
 		@Override
@@ -117,9 +117,9 @@ public class TreeClassAccessors implements DeclContribution<TreeClassDescriptor,
 		protected MethodDecl makeDecl(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
 			importManager.addImportByName(qualifiedName("org.jlato.tree.Trees"));
 
-			return decl.withBody(some(blockStmt().withStmts(listOf(
+			return decl.withBody(blockStmt().withStmts(listOf(
 					stmt("return location.safe" + (propertyFieldType(param.type()) ? "Property" : "Traversal") + "Replace(" + arg.stateTypeName() + "." + constantName(param) + ", Trees.name(" + param.id().name() + "));").build()
-			))));
+			)));
 		}
 
 		@Override
@@ -147,9 +147,9 @@ public class TreeClassAccessors implements DeclContribution<TreeClassDescriptor,
 			AllDescriptors.addImports(importManager, param.type());
 			importManager.addImportByName(qualifiedName("org.jlato.tree.Trees"));
 
-			return decl.withBody(some(blockStmt().withStmts(listOf(
+			return decl.withBody(blockStmt().withStmts(listOf(
 					stmt("return location.safe" + (propertyFieldType(param.type()) ? "Property" : "Traversal") + "Replace(" + arg.stateTypeName() + "." + constantName(param) + ", Trees.some(" + param.id().name() + "));").build()
-			))));
+			)));
 		}
 
 		@Override
@@ -178,9 +178,9 @@ public class TreeClassAccessors implements DeclContribution<TreeClassDescriptor,
 
 			Type valueType = ((QualifiedType) param.type()).typeArgs().get().first();
 
-			return decl.withBody(some(blockStmt().withStmts(listOf(
+			return decl.withBody(blockStmt().withStmts(listOf(
 					stmt("return location.safe" + (propertyFieldType(param.type()) ? "Property" : "Traversal") + "Replace(" + arg.stateTypeName() + "." + constantName(param) + ", Trees.<" + valueType + ">none());").build()
-			))));
+			)));
 		}
 
 		@Override
@@ -207,9 +207,9 @@ public class TreeClassAccessors implements DeclContribution<TreeClassDescriptor,
 			AllDescriptors.addImports(importManager, param.type());
 			importManager.addImportByName(qualifiedName("org.jlato.util.Mutation"));
 
-			return decl.withBody(some(blockStmt().withStmts(listOf(
+			return decl.withBody(blockStmt().withStmts(listOf(
 					stmt("return location.safe" + (propertyFieldType(param.type()) ? "Property" : "Traversal") + "Mutate(" + arg.stateTypeName() + "." + constantName(param) + ", mutation);").build()
-			))));
+			)));
 		}
 
 		@Override

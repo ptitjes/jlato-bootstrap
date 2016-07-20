@@ -93,54 +93,54 @@ public class PropertyAndTraversalClasses extends Utils implements DeclContributi
 
 			QualifiedType childStateType = treeTypeToStateType((QualifiedType) treeType);
 			final Type childType = qualifiedType(AllDescriptors.BU_TREE)
-					.withTypeArgs(some(listOf(childStateType)));
+					.withTypeArgs(listOf(childStateType));
 			final Type childReturnType = qualifiedType(AllDescriptors.BU_TREE)
-					.withTypeArgs(some(listOf(wildcardType())));
+					.withTypeArgs(listOf(wildcardType()));
 			final FormalParameter childParam = formalParameter(childType, variableDeclaratorId(childParamName));
 
 			MethodDecl traverseMethod = methodDecl(childReturnType, name("doTraverse"))
 					.withModifiers(listOf(overrideAnn(), Modifier.Public))
 					.withParams(listOf(typedStateParam))
-					.withBody(some(blockStmt().withStmts(listOf(
-							returnStmt().withExpr(some(
-									fieldAccessExpr(name(traversalName)).withScope(some(stateParamName))
-							))
-					))));
+					.withBody(blockStmt().withStmts(listOf(
+							returnStmt().withExpr(
+									fieldAccessExpr(name(traversalName)).withScope(stateParamName)
+							)
+					)));
 
 			MethodDecl rebuildMethod = methodDecl(stateType, name("doRebuildParentState"))
 					.withModifiers(listOf(overrideAnn(), Modifier.Public))
 					.withParams(listOf(typedStateParam, childParam))
-					.withBody(some(blockStmt().withStmts(listOf(
-							returnStmt().withExpr(some(
+					.withBody(blockStmt().withStmts(listOf(
+							returnStmt().withExpr(
 									methodInvocationExpr(name(propertySetterName(traversalName, treeType)))
-											.withScope(some(stateParamName))
+											.withScope(stateParamName)
 											.withArgs(listOf(childParamName))
-							))
-					))));
+							)
+					)));
 
 			MethodDecl leftSibling = methodDecl(qType("STraversal"), name("left" + "Sibling"))
 					.withModifiers(listOf(overrideAnn(), Modifier.Public))
 					.withParams(listOf(stateParam))
-					.withBody(some(blockStmt().withStmts(listOf(
-							returnStmt().withExpr(some(before == null ? nullLiteralExpr() : name(constantName(before))))
-					))));
+					.withBody(blockStmt().withStmts(listOf(
+							returnStmt().withExpr(before == null ? nullLiteralExpr() : name(constantName(before)))
+					)));
 
 			MethodDecl rightSibling = methodDecl(qType("STraversal"), name("right" + "Sibling"))
 					.withModifiers(listOf(overrideAnn(), Modifier.Public))
 					.withParams(listOf(stateParam))
-					.withBody(some(blockStmt().withStmts(listOf(
-							returnStmt().withExpr(some(after == null ? nullLiteralExpr() : name(constantName(after))))
-					))));
+					.withBody(blockStmt().withStmts(listOf(
+							returnStmt().withExpr(after == null ? nullLiteralExpr() : name(constantName(after)))
+					)));
 
 			QualifiedType traversalType = qType("STypeSafeTraversal", stateType, childStateType, treeType);
 			FieldDecl traversal = fieldDecl(traversalType)
 					.withModifiers(listOf(Modifier.Public, Modifier.Static))
 					.withVariables(listOf(
 							variableDeclarator(variableDeclaratorId(name(constantName)))
-									.withInit(some(
+									.withInit(
 											objectCreationExpr(traversalType)
-													.withBody(some(listOf(traverseMethod, rebuildMethod, leftSibling, rightSibling)))
-									))
+													.withBody(listOf(traverseMethod, rebuildMethod, leftSibling, rightSibling))
+									)
 					));
 			return traversal;
 		}
@@ -190,33 +190,33 @@ public class PropertyAndTraversalClasses extends Utils implements DeclContributi
 			MethodDecl retrieveMethod = methodDecl(valueType, name("doRetrieve"))
 					.withModifiers(listOf(overrideAnn(), Modifier.Public))
 					.withParams(listOf(typedStateParam))
-					.withBody(some(blockStmt().withStmts(listOf(
-							returnStmt().withExpr(some(
-									fieldAccessExpr(param.id().name()).withScope(some(stateParamName))
-							))
-					))));
+					.withBody(blockStmt().withStmts(listOf(
+							returnStmt().withExpr(
+									fieldAccessExpr(param.id().name()).withScope(stateParamName)
+							)
+					)));
 
 			MethodDecl rebuildMethod = methodDecl(stateType, name("doRebuildParentState"))
 					.withModifiers(listOf(overrideAnn(), Modifier.Public))
 					.withParams(listOf(typedStateParam, valueParam))
-					.withBody(some(blockStmt().withStmts(listOf(
-							returnStmt().withExpr(some(
+					.withBody(blockStmt().withStmts(listOf(
+							returnStmt().withExpr(
 									methodInvocationExpr(name(propertySetterName(param)))
-											.withScope(some(stateParamName))
+											.withScope(stateParamName)
 											.withArgs(listOf(valueParamName))
-							))
-					))));
+							)
+					)));
 
 			QualifiedType propertyType = qType("STypeSafeProperty", stateType, valueType);
 			FieldDecl property = fieldDecl(propertyType)
 					.withModifiers(listOf(Modifier.Public, Modifier.Static))
 					.withVariables(listOf(
 							variableDeclarator(variableDeclaratorId(name(constantName)))
-									.withInit(some(
+									.withInit(
 											objectCreationExpr(propertyType)
-													.withBody(some(listOf(retrieveMethod, rebuildMethod)))
+													.withBody(listOf(retrieveMethod, rebuildMethod))
 
-									))
+									)
 					));
 			return property;
 		}

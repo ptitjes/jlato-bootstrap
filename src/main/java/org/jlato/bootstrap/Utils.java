@@ -142,7 +142,7 @@ public class Utils {
 
 			final QualifiedType stateType = treeTypeToStateType(qualifiedType);
 			return qualifiedType(AllDescriptors.BU_TREE)
-					.withTypeArgs(some(listOf(isInterface ? wildcardType().withExt(some(stateType)) : stateType)));
+					.withTypeArgs(listOf(isInterface ? wildcardType().withExt(stateType) : stateType));
 		}
 	}
 
@@ -218,15 +218,15 @@ public class Utils {
 	}
 
 	public static QualifiedType qType(String typeName, Type typeArg) {
-		return Trees.qualifiedType(name(typeName)).withTypeArgs(some(listOf(typeArg)));
+		return Trees.qualifiedType(name(typeName)).withTypeArgs(listOf(typeArg));
 	}
 
 	public static QualifiedType qType(String typeName, Type typeArg1, Type typeArg2) {
-		return Trees.qualifiedType(name(typeName)).withTypeArgs(some(listOf(typeArg1, typeArg2)));
+		return Trees.qualifiedType(name(typeName)).withTypeArgs(listOf(typeArg1, typeArg2));
 	}
 
 	public static QualifiedType qType(String typeName, Type typeArg1, Type typeArg2, Type typeArg3) {
-		return Trees.qualifiedType(name(typeName)).withTypeArgs(some(listOf(typeArg1, typeArg2, typeArg3)));
+		return Trees.qualifiedType(name(typeName)).withTypeArgs(listOf(typeArg1, typeArg2, typeArg3));
 	}
 
 	public static String constantToCamel(String constantName) {
@@ -323,7 +323,7 @@ public class Utils {
 	public static Stmt junitAssert(String assertName, Expr... arguments) {
 		return expressionStmt(
 				methodInvocationExpr(name(assertName))
-						.withScope(some(name("Assert")))
+						.withScope(name("Assert"))
 						.withArgs(listOf(Arrays.asList(arguments)))
 		);
 	}
@@ -334,7 +334,7 @@ public class Utils {
 						localVariableDecl(type)
 								.withVariables(listOf(
 										variableDeclarator(variableDeclaratorId(name))
-												.withInit(some(init))
+												.withInit(init)
 								))
 				)
 		);
@@ -347,11 +347,11 @@ public class Utils {
 	}
 
 	public static MethodInvocationExpr hashCode(Expr e) {
-		return methodInvocationExpr(name("hashCode")).withScope(some(e));
+		return methodInvocationExpr(name("hashCode")).withScope(e);
 	}
 
 	public static MethodInvocationExpr equals(Expr e1, Expr e2) {
-		return methodInvocationExpr(name("equals")).withScope(some(e1)).withArgs(listOf(e2));
+		return methodInvocationExpr(name("equals")).withScope(e1).withArgs(listOf(e2));
 	}
 
 	public static String makeDocumentationName(Name name) {
@@ -539,7 +539,7 @@ public class Utils {
 								localVariableDecl(primitiveType(Primitive.Int))
 										.withVariables(listOf(
 												variableDeclarator(variableDeclaratorId(i))
-														.withInit(some(literalExpr(0)))
+														.withInit(literalExpr(0))
 										))
 						)
 				))
@@ -551,12 +551,12 @@ public class Utils {
 	public static Expr factoryCall(TreeClassDescriptor descriptor, ImportManager importManager) {
 		importManager.addImportByName(qualifiedName("org.jlato.tree.Trees"));
 		return methodInvocationExpr(name(lowerCaseFirst(descriptor.name.id())))
-				.withScope(some(name("Trees")));
+				.withScope(name("Trees"));
 	}
 
 
 	public static MethodInvocationExpr arbitraryCall(Name arbitrary, Type type) {
-		return methodInvocationExpr(name(arbitraryGenMethodName(type))).withScope(some(arbitrary));
+		return methodInvocationExpr(name(arbitraryGenMethodName(type))).withScope(arbitrary);
 	}
 
 	public static String arbitraryGenMethodName(Type type) {

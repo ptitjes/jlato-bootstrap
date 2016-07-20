@@ -44,9 +44,9 @@ public class TreePureInterface extends CompilationUnitPattern<TreeTypeDescriptor
 								if (!arg.isInterface()) {
 									importManager.addImportByName(qualifiedName("org.jlato.tree.TreeCombinators"));
 									parentInterfaces = parentInterfaces.append(
-											qualifiedType(name("TreeCombinators")).withTypeArgs(some(listOf(
+											qualifiedType(name("TreeCombinators")).withTypeArgs(listOf(
 													arg.interfaceType()
-											)))
+											))
 									);
 								}
 

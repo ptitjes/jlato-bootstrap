@@ -45,11 +45,11 @@ public class TreeClassDescriptor extends TreeTypeDescriptor {
 	}
 
 	public QualifiedName classPackageName() {
-		return Trees.qualifiedName(packageName).withQualifier(some(AllDescriptors.TREE_CLASSES_ROOT));
+		return Trees.qualifiedName(packageName).withQualifier(AllDescriptors.TREE_CLASSES_ROOT);
 	}
 
 	public QualifiedName classQualifiedName() {
-		return Trees.qualifiedName(className()).withQualifier(some(classPackageName()));
+		return Trees.qualifiedName(className()).withQualifier(classPackageName());
 	}
 
 	public String classFilePath() {

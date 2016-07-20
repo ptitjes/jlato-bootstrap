@@ -34,14 +34,14 @@ public class TreeClass extends TypePattern.OfClass<TreeClassDescriptor> {
 		importManager.addImportByName(arg.stateTypeQualifiedName());
 
 		classDecl = classDecl
-				.withExtendsClause(some(
+				.withExtendsClause(
 						qualifiedType(AllDescriptors.TD_TREE)
-								.withTypeArgs(some(listOf(
+								.withTypeArgs(listOf(
 										arg.stateType(),
 										arg.superInterfaces.get(0),
 										arg.interfaceType()
-								)))
-				))
+								))
+				)
 				.withImplementsClause(listOf(arg.interfaceType()));
 
 		importManager.addImportByName(AllDescriptors.TD_TREE_QUALIFIED);

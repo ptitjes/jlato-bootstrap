@@ -52,7 +52,7 @@ public class TreesEqualsHashCodeTest extends TestPattern {
 		loopStmts = loopStmts.append(newVarStmt(descriptor.interfaceType(), expected,
 				params.foldLeft(factoryCall(descriptor, importManager),
 						(e, p) -> methodInvocationExpr(name(propertySetterName(p)))
-								.withScope(some(e)).withArgs(listOf(p.id().name()))
+								.withScope(e).withArgs(listOf(p.id().name()))
 				)
 		));
 
@@ -72,7 +72,7 @@ public class TreesEqualsHashCodeTest extends TestPattern {
 					expressionStmt(
 							assignExpr(actual, Normal,
 									methodInvocationExpr(name(propertySetterName(param)))
-											.withScope(some(actual)).withArgs(listOf(param.id().name()))
+											.withScope(actual).withArgs(listOf(param.id().name()))
 							)
 					)
 			);
