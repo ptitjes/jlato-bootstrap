@@ -46,7 +46,7 @@ public class TreesAccessorsTest extends TestPattern {
 
 		final Name tested = name("t");
 
-		stmts = stmts.append(newVarStmt(ARBITRARY_TYPE, ARBITRARY_VAR, objectCreationExpr(ARBITRARY_TYPE)));
+		stmts = stmts.append(newVarStmt(ARBITRARY_TYPE, ARBITRARY_VAR, objectCreationExpr(ARBITRARY_TYPE).withArgs(listOf(name("true")))));
 
 		loopStmts = loopStmts.appendAll(
 				params.map(p -> newVarStmt(p.type(), p.id().name(), arbitraryCall(ARBITRARY_VAR, p.type())))
@@ -114,6 +114,36 @@ public class TreesAccessorsTest extends TestPattern {
 			loopStmts = loopStmts.appendAll(optionParameters.map(p ->
 					junitAssert("assertEquals",
 							Quotes.expr("Trees.<" + firstTypeArg(p) + ">none()").build(),
+							methodInvocationExpr(p.id().name()).withScope(tested)
+					)
+			));
+		}
+
+		if (params.exists(p -> eitherFieldType(p.type()))) {
+			NodeList<FormalParameter> optionParameters = params.filter(p -> eitherFieldType(p.type()));
+
+			loopStmts = loopStmts.appendAll(optionParameters.map(p ->
+					ifStmt(methodInvocationExpr(name("isLeft")).withScope(p.id().name()),
+							assignVarStmt(descriptor.interfaceType(), tested,
+									methodInvocationExpr(name(propertySetterName(p)))
+											.withScope(tested).withArgs(listOf(
+											methodInvocationExpr(name("left")).withScope(p.id().name())
+									))
+							)
+					).withElseStmt(
+							assignVarStmt(descriptor.interfaceType(), tested,
+									methodInvocationExpr(name(propertySetterName(p)))
+											.withScope(tested).withArgs(listOf(
+											methodInvocationExpr(name("right")).withScope(p.id().name())
+									))
+							)
+					)
+
+			));
+
+			loopStmts = loopStmts.appendAll(optionParameters.map(p ->
+					junitAssert("assertEquals",
+							p.id().name(),
 							methodInvocationExpr(p.id().name()).withScope(tested)
 					)
 			));
