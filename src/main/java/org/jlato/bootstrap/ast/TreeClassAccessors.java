@@ -7,6 +7,7 @@ import org.jlato.bootstrap.util.DeclPattern;
 import org.jlato.bootstrap.util.ImportManager;
 import org.jlato.bootstrap.util.MemberPattern;
 import org.jlato.tree.decl.*;
+import org.jlato.tree.type.QualifiedType;
 import org.jlato.tree.type.Type;
 
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.jlato.bootstrap.Utils.nameFieldType;
+import static org.jlato.bootstrap.Utils.optionFieldType;
 import static org.jlato.rewrite.Quotes.stmt;
 import static org.jlato.tree.Trees.*;
 
@@ -34,6 +36,9 @@ public class TreeClassAccessors implements DeclContribution<TreeClassDescriptor,
 			final Type paramType = parameter.type();
 			if (nameFieldType(paramType)) {
 				decls.add(new NameStringMutator(parameter));
+			} else if (optionFieldType(paramType)) {
+				decls.add(new OptionSomeMutator(parameter));
+				decls.add(new OptionNoneMutator(parameter));
 			}
 		}
 		return decls;
@@ -114,6 +119,67 @@ public class TreeClassAccessors implements DeclContribution<TreeClassDescriptor,
 
 			return decl.withBody(some(blockStmt().withStmts(listOf(
 					stmt("return location.safe" + (propertyFieldType(param.type()) ? "Property" : "Traversal") + "Replace(" + arg.stateTypeName() + "." + constantName(param) + ", Trees.name(" + param.id().name() + "));").build()
+			))));
+		}
+
+		@Override
+		protected String makeDoc(MethodDecl decl, TreeClassDescriptor arg) {
+			return facadeMutatorDoc(decl, arg, param);
+		}
+	}
+
+	public static class OptionSomeMutator extends MemberPattern.OfMethod<TreeClassDescriptor> {
+
+		private final FormalParameter param;
+
+		public OptionSomeMutator(FormalParameter param) {
+			this.param = param;
+		}
+
+		@Override
+		protected String makeQuote(TreeClassDescriptor arg) {
+			Type valueType = ((QualifiedType) param.type()).typeArgs().get().first();
+			return "public " + arg.name + " " + propertySetterName(param) + "(" + param.withType(valueType) + ") { ..$_ }";
+		}
+
+		@Override
+		protected MethodDecl makeDecl(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
+			AllDescriptors.addImports(importManager, param.type());
+			importManager.addImportByName(qualifiedName("org.jlato.tree.Trees"));
+
+			return decl.withBody(some(blockStmt().withStmts(listOf(
+					stmt("return location.safe" + (propertyFieldType(param.type()) ? "Property" : "Traversal") + "Replace(" + arg.stateTypeName() + "." + constantName(param) + ", Trees.some(" + param.id().name() + "));").build()
+			))));
+		}
+
+		@Override
+		protected String makeDoc(MethodDecl decl, TreeClassDescriptor arg) {
+			return facadeMutatorDoc(decl, arg, param);
+		}
+	}
+
+	public static class OptionNoneMutator extends MemberPattern.OfMethod<TreeClassDescriptor> {
+
+		private final FormalParameter param;
+
+		public OptionNoneMutator(FormalParameter param) {
+			this.param = param;
+		}
+
+		@Override
+		protected String makeQuote(TreeClassDescriptor arg) {
+			return "public " + arg.name + " " + propertySetterName(param, "No") + "() { ..$_ }";
+		}
+
+		@Override
+		protected MethodDecl makeDecl(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
+			AllDescriptors.addImports(importManager, param.type());
+			importManager.addImportByName(qualifiedName("org.jlato.tree.Trees"));
+
+			Type valueType = ((QualifiedType) param.type()).typeArgs().get().first();
+
+			return decl.withBody(some(blockStmt().withStmts(listOf(
+					stmt("return location.safe" + (propertyFieldType(param.type()) ? "Property" : "Traversal") + "Replace(" + arg.stateTypeName() + "." + constantName(param) + ", Trees.<" + valueType + ">none());").build()
 			))));
 		}
 

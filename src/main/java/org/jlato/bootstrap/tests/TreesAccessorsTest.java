@@ -3,11 +3,14 @@ package org.jlato.bootstrap.tests;
 import org.jlato.bootstrap.descriptors.AllDescriptors;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.util.ImportManager;
+import org.jlato.rewrite.Quotes;
 import org.jlato.tree.*;
 import org.jlato.tree.decl.*;
 import org.jlato.tree.expr.Expr;
 import org.jlato.tree.name.*;
 import org.jlato.tree.stmt.*;
+import org.jlato.tree.type.QualifiedType;
+import org.jlato.tree.type.Type;
 
 import static org.jlato.tree.Trees.*;
 
@@ -82,7 +85,45 @@ public class TreesAccessorsTest extends TestPattern {
 			));
 		}
 
+		if (params.exists(p -> optionFieldType(p.type()))) {
+			NodeList<FormalParameter> optionParameters = params.filter(p -> optionFieldType(p.type()));
+
+			loopStmts = loopStmts.append(assignVarStmt(descriptor.interfaceType(), tested,
+					optionParameters.foldLeft((Expr) tested,
+							(e, p) -> methodInvocationExpr(name(propertySetterName(p)))
+									.withScope(some(e)).withArgs(listOf(
+											methodInvocationExpr(name("get")).withScope(some(p.id().name()))
+									))
+					)
+			));
+
+			loopStmts = loopStmts.appendAll(optionParameters.map(p ->
+					junitAssert("assertEquals",
+							p.id().name(),
+							methodInvocationExpr(p.id().name()).withScope(some(tested))
+					)
+			));
+
+			loopStmts = loopStmts.append(assignVarStmt(descriptor.interfaceType(), tested,
+					optionParameters.foldLeft((Expr) tested,
+							(e, p) -> methodInvocationExpr(name(propertySetterName(p, "No")))
+									.withScope(some(e)).withArgs(emptyList())
+					)
+			));
+
+			loopStmts = loopStmts.appendAll(optionParameters.map(p ->
+					junitAssert("assertEquals",
+							Quotes.expr("Trees.<" + firstTypeArg(p) + ">none()").build(),
+							methodInvocationExpr(p.id().name()).withScope(some(tested))
+					)
+			));
+		}
+
 		stmts = stmts.append(loopFor(10, loopStmts));
 		return stmts;
+	}
+
+	private Type firstTypeArg(FormalParameter p) {
+		return ((QualifiedType) p.type()).typeArgs().get().first();
 	}
 }

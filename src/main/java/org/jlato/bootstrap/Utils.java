@@ -64,7 +64,15 @@ public class Utils {
 		return propertySetterName(parameter.id().name().id(), parameter.type());
 	}
 
+	public static String propertySetterName(FormalParameter parameter, String modifier) {
+		return propertySetterName(parameter.id().name().id(), parameter.type(), modifier);
+	}
+
 	public static String propertySetterName(String propertyName, Type propertyType) {
+		return propertySetterName(propertyName, propertyType, "");
+	}
+
+	public static String propertySetterName(String propertyName, Type propertyType, String modifier) {
 		if (propertyType instanceof PrimitiveType &&
 				((PrimitiveType) propertyType).primitive() == Primitive.Boolean) {
 			if (propertyName.startsWith("is")) {
@@ -73,7 +81,7 @@ public class Utils {
 				return "set" + upperCaseFirst(propertyName.substring(3));
 			}
 		}
-		return "with" + upperCaseFirst(propertyName);
+		return "with" + modifier + upperCaseFirst(propertyName);
 	}
 
 	public static Type boxedType(Type type) {
@@ -179,6 +187,24 @@ public class Utils {
 		if (treeType instanceof QualifiedType) {
 			String name = ((QualifiedType) treeType).name().id();
 			return name.equals("Name");
+		}
+		return false;
+	}
+
+	public static boolean optionFieldType(Type treeType) {
+		if (treeType instanceof QualifiedType) {
+			QualifiedType type = (QualifiedType) treeType;
+			String name = type.name().id();
+			return name.equals("NodeOption");
+		}
+		return false;
+	}
+
+	public static boolean eitherFieldType(Type treeType) {
+		if (treeType instanceof QualifiedType) {
+			QualifiedType type = (QualifiedType) treeType;
+			String name = type.name().id();
+			return name.equals("NodeEither");
 		}
 		return false;
 	}

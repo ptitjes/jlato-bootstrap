@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.jlato.bootstrap.Utils.nameFieldType;
+import static org.jlato.bootstrap.Utils.optionFieldType;
 import static org.jlato.tree.Trees.qualifiedName;
 
 /**
@@ -33,6 +34,9 @@ public class TreePureInterfaceAccessors implements DeclContribution<TreeTypeDesc
 			final Type paramType = parameter.type();
 			if (nameFieldType(paramType)) {
 				decls.add(new NameStringMutator(parameter));
+			} else if (optionFieldType(paramType)) {
+				decls.add(new OptionSomeMutator(parameter));
+				decls.add(new OptionNoneMutator(parameter));
 			}
 		}
 		return decls;
@@ -99,6 +103,57 @@ public class TreePureInterfaceAccessors implements DeclContribution<TreeTypeDesc
 		@Override
 		protected String makeQuote(TreeTypeDescriptor arg) {
 			return arg.name + " " + propertySetterName(param) + "(" + param.withType(qType("String")) + ");";
+		}
+
+		@Override
+		protected MethodDecl makeDecl(MethodDecl decl, ImportManager importManager, TreeTypeDescriptor arg) {
+			AllDescriptors.addImports(importManager, param.type());
+			return decl;
+		}
+
+		@Override
+		protected String makeDoc(MethodDecl decl, TreeTypeDescriptor arg) {
+			return facadeMutatorDoc(decl, arg, param);
+		}
+	}
+
+	public static class OptionSomeMutator extends MemberPattern.OfMethod<TreeTypeDescriptor> {
+
+		private final FormalParameter param;
+
+		public OptionSomeMutator(FormalParameter param) {
+			this.param = param;
+		}
+
+		@Override
+		protected String makeQuote(TreeTypeDescriptor arg) {
+			Type valueType = ((QualifiedType) param.type()).typeArgs().get().first();
+			return arg.name + " " + propertySetterName(param) + "(" + param.withType(valueType) + ");";
+		}
+
+		@Override
+		protected MethodDecl makeDecl(MethodDecl decl, ImportManager importManager, TreeTypeDescriptor arg) {
+			AllDescriptors.addImports(importManager, param.type());
+			return decl;
+		}
+
+		@Override
+		protected String makeDoc(MethodDecl decl, TreeTypeDescriptor arg) {
+			return facadeMutatorDoc(decl, arg, param);
+		}
+	}
+
+	public static class OptionNoneMutator extends MemberPattern.OfMethod<TreeTypeDescriptor> {
+
+		private final FormalParameter param;
+
+		public OptionNoneMutator(FormalParameter param) {
+			this.param = param;
+		}
+
+		@Override
+		protected String makeQuote(TreeTypeDescriptor arg) {
+			return arg.name + " " + propertySetterName(param, "No") + "();";
 		}
 
 		@Override
