@@ -94,7 +94,7 @@ public class StateEqualsAndHashCode implements DeclContribution<TreeClassDescrip
 			decl = decl.withBody(blockStmt().withStmts(stmts));
 
 			if (GenSettings.generateDocs)
-				decl = decl.insertLeadingComment(
+				decl = decl.setDocComment(
 						genDoc(decl,
 								"Compares this state object to the specified object.",
 								new String[]{"the object to compare this state with."},
@@ -150,7 +150,7 @@ public class StateEqualsAndHashCode implements DeclContribution<TreeClassDescrip
 			decl = decl.withBody(blockStmt().withStmts(stmts));
 
 			if (GenSettings.generateDocs)
-				decl = decl.insertLeadingComment(
+				decl = decl.setDocComment(
 						genDoc(decl,
 								"Returns a hash code for this state object.",
 								new String[]{},

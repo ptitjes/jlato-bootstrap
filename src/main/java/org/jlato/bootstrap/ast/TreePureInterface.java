@@ -33,7 +33,7 @@ public class TreePureInterface extends CompilationUnitPattern<TreeTypeDescriptor
 
 							@Override
 							protected String makeDoc(InterfaceDecl decl, TreeTypeDescriptor arg) {
-								return "/**\n" + " * " + Utils.upperCaseFirst(arg.prefixedDescription()) + ".\n */";
+								return Utils.upperCaseFirst(arg.prefixedDescription()) + ".";
 							}
 
 							@Override

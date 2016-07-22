@@ -26,7 +26,7 @@ public class StateClass extends TypePattern.OfClass<TreeClassDescriptor> {
 
 	@Override
 	protected String makeDoc(ClassDecl decl, TreeClassDescriptor arg) {
-		return "/**\n * A state object for " + arg.prefixedDescription() + ".\n */";
+		return "A state object for " + arg.prefixedDescription() + ".";
 	}
 
 	@Override

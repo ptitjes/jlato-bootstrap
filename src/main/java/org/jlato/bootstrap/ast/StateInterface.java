@@ -28,7 +28,7 @@ public class StateInterface extends TypePattern.OfInterface<TreeInterfaceDescrip
 
 	@Override
 	protected String makeDoc(InterfaceDecl decl, TreeInterfaceDescriptor arg) {
-		return "/**\n * A state object for " + arg.prefixedDescription() + ".\n */";
+		return "A state object for " + arg.prefixedDescription() + ".";
 	}
 
 	@Override

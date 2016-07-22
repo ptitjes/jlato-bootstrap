@@ -26,7 +26,7 @@ public class TreeClass extends TypePattern.OfClass<TreeClassDescriptor> {
 
 	@Override
 	protected String makeDoc(ClassDecl decl, TreeClassDescriptor arg) {
-		return "/**\n" +" * " + Utils.upperCaseFirst(arg.prefixedDescription()) + ".\n */";
+		return Utils.upperCaseFirst(arg.prefixedDescription()) + ".";
 	}
 
 	@Override

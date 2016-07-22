@@ -46,7 +46,7 @@ public class TreeKind implements DeclContribution<TreeClassDescriptor, MemberDec
 			)));
 
 			if (GenSettings.generateDocs)
-				decl = decl.insertLeadingComment(
+				decl = decl.setDocComment(
 						genDoc(decl,
 								"Returns the kind of this " + arg.description + ".",
 								new String[]{},

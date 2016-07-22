@@ -62,7 +62,7 @@ public class TreeConstruction implements DeclContribution<TreeClassDescriptor, M
 					)));
 
 			if (GenSettings.generateDocs)
-				decl = decl.insertLeadingComment(
+				decl = decl.setDocComment(
 						genDoc(decl,
 								"Creates " + arg.prefixedDescription() + " for the specified tree location.",
 								new String[]{"the tree location."}
@@ -120,7 +120,7 @@ public class TreeConstruction implements DeclContribution<TreeClassDescriptor, M
 			if (GenSettings.generateDocs) {
 				// TODO document the arguments
 
-				decl = decl.insertLeadingComment(
+				decl = decl.setDocComment(
 						genDoc(decl,
 								"Creates " + arg.prefixedDescription() + " with the specified child trees.",
 								paramDoc(parameters, p -> "the " + makeDocumentationName(p.id().name()) + " child tree.")

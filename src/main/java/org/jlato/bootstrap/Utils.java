@@ -263,22 +263,16 @@ public class Utils {
 	}
 
 	public static String genDoc(FieldDecl decl, String description) {
-		StringBuilder builder = new StringBuilder();
-		builder.append("/**\n");
-		builder.append("* ").append(description).append("\n");
-		builder.append("*/");
-		return builder.toString();
+		return description;
 	}
 
 	public static String genDoc(MethodDecl decl, String description, String[] paramDescription, String returnDescription) {
 		StringBuilder builder = new StringBuilder();
-		builder.append("/**\n");
-		builder.append("* ").append(description).append("\n");
-		builder.append("*\n");
+		builder.append(description).append("\n");
+		builder.append("\n");
 		appendParamsDoc(decl.params(), paramDescription, builder);
 		if (returnDescription != null)
-			builder.append("* @return ").append(returnDescription).append("\n");
-		builder.append("*/");
+			builder.append("@return ").append(returnDescription);
 		return builder.toString();
 	}
 
@@ -293,7 +287,7 @@ public class Utils {
 		int index = 0;
 		for (FormalParameter param : parameters) {
 			Name name = param.id().name();
-			builder.append("* @param ").append(name);
+			builder.append("@param ").append(name);
 			for (int i = 0; i < maxNameLength - name.id().length(); i++) {
 				builder.append(' ');
 			}
@@ -304,11 +298,9 @@ public class Utils {
 
 	public static String genDoc(ConstructorDecl decl, String description, String[] paramDescription) {
 		StringBuilder builder = new StringBuilder();
-		builder.append("/**\n");
-		builder.append("* ").append(description).append("\n");
-		builder.append("*\n");
+		builder.append(description).append("\n");
+		builder.append("\n");
 		appendParamsDoc(decl.params(), paramDescription, builder);
-		builder.append("*/");
 		return builder.toString();
 	}
 
