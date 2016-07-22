@@ -89,7 +89,7 @@ public abstract class TypePattern<A, T extends TypeDecl> extends Utils implement
 
 		@Override
 		protected ClassDecl insertJavadoc(ClassDecl decl, String doc) {
-			return decl.setDocComment(doc);
+			return decl.withDocComment(doc);
 		}
 
 		@Override
@@ -112,7 +112,7 @@ public abstract class TypePattern<A, T extends TypeDecl> extends Utils implement
 
 		@Override
 		protected InterfaceDecl insertJavadoc(InterfaceDecl decl, String doc) {
-			return decl.setDocComment(doc);
+			return decl.withDocComment(doc);
 		}
 
 		@Override

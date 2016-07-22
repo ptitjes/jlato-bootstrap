@@ -40,21 +40,21 @@ public abstract class MemberPattern<A, M extends MemberDecl> extends Utils imple
 	public static abstract class OfField<A> extends MemberPattern<A, FieldDecl> {
 
 		protected FieldDecl insertJavadoc(FieldDecl decl, String doc) {
-			return decl.setDocComment(doc);
+			return decl.withDocComment(doc);
 		}
 	}
 
 	public static abstract class OfMethod<A> extends MemberPattern<A, MethodDecl> {
 
 		protected MethodDecl insertJavadoc(MethodDecl decl, String doc) {
-			return decl.setDocComment(doc);
+			return decl.withDocComment(doc);
 		}
 	}
 
 	public static abstract class OfConstructor<A> extends MemberPattern<A, ConstructorDecl> {
 
 		protected ConstructorDecl insertJavadoc(ConstructorDecl decl, String doc) {
-			return decl.setDocComment(doc);
+			return decl.withDocComment(doc);
 		}
 	}
 }

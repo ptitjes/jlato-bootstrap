@@ -37,7 +37,7 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 				.withModifiers(m -> m.append(Modifier.Public).append(Modifier.Abstract));
 
 		if (GenSettings.generateDocs)
-			decl = decl.setDocComment("A factory for tree nodes.");
+			decl = decl.withDocComment("A factory for tree nodes.");
 
 		importManager.addImport(importDecl(qualifiedName("org.jlato.internal.bu.Literals")));
 		importManager.addImport(importDecl(qualifiedName("org.jlato.internal.td.coll")).setOnDemand(true));
@@ -220,7 +220,7 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 				.withBody(blockStmt().withStmts(s -> s.append(creation)));
 
 		if (GenSettings.generateDocs)
-			method = method.setDocComment(
+			method = method.withDocComment(
 					genDoc(method,
 							"Creates " + descriptor.prefixedDescription() + ".",
 							paramDoc(params, p -> "the " + makeDocumentationName(p.id().name()) + " child tree."),

@@ -32,7 +32,7 @@ public class KindEnum implements DeclPattern<TreeClassDescriptor[], EnumDecl> {
 
 				if (GenSettings.generateDocs)
 					constantDecl = constantDecl
-							.setDocComment("Kind for " + descriptor.prefixedDescription() + ".");
+							.withDocComment("Kind for " + descriptor.prefixedDescription() + ".");
 
 				return cs.append(constantDecl);
 			});
