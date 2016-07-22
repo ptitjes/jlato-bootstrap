@@ -320,7 +320,7 @@ public class Utils {
 		);
 	}
 
-	public static Stmt newVarStmt(Type type, Name name, Expr init) {
+	public static ExpressionStmt newVarStmt(Type type, Name name, Expr init) {
 		return expressionStmt(
 				variableDeclarationExpr(
 						localVariableDecl(type)
@@ -332,7 +332,7 @@ public class Utils {
 		);
 	}
 
-	public static Stmt assignVarStmt(Type type, Name name, Expr init) {
+	public static ExpressionStmt assignVarStmt(Type type, Name name, Expr init) {
 		return expressionStmt(
 				assignExpr(name, AssignOp.Normal, init)
 		);
@@ -523,6 +523,32 @@ public class Utils {
 		}
 	}
 
+	public static boolean noNullsFormHasNoParams(TreeClassDescriptor descriptor) {
+		int count = 0;
+		int index = 0;
+		for (FormalParameter param : safeList(descriptor.parameters)) {
+			Type type = param.type();
+
+			final Expr defaultValue = descriptor.defaultValues.get(index);
+			if (defaultValue == null) {
+				if (type instanceof QualifiedType) {
+					final QualifiedType qualifiedType = (QualifiedType) type;
+					switch (qualifiedType.name().id()) {
+						case "NodeList":
+							break;
+						case "NodeOption":
+							break;
+						default:
+							count++;
+							break;
+					}
+				}
+			}
+			index++;
+		}
+		return count == 0;
+	}
+
 	public Stmt loopFor(int count, NodeList<Stmt> loopStmts) {
 		final Name i = name("i");
 		return forStmt(binaryExpr(i, Less, literalExpr(count)), blockStmt().withStmts(loopStmts))
@@ -540,7 +566,7 @@ public class Utils {
 				));
 	}
 
-	public static Expr factoryCall(TreeClassDescriptor descriptor, ImportManager importManager) {
+	public static MethodInvocationExpr factoryCall(TreeClassDescriptor descriptor, ImportManager importManager) {
 		importManager.addImportByName(qualifiedName("org.jlato.tree.Trees"));
 		return methodInvocationExpr(name(lowerCaseFirst(descriptor.name.id())))
 				.withScope(name("Trees"));

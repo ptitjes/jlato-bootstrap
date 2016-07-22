@@ -141,32 +141,6 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 		return builder.toString();
 	}
 
-	private boolean noNullsFormHasNoParams(TreeClassDescriptor descriptor) {
-		int count = 0;
-		int index = 0;
-		for (FormalParameter param : safeList(descriptor.parameters)) {
-			Type type = param.type();
-
-			final Expr defaultValue = descriptor.defaultValues.get(index);
-			if (defaultValue == null) {
-				if (type instanceof QualifiedType) {
-					final QualifiedType qualifiedType = (QualifiedType) type;
-					switch (qualifiedType.name().id()) {
-						case "NodeList":
-							break;
-						case "NodeOption":
-							break;
-						default:
-							count++;
-							break;
-					}
-				}
-			}
-			index++;
-		}
-		return count == 0;
-	}
-
 	private MethodDecl generateFactoryMethod(TreeClassDescriptor descriptor, boolean noNulls) {
 		boolean castNeeded = descriptor.parameters.size() == 1;
 

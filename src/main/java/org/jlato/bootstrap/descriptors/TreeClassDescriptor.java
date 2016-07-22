@@ -8,7 +8,10 @@ import org.jlato.tree.decl.MemberDecl;
 import org.jlato.tree.expr.Expr;
 import org.jlato.tree.name.Name;
 import org.jlato.tree.name.QualifiedName;
+import org.jlato.tree.type.Primitive;
+import org.jlato.tree.type.PrimitiveType;
 import org.jlato.tree.type.QualifiedType;
+import org.jlato.tree.type.Type;
 
 import static org.jlato.tree.Trees.*;
 
@@ -70,5 +73,24 @@ public class TreeClassDescriptor extends TreeTypeDescriptor {
 			index++;
 		}
 		return paramDescriptions;
+	}
+
+	public boolean hasKnownValueFor(FormalParameter parameter) {
+		if (defaultValues.get(parameters.indexOf(parameter)) != null) return true;
+		else {
+			Type type = parameter.type();
+			if (type instanceof QualifiedType) {
+				String name = ((QualifiedType) type).name().id();
+				return name.equals("NodeList") || name.equals("NodeOption");
+			} else if (type instanceof PrimitiveType) {
+				Primitive primitive = ((PrimitiveType) type).primitive();
+				return primitive == Primitive.Boolean;
+			}
+			return false;
+		}
+	}
+
+	public Expr defaultValueFor(FormalParameter parameter) {
+		return defaultValues.get(parameters.indexOf(parameter));
 	}
 }
