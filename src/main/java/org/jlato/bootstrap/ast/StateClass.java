@@ -31,7 +31,9 @@ public class StateClass extends TypePattern.OfClass<TreeClassDescriptor> {
 
 	@Override
 	protected ClassDecl contributeSignature(ClassDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
-		NodeList<QualifiedName> superStateInterfaceNames = arg.superInterfaces.map(t -> AllDescriptors.asStateTypeQualifiedName(t.name()));
+		NodeList<QualifiedName> superStateInterfaceNames = arg.superInterfaces
+				.filter(t -> !AllDescriptors.UTILITY_INTERFACES.contains(t.name()))
+				.map(t -> AllDescriptors.asStateTypeQualifiedName(t.name()));
 
 		importManager.addImportByName(AllDescriptors.S_NODE_QUALIFIED);
 		importManager.addImportsByName(superStateInterfaceNames);

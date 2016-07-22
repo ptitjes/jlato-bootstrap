@@ -48,7 +48,9 @@ public class StateInterface extends TypePattern.OfInterface<TreeInterfaceDescrip
 		importManager.addImport(importDecl(qualifiedName("org.jlato.tree.Kind")));
 		importManager.addImport(importDecl(AllDescriptors.S_NODE_LIST_QUALIFIED));
 
-		NodeList<QualifiedName> superStateInterfaceNames = arg.superInterfaces.map(t -> AllDescriptors.asStateTypeQualifiedName(t.name()));
+		NodeList<QualifiedName> superStateInterfaceNames = arg.superInterfaces
+				.filter(t -> !AllDescriptors.UTILITY_INTERFACES.contains(t.name()))
+				.map(t -> AllDescriptors.asStateTypeQualifiedName(t.name()));
 
 		importManager.addImportsByName(superStateInterfaceNames);
 		return decl.withExtendsClause(superStateInterfaceNames.map(n -> qualifiedType(n.name())));

@@ -60,6 +60,13 @@ public class AllDescriptors {
 	public static final QualifiedName TREE_QUALIFIED = qualifiedName(TREE_NAME).withQualifier(TREE_INTERFACES_ROOT);
 	public static final QualifiedName NODE_QUALIFIED = qualifiedName(NODE_NAME).withQualifier(TREE_INTERFACES_ROOT);
 
+	public static final List<Name> UTILITY_INTERFACES = Arrays.asList(
+			name("Documentable")
+	);
+	public static final List<Name> UTILITY_INTERFACES_PKG = Arrays.asList(
+			name("decl")
+	);
+
 	/* Base Classes */
 
 	public static final Name TD_TREE = name("TDTree");
@@ -151,6 +158,9 @@ public class AllDescriptors {
 			return qualifiedName(name).withQualifier(treeRoot);
 		} else if (VALUE_ENUMS.contains(name)) {
 			final Name pkg = VALUE_ENUMS_PKG.get(VALUE_ENUMS.indexOf(name));
+			return qualifiedName(name).withQualifier(qualifiedName(pkg).withQualifier(treeRoot));
+		} else if (UTILITY_INTERFACES.contains(name)) {
+			final Name pkg = UTILITY_INTERFACES_PKG.get(UTILITY_INTERFACES.indexOf(name));
 			return qualifiedName(name).withQualifier(qualifiedName(pkg).withQualifier(treeRoot));
 		}
 
@@ -320,7 +330,8 @@ public class AllDescriptors {
 	public static final TreeClassDescriptor[] ALL_CLASSES = new TreeClassDescriptor[]{
 			new TreeClassDescriptor(name("decl"), name("AnnotationDecl"), "annotation type declaration",
 					listOf(
-							(QualifiedType) type("TypeDecl").build()
+							(QualifiedType) type("TypeDecl").build(),
+							(QualifiedType) type("Documentable<AnnotationDecl>").build()
 					),
 					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
@@ -344,7 +355,8 @@ public class AllDescriptors {
 			),
 			new TreeClassDescriptor(name("decl"), name("AnnotationMemberDecl"), "annotation type member declaration",
 					listOf(
-							(QualifiedType) type("MemberDecl").build()
+							(QualifiedType) type("MemberDecl").build(),
+							(QualifiedType) type("Documentable<AnnotationMemberDecl>").build()
 					),
 					listOf(
 							memberDecl("public static final LexicalShape defaultValShape = composite(token(LToken.Default).withSpacingBefore(space()), element());").build(),
@@ -394,7 +406,8 @@ public class AllDescriptors {
 			),
 			new TreeClassDescriptor(name("decl"), name("ClassDecl"), "class declaration",
 					listOf(
-							(QualifiedType) type("TypeDecl").build()
+							(QualifiedType) type("TypeDecl").build(),
+							(QualifiedType) type("Documentable<ClassDecl>").build()
 					),
 					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
@@ -453,7 +466,8 @@ public class AllDescriptors {
 			),
 			new TreeClassDescriptor(name("decl"), name("ConstructorDecl"), "constructor declaration",
 					listOf(
-							(QualifiedType) type("MemberDecl").build()
+							(QualifiedType) type("MemberDecl").build(),
+							(QualifiedType) type("Documentable<ConstructorDecl>").build()
 					),
 					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
@@ -509,7 +523,8 @@ public class AllDescriptors {
 			),
 			new TreeClassDescriptor(name("decl"), name("EnumConstantDecl"), "enum constant declaration",
 					listOf(
-							(QualifiedType) type("MemberDecl").build()
+							(QualifiedType) type("MemberDecl").build(),
+							(QualifiedType) type("Documentable<EnumConstantDecl>").build()
 					),
 					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
@@ -542,7 +557,8 @@ public class AllDescriptors {
 			),
 			new TreeClassDescriptor(name("decl"), name("EnumDecl"), "enum declaration",
 					listOf(
-							(QualifiedType) type("TypeDecl").build()
+							(QualifiedType) type("TypeDecl").build(),
+							(QualifiedType) type("Documentable<EnumDecl>").build()
 					),
 					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
@@ -590,7 +606,8 @@ public class AllDescriptors {
 			),
 			new TreeClassDescriptor(name("decl"), name("FieldDecl"), "field declaration",
 					listOf(
-							(QualifiedType) type("MemberDecl").build()
+							(QualifiedType) type("MemberDecl").build(),
+							(QualifiedType) type("Documentable<FieldDecl>").build()
 					),
 					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
@@ -697,7 +714,8 @@ public class AllDescriptors {
 			),
 			new TreeClassDescriptor(name("decl"), name("InterfaceDecl"), "interface declaration",
 					listOf(
-							(QualifiedType) type("TypeDecl").build()
+							(QualifiedType) type("TypeDecl").build(),
+							(QualifiedType) type("Documentable<InterfaceDecl>").build()
 					),
 					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
@@ -750,7 +768,8 @@ public class AllDescriptors {
 			),
 			new TreeClassDescriptor(name("decl"), name("MethodDecl"), "method declaration",
 					listOf(
-							(QualifiedType) type("MemberDecl").build()
+							(QualifiedType) type("MemberDecl").build(),
+							(QualifiedType) type("Documentable<MethodDecl>").build()
 					),
 					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
@@ -841,7 +860,8 @@ public class AllDescriptors {
 			),
 			new TreeClassDescriptor(name("decl"), name("PackageDecl"), "package declaration",
 					listOf(
-							(QualifiedType) type("Node").build()
+							(QualifiedType) type("Node").build(),
+							(QualifiedType) type("Documentable<PackageDecl>").build()
 					),
 					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
