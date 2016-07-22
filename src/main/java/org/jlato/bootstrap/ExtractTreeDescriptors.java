@@ -21,15 +21,15 @@ import static org.jlato.tree.Trees.*;
 public class ExtractTreeDescriptors extends TreeClassRefactoring {
 
 	@Override
-	public TreeSet<CompilationUnit> initialize(TreeSet<CompilationUnit> treeSet, TreeTypeHierarchy hierarchy) {
-		return super.initialize(treeSet, hierarchy);
+	public NodeMap<CompilationUnit> initialize(NodeMap<CompilationUnit> nodeMap, TreeTypeHierarchy hierarchy) {
+		return super.initialize(nodeMap, hierarchy);
 	}
 
 	private List<TreeInterfaceDescriptor> interfaceDescriptors = new java.util.ArrayList<>();
 	private List<TreeClassDescriptor> classDescriptors = new java.util.ArrayList<>();
 
 	@Override
-	public InterfaceDecl refactorTreeInterface(TreeSet<CompilationUnit> treeSet, String path, InterfaceDecl decl, TreeTypeHierarchy hierarchy) throws ParseException {
+	public InterfaceDecl refactorTreeInterface(NodeMap<CompilationUnit> nodeMap, String path, InterfaceDecl decl, TreeTypeHierarchy hierarchy) throws ParseException {
 		final Name name = decl.name();
 		final Name packageName = ((CompilationUnit) decl.parent().parent()).packageDecl().name().name();
 
@@ -53,7 +53,7 @@ public class ExtractTreeDescriptors extends TreeClassRefactoring {
 	}
 
 	@Override
-	public ClassDecl refactorTreeClass(TreeSet<CompilationUnit> treeSet, String path, ClassDecl decl, TreeTypeHierarchy hierarchy) {
+	public ClassDecl refactorTreeClass(NodeMap<CompilationUnit> nodeMap, String path, ClassDecl decl, TreeTypeHierarchy hierarchy) {
 		final NodeList<FormalParameter> params = collectConstructorParams(decl);
 
 		final Name name = decl.name();
@@ -75,7 +75,7 @@ public class ExtractTreeDescriptors extends TreeClassRefactoring {
 	}
 
 	@Override
-	public TreeSet<CompilationUnit> finish(TreeSet<CompilationUnit> treeSet, TreeTypeHierarchy hierarchy) {
+	public NodeMap<CompilationUnit> finish(NodeMap<CompilationUnit> nodeMap, TreeTypeHierarchy hierarchy) {
 
 		classDescriptors.sort((o1, o2) -> (o1.packageName.id() + "." + o1.name.id()).compareTo(o2.packageName.id() + "." + o2.name.id()));
 
@@ -136,7 +136,7 @@ public class ExtractTreeDescriptors extends TreeClassRefactoring {
 		}
 		System.out.println("};");
 
-		return treeSet;
+		return nodeMap;
 	}
 
 	private Expr reify(QualifiedType e) {

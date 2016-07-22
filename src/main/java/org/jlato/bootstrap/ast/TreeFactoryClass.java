@@ -74,6 +74,10 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 
 		for (int i = 1; i <= 23; i++) factoryMethods = factoryMethods.append(generateNodeListOf(i));
 
+		factoryMethods = factoryMethods.append(memberDecl("public static <T extends Tree> NodeMap<T> emptyMap() {\n" +
+				"\t\treturn TDNodeMap.empty();\n" +
+				"\t}").build());
+
 		for (TreeClassDescriptor descriptor : arg) {
 			importManager.addImport(importDecl(descriptor.classPackageName()).setOnDemand(true));
 

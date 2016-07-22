@@ -30,6 +30,7 @@ import org.jlato.parser.ParseException;
 import org.jlato.parser.Parser;
 import org.jlato.parser.ParserConfiguration;
 import org.jlato.printer.FormattingSettings;
+import org.jlato.printer.Printer;
 import org.jlato.rewrite.MatchVisitor;
 import org.jlato.rewrite.Pattern;
 import org.jlato.tree.*;
@@ -54,7 +55,7 @@ public class Bootstrap {
 		Parser parser = new Parser(ParserConfiguration.Default.preserveWhitespaces(true));
 		String pathToJLaTo = System.getProperty("path.to.jlato");
 		File rootDirectory = new File(pathToJLaTo + "src/main/java");
-		TreeSet<CompilationUnit> treeSet = parser.parseAll(rootDirectory, "UTF-8");
+		NodeMap<CompilationUnit> nodeMap = parser.parseAll(rootDirectory, "UTF-8");
 
 		final TreeInterfaceDescriptor[] interfaceDescriptors = AllDescriptors.ALL_INTERFACES;
 		final TreeClassDescriptor[] classDescriptors = AllDescriptors.ALL_CLASSES;
@@ -62,51 +63,52 @@ public class Bootstrap {
 		// Generate pure interfaces
 		final TreePureInterface treeInterfacePattern = new TreePureInterface();
 		for (TreeInterfaceDescriptor descriptor : interfaceDescriptors) {
-			treeSet = treeInterfacePattern.apply(treeSet, descriptor.interfaceFilePath(), descriptor);
+			nodeMap = treeInterfacePattern.apply(nodeMap, descriptor.interfaceFilePath(), descriptor);
 		}
 		for (TreeClassDescriptor descriptor : classDescriptors) {
 			if (descriptor.customTailored) continue;
-			treeSet = treeInterfacePattern.apply(treeSet, descriptor.interfaceFilePath(), descriptor);
+			nodeMap = treeInterfacePattern.apply(nodeMap, descriptor.interfaceFilePath(), descriptor);
 		}
 
 		// Generate Tree classes
 		final CompilationUnitPattern<TreeClassDescriptor> treeClassPattern = CompilationUnitPattern.of(new TreeClass());
 		for (TreeClassDescriptor descriptor : classDescriptors) {
 			if (descriptor.customTailored) continue;
-			treeSet = treeClassPattern.apply(treeSet, descriptor.classFilePath(), descriptor);
+			nodeMap = treeClassPattern.apply(nodeMap, descriptor.classFilePath(), descriptor);
 		}
 
 		// Generate State interfaces
 		final CompilationUnitPattern<TreeInterfaceDescriptor> stateInterfacePattern = CompilationUnitPattern.of(new StateInterface());
 		for (TreeInterfaceDescriptor descriptor : interfaceDescriptors) {
-			treeSet = stateInterfacePattern.apply(treeSet, descriptor.stateTypeFilePath(), descriptor);
+			nodeMap = stateInterfacePattern.apply(nodeMap, descriptor.stateTypeFilePath(), descriptor);
 		}
 		// Generate State classes
 		final CompilationUnitPattern<TreeClassDescriptor> stateClassPattern = CompilationUnitPattern.of(new StateClass());
 		for (TreeClassDescriptor descriptor : classDescriptors) {
-			treeSet = stateClassPattern.apply(treeSet, descriptor.stateTypeFilePath(), descriptor);
+			nodeMap = stateClassPattern.apply(nodeMap, descriptor.stateTypeFilePath(), descriptor);
 		}
 
 		// Generate Kind enum
 		final KindEnum kindEnumPattern = new KindEnum();
-		treeSet = applyPattern(treeSet, "org/jlato/tree/Kind.java", kindEnumPattern, classDescriptors);
+		nodeMap = applyPattern(nodeMap, "org/jlato/tree/Kind.java", kindEnumPattern, classDescriptors);
 
 		// Generate Trees
 		final TreeFactoryClass treeFactoryClassPattern = new TreeFactoryClass();
-		treeSet = applyPattern(treeSet, "org/jlato/tree/Trees.java", treeFactoryClassPattern, classDescriptors);
+		nodeMap = applyPattern(nodeMap, "org/jlato/tree/Trees.java", treeFactoryClassPattern, classDescriptors);
 
-		treeSet.updateOnDisk(false, FormattingSettings.Default);
+		Printer printer = new Printer(false, FormattingSettings.Default);
+		printer.printAll(nodeMap, rootDirectory, "UTF-8");
 	}
 
-	private <A, T extends TypeDecl> TreeSet<CompilationUnit> applyPattern(TreeSet<CompilationUnit> treeSet, String path, DeclPattern<A, T> pattern, A descriptor) {
-		final CompilationUnit cu = treeSet.get(path);
+	private <A, T extends TypeDecl> NodeMap<CompilationUnit> applyPattern(NodeMap<CompilationUnit> nodeMap, String path, DeclPattern<A, T> pattern, A descriptor) {
+		final CompilationUnit cu = nodeMap.get(path);
 
 		final Pattern<? extends Decl> matcher = pattern.matcher(descriptor);
 		ImportManager importManager = new ImportManager(makePackageName(path), cu.imports());
 		final MatchVisitor<Decl> visitor = (c, s) -> pattern.rewrite((T) (GenSettings.replace ? matcher.build() : c), importManager, descriptor);
 		final CompilationUnit newCU = cu.forAll(matcher, visitor)
 				.withImports(importManager.imports());
-		return treeSet.put(path, newCU);
+		return nodeMap.put(path, newCU);
 	}
 
 	private QualifiedName makePackageName(String path) {

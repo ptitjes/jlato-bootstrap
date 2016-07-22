@@ -2,7 +2,7 @@ package org.jlato.bootstrap;
 
 import org.jlato.tree.NodeList;
 import org.jlato.tree.NodeOption;
-import org.jlato.tree.TreeSet;
+import org.jlato.tree.NodeMap;
 import org.jlato.tree.decl.ClassDecl;
 import org.jlato.tree.decl.CompilationUnit;
 import org.jlato.tree.decl.InterfaceDecl;
@@ -23,9 +23,9 @@ public class TreeTypeHierarchy {
 	private final HashSet<String> classTypes = new HashSet<>();
 	private final HashMap<String, NodeList<Name>> typeToParentTypes = new HashMap<>();
 
-	public void initialize(TreeSet<CompilationUnit> treeSet) {
-		for (String path : treeSet.paths()) {
-			CompilationUnit cu = treeSet.get(path);
+	public void initialize(NodeMap<CompilationUnit> nodeMap) {
+		for (String path : nodeMap.keys()) {
+			CompilationUnit cu = nodeMap.get(path);
 
 			final TypeDecl typeDecl = cu.types().get(0);
 			if (typeDecl instanceof ClassDecl) {
@@ -52,8 +52,8 @@ public class TreeTypeHierarchy {
 			}
 		}
 
-		for (String path : treeSet.paths()) {
-			CompilationUnit cu = treeSet.get(path);
+		for (String path : nodeMap.keys()) {
+			CompilationUnit cu = nodeMap.get(path);
 
 			final TypeDecl typeDecl = cu.types().get(0);
 			if (typeDecl instanceof InterfaceDecl) {

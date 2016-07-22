@@ -2,8 +2,6 @@ package org.jlato.bootstrap.descriptors;
 
 import org.jlato.bootstrap.util.ImportManager;
 import org.jlato.tree.*;
-import org.jlato.tree.decl.FormalParameter;
-import org.jlato.tree.decl.MemberDecl;
 import org.jlato.tree.expr.Expr;
 import org.jlato.tree.name.*;
 import org.jlato.tree.type.*;
@@ -35,9 +33,9 @@ public class AllDescriptors {
 	public static final Name NODE_LIST = name("NodeList");
 	public static final Name NODE_OPTION = name("NodeOption");
 	public static final Name NODE_EITHER = name("NodeEither");
-	public static final Name TREE_SET = name("TreeSet");
+	public static final Name NODE_MAP = name("NodeMap");
 	public static final List<Name> NODE_CONTAINERS = Arrays.asList(
-			NODE_LIST, NODE_EITHER, NODE_OPTION, TREE_SET
+			NODE_LIST, NODE_EITHER, NODE_OPTION, NODE_MAP
 	);
 
 	public static final Name ASSIGN_OP = name("AssignOp");
@@ -92,7 +90,7 @@ public class AllDescriptors {
 	public static final Name S_NODE_LIST = name("S" + NODE_LIST);
 	public static final Name S_NODE_OPTION = name("S" + NODE_OPTION);
 	public static final Name S_NODE_EITHER = name("S" + NODE_EITHER);
-	public static final Name S_TREE_SET = name("S" + TREE_SET);
+	public static final Name S_TREE_SET = name("S" + NODE_MAP);
 
 	public static final QualifiedName S_NODE_LIST_QUALIFIED = qualifiedName(S_NODE_LIST).withQualifier(TREE_COLL_STATES_ROOT);
 	public static final QualifiedName S_NODE_OPTION_QUALIFIED = qualifiedName(S_NODE_OPTION).withQualifier(TREE_COLL_STATES_ROOT);

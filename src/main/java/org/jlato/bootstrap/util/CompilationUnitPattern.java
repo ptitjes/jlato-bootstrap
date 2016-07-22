@@ -8,7 +8,7 @@ import org.jlato.printer.FormattingSettings;
 import org.jlato.printer.Printer;
 import org.jlato.rewrite.MatchVisitor;
 import org.jlato.rewrite.Pattern;
-import org.jlato.tree.TreeSet;
+import org.jlato.tree.NodeMap;
 import org.jlato.tree.decl.*;
 import org.jlato.tree.name.*;
 
@@ -24,10 +24,10 @@ import static org.jlato.tree.Trees.qualifiedName;
  */
 public abstract class CompilationUnitPattern<A> {
 
-	public TreeSet<CompilationUnit> apply(TreeSet<CompilationUnit> treeSet, String path, A arg) {
-		final CompilationUnit cu = treeSet.get(path);
+	public NodeMap<CompilationUnit> apply(NodeMap<CompilationUnit> nodeMap, String path, A arg) {
+		final CompilationUnit cu = nodeMap.get(path);
 		CompilationUnit newCU = applyPattern(cu, path, arg);
-		return treeSet.put(path, newCU);
+		return nodeMap.put(path, newCU);
 	}
 
 	public void apply(String basePath, String path, A arg) throws ParseException, IOException {
@@ -45,8 +45,8 @@ public abstract class CompilationUnitPattern<A> {
 		CompilationUnit newCU = applyPattern(cu, path, arg);
 
 		final PrintWriter writer = new PrintWriter(new FileWriter(file));
-		final Printer printer = new Printer(writer, false, FormattingSettings.Default);
-		printer.print(newCU);
+		final Printer printer = new Printer(false, FormattingSettings.Default);
+		printer.print(newCU, writer);
 		writer.close();
 	}
 

@@ -25,8 +25,9 @@ import org.jlato.parser.ParseException;
 import org.jlato.parser.Parser;
 import org.jlato.parser.ParserConfiguration;
 import org.jlato.printer.FormattingSettings;
+import org.jlato.printer.Printer;
 import org.jlato.tree.*;
-import org.jlato.tree.TreeSet;
+import org.jlato.tree.NodeMap;
 import org.jlato.tree.decl.*;
 import org.jlato.tree.name.Name;
 import org.jlato.tree.type.QualifiedType;
@@ -54,15 +55,15 @@ public class Refactoring {
 	public void refactorTreeClasses(TreeClassRefactoring refactoring) throws IOException, ParseException {
 		Parser parser = new Parser(ParserConfiguration.Default.preserveWhitespaces(true));
 		File rootDirectory = new File("../jlato/src/main/java");
-		TreeSet<CompilationUnit> treeSet = parser.parseAll(rootDirectory, "UTF-8");
+		NodeMap<CompilationUnit> nodeMap = parser.parseAll(rootDirectory, "UTF-8");
 
 		TreeTypeHierarchy hierarchy = new TreeTypeHierarchy();
-		hierarchy.initialize(treeSet);
+		hierarchy.initialize(nodeMap);
 
-		treeSet = refactoring.initialize(treeSet, hierarchy);
+		nodeMap = refactoring.initialize(nodeMap, hierarchy);
 
-		for (String path : sorted(treeSet.paths())) {
-			CompilationUnit cu = treeSet.get(path);
+		for (String path : sorted(nodeMap.keys())) {
+			CompilationUnit cu = nodeMap.get(path);
 
 			final TypeDecl typeDecl = cu.types().get(0);
 			TypeDecl newDecl = null;
@@ -71,26 +72,27 @@ public class Refactoring {
 				final Name name = interfaceDecl.name();
 
 				if (hierarchy.isInterface(name) && !hierarchy.isTreeInterface(name)) {
-					newDecl = refactoring.refactorTreeInterface(treeSet, path, interfaceDecl, hierarchy);
+					newDecl = refactoring.refactorTreeInterface(nodeMap, path, interfaceDecl, hierarchy);
 				}
 			} else if (typeDecl instanceof ClassDecl) {
 				final ClassDecl classDecl = (ClassDecl) typeDecl;
 				final Name name = classDecl.name();
 
 				if (hierarchy.isClass(name)) {
-					newDecl = refactoring.refactorTreeClass(treeSet, path, classDecl, hierarchy);
+					newDecl = refactoring.refactorTreeClass(nodeMap, path, classDecl, hierarchy);
 				}
 			}
 			if (newDecl != null && newDecl != typeDecl) {
 				CompilationUnit newCU = (CompilationUnit) newDecl.parent().parent();
 				newCU = newCU.withImports(refactoring.addImports(newCU.imports()));
-				treeSet = treeSet.put(path, newCU);
+				nodeMap = nodeMap.put(path, newCU);
 			}
 		}
 
-		treeSet = refactoring.finish(treeSet, hierarchy);
+		nodeMap = refactoring.finish(nodeMap, hierarchy);
 
-		treeSet.updateOnDisk(false, FormattingSettings.Default);
+		Printer printer = new Printer(false, FormattingSettings.Default);
+		printer.printAll(nodeMap, rootDirectory, "UTF-8");
 	}
 
 	private java.lang.Iterable<String> sorted(Iterable<String> paths) {
@@ -104,7 +106,7 @@ public class Refactoring {
 
 	private static final List<String> TREE_SUPERCLASSES = Arrays.asList(AllDescriptors.TD_TREE.id());
 
-	private static final List<String> EXCLUDED_CLASSES = Arrays.asList("NodeList", "NodeOption", "NodeEither", "TreeSet");
+	private static final List<String> EXCLUDED_CLASSES = Arrays.asList("NodeList", "NodeOption", "NodeEither", "NodeMap");
 
 	public static boolean filterTreeClass(String name, NodeOption<QualifiedType> superclass) {
 		if (superclass.isNone()) return false;
