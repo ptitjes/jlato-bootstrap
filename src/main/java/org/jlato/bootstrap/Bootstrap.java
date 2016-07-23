@@ -33,14 +33,16 @@ import org.jlato.printer.FormattingSettings;
 import org.jlato.printer.Printer;
 import org.jlato.rewrite.MatchVisitor;
 import org.jlato.rewrite.Pattern;
-import org.jlato.tree.*;
-import org.jlato.tree.decl.*;
-import org.jlato.tree.name.*;
+import org.jlato.tree.NodeMap;
+import org.jlato.tree.decl.CompilationUnit;
+import org.jlato.tree.decl.Decl;
+import org.jlato.tree.decl.TypeDecl;
+import org.jlato.tree.name.QualifiedName;
 
 import java.io.File;
 import java.io.IOException;
 
-import static org.jlato.tree.Trees.*;
+import static org.jlato.tree.Trees.qualifiedName;
 
 /**
  * @author Didier Villevalois

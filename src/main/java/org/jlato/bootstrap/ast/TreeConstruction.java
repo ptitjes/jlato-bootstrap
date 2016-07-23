@@ -17,8 +17,7 @@ import org.jlato.tree.type.Type;
 
 import java.util.Arrays;
 
-import static org.jlato.rewrite.Quotes.*;
-
+import static org.jlato.rewrite.Quotes.memberDecl;
 import static org.jlato.tree.Trees.*;
 
 /**

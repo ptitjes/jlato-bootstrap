@@ -1,8 +1,8 @@
 package org.jlato.bootstrap;
 
 import org.jlato.tree.NodeList;
-import org.jlato.tree.NodeOption;
 import org.jlato.tree.NodeMap;
+import org.jlato.tree.NodeOption;
 import org.jlato.tree.decl.ClassDecl;
 import org.jlato.tree.decl.CompilationUnit;
 import org.jlato.tree.decl.InterfaceDecl;

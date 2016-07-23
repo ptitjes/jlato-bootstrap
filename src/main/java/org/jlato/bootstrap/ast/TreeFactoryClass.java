@@ -16,10 +16,10 @@ import org.jlato.tree.type.QualifiedType;
 import org.jlato.tree.type.Type;
 import org.jlato.util.Function1;
 
-import static org.jlato.rewrite.Quotes.expr;
-import static org.jlato.rewrite.Quotes.memberDecl;
-import static org.jlato.rewrite.Quotes.typeDecl;
+import static org.jlato.rewrite.Quotes.*;
 import static org.jlato.tree.Trees.*;
+import static org.jlato.tree.Trees.importDecl;
+import static org.jlato.tree.Trees.qualifiedName;
 
 /**
  * @author Didier Villevalois

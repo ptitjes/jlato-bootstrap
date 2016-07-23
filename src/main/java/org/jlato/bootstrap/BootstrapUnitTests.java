@@ -9,7 +9,6 @@ import org.jlato.bootstrap.tests.TreesLambdaAccessorsTest;
 import org.jlato.bootstrap.util.CompilationUnitPattern;
 import org.jlato.parser.ParseException;
 
-import java.io.File;
 import java.io.IOException;
 
 /**

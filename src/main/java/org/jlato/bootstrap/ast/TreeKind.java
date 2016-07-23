@@ -7,7 +7,6 @@ import org.jlato.bootstrap.util.DeclContribution;
 import org.jlato.bootstrap.util.DeclPattern;
 import org.jlato.bootstrap.util.ImportManager;
 import org.jlato.rewrite.Pattern;
-import org.jlato.tree.NodeList;
 import org.jlato.tree.decl.Decl;
 import org.jlato.tree.decl.MemberDecl;
 import org.jlato.tree.decl.MethodDecl;

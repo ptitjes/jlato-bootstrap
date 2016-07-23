@@ -4,15 +4,23 @@ import org.jlato.bootstrap.descriptors.AllDescriptors;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.descriptors.TreeTypeDescriptor;
 import org.jlato.bootstrap.util.ImportManager;
+import org.jlato.rewrite.Matcher;
 import org.jlato.rewrite.Substitution;
-import org.jlato.rewrite.TypeSafeMatcher;
-import org.jlato.tree.*;
+import org.jlato.tree.NodeList;
+import org.jlato.tree.Tree;
+import org.jlato.tree.Trees;
 import org.jlato.tree.decl.*;
-import org.jlato.tree.expr.*;
+import org.jlato.tree.expr.AnnotationExpr;
+import org.jlato.tree.expr.AssignOp;
+import org.jlato.tree.expr.Expr;
+import org.jlato.tree.expr.MethodInvocationExpr;
 import org.jlato.tree.name.Name;
-import org.jlato.tree.name.QualifiedName;
-import org.jlato.tree.stmt.*;
-import org.jlato.tree.type.*;
+import org.jlato.tree.stmt.ExpressionStmt;
+import org.jlato.tree.stmt.Stmt;
+import org.jlato.tree.type.Primitive;
+import org.jlato.tree.type.PrimitiveType;
+import org.jlato.tree.type.QualifiedType;
+import org.jlato.tree.type.Type;
 import org.jlato.util.Function1;
 
 import java.util.ArrayList;
@@ -21,7 +29,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import static org.jlato.tree.Trees.*;
-import static org.jlato.tree.Trees.listOf;
 import static org.jlato.tree.expr.BinaryOp.Less;
 import static org.jlato.tree.expr.UnaryOp.PostIncrement;
 
@@ -608,24 +615,14 @@ public class Utils {
 
 	// Matchers
 
-	public static TypeSafeMatcher<ConstructorDecl> constructors(final Function1<ConstructorDecl, Boolean> predicate) {
-		return new MatcherImpl<ConstructorDecl>() {
-			@Override
-			public Substitution match(Object o, Substitution substitution) {
-				if (!(o instanceof ConstructorDecl)) return null;
-				ConstructorDecl decl = (ConstructorDecl) o;
-				if (!predicate.apply(decl)) return null;
-				return substitution;
-			}
+	public static Matcher<ConstructorDecl> constructors(final Function1<ConstructorDecl, Boolean> predicate) {
+		return (o, substitution) -> {
+			if (!(o instanceof ConstructorDecl)) return null;
+			ConstructorDecl decl = (ConstructorDecl) o;
+			if (!predicate.apply(decl)) return null;
+			return substitution;
 		};
 	}
 
-	public static final TypeSafeMatcher<ConstructorDecl> publicConstructorMatcher = constructors(c -> c.modifiers().contains(Modifier.Public));
-
-	public static abstract class MatcherImpl<T> implements TypeSafeMatcher<T> {
-		@Override
-		public final Substitution match(Object o) {
-			return match(o, Substitution.empty());
-		}
-	}
+	public static final Matcher<ConstructorDecl> publicConstructorMatcher = constructors(c -> c.modifiers().contains(Modifier.Public));
 }

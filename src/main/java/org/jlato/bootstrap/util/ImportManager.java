@@ -1,13 +1,16 @@
 package org.jlato.bootstrap.util;
 
-import org.jlato.tree.*;
-import org.jlato.tree.decl.*;
-import org.jlato.tree.name.*;
+import org.jlato.tree.NodeList;
+import org.jlato.tree.NodeOption;
+import org.jlato.tree.Trees;
+import org.jlato.tree.decl.ImportDecl;
+import org.jlato.tree.name.QualifiedName;
 import org.jlato.util.Function1;
 
 import java.util.*;
 
-import static org.jlato.tree.Trees.*;
+import static org.jlato.tree.Trees.importDecl;
+import static org.jlato.tree.Trees.listOf;
 
 /**
  * @author Didier Villevalois

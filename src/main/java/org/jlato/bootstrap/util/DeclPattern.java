@@ -1,10 +1,7 @@
 package org.jlato.bootstrap.util;
 
 import org.jlato.rewrite.Pattern;
-import org.jlato.rewrite.TypeSafeMatcher;
 import org.jlato.tree.decl.Decl;
-import org.jlato.tree.decl.MemberDecl;
-import org.jlato.tree.decl.TypeDecl;
 
 /**
  * @author Didier Villevalois

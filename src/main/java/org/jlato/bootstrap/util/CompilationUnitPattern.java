@@ -9,15 +9,17 @@ import org.jlato.printer.Printer;
 import org.jlato.rewrite.MatchVisitor;
 import org.jlato.rewrite.Pattern;
 import org.jlato.tree.NodeMap;
-import org.jlato.tree.decl.*;
-import org.jlato.tree.name.*;
+import org.jlato.tree.decl.CompilationUnit;
+import org.jlato.tree.decl.TypeDecl;
+import org.jlato.tree.name.QualifiedName;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Arrays;
 
-import static org.jlato.tree.Trees.compilationUnit;
-import static org.jlato.tree.Trees.packageDecl;
-import static org.jlato.tree.Trees.qualifiedName;
+import static org.jlato.tree.Trees.*;
 
 /**
  * @author Didier Villevalois

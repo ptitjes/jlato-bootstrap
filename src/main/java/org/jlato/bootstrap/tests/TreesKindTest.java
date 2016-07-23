@@ -2,9 +2,8 @@ package org.jlato.bootstrap.tests;
 
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.util.ImportManager;
-import org.jlato.tree.*;
-import org.jlato.tree.decl.*;
-import org.jlato.tree.stmt.*;
+import org.jlato.tree.NodeList;
+import org.jlato.tree.stmt.Stmt;
 
 import static org.jlato.tree.Trees.*;
 

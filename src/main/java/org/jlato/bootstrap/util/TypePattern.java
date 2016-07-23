@@ -3,8 +3,8 @@ package org.jlato.bootstrap.util;
 import org.jlato.bootstrap.GenSettings;
 import org.jlato.bootstrap.Utils;
 import org.jlato.rewrite.MatchVisitor;
+import org.jlato.rewrite.Matcher;
 import org.jlato.rewrite.Pattern;
-import org.jlato.rewrite.TypeSafeMatcher;
 import org.jlato.tree.decl.*;
 
 import java.util.Collections;
@@ -79,7 +79,7 @@ public abstract class TypePattern<A, T extends TypeDecl> extends Utils implement
 	}
 
 
-	protected abstract <M extends MemberDecl> T forAll(T type, TypeSafeMatcher<? extends M> matcher, MatchVisitor<M> visitor);
+	protected abstract <M extends MemberDecl> T forAll(T type, Matcher<? extends M> matcher, MatchVisitor<M> visitor);
 
 	protected abstract T ensureBody(T type);
 
@@ -93,7 +93,7 @@ public abstract class TypePattern<A, T extends TypeDecl> extends Utils implement
 		}
 
 		@Override
-		protected <M extends MemberDecl> ClassDecl forAll(ClassDecl type, TypeSafeMatcher<? extends M> matcher, MatchVisitor<M> visitor) {
+		protected <M extends MemberDecl> ClassDecl forAll(ClassDecl type, Matcher<? extends M> matcher, MatchVisitor<M> visitor) {
 			return type.forAll(matcher, visitor);
 		}
 
@@ -116,7 +116,7 @@ public abstract class TypePattern<A, T extends TypeDecl> extends Utils implement
 		}
 
 		@Override
-		protected <M extends MemberDecl> InterfaceDecl forAll(InterfaceDecl type, TypeSafeMatcher<? extends M> matcher, MatchVisitor<M> visitor) {
+		protected <M extends MemberDecl> InterfaceDecl forAll(InterfaceDecl type, Matcher<? extends M> matcher, MatchVisitor<M> visitor) {
 			return type.forAll(matcher, visitor);
 		}
 

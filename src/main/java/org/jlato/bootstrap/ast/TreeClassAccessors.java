@@ -7,8 +7,9 @@ import org.jlato.bootstrap.util.DeclPattern;
 import org.jlato.bootstrap.util.ImportManager;
 import org.jlato.bootstrap.util.MemberPattern;
 import org.jlato.tree.NodeList;
-import org.jlato.tree.NodeOption;
-import org.jlato.tree.decl.*;
+import org.jlato.tree.decl.FormalParameter;
+import org.jlato.tree.decl.MemberDecl;
+import org.jlato.tree.decl.MethodDecl;
 import org.jlato.tree.type.QualifiedType;
 import org.jlato.tree.type.Type;
 
@@ -16,9 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.jlato.bootstrap.Utils.eitherFieldType;
-import static org.jlato.bootstrap.Utils.nameFieldType;
-import static org.jlato.bootstrap.Utils.optionFieldType;
+import static org.jlato.bootstrap.Utils.*;
 import static org.jlato.rewrite.Quotes.stmt;
 import static org.jlato.tree.Trees.*;
 

@@ -1,20 +1,23 @@
 package org.jlato.bootstrap.descriptors;
 
 import org.jlato.bootstrap.util.ImportManager;
-import org.jlato.tree.*;
+import org.jlato.tree.NodeList;
+import org.jlato.tree.NodeOption;
 import org.jlato.tree.expr.Expr;
-import org.jlato.tree.name.*;
-import org.jlato.tree.type.*;
+import org.jlato.tree.name.Name;
+import org.jlato.tree.name.QualifiedName;
+import org.jlato.tree.type.QualifiedType;
+import org.jlato.tree.type.ReferenceType;
+import org.jlato.tree.type.Type;
+import org.jlato.tree.type.WildcardType;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.jlato.rewrite.Quotes.memberDecl;
-import static org.jlato.rewrite.Quotes.param;
-import static org.jlato.rewrite.Quotes.expr;
-import static org.jlato.rewrite.Quotes.type;
+import static org.jlato.rewrite.Quotes.*;
 import static org.jlato.tree.Trees.*;
+import static org.jlato.tree.Trees.qualifiedName;
 
 /**
  * @author Didier Villevalois

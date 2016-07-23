@@ -4,11 +4,11 @@ import org.jlato.bootstrap.descriptors.AllDescriptors;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.util.ImportManager;
 import org.jlato.rewrite.Quotes;
-import org.jlato.tree.*;
-import org.jlato.tree.decl.*;
+import org.jlato.tree.NodeList;
+import org.jlato.tree.decl.FormalParameter;
 import org.jlato.tree.expr.Expr;
-import org.jlato.tree.name.*;
-import org.jlato.tree.stmt.*;
+import org.jlato.tree.name.Name;
+import org.jlato.tree.stmt.Stmt;
 import org.jlato.tree.type.QualifiedType;
 import org.jlato.tree.type.Type;
 

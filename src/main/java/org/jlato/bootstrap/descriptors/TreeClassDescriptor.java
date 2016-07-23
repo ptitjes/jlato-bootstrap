@@ -13,7 +13,8 @@ import org.jlato.tree.type.PrimitiveType;
 import org.jlato.tree.type.QualifiedType;
 import org.jlato.tree.type.Type;
 
-import static org.jlato.tree.Trees.*;
+import static org.jlato.tree.Trees.name;
+import static org.jlato.tree.Trees.qualifiedType;
 
 /**
  * @author Didier Villevalois

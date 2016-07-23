@@ -7,9 +7,11 @@ import org.jlato.bootstrap.util.CompilationUnitPattern;
 import org.jlato.bootstrap.util.DeclContribution;
 import org.jlato.bootstrap.util.ImportManager;
 import org.jlato.bootstrap.util.TypePattern;
-import org.jlato.tree.*;
-import org.jlato.tree.decl.*;
-import org.jlato.tree.type.*;
+import org.jlato.tree.NodeList;
+import org.jlato.tree.decl.InterfaceDecl;
+import org.jlato.tree.decl.MemberDecl;
+import org.jlato.tree.decl.TypeDecl;
+import org.jlato.tree.type.QualifiedType;
 
 import java.util.Arrays;
 

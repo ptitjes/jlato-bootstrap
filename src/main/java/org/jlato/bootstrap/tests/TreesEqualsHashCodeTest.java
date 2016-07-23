@@ -3,13 +3,13 @@ package org.jlato.bootstrap.tests;
 import org.jlato.bootstrap.descriptors.AllDescriptors;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.util.ImportManager;
-import org.jlato.tree.*;
-import org.jlato.tree.decl.*;
-import org.jlato.tree.name.*;
-import org.jlato.tree.stmt.*;
+import org.jlato.tree.NodeList;
+import org.jlato.tree.decl.FormalParameter;
+import org.jlato.tree.name.Name;
+import org.jlato.tree.stmt.Stmt;
 
 import static org.jlato.tree.Trees.*;
-import static org.jlato.tree.expr.AssignOp.*;
+import static org.jlato.tree.expr.AssignOp.Normal;
 
 /**
  * @author Didier Villevalois

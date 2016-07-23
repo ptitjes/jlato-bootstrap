@@ -1,10 +1,12 @@
 package org.jlato.bootstrap;
 
 import org.jlato.parser.ParseException;
-import org.jlato.tree.*;
-import org.jlato.tree.decl.*;
-
-import java.util.function.Function;
+import org.jlato.tree.NodeList;
+import org.jlato.tree.NodeMap;
+import org.jlato.tree.decl.ClassDecl;
+import org.jlato.tree.decl.CompilationUnit;
+import org.jlato.tree.decl.ImportDecl;
+import org.jlato.tree.decl.InterfaceDecl;
 
 /**
  * @author Didier Villevalois

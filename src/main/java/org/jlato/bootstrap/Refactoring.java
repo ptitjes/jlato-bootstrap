@@ -26,15 +26,20 @@ import org.jlato.parser.Parser;
 import org.jlato.parser.ParserConfiguration;
 import org.jlato.printer.FormattingSettings;
 import org.jlato.printer.Printer;
-import org.jlato.tree.*;
 import org.jlato.tree.NodeMap;
-import org.jlato.tree.decl.*;
+import org.jlato.tree.NodeOption;
+import org.jlato.tree.decl.ClassDecl;
+import org.jlato.tree.decl.CompilationUnit;
+import org.jlato.tree.decl.InterfaceDecl;
+import org.jlato.tree.decl.TypeDecl;
 import org.jlato.tree.name.Name;
 import org.jlato.tree.type.QualifiedType;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Didier Villevalois
