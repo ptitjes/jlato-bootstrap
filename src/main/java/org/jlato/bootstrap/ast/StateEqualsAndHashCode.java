@@ -56,8 +56,8 @@ public class StateEqualsAndHashCode implements DeclContribution<TreeClassDescrip
 			NodeList<Stmt> stmts = emptyList();
 
 			stmts = stmts.appendAll(listOf(
-					stmt("if (this == o)\nreturn true;").build(),
-					stmt("if (o == null || getClass() != o.getClass())\nreturn false;").build()
+					stmt("if (this == o) return true;").build(),
+					stmt("if (o == null || getClass() != o.getClass()) return false;").build()
 			));
 
 			if (!params.isEmpty()) {
