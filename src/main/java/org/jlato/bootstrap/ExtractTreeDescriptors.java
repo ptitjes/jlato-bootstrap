@@ -5,7 +5,6 @@ import org.jlato.bootstrap.descriptors.TreeInterfaceDescriptor;
 import org.jlato.parser.ParseException;
 import org.jlato.tree.NodeList;
 import org.jlato.tree.NodeMap;
-import org.jlato.tree.Tree;
 import org.jlato.tree.decl.*;
 import org.jlato.tree.expr.Expr;
 import org.jlato.tree.name.Name;
@@ -140,23 +139,4 @@ public class ExtractTreeDescriptors extends TreeClassRefactoring {
 
 		return nodeMap;
 	}
-
-	private Expr reify(QualifiedType e) {
-		return reify("(QualifiedType) type", e);
-	}
-
-	private Expr reify(FormalParameter p) {
-		return reify("param", p);
-	}
-
-	private Expr reify(MemberDecl d) {
-		return reify("memberDecl", d);
-	}
-
-	private Expr reify(String kind, Tree d) {
-		final String asString = d.toString();
-		final String escaped = asString.replace("\n", "\\n\" +\n\"").replace("\t", "\\t");
-		return expr(kind + "(\"" + escaped + "\").build()").build();
-	}
-
 }

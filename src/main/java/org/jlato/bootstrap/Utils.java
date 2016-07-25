@@ -4,16 +4,14 @@ import org.jlato.bootstrap.descriptors.AllDescriptors;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.descriptors.TreeTypeDescriptor;
 import org.jlato.bootstrap.util.ImportManager;
+import org.jlato.printer.Printer;
 import org.jlato.rewrite.Matcher;
-import org.jlato.rewrite.Substitution;
 import org.jlato.tree.NodeList;
 import org.jlato.tree.Tree;
+import org.jlato.tree.TreeCombinators;
 import org.jlato.tree.Trees;
 import org.jlato.tree.decl.*;
-import org.jlato.tree.expr.AnnotationExpr;
-import org.jlato.tree.expr.AssignOp;
-import org.jlato.tree.expr.Expr;
-import org.jlato.tree.expr.MethodInvocationExpr;
+import org.jlato.tree.expr.*;
 import org.jlato.tree.name.Name;
 import org.jlato.tree.stmt.ExpressionStmt;
 import org.jlato.tree.stmt.Stmt;
@@ -28,6 +26,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import static org.jlato.rewrite.Quotes.expr;
 import static org.jlato.tree.Trees.*;
 import static org.jlato.tree.expr.BinaryOp.Less;
 import static org.jlato.tree.expr.UnaryOp.PostIncrement;
@@ -554,6 +553,56 @@ public class Utils {
 			index++;
 		}
 		return count == 0;
+	}
+
+	public static void printIndent(StringBuilder builder, int indent) {
+		for (int i = 0; i < indent; i++) {
+			builder.append("\t");
+		}
+	}
+
+	public static void printIndented(NodeList<Stmt> stmts, StringBuilder builder, int indent) {
+		for (Stmt stmt : stmts) {
+			printIndent(builder, indent);
+			builder.append(Printer.printToString(stmt, true));
+			builder.append("\n");
+		}
+	}
+
+	public static CastExpr reify(QualifiedType e) {
+		return castExpr(qualifiedType(name("QualifiedType")), reify("type", e));
+	}
+
+	public static MethodInvocationExpr reify(FormalParameter p) {
+		return reify("param", p);
+	}
+
+	public static MethodInvocationExpr reify(MemberDecl d) {
+		return reify("memberDecl", d);
+	}
+
+	public static CastExpr reify(MethodDecl d) {
+		return castExpr(qualifiedType(name("MethodDecl")), reify("memberDecl", d));
+	}
+
+	public static MethodInvocationExpr reify(String kind, Tree d) {
+		final String asString = Printer.printToString(d, true);
+		final String escaped = asString
+				.replace("\"", "\\\"").replace("\'", "\\\'")
+				.replace("\n", "\\n\" +\n\"").replace("\t", "\\t");
+		return (MethodInvocationExpr) expr(kind + "(\"" + escaped + "\").build()").build();
+	}
+
+	public static MethodInvocationExpr reifyList(String kind, NodeList<? extends Tree> list) {
+		NodeList<MethodInvocationExpr> l = list.map(t -> reify(kind, t).insertNewLineBefore());
+		return list.isEmpty() ?
+				methodInvocationExpr(name("emptyList")) :
+				methodInvocationExpr(name("listOf")).withArgs(insertNewLineAfterLast(l));
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T extends TreeCombinators<T> & Expr> NodeList<Expr> insertNewLineAfterLast(NodeList<T> l) {
+		return (NodeList<Expr>) (l.isEmpty() ? l : l.last().insertNewLineAfter().parent());
 	}
 
 	public Stmt loopFor(int count, NodeList<Stmt> loopStmts) {
