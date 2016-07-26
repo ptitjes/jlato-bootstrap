@@ -40,20 +40,6 @@ public class ExtractFromJJ {
 
 		productions.recomputeReferences();
 
-//		productions.getAll().stream().filter(p -> true).forEach(p -> {
-//			System.out.println(p);
-//			System.out.println();
-
-//			for (GProductionRef ref : productions.referencesOf(p)) {
-//				System.out.println("\t" + ref);
-//			}
-//			System.out.println();
-//			System.out.println();
-
-//			System.out.println(Printer.printToString(p.toExpr(), true));
-//			System.out.println();
-//		});
-
 		MethodInvocationExpr productionListExpr =
 				methodInvocationExpr(name("listOf")).withArgs(insertNewLineAfterLast(
 						listOf(
