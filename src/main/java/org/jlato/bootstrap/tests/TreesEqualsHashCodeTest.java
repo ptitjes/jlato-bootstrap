@@ -3,10 +3,16 @@ package org.jlato.bootstrap.tests;
 import org.jlato.bootstrap.descriptors.AllDescriptors;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.util.ImportManager;
+import org.jlato.tree.Kind;
 import org.jlato.tree.NodeList;
 import org.jlato.tree.decl.FormalParameter;
+import org.jlato.tree.expr.Expr;
+import org.jlato.tree.expr.MethodInvocationExpr;
+import org.jlato.tree.expr.UnaryOp;
 import org.jlato.tree.name.Name;
 import org.jlato.tree.stmt.Stmt;
+import org.jlato.tree.type.Primitive;
+import org.jlato.tree.type.PrimitiveType;
 
 import static org.jlato.tree.Trees.*;
 import static org.jlato.tree.expr.AssignOp.Normal;
@@ -47,7 +53,17 @@ public class TreesEqualsHashCodeTest extends TestPattern {
 		stmts = stmts.append(newVarStmt(ARBITRARY_TYPE, ARBITRARY_VAR, objectCreationExpr(ARBITRARY_TYPE)));
 
 		loopStmts = loopStmts.appendAll(
-				params.map(p -> newVarStmt(p.type(), p.id().name(), arbitraryCall(ARBITRARY_VAR, p.type())))
+				params.map(p -> {
+					MethodInvocationExpr arbitraryCall = arbitraryCall(ARBITRARY_VAR, p.type());
+					boolean booleanType = p.type().kind() == Kind.PrimitiveType &&
+							((PrimitiveType) p.type()).primitive() == Primitive.Boolean;
+					Expr defaultValue = descriptor.defaultValueFor(p);
+					boolean negated = booleanType && defaultValue != null && defaultValue.equals(literalExpr(true));
+
+					return newVarStmt(p.type(), p.id().name(),
+							negated ? unaryExpr(UnaryOp.Not, arbitraryCall) : arbitraryCall
+					);
+				})
 		);
 		loopStmts = loopStmts.append(newVarStmt(descriptor.interfaceType(), expected,
 				params.foldLeft(factoryCall(descriptor, importManager),
