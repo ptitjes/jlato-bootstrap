@@ -29,13 +29,17 @@ public class GContinuations {
 	private GProductions productions;
 	private Set<GLocation> locations;
 
-	public GContinuations(GProductions productions, GLocation location) {
-		this(productions, Collections.singleton(location));
+	public GContinuations(GLocation location, GProductions productions) {
+		this(Collections.singleton(location), productions);
 	}
 
-	GContinuations(GProductions productions, Set<GLocation> locations) {
+	GContinuations(Set<GLocation> locations, GProductions productions) {
 		this.productions = productions;
 		this.locations = locations;
+	}
+
+	public Set<GLocation> locations() {
+		return locations;
 	}
 
 	public Set<String> terminals() {
@@ -49,10 +53,13 @@ public class GContinuations {
 	private Stream<GLocation> moveToNextTerminal(GLocation location) {
 		if (location == null) return Stream.empty();
 
+//		System.out.println("moveToNextTerminal from " + location);
+
 		GExpansion expansion = location.current;
 		Stream<GLocation> toFollow;
 		switch (expansion.kind) {
 			case Terminal:
+//				System.out.println("\tFound terminal: " + expansion.symbol);
 				return Stream.of(location);
 			case Choice:
 				toFollow = location.allChildren().stream();
@@ -68,9 +75,15 @@ public class GContinuations {
 				toFollow = Stream.of(location.firstChild());
 				break;
 			case NonTerminal:
+//				System.out.println("\tTraversing non-terminal: " + expansion.symbol);
+//				System.out.println(productions.get(expansion.symbol).expansion);
 				toFollow = Stream.of(location.traverseRef(productions));
 				break;
 			case Action:
+//				System.out.println("\tAction: " + expansion);
+				toFollow = Stream.of(nextOrParentsNext(location));
+				break;
+			case LookAhead:
 				toFollow = Stream.of(nextOrParentsNext(location));
 				break;
 			default:
@@ -81,8 +94,11 @@ public class GContinuations {
 
 	private static GLocation nextOrParentsNext(GLocation location) {
 		GLocation next = location.nextSibling();
-		while (next == null && location.parent != null)
-			next = location.parent.nextSibling();
+		while (next == null && location.parent != null) {
+//			System.out.println("\t\t>>" + location.parent);
+			location = location.parent;
+			next = location.nextSibling();
+		}
 		return next;
 	}
 

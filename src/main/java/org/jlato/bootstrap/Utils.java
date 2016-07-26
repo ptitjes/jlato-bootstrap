@@ -176,6 +176,22 @@ public class Utils {
 		}
 	}
 
+	public static QualifiedType stateTypeToTreeType(QualifiedType treeType) {
+		final Name name = treeType.name();
+		final String id = name.id();
+		switch (id) {
+			case "SNodeList":
+				return qualifiedType(AllDescriptors.S_NODE_LIST);
+			case "SNodeOption":
+				return qualifiedType(AllDescriptors.S_NODE_OPTION);
+			case "SNodeEither":
+				return qualifiedType(AllDescriptors.S_NODE_EITHER);
+			default:
+				final TreeTypeDescriptor descriptor = AllDescriptors.get(name(name.id().substring(1)));
+				return descriptor.stateType();
+		}
+	}
+
 	public static boolean propertyFieldType(Type treeType) {
 		if (treeType instanceof PrimitiveType) return true;
 		if (treeType instanceof QualifiedType) {

@@ -1,7 +1,8 @@
 package org.jlato.cc;
 
-import org.jlato.cc.grammar.GProduction;
 import org.jlato.cc.grammar.GExpansion;
+import org.jlato.cc.grammar.GProduction;
+import org.jlato.cc.grammar.GProductions;
 import org.jlato.tree.decl.MethodDecl;
 
 import static org.jlato.rewrite.Quotes.memberDecl;
@@ -13,7 +14,7 @@ import static org.jlato.tree.Trees.listOf;
  * @author Didier Villevalois
  */
 public class Grammar {
-	public GProduction[] productions = new GProduction[]{
+	public static GProductions productions = new GProductions(
 			new GProduction("NodeListVar",
 					(MethodDecl) memberDecl("BUTree<SNodeList> NodeListVar();").build(),
 					emptyList(),
@@ -5097,5 +5098,5 @@ public class Grammar {
 							)
 					)
 			)
-	};
+	);
 }

@@ -72,4 +72,9 @@ public class GLocation {
 		result = 31 * result + index;
 		return result;
 	}
+
+	@Override
+	public String toString() {
+		return parent == null ? "<>" : parent + "." + index;
+	}
 }

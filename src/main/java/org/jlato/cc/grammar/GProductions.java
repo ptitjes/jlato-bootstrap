@@ -12,6 +12,10 @@ public class GProductions {
 	private Map<String, GProduction> productionsByName = new HashMap<>();
 	private Map<String, List<GProductionRef>> references = new HashMap<>();
 
+	public GProductions(GProduction... productions) {
+		this(Arrays.asList(productions));
+	}
+
 	public GProductions(List<GProduction> productions) {
 		this.productions = productions;
 		for (GProduction production : productions) {
