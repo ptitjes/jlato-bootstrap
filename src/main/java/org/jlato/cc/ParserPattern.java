@@ -43,12 +43,11 @@ import static org.jlato.tree.Trees.*;
 public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 
 	public static final String NAME = "ParserImplementation";
-	public static final Name LOOKAHEAD = name("lookahead");
 	public static final Name MATCH_NEXT = name("matchNext");
 
 	@Override
 	protected String makeQuote(TreeClassDescriptor[] arg) {
-		return "public class " + NAME + " extends ParserBaseExtended { ..$_ }";
+		return "public class " + NAME + " extends ParserNewBase { ..$_ }";
 	}
 
 	private NodeList<MethodDecl> matchMethods = emptyList();
@@ -66,6 +65,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				importDecl(qualifiedName("org.jlato.internal.bu.type")).setOnDemand(true),
 				importDecl(qualifiedName("org.jlato.tree.Problem.Severity")),
 				importDecl(qualifiedName("org.jlato.parser.ParseException")),
+				importDecl(qualifiedName("org.jlato.parser.ParserImplConstants")),
 				importDecl(qualifiedName("org.jlato.tree.expr.AssignOp")),
 				importDecl(qualifiedName("org.jlato.tree.expr.BinaryOp")),
 				importDecl(qualifiedName("org.jlato.tree.expr.UnaryOp")),
@@ -168,7 +168,8 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				break;
 			}
 			case Terminal: {
-				Expr call = methodInvocationExpr(name("parse")).withArgs(listOf(literalExpr(expansion.symbol)));
+				Expr argument = fieldAccessExpr(name(expansion.symbol)).withScope(name("ParserImplConstants"));
+				Expr call = methodInvocationExpr(name("parse")).withArgs(listOf(argument));
 				stmts = stmts.append(expressionStmt(
 						expansion.name == null ? call :
 								assignExpr(name(expansion.name), AssignOp.Normal, call)
@@ -228,7 +229,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 					return methodInvocationExpr(MATCH_NEXT)
 							.withArgs(listOf(firstTerminalsOf(expansion).stream()
 									.filter(t -> t != null)
-									.map(Trees::literalExpr)
+									.map(t -> fieldAccessExpr(name(t)).withScope(name("ParserImplConstants")))
 									.collect(Collectors.toSet())));
 				}
 			}
@@ -236,7 +237,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		return methodInvocationExpr(MATCH_NEXT)
 				.withArgs(listOf(firstTerminalsOf(expansion).stream()
 						.filter(t -> t != null)
-						.map(Trees::literalExpr)
+						.map(t -> fieldAccessExpr(name(t)).withScope(name("ParserImplConstants")))
 						.collect(Collectors.toSet())));
 	}
 
@@ -300,7 +301,8 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				break;
 			}
 			case Terminal: {
-				Expr call = methodInvocationExpr(name("match")).withArgs(listOf(literalExpr(expansion.symbol)));
+				Expr argument = fieldAccessExpr(name(expansion.symbol)).withScope(name("ParserImplConstants"));
+				Expr call = methodInvocationExpr(name("match")).withArgs(listOf(argument));
 				stmts = stmts.append(ifStmt(unaryExpr(UnaryOp.Not, call), returnStmt().withExpr(literalExpr(false))));
 				break;
 			}

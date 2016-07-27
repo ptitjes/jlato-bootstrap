@@ -14,7 +14,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import static org.jlato.tree.Trees.emptyList;
@@ -203,152 +202,220 @@ public class ProductionsExtractor {
 		boolean eof = re instanceof REndOfFile;
 		boolean isString = re instanceof RStringLiteral;
 		boolean toplevelRE = (re.tpContext != null);
-		boolean needBrackets
-				= justName || eof || hasLabel || (!isString && toplevelRE);
-		if (needBrackets) {
-			returnString += "<";
-			if (!justName) {
-				if (re.private_rexp) {
-					returnString += "#";
-				}
-				if (hasLabel) {
-					returnString += re.label;
-					returnString += ": ";
-				}
-			}
-		}
-		if (re instanceof RCharacterList) {
-			RCharacterList cl = (RCharacterList) re;
-			if (cl.negated_list) {
-				returnString += "~";
-			}
-			returnString += "[";
-			for (Iterator it = cl.descriptors.iterator(); it.hasNext(); ) {
-				Object o = it.next();
-				if (o instanceof SingleCharacter) {
-					//returnString += "\"";
-					char s[] = {((SingleCharacter) o).ch};
-					returnString += add_escapes(new String(s));
-					//returnString += "\"";
-				} else if (o instanceof CharacterRange) {
-					//returnString += "\"";
-					char s[] = {((CharacterRange) o).getLeft()};
-					returnString += add_escapes(new String(s));
-					//returnString += "\"-\"";
-					returnString += "-";
-					s[0] = ((CharacterRange) o).getRight();
-					returnString += add_escapes(new String(s));
-					//returnString += "\"";
-				} else {
-					throw new IllegalArgumentException("Oops: unknown character list element type.");
-				}
-				if (it.hasNext()) {
-					returnString += ",";
-				}
-			}
-			returnString += "]";
-		} else if (re instanceof RChoice) {
-			RChoice c = (RChoice) re;
-			for (Iterator it = c.getChoices().iterator(); it.hasNext(); ) {
-				RegularExpression sub = (RegularExpression) (it.next());
-				returnString += emitRE(sub);
-				if (it.hasNext()) {
-					returnString += " | ";
-				}
-			}
-		} else if (re instanceof REndOfFile) {
-			returnString += "EOF";
-		} else if (re instanceof RJustName) {
-			RJustName jn = (RJustName) re;
-			returnString += jn.label;
-		} else if (re instanceof ROneOrMore) {
-			ROneOrMore om = (ROneOrMore) re;
-			returnString += "(";
-			returnString += emitRE(om.regexpr);
-			returnString += ")+";
-		} else if (re instanceof RSequence) {
-			RSequence s = (RSequence) re;
-			for (Iterator it = s.units.iterator(); it.hasNext(); ) {
-				RegularExpression sub = (RegularExpression) (it.next());
-				boolean needParens = false;
-				if (sub instanceof RChoice) {
-					needParens = true;
-				}
-				if (needParens) {
-					returnString += "(";
-				}
-				returnString += emitRE(sub);
-				if (needParens) {
-					returnString += ")";
-				}
-				if (it.hasNext()) {
-					returnString += " ";
-				}
-			}
-		} else if (re instanceof RStringLiteral) {
-			RStringLiteral sl = (RStringLiteral) re;
-			returnString += (/*"\"" + */JavaCCParserInternals.add_escapes(sl.image)/* + "\""*/);
-		} else if (re instanceof RZeroOrMore) {
-			RZeroOrMore zm = (RZeroOrMore) re;
-			returnString += "(";
-			returnString += emitRE(zm.regexpr);
-			returnString += ")*";
-		} else if (re instanceof RZeroOrOne) {
-			RZeroOrOne zo = (RZeroOrOne) re;
-			returnString += "(";
-			returnString += emitRE(zo.regexpr);
-			returnString += ")?";
-		} else if (re instanceof RRepetitionRange) {
-			RRepetitionRange zo = (RRepetitionRange) re;
-			returnString += "(";
-			returnString += emitRE(zo.regexpr);
-			returnString += ")";
-			returnString += "{";
-			if (zo.hasMax) {
-				returnString += zo.min;
-				returnString += ",";
-				returnString += zo.max;
-			} else {
-				returnString += zo.min;
-			}
-			returnString += "}";
-		} else {
-			throw new IllegalArgumentException("Oops: Unknown regular expression type.");
-		}
-		if (needBrackets) {
-			returnString += ">";
-		}
-		return returnString;
-	}
+		if (eof) return "EOF";
+		else if (hasLabel) return re.label;
+		else if (isString) {
+			switch (((RStringLiteral) re).image) {
+				// Separators
+				case "(":
+					return "LPAREN";
+				case ")":
+					return "RPAREN";
+				case "{":
+					return "LBRACE";
+				case "}":
+					return "RBRACE";
+				case "[":
+					return "LBRACKET";
+				case "]":
+					return "RBRACKET";
+				case ";":
+					return "SEMICOLON";
+				case ",":
+					return "COMMA";
+				case ".":
+					return "DOT";
+				case "@":
+					return "AT";
+				// Operators
+				case "=":
+					return "ASSIGN";
+				case "<":
+					return "LT";
+				case ">":
+					return "GT";
+				case "!":
+					return "BANG";
+				case "~":
+					return "TILDE";
+				case "?":
+					return "HOOK";
+				case ":":
+					return "COLON";
+				case "==":
+					return "EQ";
+				case "<=":
+					return "LE";
+				case ">=":
+					return "GE";
+				case "!=":
+					return "NE";
+				case "||":
+					return "SC_OR";
+				case "&&":
+					return "SC_AND";
+				case "++":
+					return "INCR";
+				case "--":
+					return "DECR";
+				case "+":
+					return "PLUS";
+				case "-":
+					return "MINUS";
+				case "*":
+					return "STAR";
+				case "/":
+					return "SLASH";
+				case "&":
+					return "BIT_AND";
+				case "|":
+					return "BIT_OR";
+				case "^":
+					return "XOR";
+				case "%":
+					return "REM";
+				case "<<":
+					return "LSHIFT";
+				case "+=":
+					return "PLUSASSIGN";
+				case "-=":
+					return "MINUSASSIGN";
+				case "*=":
+					return "STARASSIGN";
+				case "/=":
+					return "SLASHASSIGN";
+				case "&=":
+					return "ANDASSIGN";
+				case "|=":
+					return "ORASSIGN";
+				case "^=":
+					return "XORASSIGN";
+				case "%=":
+					return "REMASSIGN";
+				case "<<=":
+					return "LSHIFTASSIGN";
+				case ">>=":
+					return "RSIGNEDSHIFTASSIGN";
+				case ">>>=":
+					return "RUNSIGNEDSHIFTASSIGN";
+				case "...":
+					return "ELLIPSIS";
+				case "->":
+					return "ARROW";
+				case "::":
+					return "DOUBLECOLON";
 
-	static public String add_escapes(String str) {
-		String retval = "";
-		char ch;
-		for (int i = 0; i < str.length(); i++) {
-			ch = str.charAt(i);
-			if (ch == '\b') {
-				retval += "\\b";
-			} else if (ch == '\t') {
-				retval += "\\t";
-			} else if (ch == '\n') {
-				retval += "\\n";
-			} else if (ch == '\f') {
-				retval += "\\f";
-			} else if (ch == '\r') {
-				retval += "\\r";
-			} else if (ch == '\"') {
-				retval += "\\\"";
-			} else if (ch == '\'') {
-				retval += "\\\'";
-			} else if (ch == '\\') {
-				retval += "\\\\";
-			} else if (ch < 0x20 || ch > 0x7e) {
-				String s = "0000" + Integer.toString(ch, 16);
-				retval += "\\u" + s.substring(s.length() - 4, s.length());
-			} else {
-				retval += ch;
+				case "abstract":
+					return "ABSTRACT";
+				case "assert":
+					return "ASSERT";
+				case "boolean":
+					return "BOOLEAN";
+				case "break":
+					return "BREAK";
+				case "byte":
+					return "BYTE";
+				case "case":
+					return "CASE";
+				case "catch":
+					return "CATCH";
+				case "char":
+					return "CHAR";
+				case "class":
+					return "CLASS";
+				case "const":
+					return "CONST";
+				case "continue":
+					return "CONTINUE";
+				case "default":
+					return "_DEFAULT";
+				case "do":
+					return "DO";
+				case "double":
+					return "DOUBLE";
+				case "else":
+					return "ELSE";
+				case "enum":
+					return "ENUM";
+				case "extends":
+					return "EXTENDS";
+				case "false":
+					return "FALSE";
+				case "final":
+					return "FINAL";
+				case "finally":
+					return "FINALLY";
+				case "float":
+					return "FLOAT";
+				case "for":
+					return "FOR";
+				case "goto":
+					return "GOTO";
+				case "if":
+					return "IF";
+				case "implements":
+					return "IMPLEMENTS";
+				case "import":
+					return "IMPORT";
+				case "instanceof":
+					return "INSTANCEOF";
+				case "int":
+					return "INT";
+				case "interface":
+					return "INTERFACE";
+				case "long":
+					return "LONG";
+				case "native":
+					return "NATIVE";
+				case "new":
+					return "NEW";
+				case "null":
+					return "NULL";
+				case "package":
+					return "PACKAGE";
+				case "private":
+					return "PRIVATE";
+				case "protected":
+					return "PROTECTED";
+				case "public":
+					return "PUBLIC";
+				case "return":
+					return "RETURN";
+				case "short":
+					return "SHORT";
+				case "static":
+					return "STATIC";
+				case "strictfp":
+					return "STRICTFP";
+				case "super":
+					return "SUPER";
+				case "switch":
+					return "SWITCH";
+				case "synchronized":
+					return "SYNCHRONIZED";
+				case "this":
+					return "THIS";
+				case "throw":
+					return "THROW";
+				case "throws":
+					return "THROWS";
+				case "transient":
+					return "TRANSIENT";
+				case "true":
+					return "TRUE";
+				case "try":
+					return "TRY";
+				case "void":
+					return "VOID";
+				case "volatile":
+					return "VOLATILE";
+				case "while":
+					return "WHILE";
+				case "\u001A": // TODO Fix
+					return "EOF";
+				default:
 			}
 		}
-		return retval;
+		throw new IllegalArgumentException();
 	}
 }

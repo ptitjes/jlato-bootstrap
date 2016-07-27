@@ -27,7 +27,7 @@ public class GenParser {
 		GProductions productions = Grammar.productions;
 
 		String pathToJLaTo = System.getProperty("path.to.jlato");
-		String rootDirectory = pathToJLaTo + "src/test/java";
+		String rootDirectory = pathToJLaTo + "src/main/java";
 
 		final TreeClassDescriptor[] classDescriptors = AllDescriptors.ALL_CLASSES;
 
