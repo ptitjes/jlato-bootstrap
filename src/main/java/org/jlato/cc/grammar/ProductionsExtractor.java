@@ -6,6 +6,7 @@ import org.jlato.parser.Parser;
 import org.jlato.parser.ParserConfiguration;
 import org.jlato.tree.NodeList;
 import org.jlato.tree.decl.MethodDecl;
+import org.jlato.tree.expr.Expr;
 import org.jlato.tree.stmt.Stmt;
 
 import java.io.File;
@@ -15,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
+import static org.jlato.tree.Trees.emptyList;
 
 /**
  * @author Didier Villevalois
@@ -107,6 +110,23 @@ public class ProductionsExtractor {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
+	private NodeList<Expr> tokensToArguments(List actionTokens) {
+		if (actionTokens.isEmpty()) return emptyList();
+
+		String string = dumpTokens(actionTokens);
+		NodeList<Expr> arguments = emptyList();
+		try {
+			for (String argument : string.split(",")) {
+				arguments = arguments.append(parser.parse(ParseContext.Expression, argument.trim()));
+			}
+			return arguments;
+		} catch (org.jlato.parser.ParseException e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+	}
+
 	private String dumpTokens(List<Token> actionTokens) {
 		StringBuilder builder = new StringBuilder();
 		boolean first = true;
@@ -131,7 +151,8 @@ public class ProductionsExtractor {
 	private GExpansion emitExpansionNonTerminal(NonTerminal nt) {
 		String name = nt.getLhsTokens().isEmpty() ? null : nt.getLhsTokens().get(0).toString();
 		String symbol = nt.getName();
-		return GExpansion.nonTerminal(name, symbol);
+		NodeList<Expr> arguments = tokensToArguments(nt.getArgumentTokens());
+		return GExpansion.nonTerminal(name, symbol, arguments);
 	}
 
 	private GExpansion emitExpansionRegularExpression(RegularExpression r) {

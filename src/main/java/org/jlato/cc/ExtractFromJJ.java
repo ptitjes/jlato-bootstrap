@@ -5,16 +5,15 @@ import org.jlato.cc.grammar.*;
 import org.jlato.parser.Parser;
 import org.jlato.parser.ParserConfiguration;
 import org.jlato.printer.Printer;
-import org.jlato.tree.expr.MethodInvocationExpr;
+import org.jlato.tree.decl.CompilationUnit;
+import org.jlato.tree.decl.Modifier;
+import org.jlato.tree.expr.ObjectCreationExpr;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.util.stream.Collectors;
 
 import static org.jlato.bootstrap.Utils.insertNewLineAfterLast;
-import static org.jlato.tree.Trees.listOf;
-import static org.jlato.tree.Trees.methodInvocationExpr;
-import static org.jlato.tree.Trees.name;
+import static org.jlato.tree.Trees.*;
 
 /**
  * @author Didier Villevalois
@@ -27,7 +26,7 @@ public class ExtractFromJJ {
 		new ExtractFromJJ().generate();
 	}
 
-	private void generate() throws FileNotFoundException, ParseException {
+	private void generate() throws IOException, ParseException {
 		Parser parser = new Parser(ParserConfiguration.Default.preserveWhitespaces(true));
 		String pathToJLaTo = System.getProperty("path.to.jlato");
 		File javaSourceDirectory = new File(pathToJLaTo + "src/main/java");
@@ -40,8 +39,8 @@ public class ExtractFromJJ {
 
 		productions.recomputeReferences();
 
-		MethodInvocationExpr productionListExpr =
-				methodInvocationExpr(name("listOf")).withArgs(insertNewLineAfterLast(
+		ObjectCreationExpr productionListExpr =
+				objectCreationExpr(qualifiedType(name("GProductions"))).withArgs(insertNewLineAfterLast(
 						listOf(
 								productions.getAll().stream()
 										.map(c -> c.toExpr().insertNewLineBefore())
@@ -49,7 +48,34 @@ public class ExtractFromJJ {
 						)
 				));
 
-		System.out.println(productionListExpr);
+		CompilationUnit cu = compilationUnit(packageDecl(qualifiedName("org.jlato.cc")))
+				.withImports(listOf(
+						importDecl(qualifiedName("org.jlato.cc.grammar.GExpansion")),
+						importDecl(qualifiedName("org.jlato.cc.grammar.GProduction")),
+						importDecl(qualifiedName("org.jlato.cc.grammar.GProductions")),
+						importDecl(qualifiedName("org.jlato.tree.decl.MethodDecl")).insertNewLineAfter(),
+						importDecl(qualifiedName("org.jlato.rewrite.Quotes.expr")).setStatic(true),
+						importDecl(qualifiedName("org.jlato.rewrite.Quotes.memberDecl")).setStatic(true),
+						importDecl(qualifiedName("org.jlato.rewrite.Quotes.stmt")).setStatic(true),
+						importDecl(qualifiedName("org.jlato.tree.Trees.emptyList")).setStatic(true),
+						importDecl(qualifiedName("org.jlato.tree.Trees.listOf")).setStatic(true)
+				))
+				.withTypes(listOf(
+						classDecl(name("Grammar"))
+								.withModifiers(listOf(Modifier.Public))
+								.withMembers(listOf(
+										fieldDecl(qualifiedType(name("GProductions")))
+												.withModifiers(listOf(Modifier.Public, Modifier.Static))
+												.withVariables(listOf(
+														variableDeclarator(variableDeclaratorId(name("productions")))
+																.withInit(productionListExpr)
+												))
+								))
+				));
+
+		PrintWriter writer = new PrintWriter(new FileWriter("src/main/java/org/jlato/cc/Grammar.java"));
+		Printer.printTo(cu, writer, true);
+		writer.close();
 	}
 
 	private GProduction simplifyProduction(GProduction p) {
@@ -68,7 +94,7 @@ public class ExtractFromJJ {
 					if (e.children.size() == 1) {
 						GExpansion child = e.children.get(0);
 						if (child.kind == GExpansion.Kind.Sequence)
-							return new GExpansion(e.kind, child.children, null, null, null, -1);
+							return new GExpansion(e.kind, child.children, null, null, null, null, -1);
 					}
 				default:
 			}
