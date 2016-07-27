@@ -6,7 +6,13 @@ import org.jlato.bootstrap.util.TypePattern;
 import org.jlato.cc.grammar.GContinuations;
 import org.jlato.cc.grammar.GExpansion;
 import org.jlato.cc.grammar.GProduction;
+import org.jlato.rewrite.MatchVisitor;
+import org.jlato.rewrite.Matcher;
+import org.jlato.rewrite.Quotes;
+import org.jlato.rewrite.Substitution;
+import org.jlato.tree.Kind;
 import org.jlato.tree.NodeList;
+import org.jlato.tree.Tree;
 import org.jlato.tree.Trees;
 import org.jlato.tree.decl.ClassDecl;
 import org.jlato.tree.decl.MemberDecl;
@@ -17,6 +23,7 @@ import org.jlato.tree.expr.Expr;
 import org.jlato.tree.expr.MethodInvocationExpr;
 import org.jlato.tree.expr.UnaryOp;
 import org.jlato.tree.name.Name;
+import org.jlato.tree.stmt.ExpressionStmt;
 import org.jlato.tree.stmt.IfStmt;
 import org.jlato.tree.stmt.Stmt;
 import org.jlato.tree.type.Primitive;
@@ -57,13 +64,13 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				importDecl(qualifiedName("org.jlato.internal.bu.name")).setOnDemand(true),
 				importDecl(qualifiedName("org.jlato.internal.bu.stmt")).setOnDemand(true),
 				importDecl(qualifiedName("org.jlato.internal.bu.type")).setOnDemand(true),
+				importDecl(qualifiedName("org.jlato.tree.Problem.Severity")),
+				importDecl(qualifiedName("org.jlato.parser.ParseException")),
 				importDecl(qualifiedName("org.jlato.tree.expr.AssignOp")),
 				importDecl(qualifiedName("org.jlato.tree.expr.BinaryOp")),
 				importDecl(qualifiedName("org.jlato.tree.expr.UnaryOp")),
 				importDecl(qualifiedName("org.jlato.tree.decl.ModifierKeyword")),
-				importDecl(qualifiedName("org.jlato.tree.decl.Primitive")),
-				importDecl(qualifiedName("org.jlato.parser.ParserBase")),
-				importDecl(qualifiedName("org.jlato.parser.ParserBase.ByRef"))
+				importDecl(qualifiedName("org.jlato.tree.type.Primitive"))
 		));
 
 		NodeList<MemberDecl> members = Trees.emptyList();
@@ -104,6 +111,8 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 
 		return methodDecl(type, name("parse" + upperCaseFirst(production.symbol)))
 				.withModifiers(listOf(Modifier.Public))
+				.withParams(production.signature.params())
+				.withThrowsClause(listOf(qualifiedType(name("ParseException"))))
 				.withBody(blockStmt().withStmts(stmts));
 	}
 
@@ -144,12 +153,14 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				Collections.reverse(expansionsIfStmt);
 
 				stmts = stmts.append(listOf(expansionsIfStmt).foldRight(Trees.<Stmt>none(),
-						(ifThenClause, elseClause) -> some(ifThenClause.withElseStmt(elseClause))
+						(ifThenClause, elseClause) ->
+								elseClause.isNone() ? some(ifThenClause.thenStmt()) : some(ifThenClause.withElseStmt(elseClause))
 				).get());
 				break;
 			}
 			case NonTerminal: {
-				Expr call = methodInvocationExpr(name("parse" + upperCaseFirst(expansion.symbol)));
+				Expr call = methodInvocationExpr(name("parse" + upperCaseFirst(expansion.symbol)))
+						.withArgs(expansion.arguments);
 				stmts = stmts.append(expressionStmt(
 						expansion.name == null ? call :
 								assignExpr(name(expansion.name), AssignOp.Normal, call)
@@ -165,7 +176,18 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				break;
 			}
 			case Action: {
-				stmts = stmts.appendAll(expansion.action);
+				NodeList<Stmt> action = expansion.action;
+				if (action.size() == 1) {
+					Stmt stmt = action.get(0);
+					if (stmt.kind() == Kind.ExpressionStmt)
+						action = listOf(
+								((ExpressionStmt) stmt).forAll(
+										(object, substitution) -> name("token").equals(object) ? substitution : null,
+										(tree, s) -> methodInvocationExpr(name("getToken")).withArgs(listOf(literalExpr(0)))
+								)
+						);
+				}
+				stmts = stmts.appendAll(action);
 				break;
 			}
 			default:
