@@ -557,7 +557,9 @@ public class Grammar {
 											)
 									),
 									GExpansion.sequence(
-											GExpansion.lookAhead(0),
+											GExpansion.lookAhead(
+													expr("quotesMode").build()
+											),
 											GExpansion.nonTerminal("ret", "NodeListVar", emptyList())
 									)
 							),
@@ -601,7 +603,9 @@ public class Grammar {
 											)
 									),
 									GExpansion.sequence(
-											GExpansion.lookAhead(0),
+											GExpansion.lookAhead(
+													expr("quotesMode").build()
+											),
 											GExpansion.nonTerminal("ret", "NodeListVar", emptyList())
 									)
 							),
@@ -654,7 +658,9 @@ public class Grammar {
 													)
 											),
 											GExpansion.sequence(
-													GExpansion.lookAhead(0),
+													GExpansion.lookAhead(
+															expr("quotesMode").build()
+													),
 													GExpansion.nonTerminal("constants", "NodeListVar", emptyList())
 											)
 									)
@@ -749,7 +755,9 @@ public class Grammar {
 													)
 											),
 											GExpansion.sequence(
-													GExpansion.lookAhead(0),
+													GExpansion.lookAhead(
+															expr("quotesMode").build()
+													),
 													GExpansion.nonTerminal("ret", "NodeListVar", emptyList())
 											)
 									)
@@ -879,7 +887,9 @@ public class Grammar {
 											)
 									),
 									GExpansion.sequence(
-											GExpansion.lookAhead(0),
+											GExpansion.lookAhead(
+													expr("quotesMode").build()
+											),
 											GExpansion.nonTerminal("ret", "NodeListVar", emptyList())
 									)
 							),
@@ -944,7 +954,9 @@ public class Grammar {
 											)
 									),
 									GExpansion.sequence(
-											GExpansion.lookAhead(0),
+											GExpansion.lookAhead(
+													expr("quotesMode").build()
+											),
 											GExpansion.nonTerminal("ret", "NodeListVar", emptyList())
 									)
 							),
@@ -994,7 +1006,9 @@ public class Grammar {
 													)
 											),
 											GExpansion.sequence(
-													GExpansion.lookAhead(0),
+													GExpansion.lookAhead(
+															expr("quotesMode").build()
+													),
 													GExpansion.nonTerminal("ret", "NodeListVar", emptyList())
 											)
 									)
@@ -1406,7 +1420,9 @@ public class Grammar {
 											)
 									),
 									GExpansion.sequence(
-											GExpansion.lookAhead(0),
+											GExpansion.lookAhead(
+													expr("quotesMode").build()
+											),
 											GExpansion.nonTerminal("ret", "NodeListVar", emptyList())
 									)
 							),
@@ -1545,7 +1561,9 @@ public class Grammar {
 													)
 											),
 											GExpansion.sequence(
-													GExpansion.lookAhead(0),
+													GExpansion.lookAhead(
+															expr("quotesMode").build()
+													),
 													GExpansion.nonTerminal("stmts", "NodeListVar", emptyList())
 											)
 									)
@@ -1641,7 +1659,9 @@ public class Grammar {
 													)
 											),
 											GExpansion.sequence(
-													GExpansion.lookAhead(0),
+													GExpansion.lookAhead(
+															expr("quotesMode").build()
+													),
 													GExpansion.nonTerminal("ret", "NodeListVar", emptyList())
 											)
 									)
@@ -1907,7 +1927,9 @@ public class Grammar {
 									)
 							),
 							GExpansion.sequence(
-									GExpansion.lookAhead(0),
+									GExpansion.lookAhead(
+											expr("quotesMode").build()
+									),
 									GExpansion.terminal(null, "NODE_LIST_VARIABLE"),
 									GExpansion.action(
 											listOf(
@@ -2199,7 +2221,9 @@ public class Grammar {
 											)
 									),
 									GExpansion.sequence(
-											GExpansion.lookAhead(0),
+											GExpansion.lookAhead(
+													expr("quotesMode").build()
+											),
 											GExpansion.nonTerminal("name", "NodeVar", emptyList())
 									)
 							),
@@ -3681,7 +3705,9 @@ public class Grammar {
 															))
 													),
 													GExpansion.sequence(
-															GExpansion.lookAhead(0),
+															GExpansion.lookAhead(
+																	expr("isLambda()").build()
+															),
 															GExpansion.nonTerminal("params", "FormalParameterList", emptyList()),
 															GExpansion.terminal(null, "RPAREN"),
 															GExpansion.terminal(null, "ARROW"),
@@ -3863,7 +3889,9 @@ public class Grammar {
 													)
 											),
 											GExpansion.sequence(
-													GExpansion.lookAhead(0),
+													GExpansion.lookAhead(
+															expr("quotesMode").build()
+													),
 													GExpansion.nonTerminal("ret", "NodeListVar", emptyList())
 											)
 									)
@@ -4950,7 +4978,9 @@ public class Grammar {
 					(MethodDecl) memberDecl("void RUNSIGNEDSHIFT();").build(),
 					emptyList(),
 					GExpansion.sequence(
-							GExpansion.lookAhead(0),
+							GExpansion.lookAhead(
+									expr("getToken(1).kind == GT && getToken(1).realKind == RUNSIGNEDSHIFT").build()
+							),
 							GExpansion.terminal(null, "GT"),
 							GExpansion.terminal(null, "GT"),
 							GExpansion.terminal(null, "GT"),
@@ -4965,7 +4995,9 @@ public class Grammar {
 					(MethodDecl) memberDecl("void RSIGNEDSHIFT();").build(),
 					emptyList(),
 					GExpansion.sequence(
-							GExpansion.lookAhead(0),
+							GExpansion.lookAhead(
+									expr("getToken(1).kind == GT && getToken(1).realKind == RSIGNEDSHIFT").build()
+							),
 							GExpansion.terminal(null, "GT"),
 							GExpansion.terminal(null, "GT"),
 							GExpansion.action(

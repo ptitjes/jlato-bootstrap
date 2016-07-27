@@ -85,7 +85,7 @@ public class ExtractFromJJ {
 				case Sequence:
 					if (e.children.size() == 1) return e.children.get(0);
 				case LookAhead:
-					if (e.amount != -1) {
+					if (e.semanticLookahead != null || e.amount != -1) {
 						return e;
 					}
 				case ZeroOrOne:
@@ -94,7 +94,7 @@ public class ExtractFromJJ {
 					if (e.children.size() == 1) {
 						GExpansion child = e.children.get(0);
 						if (child.kind == GExpansion.Kind.Sequence)
-							return new GExpansion(e.kind, child.children, null, null, null, null, -1);
+							return new GExpansion(e.kind, child.children, null, null, null, null, -1, null);
 					}
 				default:
 			}

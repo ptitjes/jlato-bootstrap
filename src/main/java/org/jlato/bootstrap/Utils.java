@@ -585,6 +585,12 @@ public class Utils {
 		}
 	}
 
+	public static void printIndented(Expr expr, StringBuilder builder, int indent) {
+		printIndent(builder, indent);
+		builder.append(Printer.printToString(expr, true));
+		builder.append("\n");
+	}
+
 	public static CastExpr reify(QualifiedType e) {
 		return castExpr(qualifiedType(name("QualifiedType")), reify("type", e));
 	}

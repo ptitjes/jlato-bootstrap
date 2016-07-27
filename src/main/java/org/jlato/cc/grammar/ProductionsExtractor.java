@@ -126,6 +126,18 @@ public class ProductionsExtractor {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
+	private Expr tokensToExpression(List actionTokens) {
+		String string = dumpTokens(actionTokens);
+
+		try {
+			return parser.parse(ParseContext.Expression, string);
+		} catch (org.jlato.parser.ParseException e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+	}
+
 	private String dumpTokens(List<Token> actionTokens) {
 		StringBuilder builder = new StringBuilder();
 		boolean first = true;
@@ -143,6 +155,7 @@ public class ProductionsExtractor {
 
 	private GExpansion emitExpansionLookahead(Lookahead e) {
 		if (!e.isExplicit()) return null;
+		if (e.getAmount() == 0) return GExpansion.lookAhead(tokensToExpression(e.getActionTokens()));
 		if (e.getAmount() != Integer.MAX_VALUE) return GExpansion.lookAhead(e.getAmount());
 		return GExpansion.lookAhead(Collections.singletonList(emitExpansionTree(e.getLaExpansion())));
 	}
