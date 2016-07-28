@@ -2895,18 +2895,20 @@ public class Grammar {
 													)
 											),
 											GExpansion.sequence(
-													GExpansion.nonTerminal(null, "RSIGNEDSHIFT", emptyList()),
-													GExpansion.action(
-															listOf(
-																	stmt("op = BinaryOp.RightSignedShift;").build()
-															)
-													)
-											),
-											GExpansion.sequence(
+													GExpansion.lookAhead(3),
 													GExpansion.nonTerminal(null, "RUNSIGNEDSHIFT", emptyList()),
 													GExpansion.action(
 															listOf(
 																	stmt("op = BinaryOp.RightUnsignedShift;").build()
+															)
+													)
+											),
+											GExpansion.sequence(
+													GExpansion.lookAhead(2),
+													GExpansion.nonTerminal(null, "RSIGNEDSHIFT", emptyList()),
+													GExpansion.action(
+															listOf(
+																	stmt("op = BinaryOp.RightSignedShift;").build()
 															)
 													)
 											)

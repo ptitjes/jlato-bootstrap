@@ -129,7 +129,10 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				Collections.reverse(expansionsIfStmt);
 
 				stmts = stmts.append(listOf(expansionsIfStmt).foldRight(
-						(Stmt) blockStmt().withStmts(listOf(throwStmt(objectCreationExpr(qualifiedType(name("IllegalStateException")))))),
+						(Stmt) blockStmt().withStmts(listOf(throwStmt(
+								methodInvocationExpr(name("produceParseException"))
+										.withArgs(listOf(firstTerminalsOf(expansion).stream().map(this::prefixedConstant).collect(Collectors.toList())))
+						))),
 						(ifThenClause, elseClause) -> ifThenClause.withElseStmt(elseClause)
 				));
 				break;
