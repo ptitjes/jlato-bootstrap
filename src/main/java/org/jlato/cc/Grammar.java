@@ -2203,6 +2203,7 @@ public class Grammar {
 			new GProduction("Name",
 					(MethodDecl) memberDecl("BUTree<SName> Name();").build(),
 					listOf(
+							stmt("Token id;").build(),
 							stmt("BUTree<SName> name;").build()
 					),
 					GExpansion.sequence(
@@ -2213,10 +2214,10 @@ public class Grammar {
 															stmt("run();").build()
 													)
 											),
-											GExpansion.terminal(null, "IDENTIFIER"),
+											GExpansion.terminal("id", "IDENTIFIER"),
 											GExpansion.action(
 													listOf(
-															stmt("name = dress(SName.make(token.image));").build()
+															stmt("name = dress(SName.make(id.image));").build()
 													)
 											)
 									),
@@ -3371,6 +3372,7 @@ public class Grammar {
 			new GProduction("Literal",
 					(MethodDecl) memberDecl("BUTree<? extends SExpr> Literal();").build(),
 					listOf(
+							stmt("Token literal;").build(),
 							stmt("BUTree<? extends SExpr> ret;").build()
 					),
 					GExpansion.sequence(
@@ -3381,74 +3383,74 @@ public class Grammar {
 							),
 							GExpansion.choice(
 									GExpansion.sequence(
-											GExpansion.terminal(null, "INTEGER_LITERAL"),
+											GExpansion.terminal("literal", "INTEGER_LITERAL"),
 											GExpansion.action(
 													listOf(
-															stmt("ret = SLiteralExpr.make(Integer.class, token.image);").build()
+															stmt("ret = SLiteralExpr.make(Integer.class, literal.image);").build()
 													)
 											)
 									),
 									GExpansion.sequence(
-											GExpansion.terminal(null, "LONG_LITERAL"),
+											GExpansion.terminal("literal", "LONG_LITERAL"),
 											GExpansion.action(
 													listOf(
-															stmt("ret = SLiteralExpr.make(Long.class, token.image);").build()
+															stmt("ret = SLiteralExpr.make(Long.class, literal.image);").build()
 													)
 											)
 									),
 									GExpansion.sequence(
-											GExpansion.terminal(null, "FLOAT_LITERAL"),
+											GExpansion.terminal("literal", "FLOAT_LITERAL"),
 											GExpansion.action(
 													listOf(
-															stmt("ret = SLiteralExpr.make(Float.class, token.image);").build()
+															stmt("ret = SLiteralExpr.make(Float.class, literal.image);").build()
 													)
 											)
 									),
 									GExpansion.sequence(
-											GExpansion.terminal(null, "DOUBLE_LITERAL"),
+											GExpansion.terminal("literal", "DOUBLE_LITERAL"),
 											GExpansion.action(
 													listOf(
-															stmt("ret = SLiteralExpr.make(Double.class, token.image);").build()
+															stmt("ret = SLiteralExpr.make(Double.class, literal.image);").build()
 													)
 											)
 									),
 									GExpansion.sequence(
-											GExpansion.terminal(null, "CHARACTER_LITERAL"),
+											GExpansion.terminal("literal", "CHARACTER_LITERAL"),
 											GExpansion.action(
 													listOf(
-															stmt("ret = SLiteralExpr.make(Character.class, token.image);").build()
+															stmt("ret = SLiteralExpr.make(Character.class, literal.image);").build()
 													)
 											)
 									),
 									GExpansion.sequence(
-											GExpansion.terminal(null, "STRING_LITERAL"),
+											GExpansion.terminal("literal", "STRING_LITERAL"),
 											GExpansion.action(
 													listOf(
-															stmt("ret = SLiteralExpr.make(String.class, token.image);").build()
+															stmt("ret = SLiteralExpr.make(String.class, literal.image);").build()
 													)
 											)
 									),
 									GExpansion.sequence(
-											GExpansion.terminal(null, "TRUE"),
+											GExpansion.terminal("literal", "TRUE"),
 											GExpansion.action(
 													listOf(
-															stmt("ret = SLiteralExpr.make(Boolean.class, token.image);").build()
+															stmt("ret = SLiteralExpr.make(Boolean.class, literal.image);").build()
 													)
 											)
 									),
 									GExpansion.sequence(
-											GExpansion.terminal(null, "FALSE"),
+											GExpansion.terminal("literal", "FALSE"),
 											GExpansion.action(
 													listOf(
-															stmt("ret = SLiteralExpr.make(Boolean.class, token.image);").build()
+															stmt("ret = SLiteralExpr.make(Boolean.class, literal.image);").build()
 													)
 											)
 									),
 									GExpansion.sequence(
-											GExpansion.terminal(null, "NULL"),
+											GExpansion.terminal("literal", "NULL"),
 											GExpansion.action(
 													listOf(
-															stmt("ret = SLiteralExpr.make(Void.class, token.image);").build()
+															stmt("ret = SLiteralExpr.make(Void.class, literal.image);").build()
 													)
 											)
 									)
