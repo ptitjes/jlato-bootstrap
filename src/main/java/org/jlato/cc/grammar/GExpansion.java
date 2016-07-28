@@ -203,8 +203,9 @@ public class GExpansion {
 
 		switch (kind) {
 			case LookAhead:
-				if (action != null) {
+				if (semanticLookahead != null) {
 					Utils.printIndented(semanticLookahead, builder, indent + 1);
+					break;
 				}
 				if (amount != -1) {
 					builder.append(amount);

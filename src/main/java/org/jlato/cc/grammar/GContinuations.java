@@ -1,8 +1,6 @@
 package org.jlato.cc.grammar;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -11,55 +9,57 @@ import java.util.stream.Stream;
  */
 public class GContinuations {
 
-//  // Example use
-//	{
-//		GProduction production = productions.get("ClassOrInterfaceBodyDecl");
-//		List<GExpansion> choices = production.expansion.children.get(1).children.get(1).children.get(2).children;
-//		System.out.println(choices);
-//
-//		Stream<GContinuations> continuations =
-//				choices.stream().map(c -> new GContinuations(productions, c.location()));
-//
-//		continuations.forEach(c -> {
-//			c.next();
-//			System.out.println(c.terminals());
-//		});
-//	}
+	static boolean debug = false;
 
 	private GProductions productions;
-	private Set<GLocation> locations;
+	private List<GLocation> locations;
+	private boolean fromTerminals = false;
 
-	public GContinuations(GLocation location, GProductions productions) {
-		this(Collections.singleton(location), productions);
+	public GContinuations(GLocation location, GProductions productions, boolean fromTerminals) {
+		this(Collections.singletonList(location), productions, fromTerminals);
 	}
 
-	GContinuations(Set<GLocation> locations, GProductions productions) {
+	public GContinuations(List<GLocation> locations, GProductions productions, boolean fromTerminals) {
 		this.productions = productions;
 		this.locations = locations;
+		this.fromTerminals = fromTerminals;
 	}
 
-	public Set<GLocation> locations() {
+	public List<GLocation> locations() {
 		return locations;
 	}
 
-	public Set<String> terminals() {
-		return locations.stream().map(l -> l.current.symbol).collect(Collectors.toSet());
+	public List<String> terminals() {
+		return locations.stream().map(l -> l.current.symbol).distinct().collect(Collectors.toList());
+	}
+
+	public Map<String, List<GLocation>> perTerminalLocations() {
+		return locations.stream().collect(Collectors.groupingBy(l -> l.current.symbol));
 	}
 
 	public void next() {
-		this.locations = locations.stream().flatMap(this::moveToNextTerminal).collect(Collectors.toSet());
+		if (fromTerminals)
+			this.locations = locations.stream().map(GContinuations::nextOrParentsNext).distinct().collect(Collectors.toList());
+
+		this.locations = locations.stream().flatMap(this::moveToNextTerminal).distinct().collect(Collectors.toList());
+		fromTerminals = true;
 	}
 
 	private Stream<GLocation> moveToNextTerminal(GLocation location) {
 		if (location == null) return Stream.empty();
 
-//		System.out.println("moveToNextTerminal from " + location);
-
 		GExpansion expansion = location.current;
+
+		if (debug) {
+			System.out.println("moveToNextTerminal from " + location);
+			System.out.println(expansion);
+			System.out.println();
+		}
+
 		Stream<GLocation> toFollow;
 		switch (expansion.kind) {
 			case Terminal:
-//				System.out.println("\tFound terminal: " + expansion.symbol);
+				if (debug) System.out.println("\tFound terminal: " + expansion.symbol);
 				return Stream.of(location);
 			case Choice:
 				toFollow = location.allChildren().stream();
@@ -75,12 +75,11 @@ public class GContinuations {
 				toFollow = Stream.of(location.firstChild());
 				break;
 			case NonTerminal:
-//				System.out.println("\tTraversing non-terminal: " + expansion.symbol);
-//				System.out.println(productions.get(expansion.symbol).expansion);
+				if (debug) System.out.println("\tTraversing non-terminal: " + expansion.symbol);
+				if (debug) System.out.println(productions.get(expansion.symbol).expansion);
 				toFollow = Stream.of(location.traverseRef(productions));
 				break;
 			case Action:
-//				System.out.println("\tAction: " + expansion);
 				toFollow = Stream.of(nextOrParentsNext(location));
 				break;
 			case LookAhead:
@@ -95,8 +94,15 @@ public class GContinuations {
 	private static GLocation nextOrParentsNext(GLocation location) {
 		GLocation next = location.nextSibling();
 		while (next == null && location.parent != null) {
-//			System.out.println("\t\t>>" + location.parent);
-			location = location.parent;
+			do {
+				location = location.parent;
+			} while (location.parent != null && location.parent.current.kind == GExpansion.Kind.Choice);
+
+			if (debug) {
+				System.out.println(">>>>>>>>>>>>>>>>>>>>>>> " + location);
+				System.out.println(location.current);
+				System.out.println();
+			}
 			next = location.nextSibling();
 		}
 		return next;

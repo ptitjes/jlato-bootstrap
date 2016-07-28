@@ -4980,9 +4980,6 @@ public class Grammar {
 					(MethodDecl) memberDecl("void RUNSIGNEDSHIFT();").build(),
 					emptyList(),
 					GExpansion.sequence(
-							GExpansion.lookAhead(
-									expr("getToken(1).kind == GT && getToken(1).realKind == RUNSIGNEDSHIFT").build()
-							),
 							GExpansion.terminal(null, "GT"),
 							GExpansion.terminal(null, "GT"),
 							GExpansion.terminal(null, "GT"),
@@ -4997,9 +4994,6 @@ public class Grammar {
 					(MethodDecl) memberDecl("void RSIGNEDSHIFT();").build(),
 					emptyList(),
 					GExpansion.sequence(
-							GExpansion.lookAhead(
-									expr("getToken(1).kind == GT && getToken(1).realKind == RSIGNEDSHIFT").build()
-							),
 							GExpansion.terminal(null, "GT"),
 							GExpansion.terminal(null, "GT"),
 							GExpansion.action(
