@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.jlato.rewrite.Quotes.stmt;
 import static org.jlato.tree.Trees.*;
 
 /**
@@ -66,6 +67,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				importDecl(qualifiedName("org.jlato.tree.Problem.Severity")),
 				importDecl(qualifiedName("org.jlato.parser.ParseException")),
 				importDecl(qualifiedName("org.jlato.parser.ParserImplConstants")),
+				importDecl(qualifiedName("org.jlato.parser.Token")),
 				importDecl(qualifiedName("org.jlato.tree.expr.AssignOp")),
 				importDecl(qualifiedName("org.jlato.tree.expr.BinaryOp")),
 				importDecl(qualifiedName("org.jlato.tree.expr.UnaryOp")),
@@ -177,18 +179,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				break;
 			}
 			case Action: {
-				NodeList<Stmt> action = expansion.action;
-				if (action.size() == 1) {
-					Stmt stmt = action.get(0);
-					if (stmt.kind() == Kind.ExpressionStmt)
-						action = listOf(
-								((ExpressionStmt) stmt).forAll(
-										(object, substitution) -> name("token").equals(object) ? substitution : null,
-										(tree, s) -> methodInvocationExpr(name("getToken")).withArgs(listOf(literalExpr(0)))
-								)
-						);
-				}
-				stmts = stmts.appendAll(action);
+				stmts = stmts.appendAll(expansion.action);
 				break;
 			}
 			default:
@@ -208,11 +199,13 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		return methodInvocationExpr(name("backupLookahead")).withArgs(listOf(expr));
 	}
 
-	private MethodInvocationExpr matchCondition(String symbol, GExpansion expansion) {
+	private Expr matchCondition(String symbol, GExpansion expansion) {
 		if (expansion.children != null && !expansion.children.isEmpty()) {
 			GExpansion firstChild = expansion.children.get(0);
 			if (firstChild.kind == GExpansion.Kind.LookAhead) {
-				if (firstChild.amount == -1) {
+				if (firstChild.semanticLookahead != null) {
+					return firstChild.semanticLookahead;
+				} else if (firstChild.amount == -1) {
 					String matchMethodName = "match" + symbol + (matchMethods.size() + 1);
 
 					NodeList<Stmt> stmts =
@@ -307,6 +300,12 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				break;
 			}
 			case Action: {
+				break;
+			}
+			case LookAhead: {
+				if (expansion.semanticLookahead != null) {
+					stmts = stmts.append(ifStmt(unaryExpr(UnaryOp.Not, expansion.semanticLookahead), returnStmt().withExpr(literalExpr(false))));
+				}
 				break;
 			}
 			default:
