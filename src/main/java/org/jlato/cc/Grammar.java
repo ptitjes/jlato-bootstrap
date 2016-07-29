@@ -1829,15 +1829,15 @@ public class Grammar {
 							),
 							GExpansion.zeroOrMore(
 									GExpansion.lookAhead(2),
+									GExpansion.action(
+											listOf(
+													stmt("lateRun();").build()
+											)
+									),
 									GExpansion.terminal(null, "DOT"),
 									GExpansion.action(
 											listOf(
 													stmt("scope = optionOf(ret);").build()
-											)
-									),
-									GExpansion.action(
-											listOf(
-													stmt("lateRun();").build()
 											)
 									),
 									GExpansion.nonTerminal("annotations", "Annotations", emptyList()),
@@ -4990,7 +4990,7 @@ public class Grammar {
 							GExpansion.terminal(null, "GT"),
 							GExpansion.action(
 									listOf(
-											stmt("popNewWhitespaces();").build()
+											stmt("popNewWhitespaces(2);").build()
 									)
 							)
 					)
@@ -5006,7 +5006,7 @@ public class Grammar {
 							GExpansion.terminal(null, "GT"),
 							GExpansion.action(
 									listOf(
-											stmt("popNewWhitespaces();").build()
+											stmt("popNewWhitespaces(1);").build()
 									)
 							)
 					)
