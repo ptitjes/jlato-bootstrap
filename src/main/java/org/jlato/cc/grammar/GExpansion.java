@@ -211,7 +211,7 @@ public class GExpansion {
 
 		builder.append("\n");
 		Utils.printIndent(builder, indent);
-		builder.append(kind).append("(");
+		builder.append(Utils.lowerCaseFirst(kind.toString())).append("(");
 
 		switch (kind) {
 			case LookAhead:
@@ -242,9 +242,7 @@ public class GExpansion {
 				break;
 			case Terminal:
 				if (name != null) builder.append(name).append(", ");
-				builder.append("\"");
 				builder.append(symbol);
-				builder.append("\"");
 				break;
 			case Action:
 				builder.append("{");

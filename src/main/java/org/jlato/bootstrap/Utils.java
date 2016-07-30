@@ -579,9 +579,7 @@ public class Utils {
 
 	public static void printIndented(NodeList<Stmt> stmts, StringBuilder builder, int indent) {
 		for (Stmt stmt : stmts) {
-			printIndent(builder, indent);
-			builder.append(Printer.printToString(stmt, true));
-			builder.append("\n");
+			printIndented(Printer.printToString(stmt, true), builder, indent);
 		}
 	}
 
@@ -589,6 +587,14 @@ public class Utils {
 		printIndent(builder, indent);
 		builder.append(Printer.printToString(expr, true));
 		builder.append("\n");
+	}
+
+	public static void printIndented(String content, StringBuilder builder, int indent) {
+		for (String line : content.split("\n")) {
+			printIndent(builder, indent);
+			builder.append(line);
+			builder.append("\n");
+		}
 	}
 
 	public static CastExpr reify(QualifiedType e) {
