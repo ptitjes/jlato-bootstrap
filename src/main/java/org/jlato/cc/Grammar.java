@@ -14,24 +14,28 @@ public class Grammar {
 	public static GProductions productions = new GProductions(
 			new GProduction("NodeListVar",
 					(MethodDecl) memberDecl("BUTree<SNodeList> NodeListVar();").build(),
-					emptyList(),
+					listOf(
+							stmt("Token id;").build()
+					),
 					GExpansion.sequence(
-							GExpansion.terminal(null, "NODE_LIST_VARIABLE"),
+							GExpansion.terminal("id", "NODE_LIST_VARIABLE"),
 							GExpansion.action(
 									listOf(
-											stmt("return makeVar();").build()
+											stmt("return makeVar(id);").build()
 									)
 							)
 					)
 			),
 			new GProduction("NodeVar",
 					(MethodDecl) memberDecl("BUTree<SName> NodeVar();").build(),
-					emptyList(),
+					listOf(
+							stmt("Token id;").build()
+					),
 					GExpansion.sequence(
-							GExpansion.terminal(null, "NODE_VARIABLE"),
+							GExpansion.terminal("id", "NODE_VARIABLE"),
 							GExpansion.action(
 									listOf(
-											stmt("return makeVar();").build()
+											stmt("return makeVar(id);").build()
 									)
 							)
 					)
@@ -229,7 +233,7 @@ public class Grammar {
 													)
 											),
 											GExpansion.sequence(
-													GExpansion.terminal(null, "_DEFAULT"),
+													GExpansion.terminal(null, "DEFAULT"),
 													GExpansion.action(
 															listOf(
 																	stmt("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Default));").build()
@@ -844,7 +848,7 @@ public class Grammar {
 							GExpansion.terminal(null, "RPAREN"),
 							GExpansion.nonTerminal("dims", "ArrayDims", emptyList()),
 							GExpansion.zeroOrOne(
-									GExpansion.terminal(null, "_DEFAULT"),
+									GExpansion.terminal(null, "DEFAULT"),
 									GExpansion.nonTerminal("val", "MemberValue", emptyList()),
 									GExpansion.action(
 											listOf(
@@ -1901,7 +1905,8 @@ public class Grammar {
 					(MethodDecl) memberDecl("BUTree<SNodeList> TypeArgumentList();").build(),
 					listOf(
 							stmt("BUTree<SNodeList> ret = emptyList();").build(),
-							stmt("BUTree<? extends SType> type;").build()
+							stmt("BUTree<? extends SType> type;").build(),
+							stmt("Token id;").build()
 					),
 					GExpansion.choice(
 							GExpansion.sequence(
@@ -1930,10 +1935,10 @@ public class Grammar {
 									GExpansion.lookAhead(
 											expr("quotesMode").build()
 									),
-									GExpansion.terminal(null, "NODE_LIST_VARIABLE"),
+									GExpansion.terminal("id", "NODE_LIST_VARIABLE"),
 									GExpansion.action(
 											listOf(
-													stmt("return makeVar();").build()
+													stmt("return makeVar(id);").build()
 											)
 									)
 							)
@@ -4453,7 +4458,7 @@ public class Grammar {
 											GExpansion.terminal(null, "CASE"),
 											GExpansion.nonTerminal("label", "Expression", emptyList())
 									),
-									GExpansion.terminal(null, "_DEFAULT")
+									GExpansion.terminal(null, "DEFAULT")
 							),
 							GExpansion.terminal(null, "COLON"),
 							GExpansion.nonTerminal("stmts", "Statements", emptyList()),
@@ -4983,7 +4988,7 @@ public class Grammar {
 					emptyList(),
 					GExpansion.sequence(
 							GExpansion.lookAhead(
-									expr("getToken(1).kind == GT && getToken(1).realKind == RUNSIGNEDSHIFT").build()
+									expr("getToken(1).kind == TokenType.GT && getToken(1).realKind == TokenType.RUNSIGNEDSHIFT").build()
 							),
 							GExpansion.terminal(null, "GT"),
 							GExpansion.terminal(null, "GT"),
@@ -5000,7 +5005,7 @@ public class Grammar {
 					emptyList(),
 					GExpansion.sequence(
 							GExpansion.lookAhead(
-									expr("getToken(1).kind == GT && getToken(1).realKind == RSIGNEDSHIFT").build()
+									expr("getToken(1).kind == TokenType.GT && getToken(1).realKind == TokenType.RSIGNEDSHIFT").build()
 							),
 							GExpansion.terminal(null, "GT"),
 							GExpansion.terminal(null, "GT"),
