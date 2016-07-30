@@ -7,6 +7,7 @@ import org.jlato.bootstrap.tests.TreesKindTest;
 import org.jlato.bootstrap.util.CompilationUnitPattern;
 import org.jlato.cc.grammar.GProduction;
 import org.jlato.cc.grammar.GProductions;
+import org.jlato.printer.FormattingSettings;
 
 import javax.print.attribute.standard.MediaSize;
 import java.io.FileNotFoundException;
@@ -34,6 +35,7 @@ public class GenParser {
 		// Generate unit test classes
 
 		CompilationUnitPattern.of(new ParserPattern())
+				.withFormatting(true, FormattingSettings.Default.withCommentFormatting(true))
 				.apply(rootDirectory, "org/jlato/internal/parser/ParserImplementation.java", classDescriptors);
 	}
 }

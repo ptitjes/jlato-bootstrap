@@ -1,15 +1,19 @@
 package org.jlato.cc.grammar;
 
 import org.jlato.bootstrap.Utils;
+import org.jlato.printer.Printer;
+import org.jlato.tree.Kind;
 import org.jlato.tree.NodeList;
 import org.jlato.tree.expr.Expr;
 import org.jlato.tree.expr.MethodInvocationExpr;
 import org.jlato.tree.name.Name;
+import org.jlato.tree.stmt.IfStmt;
 import org.jlato.tree.stmt.Stmt;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static org.jlato.bootstrap.Utils.*;
@@ -192,11 +196,19 @@ public class GExpansion {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		this.print(builder, 1);
+		this.print(builder, 0, e -> true);
 		return builder.toString();
 	}
 
-	private void print(StringBuilder builder, int indent) {
+	public String toString(Predicate<GExpansion> filter) {
+		StringBuilder builder = new StringBuilder();
+		this.print(builder, 0, filter);
+		return builder.toString();
+	}
+
+	private void print(StringBuilder builder, int indent, Predicate<GExpansion> filter) {
+		if (!filter.test(this)) return;
+
 		builder.append("\n");
 		Utils.printIndent(builder, indent);
 		builder.append(kind).append("(");
@@ -204,7 +216,9 @@ public class GExpansion {
 		switch (kind) {
 			case LookAhead:
 				if (semanticLookahead != null) {
-					Utils.printIndented(semanticLookahead, builder, indent + 1);
+					builder.append("{ ");
+					builder.append(Printer.printToString(semanticLookahead, true).trim());
+					builder.append(" }");
 					break;
 				}
 				if (amount != -1) {
@@ -217,7 +231,7 @@ public class GExpansion {
 			case ZeroOrMore:
 			case OneOrMore:
 				for (GExpansion child : children) {
-					child.print(builder, indent + 1);
+					child.print(builder, indent + 1, filter);
 				}
 				builder.append("\n");
 				Utils.printIndent(builder, indent);
@@ -234,9 +248,15 @@ public class GExpansion {
 				break;
 			case Action:
 				builder.append("{");
-				builder.append("\n");
-				Utils.printIndented(action, builder, indent + 1);
-				Utils.printIndent(builder, indent);
+				if (action.size() == 1 && action.first().kind() != org.jlato.tree.Kind.IfStmt) {
+					builder.append(" ");
+					builder.append(Printer.printToString(action.first(), true).trim());
+					builder.append(" ");
+				} else {
+					builder.append("\n");
+					Utils.printIndented(action, builder, indent + 1);
+					Utils.printIndent(builder, indent);
+				}
 				builder.append("}");
 				break;
 			default:

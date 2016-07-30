@@ -26,6 +26,15 @@ import static org.jlato.tree.Trees.*;
  */
 public abstract class CompilationUnitPattern<A> {
 
+	private boolean format = false;
+	private FormattingSettings formattingSettings = FormattingSettings.Default;
+
+	public CompilationUnitPattern<A> withFormatting(boolean format, FormattingSettings formattingSettings) {
+		this.format = format;
+		this.formattingSettings = formattingSettings;
+		return this;
+	}
+
 	public NodeMap<CompilationUnit> apply(NodeMap<CompilationUnit> nodeMap, String path, A arg) {
 		final CompilationUnit cu = nodeMap.get(path);
 		CompilationUnit newCU = applyPattern(cu, path, arg);
@@ -47,7 +56,7 @@ public abstract class CompilationUnitPattern<A> {
 		CompilationUnit newCU = applyPattern(cu, path, arg);
 
 		final PrintWriter writer = new PrintWriter(new FileWriter(file));
-		final Printer printer = new Printer(false, FormattingSettings.Default);
+		final Printer printer = new Printer(format, formattingSettings);
 		printer.print(newCU, writer);
 		writer.close();
 	}

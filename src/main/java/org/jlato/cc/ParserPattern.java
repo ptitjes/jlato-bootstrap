@@ -93,7 +93,8 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				.withModifiers(listOf(Modifier.Public))
 				.withParams(production.signature.params())
 				.withThrowsClause(listOf(qualifiedType(name("ParseException"))))
-				.withBody(blockStmt().withStmts(stmts));
+				.withBody(blockStmt().withStmts(stmts))
+				.insertLeadingComment(production.expansion.toString(), true);
 	}
 
 	private NodeList<Stmt> parseStatementsFor(String symbol, GExpansion expansion) {
@@ -375,7 +376,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 						formalParameter(primitiveType(Primitive.Int), variableDeclaratorId(LOOKAHEAD))
 				))
 				.withBody(blockStmt().withStmts(stmts))
-				.insertLeadingComment(expansion.toString(), true);
+				.insertLeadingComment(expansion.toString(e -> e.kind != GExpansion.Kind.Action), true);
 	}
 
 	private MethodInvocationExpr matchMethodCall(String methodName, Expr lookahead) {
@@ -413,6 +414,6 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 
 	@Override
 	protected String makeDoc(ClassDecl decl, TreeClassDescriptor[] arg) {
-		return null;
+		return "Internal implementation of the Java parser as a recursive descent parser.";
 	}
 }
