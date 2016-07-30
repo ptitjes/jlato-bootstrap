@@ -41,8 +41,11 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		return "public class " + NAME + " extends ParserNewBase { ..$_ }";
 	}
 
-	private NodeList<MethodDecl> matchMethods = emptyList();
 	private Set<String> symbolToMatchNames = new HashSet<>();
+
+	private NodeList<MethodDecl> parseMethods = emptyList();
+	private Map<String, Integer> perSymbolLookaheadMethodCount = new HashMap<>();
+	private Map<String, List<MethodDecl>> perSymbolMatchMethods = new HashMap<>();
 
 	@Override
 	protected ClassDecl contributeBody(ClassDecl decl, ImportManager importManager, TreeClassDescriptor[] arg) {
@@ -69,14 +72,25 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				importDecl(qualifiedName("org.jlato.tree.type.Primitive"))
 		));
 
-		NodeList<MemberDecl> members = Trees.emptyList();
-
 		for (GProduction production : Grammar.productions.getAll()) {
 			if (excluded(production)) continue;
 
-			members = members.append(parseMethod(importManager, production));
-			members = members.appendAll(matchMethods);
-			matchMethods = emptyList();
+			parseMethods = parseMethods.append(parseMethod(importManager, production));
+		}
+
+		NodeList<MemberDecl> members = Trees.emptyList();
+		for (MethodDecl parseMethod : parseMethods) {
+			members = members.append(parseMethod);
+
+			String id = parseMethod.name().id();
+			int indexOfUnderscore = id.indexOf('_');
+			String symbol = id.substring("parse".length(), indexOfUnderscore == -1 ? id.length() : indexOfUnderscore);
+
+			List<MethodDecl> methods = perSymbolMatchMethods.get(symbol);
+			if (methods != null) {
+				Collections.sort(methods, (m1, m2) -> m1.name().id().compareTo(m2.name().id()));
+				members = members.appendAll(listOf(methods));
+			}
 		}
 
 		return decl.withMembers(members);
@@ -190,8 +204,8 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				} else {
 					int amount = firstChild.amount;
 					if (amount == -1) {
-						String matchMethodName = "match" + symbol + (matchMethods.size() + 1);
-						Expr call = createMatchCallFor(matchMethodName, GExpansion.sequence(firstChild.children), literalExpr(0));
+						String matchMethodName = "match" + symbol + "_lookahead" + incrementCount(symbol);
+						Expr call = createMatchMethodAndCallFor(symbol, matchMethodName, GExpansion.sequence(firstChild.children), literalExpr(0));
 						return binaryExpr(call, BinaryOp.NotEqual, literalExpr(-1));
 					} else {
 						return buildLookaheadWithAmountCondition(symbol, expansion, amount);
@@ -202,11 +216,18 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		return binaryExpr(matchCall(firstTerminalsOf(expansion), literalExpr(0)), BinaryOp.NotEqual, FAILED_LOOKAHEAD);
 	}
 
+	private int incrementCount(String symbol) {
+		Integer count = perSymbolLookaheadMethodCount.get(symbol);
+		int newCount = (count == null ? 0 : count) + 1;
+		perSymbolLookaheadMethodCount.put(symbol, newCount);
+		return newCount;
+	}
+
 	private Expr buildLookaheadWithAmountCondition(String symbol, GExpansion expansion, int amount) {
-		String matchMethodName = "match" + symbol + (matchMethods.size() + 1);
+		String matchMethodName = "match" + symbol + "_lookahead" + incrementCount(symbol);
 		NodeList<Stmt> stmts = buildLookaheadWithAmountCondition(Collections.singletonList(expansion.location()), 0, amount);
 		stmts = stmts.append(returnStmt().withExpr(FAILED_LOOKAHEAD));
-		matchMethods = matchMethods.append(matchMethod(matchMethodName, stmts, expansion));
+		createMatchMethod(symbol, matchMethodName, expansion, stmts);
 		return binaryExpr(matchMethodCall(matchMethodName, literalExpr(0)), BinaryOp.NotEqual, FAILED_LOOKAHEAD);
 	}
 
@@ -236,15 +257,15 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		return stmts;
 	}
 
-	private Expr createMatchCallFor(String symbol, Expr outerLookahead) {
+	private Expr createMatchMethodAndCallFor(String symbol, Expr outerLookahead) {
 		if (!symbolToMatchNames.contains(symbol)) {
 			symbolToMatchNames.add(symbol);
 			GExpansion symbolExpansion = Grammar.productions.get(symbol).expansion;
-			return createMatchCallFor(matchMethodName(symbol), symbolExpansion, outerLookahead);
+			return createMatchMethodAndCallFor(symbol, matchMethodName(symbol), symbolExpansion, outerLookahead);
 		} else return matchMethodCall(matchMethodName(symbol), outerLookahead);
 	}
 
-	private Expr createMatchCallFor(String namePrefix, GExpansion expansion, Expr outerLookahead) {
+	private Expr createMatchMethodAndCallFor(String symbol, String namePrefix, GExpansion expansion, Expr outerLookahead) {
 		switch (expansion.kind) {
 			case LookAhead:
 				Expr semanticLookahead = expansion.semanticLookahead;
@@ -254,21 +275,18 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 					}
 					return conditionalExpr(semanticLookahead, outerLookahead, FAILED_LOOKAHEAD);
 				}
-//				if (expansion.amount != -1)
-//					// TODO Match for expansion.amount of tokens
-//					return matchCall(firstTerminalsOf(expansion), outerLookahead);
 				return null;
 			case Sequence: {
 				NodeList<Stmt> stmts = emptyList();
 				int count = 0;
 				for (GExpansion child : expansion.children) {
-					Expr childCall = createMatchCallFor(namePrefix + "_" + ++count, child, LOOKAHEAD);
+					Expr childCall = createMatchMethodAndCallFor(symbol, namePrefix + "_" + ++count, child, LOOKAHEAD);
 					if (childCall == null) continue;
 					stmts = stmts.append(expressionStmt(assignExpr(LOOKAHEAD, AssignOp.Normal, childCall)));
 					stmts = stmts.append(ifStmt(binaryExpr(LOOKAHEAD, BinaryOp.Equal, FAILED_LOOKAHEAD), returnStmt().withExpr(FAILED_LOOKAHEAD)));
 				}
 				stmts = stmts.append(returnStmt().withExpr(LOOKAHEAD));
-				matchMethods = matchMethods.append(matchMethod(namePrefix, stmts, expansion));
+				createMatchMethod(symbol, namePrefix, expansion, stmts);
 
 				return matchMethodCall(namePrefix, outerLookahead);
 			}
@@ -280,13 +298,13 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				)));
 				int count = 0;
 				for (GExpansion child : expansion.children) {
-					Expr childCall = createMatchCallFor(namePrefix + "_" + ++count, child, LOOKAHEAD);
+					Expr childCall = createMatchMethodAndCallFor(symbol, namePrefix + "_" + ++count, child, LOOKAHEAD);
 					if (childCall == null) continue;
 					stmts = stmts.append(expressionStmt(assignExpr(LOOKAHEAD_NEW, AssignOp.Normal, childCall)));
 					stmts = stmts.append(ifStmt(binaryExpr(LOOKAHEAD_NEW, BinaryOp.NotEqual, FAILED_LOOKAHEAD), returnStmt().withExpr(LOOKAHEAD_NEW)));
 				}
 				stmts = stmts.append(returnStmt().withExpr(FAILED_LOOKAHEAD));
-				matchMethods = matchMethods.append(matchMethod(namePrefix, stmts, expansion));
+				createMatchMethod(symbol, namePrefix, expansion, stmts);
 
 				return matchMethodCall(namePrefix, outerLookahead);
 			}
@@ -297,12 +315,12 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 								.withVariables(listOf(variableDeclarator(variableDeclaratorId(LOOKAHEAD_NEW))))
 				)));
 
-				Expr childCall = createMatchCallFor(namePrefix + "_" + 1, GExpansion.sequence(expansion.children), LOOKAHEAD);
+				Expr childCall = createMatchMethodAndCallFor(symbol, namePrefix + "_" + 1, GExpansion.sequence(expansion.children), LOOKAHEAD);
 				stmts = stmts.append(expressionStmt(assignExpr(LOOKAHEAD_NEW, AssignOp.Normal, childCall)));
 				stmts = stmts.append(ifStmt(binaryExpr(LOOKAHEAD_NEW, BinaryOp.NotEqual, FAILED_LOOKAHEAD), returnStmt().withExpr(LOOKAHEAD_NEW)));
 
 				stmts = stmts.append(returnStmt().withExpr(LOOKAHEAD));
-				matchMethods = matchMethods.append(matchMethod(namePrefix, stmts, expansion));
+				createMatchMethod(symbol, namePrefix, expansion, stmts);
 
 				return matchMethodCall(namePrefix, outerLookahead);
 			}
@@ -313,7 +331,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 								.withVariables(listOf(variableDeclarator(variableDeclaratorId(LOOKAHEAD_NEW))))
 				)));
 
-				Expr childCall = createMatchCallFor(namePrefix + "_" + 1, GExpansion.sequence(expansion.children), LOOKAHEAD);
+				Expr childCall = createMatchMethodAndCallFor(symbol, namePrefix + "_" + 1, GExpansion.sequence(expansion.children), LOOKAHEAD);
 				stmts = stmts.append(expressionStmt(assignExpr(LOOKAHEAD_NEW, AssignOp.Normal, childCall)));
 				stmts = stmts.append(whileStmt(
 						binaryExpr(LOOKAHEAD_NEW, BinaryOp.NotEqual, FAILED_LOOKAHEAD),
@@ -323,7 +341,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 						))
 				));
 				stmts = stmts.append(returnStmt().withExpr(LOOKAHEAD));
-				matchMethods = matchMethods.append(matchMethod(namePrefix, stmts, expansion));
+				createMatchMethod(symbol, namePrefix, expansion, stmts);
 
 				return matchMethodCall(namePrefix, outerLookahead);
 			}
@@ -334,7 +352,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 								.withVariables(listOf(variableDeclarator(variableDeclaratorId(LOOKAHEAD_NEW))))
 				)));
 
-				Expr childCall = createMatchCallFor(namePrefix + "_" + 1, GExpansion.sequence(expansion.children), LOOKAHEAD);
+				Expr childCall = createMatchMethodAndCallFor(symbol, namePrefix + "_" + 1, GExpansion.sequence(expansion.children), LOOKAHEAD);
 				stmts = stmts.append(expressionStmt(assignExpr(LOOKAHEAD_NEW, AssignOp.Normal, childCall)));
 				stmts = stmts.append(ifStmt(binaryExpr(LOOKAHEAD_NEW, BinaryOp.Equal, FAILED_LOOKAHEAD), returnStmt().withExpr(FAILED_LOOKAHEAD)));
 				stmts = stmts.append(whileStmt(
@@ -345,17 +363,15 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 						))
 				));
 				stmts = stmts.append(returnStmt().withExpr(LOOKAHEAD));
-				matchMethods = matchMethods.append(matchMethod(namePrefix, stmts, expansion));
+				createMatchMethod(symbol, namePrefix, expansion, stmts);
 
 				return matchMethodCall(namePrefix, outerLookahead);
 			}
 			case NonTerminal: {
-				String symbol = expansion.symbol;
-				return createMatchCallFor(symbol, outerLookahead);
+				return createMatchMethodAndCallFor(expansion.symbol, outerLookahead);
 			}
 			case Terminal: {
-				String symbol = expansion.symbol;
-				return matchCall(symbol, LOOKAHEAD);
+				return matchCall(expansion.symbol, LOOKAHEAD);
 			}
 			case Action: {
 				return null;
@@ -363,6 +379,15 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 			default:
 		}
 		return null;
+	}
+
+	private void createMatchMethod(String symbol, String namePrefix, GExpansion expansion, NodeList<Stmt> stmts) {
+		List<MethodDecl> methods = perSymbolMatchMethods.get(symbol);
+		if (methods == null) {
+			methods = new ArrayList<>();
+			perSymbolMatchMethods.put(symbol, methods);
+		}
+		methods.add(matchMethod(namePrefix, stmts, expansion));
 	}
 
 	private String matchMethodName(String symbol) {
