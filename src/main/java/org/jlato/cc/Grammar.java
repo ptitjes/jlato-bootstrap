@@ -1438,7 +1438,7 @@ public class Grammar {
 							zeroOrOne(
 									choice(
 											sequence(
-													lookAhead(2),
+//													lookAhead(2),
 													zeroOrOne(
 															lookAhead(
 																	expr("inConstructor").build(),
@@ -1450,7 +1450,7 @@ public class Grammar {
 															))
 													),
 													zeroOrMore(
-															lookAhead(2),
+//															lookAhead(2),
 															nonTerminal("stmt", "BlockStatement"),
 															action(listOf(
 																	stmt("ret = append(ret, stmt);").build()
@@ -2036,7 +2036,7 @@ public class Grammar {
 									sequence(
 											nonTerminal("ret", "ConditionalExpression"),
 											zeroOrOne(
-													lookAhead(2),
+//													lookAhead(2),
 													action(listOf(
 															stmt("lateRun();").build()
 													)),
@@ -2218,7 +2218,7 @@ public class Grammar {
 					sequence(
 							nonTerminal("ret", "ConditionalOrExpression"),
 							zeroOrOne(
-									lookAhead(2),
+//									lookAhead(2),
 									action(listOf(
 											stmt("lateRun();").build()
 									)),
@@ -2245,7 +2245,7 @@ public class Grammar {
 					sequence(
 							nonTerminal("ret", "ConditionalAndExpression"),
 							zeroOrMore(
-									lookAhead(2),
+//									lookAhead(2),
 									action(listOf(
 											stmt("lateRun();").build()
 									)),
@@ -2270,7 +2270,7 @@ public class Grammar {
 					sequence(
 							nonTerminal("ret", "InclusiveOrExpression"),
 							zeroOrMore(
-									lookAhead(2),
+//									lookAhead(2),
 									action(listOf(
 											stmt("lateRun();").build()
 									)),
@@ -2295,7 +2295,7 @@ public class Grammar {
 					sequence(
 							nonTerminal("ret", "ExclusiveOrExpression"),
 							zeroOrMore(
-									lookAhead(2),
+//									lookAhead(2),
 									action(listOf(
 											stmt("lateRun();").build()
 									)),
@@ -2320,7 +2320,7 @@ public class Grammar {
 					sequence(
 							nonTerminal("ret", "AndExpression"),
 							zeroOrMore(
-									lookAhead(2),
+//									lookAhead(2),
 									action(listOf(
 											stmt("lateRun();").build()
 									)),
@@ -2345,7 +2345,7 @@ public class Grammar {
 					sequence(
 							nonTerminal("ret", "EqualityExpression"),
 							zeroOrMore(
-									lookAhead(2),
+//									lookAhead(2),
 									action(listOf(
 											stmt("lateRun();").build()
 									)),
@@ -2371,7 +2371,7 @@ public class Grammar {
 					sequence(
 							nonTerminal("ret", "InstanceOfExpression"),
 							zeroOrMore(
-									lookAhead(2),
+//									lookAhead(2),
 									action(listOf(
 											stmt("lateRun();").build()
 									)),
@@ -2410,7 +2410,7 @@ public class Grammar {
 					sequence(
 							nonTerminal("ret", "RelationalExpression"),
 							zeroOrOne(
-									lookAhead(2),
+//									lookAhead(2),
 									action(listOf(
 											stmt("lateRun();").build()
 									)),
@@ -2442,7 +2442,7 @@ public class Grammar {
 					sequence(
 							nonTerminal("ret", "ShiftExpression"),
 							zeroOrMore(
-									lookAhead(2),
+//									lookAhead(2),
 									action(listOf(
 											stmt("lateRun();").build()
 									)),
@@ -2540,7 +2540,7 @@ public class Grammar {
 					sequence(
 							nonTerminal("ret", "MultiplicativeExpression"),
 							zeroOrMore(
-									lookAhead(2),
+//									lookAhead(2),
 									action(listOf(
 											stmt("lateRun();").build()
 									)),
@@ -2579,7 +2579,7 @@ public class Grammar {
 					sequence(
 							nonTerminal("ret", "UnaryExpression"),
 							zeroOrMore(
-									lookAhead(2),
+//									lookAhead(2),
 									action(listOf(
 											stmt("lateRun();").build()
 									)),
@@ -2972,7 +2972,7 @@ public class Grammar {
 					sequence(
 							nonTerminal("ret", "PrimaryPrefix"),
 							zeroOrMore(
-									lookAhead(2),
+//									lookAhead(2),
 									action(listOf(
 											stmt("lateRun();").build()
 									)),
@@ -4295,7 +4295,7 @@ public class Grammar {
 									))
 							),
 							zeroOrOne(
-									lookAhead(2),
+//									lookAhead(2),
 									terminal("SEMICOLON"),
 									action(listOf(
 											stmt("trailingSemiColon.value = true;").build()
