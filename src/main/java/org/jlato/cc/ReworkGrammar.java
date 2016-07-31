@@ -58,7 +58,8 @@ public class ReworkGrammar {
 						importDecl(qualifiedName("org.jlato.rewrite.Quotes.memberDecl")).setStatic(true),
 						importDecl(qualifiedName("org.jlato.rewrite.Quotes.stmt")).setStatic(true),
 						importDecl(qualifiedName("org.jlato.tree.Trees.emptyList")).setStatic(true),
-						importDecl(qualifiedName("org.jlato.tree.Trees.listOf")).setStatic(true)
+						importDecl(qualifiedName("org.jlato.tree.Trees.listOf")).setStatic(true),
+						importDecl(qualifiedName("org.jlato.cc.grammar.GExpansion")).setOnDemand(true).setStatic(true)
 				))
 				.withTypes(listOf(
 						classDecl(name("Grammar"))

@@ -211,7 +211,7 @@ public class GExpansion {
 
 	private MethodInvocationExpr factoryCall(NodeList<Expr> args) {
 		Name methodName = name(lowerCaseFirst(kind.name()));
-		return methodInvocationExpr(methodName).withScope(name("GExpansion")).withArgs(args)
+		return methodInvocationExpr(methodName).withArgs(args)
 				.insertNewLineBefore();
 	}
 
