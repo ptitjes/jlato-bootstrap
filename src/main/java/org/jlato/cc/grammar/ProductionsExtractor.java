@@ -4,10 +4,13 @@ import org.javacc.parser.*;
 import org.jlato.parser.ParseContext;
 import org.jlato.parser.Parser;
 import org.jlato.parser.ParserConfiguration;
+import org.jlato.tree.Kind;
 import org.jlato.tree.NodeList;
+import org.jlato.tree.decl.FormalParameter;
 import org.jlato.tree.decl.MethodDecl;
 import org.jlato.tree.expr.Expr;
 import org.jlato.tree.stmt.Stmt;
+import org.jlato.tree.type.Type;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -45,7 +48,10 @@ public class ProductionsExtractor {
 				NodeList<Stmt> declarations = tokensToStatements(((BNFProduction) production).getDeclarationTokens());
 				GExpansion expansion = emitExpansionTree(production.getExpansion());
 
-				productions.add(new GProduction(symbol, signature, declarations, expansion));
+				Type returnType = signature.type();
+				NodeList<FormalParameter> dataParams = signature.params();
+				productions.add(new GProduction(symbol, returnType.kind() == Kind.VoidType ? null : returnType,
+						emptyList(), dataParams, declarations, expansion));
 			}
 		}
 		return new GProductions(productions);

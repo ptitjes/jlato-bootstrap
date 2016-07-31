@@ -1,22 +1,22 @@
 package org.jlato.cc;
 
-import org.jlato.cc.grammar.GExpansion;
-import org.jlato.cc.grammar.GProduction;
 import org.jlato.cc.grammar.GProductions;
-import org.jlato.tree.decl.MethodDecl;
 
 import static org.jlato.rewrite.Quotes.expr;
-import static org.jlato.rewrite.Quotes.memberDecl;
+import static org.jlato.rewrite.Quotes.param;
 import static org.jlato.rewrite.Quotes.stmt;
+import static org.jlato.rewrite.Quotes.type;
 import static org.jlato.tree.Trees.emptyList;
 import static org.jlato.tree.Trees.listOf;
 import static org.jlato.cc.grammar.GExpansion.*;
+import static org.jlato.cc.grammar.GProduction.*;
 
 public class Grammar {
 
 	public static GProductions productions = new GProductions(
-			new GProduction("NodeListVar",
-					(MethodDecl) memberDecl("BUTree<SNodeList> NodeListVar();").build(),
+			production("NodeListVar", type("BUTree<SNodeList>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("Token id;").build()
 					),
@@ -29,8 +29,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("NodeVar",
-					(MethodDecl) memberDecl("BUTree<SName> NodeVar();").build(),
+			production("NodeVar", type("BUTree<SName>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("Token id;").build()
 					),
@@ -43,8 +44,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("CompilationUnit",
-					(MethodDecl) memberDecl("BUTree<SCompilationUnit> CompilationUnit();").build(),
+			production("CompilationUnit", type("BUTree<SCompilationUnit>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SPackageDecl> packageDecl = null;").build(),
 							stmt("BUTree<SNodeList> imports;").build(),
@@ -78,16 +80,18 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("Epilog",
-					(MethodDecl) memberDecl("void Epilog();").build(),
+			production("Epilog", null,
+					emptyList(),
+					emptyList(),
 					emptyList(),
 					choice(
 							terminal(null, "EOF"),
 							terminal(null, "EOF")
 					)
 			),
-			new GProduction("PackageDecl",
-					(MethodDecl) memberDecl("BUTree<SPackageDecl> PackageDecl();").build(),
+			production("PackageDecl", type("BUTree<SPackageDecl>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> annotations = null;").build(),
 							stmt("BUTree<SQualifiedName> name;").build()
@@ -109,8 +113,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("ImportDecls",
-					(MethodDecl) memberDecl("BUTree<SNodeList> ImportDecls();").build(),
+			production("ImportDecls", type("BUTree<SNodeList>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> imports = emptyList();").build(),
 							stmt("BUTree<SImportDecl> importDecl = null;").build()
@@ -131,8 +136,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("ImportDecl",
-					(MethodDecl) memberDecl("BUTree<SImportDecl> ImportDecl();").build(),
+			production("ImportDecl", type("BUTree<SImportDecl>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SQualifiedName> name;").build(),
 							stmt("boolean isStatic = false;").build(),
@@ -171,8 +177,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("TypeDecls",
-					(MethodDecl) memberDecl("BUTree<SNodeList> TypeDecls();").build(),
+			production("TypeDecls", type("BUTree<SNodeList>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> types = emptyList();").build(),
 							stmt("BUTree<? extends STypeDecl> typeDecl = null;").build()
@@ -193,8 +200,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("Modifiers",
-					(MethodDecl) memberDecl("BUTree<SNodeList> Modifiers();").build(),
+			production("Modifiers", type("BUTree<SNodeList>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> modifiers = emptyList();").build(),
 							stmt("BUTree<? extends SAnnotationExpr> ann;").build()
@@ -316,8 +324,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("ModifiersNoDefault",
-					(MethodDecl) memberDecl("BUTree<SNodeList> ModifiersNoDefault();").build(),
+			production("ModifiersNoDefault", type("BUTree<SNodeList>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> modifiers = emptyList();").build(),
 							stmt("BUTree<? extends SAnnotationExpr> ann;").build()
@@ -431,8 +440,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("TypeDecl",
-					(MethodDecl) memberDecl("BUTree<? extends STypeDecl> TypeDecl();").build(),
+			production("TypeDecl", type("BUTree<? extends STypeDecl>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> modifiers;").build(),
 							stmt("BUTree<? extends STypeDecl> ret;").build()
@@ -474,8 +484,11 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("ClassOrInterfaceDecl",
-					(MethodDecl) memberDecl("BUTree<? extends STypeDecl> ClassOrInterfaceDecl(BUTree<SNodeList> modifiers);").build(),
+			production("ClassOrInterfaceDecl", type("BUTree<? extends STypeDecl>").build(),
+					emptyList(),
+					listOf(
+							param("BUTree<SNodeList> modifiers").build()
+					),
 					listOf(
 							stmt("TypeKind typeKind;").build(),
 							stmt("BUTree<SName> name;").build(),
@@ -536,8 +549,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("ExtendsList",
-					(MethodDecl) memberDecl("BUTree<SNodeList> ExtendsList();").build(),
+			production("ExtendsList", type("BUTree<SNodeList>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> ret = emptyList();").build(),
 							stmt("BUTree<SQualifiedType> cit;").build(),
@@ -577,8 +591,12 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("ImplementsList",
-					(MethodDecl) memberDecl("BUTree<SNodeList> ImplementsList(TypeKind typeKind, ByRef<BUProblem> problem);").build(),
+			production("ImplementsList", type("BUTree<SNodeList>").build(),
+					emptyList(),
+					listOf(
+							param("TypeKind typeKind").build(),
+							param("ByRef<BUProblem> problem").build()
+					),
 					listOf(
 							stmt("BUTree<SNodeList> ret = emptyList();").build(),
 							stmt("BUTree<SQualifiedType> cit;").build(),
@@ -623,8 +641,11 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("EnumDecl",
-					(MethodDecl) memberDecl("BUTree<? extends STypeDecl> EnumDecl(BUTree<SNodeList> modifiers);").build(),
+			production("EnumDecl", type("BUTree<? extends STypeDecl>").build(),
+					emptyList(),
+					listOf(
+							param("BUTree<SNodeList> modifiers").build()
+					),
 					listOf(
 							stmt("BUTree<SName> name;").build(),
 							stmt("BUTree<SNodeList> implementsClause = emptyList();").build(),
@@ -694,8 +715,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("EnumConstantDecl",
-					(MethodDecl) memberDecl("BUTree<SEnumConstantDecl> EnumConstantDecl();").build(),
+			production("EnumConstantDecl", type("BUTree<SEnumConstantDecl>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> modifiers = null;").build(),
 							stmt("BUTree<SName> name;").build(),
@@ -725,8 +747,11 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("AnnotationTypeDecl",
-					(MethodDecl) memberDecl("BUTree<SAnnotationDecl> AnnotationTypeDecl(BUTree<SNodeList> modifiers);").build(),
+			production("AnnotationTypeDecl", type("BUTree<SAnnotationDecl>").build(),
+					emptyList(),
+					listOf(
+							param("BUTree<SNodeList> modifiers").build()
+					),
 					listOf(
 							stmt("BUTree<SName> name;").build(),
 							stmt("BUTree<SNodeList> members;").build()
@@ -743,8 +768,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("AnnotationTypeBody",
-					(MethodDecl) memberDecl("BUTree<SNodeList> AnnotationTypeBody();").build(),
+			production("AnnotationTypeBody", type("BUTree<SNodeList>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> ret = emptyList();").build(),
 							stmt("BUTree<? extends SMemberDecl> member;").build()
@@ -777,8 +803,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("AnnotationTypeBodyDecl",
-					(MethodDecl) memberDecl("BUTree<? extends SMemberDecl> AnnotationTypeBodyDecl();").build(),
+			production("AnnotationTypeBodyDecl", type("BUTree<? extends SMemberDecl>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> modifiers;").build(),
 							stmt("BUTree<? extends SMemberDecl> ret;").build()
@@ -833,8 +860,11 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("AnnotationTypeMemberDecl",
-					(MethodDecl) memberDecl("BUTree<SAnnotationMemberDecl> AnnotationTypeMemberDecl(BUTree<SNodeList> modifiers);").build(),
+			production("AnnotationTypeMemberDecl", type("BUTree<SAnnotationMemberDecl>").build(),
+					emptyList(),
+					listOf(
+							param("BUTree<SNodeList> modifiers").build()
+					),
 					listOf(
 							stmt("BUTree<? extends SType> type;").build(),
 							stmt("BUTree<SName> name;").build(),
@@ -867,8 +897,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("TypeParameters",
-					(MethodDecl) memberDecl("BUTree<SNodeList> TypeParameters();").build(),
+			production("TypeParameters", type("BUTree<SNodeList>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> ret = emptyList();").build(),
 							stmt("BUTree<STypeParameter> tp;").build()
@@ -908,8 +939,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("TypeParameter",
-					(MethodDecl) memberDecl("BUTree<STypeParameter> TypeParameter();").build(),
+			production("TypeParameter", type("BUTree<STypeParameter>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> annotations = null;").build(),
 							stmt("BUTree<SName> name;").build(),
@@ -933,8 +965,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("TypeBounds",
-					(MethodDecl) memberDecl("BUTree<SNodeList> TypeBounds();").build(),
+			production("TypeBounds", type("BUTree<SNodeList>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> ret = emptyList();").build(),
 							stmt("BUTree<SQualifiedType> cit;").build(),
@@ -974,8 +1007,11 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("ClassOrInterfaceBody",
-					(MethodDecl) memberDecl("BUTree<SNodeList> ClassOrInterfaceBody(TypeKind typeKind);").build(),
+			production("ClassOrInterfaceBody", type("BUTree<SNodeList>").build(),
+					emptyList(),
+					listOf(
+							param("TypeKind typeKind").build()
+					),
 					listOf(
 							stmt("BUTree<SNodeList> ret = emptyList();").build(),
 							stmt("BUTree<? extends SMemberDecl> member;").build()
@@ -993,8 +1029,11 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("ClassOrInterfaceBodyDecls",
-					(MethodDecl) memberDecl("BUTree<SNodeList> ClassOrInterfaceBodyDecls(TypeKind typeKind);").build(),
+			production("ClassOrInterfaceBodyDecls", type("BUTree<SNodeList>").build(),
+					emptyList(),
+					listOf(
+							param("TypeKind typeKind").build()
+					),
 					listOf(
 							stmt("BUTree<? extends SMemberDecl> member;").build(),
 							stmt("BUTree<SNodeList> ret = emptyList();").build()
@@ -1027,8 +1066,11 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("ClassOrInterfaceBodyDecl",
-					(MethodDecl) memberDecl("BUTree<? extends SMemberDecl> ClassOrInterfaceBodyDecl(TypeKind typeKind);").build(),
+			production("ClassOrInterfaceBodyDecl", type("BUTree<? extends SMemberDecl>").build(),
+					emptyList(),
+					listOf(
+							param("TypeKind typeKind").build()
+					),
 					listOf(
 							stmt("BUTree<SNodeList> modifiers;").build(),
 							stmt("BUTree<? extends SMemberDecl> ret;").build(),
@@ -1124,8 +1166,11 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("FieldDecl",
-					(MethodDecl) memberDecl("BUTree<SFieldDecl> FieldDecl(BUTree<SNodeList> modifiers);").build(),
+			production("FieldDecl", type("BUTree<SFieldDecl>").build(),
+					emptyList(),
+					listOf(
+							param("BUTree<SNodeList> modifiers").build()
+					),
 					listOf(
 							stmt("BUTree<? extends SType> type;").build(),
 							stmt("BUTree<SNodeList> variables = emptyList();").build(),
@@ -1144,8 +1189,11 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("VariableDecl",
-					(MethodDecl) memberDecl("BUTree<SLocalVariableDecl> VariableDecl(BUTree<SNodeList> modifiers);").build(),
+			production("VariableDecl", type("BUTree<SLocalVariableDecl>").build(),
+					emptyList(),
+					listOf(
+							param("BUTree<SNodeList> modifiers").build()
+					),
 					listOf(
 							stmt("BUTree<? extends SType> type;").build(),
 							stmt("BUTree<SNodeList> variables = emptyList();").build()
@@ -1162,8 +1210,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("VariableDeclarators",
-					(MethodDecl) memberDecl("BUTree<SNodeList> VariableDeclarators();").build(),
+			production("VariableDeclarators", type("BUTree<SNodeList>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> variables = emptyList();").build(),
 							stmt("BUTree<SVariableDeclarator> val;").build()
@@ -1191,8 +1240,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("VariableDeclarator",
-					(MethodDecl) memberDecl("BUTree<SVariableDeclarator> VariableDeclarator();").build(),
+			production("VariableDeclarator", type("BUTree<SVariableDeclarator>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SVariableDeclaratorId> id;").build(),
 							stmt("BUTree<SNodeOption> init = none();").build(),
@@ -1221,8 +1271,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("VariableDeclaratorId",
-					(MethodDecl) memberDecl("BUTree<SVariableDeclaratorId> VariableDeclaratorId();").build(),
+			production("VariableDeclaratorId", type("BUTree<SVariableDeclaratorId>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SName> name;").build(),
 							stmt("BUTree<SNodeList> arrayDims;").build()
@@ -1242,8 +1293,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("ArrayDims",
-					(MethodDecl) memberDecl("BUTree<SNodeList> ArrayDims();").build(),
+			production("ArrayDims", type("BUTree<SNodeList>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> arrayDims = emptyList();").build(),
 							stmt("BUTree<SNodeList> annotations;").build()
@@ -1276,8 +1328,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("VariableInitializer",
-					(MethodDecl) memberDecl("BUTree<? extends SExpr> VariableInitializer();").build(),
+			production("VariableInitializer", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<? extends SExpr> ret;").build()
 					),
@@ -1293,8 +1346,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("ArrayInitializer",
-					(MethodDecl) memberDecl("BUTree<SArrayInitializerExpr> ArrayInitializer();").build(),
+			production("ArrayInitializer", type("BUTree<SArrayInitializerExpr>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> values = emptyList();").build(),
 							stmt("BUTree<? extends SExpr> val;").build(),
@@ -1341,8 +1395,11 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("MethodDecl",
-					(MethodDecl) memberDecl("BUTree<SMethodDecl> MethodDecl(BUTree<SNodeList> modifiers);").build(),
+			production("MethodDecl", type("BUTree<SMethodDecl>").build(),
+					emptyList(),
+					listOf(
+							param("BUTree<SNodeList> modifiers").build()
+					),
 					listOf(
 							stmt("BUTree<SNodeList> typeParameters = null;").build(),
 							stmt("BUTree<? extends SType> type;").build(),
@@ -1382,8 +1439,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("FormalParameters",
-					(MethodDecl) memberDecl("BUTree<SNodeList> FormalParameters();").build(),
+			production("FormalParameters", type("BUTree<SNodeList>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> ret = null;").build(),
 							stmt("BUTree<SFormalParameter> par;").build()
@@ -1401,8 +1459,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("FormalParameterList",
-					(MethodDecl) memberDecl("BUTree<SNodeList> FormalParameterList();").build(),
+			production("FormalParameterList", type("BUTree<SNodeList>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> ret = null;").build(),
 							stmt("BUTree<SFormalParameter> par;").build()
@@ -1440,8 +1499,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("FormalParameter",
-					(MethodDecl) memberDecl("BUTree<SFormalParameter> FormalParameter();").build(),
+			production("FormalParameter", type("BUTree<SFormalParameter>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> modifiers;").build(),
 							stmt("BUTree<? extends SType> type;").build(),
@@ -1474,8 +1534,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("ThrowsClause",
-					(MethodDecl) memberDecl("BUTree<SNodeList> ThrowsClause();").build(),
+			production("ThrowsClause", type("BUTree<SNodeList>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> ret = emptyList();").build(),
 							stmt("BUTree<SQualifiedType> cit;").build()
@@ -1504,8 +1565,11 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("ConstructorDecl",
-					(MethodDecl) memberDecl("BUTree<SConstructorDecl> ConstructorDecl(BUTree<SNodeList> modifiers);").build(),
+			production("ConstructorDecl", type("BUTree<SConstructorDecl>").build(),
+					emptyList(),
+					listOf(
+							param("BUTree<SNodeList> modifiers").build()
+					),
 					listOf(
 							stmt("BUTree<SNodeList> typeParameters = null;").build(),
 							stmt("BUTree<SName> name;").build(),
@@ -1588,8 +1652,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("ExplicitConstructorInvocation",
-					(MethodDecl) memberDecl("BUTree<SExplicitConstructorInvocationStmt> ExplicitConstructorInvocation();").build(),
+			production("ExplicitConstructorInvocation", type("BUTree<SExplicitConstructorInvocationStmt>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("boolean isThis = false;").build(),
 							stmt("BUTree<SNodeList> args;").build(),
@@ -1647,8 +1712,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("Statements",
-					(MethodDecl) memberDecl("BUTree<SNodeList> Statements();").build(),
+			production("Statements", type("BUTree<SNodeList>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> ret = null;").build(),
 							stmt("BUTree<? extends SStmt> stmt;").build()
@@ -1680,8 +1746,11 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("InitializerDecl",
-					(MethodDecl) memberDecl("BUTree<SInitializerDecl> InitializerDecl(BUTree<SNodeList> modifiers);").build(),
+			production("InitializerDecl", type("BUTree<SInitializerDecl>").build(),
+					emptyList(),
+					listOf(
+							param("BUTree<SNodeList> modifiers").build()
+					),
 					listOf(
 							stmt("BUTree<SBlockStmt> block;").build()
 					),
@@ -1694,8 +1763,11 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("Type",
-					(MethodDecl) memberDecl("BUTree<? extends SType> Type(BUTree<SNodeList> annotations);").build(),
+			production("Type", type("BUTree<? extends SType>").build(),
+					emptyList(),
+					listOf(
+							param("BUTree<SNodeList> annotations").build()
+					),
 					listOf(
 							stmt("BUTree<? extends SType> primitiveType = null;").build(),
 							stmt("BUTree<? extends SReferenceType> type = null;").build(),
@@ -1755,8 +1827,11 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("ReferenceType",
-					(MethodDecl) memberDecl("BUTree<? extends SReferenceType> ReferenceType(BUTree<SNodeList> annotations);").build(),
+			production("ReferenceType", type("BUTree<? extends SReferenceType>").build(),
+					emptyList(),
+					listOf(
+							param("BUTree<SNodeList> annotations").build()
+					),
 					listOf(
 							stmt("BUTree<? extends SType> primitiveType;").build(),
 							stmt("BUTree<? extends SReferenceType> type;").build(),
@@ -1810,8 +1885,11 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("QualifiedType",
-					(MethodDecl) memberDecl("BUTree<SQualifiedType> QualifiedType(BUTree<SNodeList> annotations);").build(),
+			production("QualifiedType", type("BUTree<SQualifiedType>").build(),
+					emptyList(),
+					listOf(
+							param("BUTree<SNodeList> annotations").build()
+					),
 					listOf(
 							stmt("BUTree<SNodeOption> scope = none();").build(),
 							stmt("BUTree<SQualifiedType> ret;").build(),
@@ -1866,8 +1944,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("TypeArguments",
-					(MethodDecl) memberDecl("BUTree<SNodeList> TypeArguments();").build(),
+			production("TypeArguments", type("BUTree<SNodeList>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> ret = emptyList();").build(),
 							stmt("BUTree<? extends SType> type;").build()
@@ -1885,8 +1964,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("TypeArgumentsOrDiamond",
-					(MethodDecl) memberDecl("BUTree<SNodeList> TypeArgumentsOrDiamond();").build(),
+			production("TypeArgumentsOrDiamond", type("BUTree<SNodeList>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> ret = emptyList();").build(),
 							stmt("BUTree<? extends SType> type;").build()
@@ -1904,8 +1984,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("TypeArgumentList",
-					(MethodDecl) memberDecl("BUTree<SNodeList> TypeArgumentList();").build(),
+			production("TypeArgumentList", type("BUTree<SNodeList>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> ret = emptyList();").build(),
 							stmt("BUTree<? extends SType> type;").build(),
@@ -1947,8 +2028,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("TypeArgument",
-					(MethodDecl) memberDecl("BUTree<? extends SType> TypeArgument();").build(),
+			production("TypeArgument", type("BUTree<? extends SType>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<? extends SType> ret;").build(),
 							stmt("BUTree<SNodeList> annotations = null;").build()
@@ -1975,8 +2057,11 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("Wildcard",
-					(MethodDecl) memberDecl("BUTree<SWildcardType> Wildcard(BUTree<SNodeList> annotations);").build(),
+			production("Wildcard", type("BUTree<SWildcardType>").build(),
+					emptyList(),
+					listOf(
+							param("BUTree<SNodeList> annotations").build()
+					),
 					listOf(
 							stmt("BUTree<? extends SReferenceType> ext = null;").build(),
 							stmt("BUTree<? extends SReferenceType> sup = null;").build(),
@@ -2024,8 +2109,11 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("PrimitiveType",
-					(MethodDecl) memberDecl("BUTree<SPrimitiveType> PrimitiveType(BUTree<SNodeList> annotations);").build(),
+			production("PrimitiveType", type("BUTree<SPrimitiveType>").build(),
+					emptyList(),
+					listOf(
+							param("BUTree<SNodeList> annotations").build()
+					),
 					listOf(
 							stmt("Primitive primitive;").build()
 					),
@@ -2108,8 +2196,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("ResultType",
-					(MethodDecl) memberDecl("BUTree<? extends SType> ResultType();").build(),
+			production("ResultType", type("BUTree<? extends SType>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<? extends SType> ret;").build()
 					),
@@ -2139,8 +2228,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("AnnotatedQualifiedType",
-					(MethodDecl) memberDecl("BUTree<SQualifiedType> AnnotatedQualifiedType();").build(),
+			production("AnnotatedQualifiedType", type("BUTree<SQualifiedType>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> annotations;").build(),
 							stmt("BUTree<SQualifiedType> ret;").build()
@@ -2162,8 +2252,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("QualifiedName",
-					(MethodDecl) memberDecl("BUTree<SQualifiedName> QualifiedName();").build(),
+			production("QualifiedName", type("BUTree<SQualifiedName>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeOption> qualifier = none();").build(),
 							stmt("BUTree<SQualifiedName> ret = null;").build(),
@@ -2208,8 +2299,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("Name",
-					(MethodDecl) memberDecl("BUTree<SName> Name();").build(),
+			production("Name", type("BUTree<SName>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("Token id;").build(),
 							stmt("BUTree<SName> name;").build()
@@ -2243,8 +2335,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("Expression",
-					(MethodDecl) memberDecl("BUTree<? extends SExpr> Expression();").build(),
+			production("Expression", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<? extends SExpr> ret;").build(),
 							stmt("AssignOp op;").build(),
@@ -2356,8 +2449,12 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("LambdaBody",
-					(MethodDecl) memberDecl("BUTree<SLambdaExpr> LambdaBody(BUTree<SNodeList> parameters, boolean parenthesis);").build(),
+			production("LambdaBody", type("BUTree<SLambdaExpr>").build(),
+					emptyList(),
+					listOf(
+							param("BUTree<SNodeList> parameters").build(),
+							param("boolean parenthesis").build()
+					),
 					listOf(
 							stmt("BUTree<SBlockStmt> block;").build(),
 							stmt("BUTree<? extends SExpr> expr;").build(),
@@ -2389,8 +2486,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("InferredFormalParameterList",
-					(MethodDecl) memberDecl("BUTree<SNodeList> InferredFormalParameterList();").build(),
+			production("InferredFormalParameterList", type("BUTree<SNodeList>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> ret = emptyList();").build(),
 							stmt("BUTree<SFormalParameter> param;").build()
@@ -2418,8 +2516,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("InferredFormalParameter",
-					(MethodDecl) memberDecl("BUTree<SFormalParameter> InferredFormalParameter();").build(),
+			production("InferredFormalParameter", type("BUTree<SFormalParameter>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SName> name;").build()
 					),
@@ -2432,8 +2531,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("AssignmentOperator",
-					(MethodDecl) memberDecl("AssignOp AssignmentOperator();").build(),
+			production("AssignmentOperator", type("AssignOp").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("AssignOp ret;").build()
 					),
@@ -2543,8 +2643,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("ConditionalExpression",
-					(MethodDecl) memberDecl("BUTree<? extends SExpr> ConditionalExpression();").build(),
+			production("ConditionalExpression", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<? extends SExpr> ret;").build(),
 							stmt("BUTree<? extends SExpr> left;").build(),
@@ -2576,8 +2677,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("ConditionalOrExpression",
-					(MethodDecl) memberDecl("BUTree<? extends SExpr> ConditionalOrExpression();").build(),
+			production("ConditionalOrExpression", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<? extends SExpr> ret;").build(),
 							stmt("BUTree<? extends SExpr> right;").build()
@@ -2606,8 +2708,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("ConditionalAndExpression",
-					(MethodDecl) memberDecl("BUTree<? extends SExpr> ConditionalAndExpression();").build(),
+			production("ConditionalAndExpression", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<? extends SExpr> ret;").build(),
 							stmt("BUTree<? extends SExpr> right;").build()
@@ -2636,8 +2739,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("InclusiveOrExpression",
-					(MethodDecl) memberDecl("BUTree<? extends SExpr> InclusiveOrExpression();").build(),
+			production("InclusiveOrExpression", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<? extends SExpr> ret;").build(),
 							stmt("BUTree<? extends SExpr> right;").build()
@@ -2666,8 +2770,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("ExclusiveOrExpression",
-					(MethodDecl) memberDecl("BUTree<? extends SExpr> ExclusiveOrExpression();").build(),
+			production("ExclusiveOrExpression", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<? extends SExpr> ret;").build(),
 							stmt("BUTree<? extends SExpr> right;").build()
@@ -2696,8 +2801,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("AndExpression",
-					(MethodDecl) memberDecl("BUTree<? extends SExpr> AndExpression();").build(),
+			production("AndExpression", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<? extends SExpr> ret;").build(),
 							stmt("BUTree<? extends SExpr> right;").build()
@@ -2726,8 +2832,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("EqualityExpression",
-					(MethodDecl) memberDecl("BUTree<? extends SExpr> EqualityExpression();").build(),
+			production("EqualityExpression", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<? extends SExpr> ret;").build(),
 							stmt("BUTree<? extends SExpr> right;").build(),
@@ -2774,8 +2881,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("InstanceOfExpression",
-					(MethodDecl) memberDecl("BUTree<? extends SExpr> InstanceOfExpression();").build(),
+			production("InstanceOfExpression", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<? extends SExpr> ret;").build(),
 							stmt("BUTree<SNodeList> annotations;").build(),
@@ -2813,8 +2921,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("RelationalExpression",
-					(MethodDecl) memberDecl("BUTree<? extends SExpr> RelationalExpression();").build(),
+			production("RelationalExpression", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<? extends SExpr> ret;").build(),
 							stmt("BUTree<? extends SExpr> right;").build(),
@@ -2877,8 +2986,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("ShiftExpression",
-					(MethodDecl) memberDecl("BUTree<? extends SExpr> ShiftExpression();").build(),
+			production("ShiftExpression", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<? extends SExpr> ret;").build(),
 							stmt("BUTree<? extends SExpr> right;").build(),
@@ -2935,8 +3045,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("AdditiveExpression",
-					(MethodDecl) memberDecl("BUTree<? extends SExpr> AdditiveExpression();").build(),
+			production("AdditiveExpression", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<? extends SExpr> ret;").build(),
 							stmt("BUTree<? extends SExpr> right;").build(),
@@ -2983,8 +3094,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("MultiplicativeExpression",
-					(MethodDecl) memberDecl("BUTree<? extends SExpr> MultiplicativeExpression();").build(),
+			production("MultiplicativeExpression", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<? extends SExpr> ret;").build(),
 							stmt("BUTree<? extends SExpr> right;").build(),
@@ -3039,8 +3151,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("UnaryExpression",
-					(MethodDecl) memberDecl("BUTree<? extends SExpr> UnaryExpression();").build(),
+			production("UnaryExpression", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<? extends SExpr> ret;").build(),
 							stmt("UnaryOp op;").build()
@@ -3088,8 +3201,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("PrefixExpression",
-					(MethodDecl) memberDecl("BUTree<? extends SExpr> PrefixExpression();").build(),
+			production("PrefixExpression", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("UnaryOp op;").build(),
 							stmt("BUTree<? extends SExpr> ret;").build()
@@ -3126,8 +3240,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("UnaryExpressionNotPlusMinus",
-					(MethodDecl) memberDecl("BUTree<? extends SExpr> UnaryExpressionNotPlusMinus();").build(),
+			production("UnaryExpressionNotPlusMinus", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<? extends SExpr> ret;").build(),
 							stmt("UnaryOp op;").build()
@@ -3180,8 +3295,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("PostfixExpression",
-					(MethodDecl) memberDecl("BUTree<? extends SExpr> PostfixExpression();").build(),
+			production("PostfixExpression", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<? extends SExpr> ret;").build(),
 							stmt("UnaryOp op;").build()
@@ -3226,8 +3342,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("CastExpression",
-					(MethodDecl) memberDecl("BUTree<? extends SExpr> CastExpression();").build(),
+			production("CastExpression", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> annotations = null;").build(),
 							stmt("BUTree<? extends SType> primitiveType;").build(),
@@ -3328,8 +3445,11 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("ReferenceCastTypeRest",
-					(MethodDecl) memberDecl("BUTree<? extends SType> ReferenceCastTypeRest(BUTree<? extends SType> type);").build(),
+			production("ReferenceCastTypeRest", type("BUTree<? extends SType>").build(),
+					emptyList(),
+					listOf(
+							param("BUTree<? extends SType> type").build()
+					),
 					listOf(
 							stmt("BUTree<SNodeList> types = emptyList();").build(),
 							stmt("BUTree<SNodeList> annotations = null;").build()
@@ -3379,8 +3499,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("Literal",
-					(MethodDecl) memberDecl("BUTree<? extends SExpr> Literal();").build(),
+			production("Literal", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("Token literal;").build(),
 							stmt("BUTree<? extends SExpr> ret;").build()
@@ -3472,8 +3593,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("PrimaryExpression",
-					(MethodDecl) memberDecl("BUTree<? extends SExpr> PrimaryExpression();").build(),
+			production("PrimaryExpression", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<? extends SExpr> ret;").build()
 					),
@@ -3497,8 +3619,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("PrimaryExpressionWithoutSuperSuffix",
-					(MethodDecl) memberDecl("BUTree<? extends SExpr> PrimaryExpressionWithoutSuperSuffix();").build(),
+			production("PrimaryExpressionWithoutSuperSuffix", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<? extends SExpr> ret;").build()
 					),
@@ -3524,8 +3647,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("PrimaryPrefix",
-					(MethodDecl) memberDecl("BUTree<? extends SExpr> PrimaryPrefix();").build(),
+			production("PrimaryPrefix", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<? extends SExpr> ret = null;").build(),
 							stmt("BUTree<SNodeList> typeArgs = null;").build(),
@@ -3747,8 +3871,11 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("PrimarySuffix",
-					(MethodDecl) memberDecl("BUTree<? extends SExpr> PrimarySuffix(BUTree<? extends SExpr> scope);").build(),
+			production("PrimarySuffix", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					listOf(
+							param("BUTree<? extends SExpr> scope").build()
+					),
 					listOf(
 							stmt("BUTree<? extends SExpr> ret;").build()
 					),
@@ -3780,8 +3907,11 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("PrimarySuffixWithoutSuper",
-					(MethodDecl) memberDecl("BUTree<? extends SExpr> PrimarySuffixWithoutSuper(BUTree<? extends SExpr> scope);").build(),
+			production("PrimarySuffixWithoutSuper", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					listOf(
+							param("BUTree<? extends SExpr> scope").build()
+					),
 					listOf(
 							stmt("BUTree<? extends SExpr> ret;").build(),
 							stmt("BUTree<SName> name;").build()
@@ -3837,8 +3967,11 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("FieldAccess",
-					(MethodDecl) memberDecl("BUTree<? extends SExpr> FieldAccess(BUTree<? extends SExpr> scope);").build(),
+			production("FieldAccess", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					listOf(
+							param("BUTree<? extends SExpr> scope").build()
+					),
 					listOf(
 							stmt("BUTree<SName> name;").build()
 					),
@@ -3851,8 +3984,11 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("MethodInvocation",
-					(MethodDecl) memberDecl("BUTree<? extends SExpr> MethodInvocation(BUTree<? extends SExpr> scope);").build(),
+			production("MethodInvocation", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					listOf(
+							param("BUTree<? extends SExpr> scope").build()
+					),
 					listOf(
 							stmt("BUTree<SNodeList> typeArgs = null;").build(),
 							stmt("BUTree<SName> name;").build(),
@@ -3872,8 +4008,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("Arguments",
-					(MethodDecl) memberDecl("BUTree<SNodeList> Arguments();").build(),
+			production("Arguments", type("BUTree<SNodeList>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> ret = emptyList();").build(),
 							stmt("BUTree<? extends SExpr> expr;").build()
@@ -3916,8 +4053,11 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("MethodReferenceSuffix",
-					(MethodDecl) memberDecl("BUTree<? extends SExpr> MethodReferenceSuffix(BUTree<? extends SExpr> scope);").build(),
+			production("MethodReferenceSuffix", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					listOf(
+							param("BUTree<? extends SExpr> scope").build()
+					),
 					listOf(
 							stmt("BUTree<SNodeList> typeArgs = null;").build(),
 							stmt("BUTree<SName> name;").build(),
@@ -3951,8 +4091,11 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("AllocationExpression",
-					(MethodDecl) memberDecl("BUTree<? extends SExpr> AllocationExpression(BUTree<? extends SExpr> scope);").build(),
+			production("AllocationExpression", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					listOf(
+							param("BUTree<? extends SExpr> scope").build()
+					),
 					listOf(
 							stmt("BUTree<? extends SExpr> ret;").build(),
 							stmt("BUTree<? extends SType> type;").build(),
@@ -4020,8 +4163,11 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("ArrayCreationExpr",
-					(MethodDecl) memberDecl("BUTree<? extends SExpr> ArrayCreationExpr(BUTree<? extends SType> componentType);").build(),
+			production("ArrayCreationExpr", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					listOf(
+							param("BUTree<? extends SType> componentType").build()
+					),
 					listOf(
 							stmt("BUTree<? extends SExpr> expr;").build(),
 							stmt("BUTree<SNodeList> arrayDimExprs = emptyList();").build(),
@@ -4056,8 +4202,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("ArrayDimExprsMandatory",
-					(MethodDecl) memberDecl("BUTree<SNodeList> ArrayDimExprsMandatory();").build(),
+			production("ArrayDimExprsMandatory", type("BUTree<SNodeList>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> arrayDimExprs = emptyList();").build(),
 							stmt("BUTree<SNodeList> annotations;").build(),
@@ -4093,8 +4240,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("ArrayDimsMandatory",
-					(MethodDecl) memberDecl("BUTree<SNodeList> ArrayDimsMandatory();").build(),
+			production("ArrayDimsMandatory", type("BUTree<SNodeList>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> arrayDims = emptyList();").build(),
 							stmt("BUTree<SNodeList> annotations;").build()
@@ -4127,8 +4275,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("Statement",
-					(MethodDecl) memberDecl("BUTree<? extends SStmt> Statement();").build(),
+			production("Statement", type("BUTree<? extends SStmt>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<? extends SStmt> ret;").build()
 					),
@@ -4161,8 +4310,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("AssertStatement",
-					(MethodDecl) memberDecl("BUTree<SAssertStmt> AssertStatement();").build(),
+			production("AssertStatement", type("BUTree<SAssertStmt>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<? extends SExpr> check;").build(),
 							stmt("BUTree<? extends SExpr> msg = null;").build()
@@ -4187,8 +4337,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("LabeledStatement",
-					(MethodDecl) memberDecl("BUTree<SLabeledStmt> LabeledStatement();").build(),
+			production("LabeledStatement", type("BUTree<SLabeledStmt>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SName> label;").build(),
 							stmt("BUTree<? extends SStmt> stmt;").build()
@@ -4209,8 +4360,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("Block",
-					(MethodDecl) memberDecl("BUTree<SBlockStmt> Block();").build(),
+			production("Block", type("BUTree<SBlockStmt>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> stmts;").build()
 					),
@@ -4230,8 +4382,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("BlockStatement",
-					(MethodDecl) memberDecl("BUTree<? extends SStmt> BlockStatement();").build(),
+			production("BlockStatement", type("BUTree<? extends SStmt>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<? extends SStmt> ret;").build(),
 							stmt("BUTree<? extends SExpr> expr;").build(),
@@ -4294,8 +4447,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("VariableDeclExpression",
-					(MethodDecl) memberDecl("BUTree<SVariableDeclarationExpr> VariableDeclExpression();").build(),
+			production("VariableDeclExpression", type("BUTree<SVariableDeclarationExpr>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> modifiers;").build(),
 							stmt("BUTree<SLocalVariableDecl> variableDecl;").build()
@@ -4322,8 +4476,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("EmptyStatement",
-					(MethodDecl) memberDecl("BUTree<SEmptyStmt> EmptyStatement();").build(),
+			production("EmptyStatement", type("BUTree<SEmptyStmt>").build(),
+					emptyList(),
+					emptyList(),
 					emptyList(),
 					sequence(
 							action(
@@ -4339,8 +4494,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("StatementExpression",
-					(MethodDecl) memberDecl("BUTree<SExpressionStmt> StatementExpression();").build(),
+			production("StatementExpression", type("BUTree<SExpressionStmt>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<? extends SExpr> expr;").build(),
 							stmt("AssignOp op;").build(),
@@ -4410,8 +4566,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("SwitchStatement",
-					(MethodDecl) memberDecl("BUTree<SSwitchStmt> SwitchStatement();").build(),
+			production("SwitchStatement", type("BUTree<SSwitchStmt>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<? extends SExpr> selector;").build(),
 							stmt("BUTree<SSwitchCase> entry;").build(),
@@ -4444,8 +4601,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("SwitchEntry",
-					(MethodDecl) memberDecl("BUTree<SSwitchCase> SwitchEntry();").build(),
+			production("SwitchEntry", type("BUTree<SSwitchCase>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<? extends SExpr> label = null;").build(),
 							stmt("BUTree<SNodeList> stmts;").build()
@@ -4472,8 +4630,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("IfStatement",
-					(MethodDecl) memberDecl("BUTree<SIfStmt> IfStatement();").build(),
+			production("IfStatement", type("BUTree<SIfStmt>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<? extends SExpr> condition;").build(),
 							stmt("BUTree<? extends SStmt> thenStmt;").build(),
@@ -4502,8 +4661,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("WhileStatement",
-					(MethodDecl) memberDecl("BUTree<SWhileStmt> WhileStatement();").build(),
+			production("WhileStatement", type("BUTree<SWhileStmt>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<? extends SExpr> condition;").build(),
 							stmt("BUTree<? extends SStmt> body;").build()
@@ -4526,8 +4686,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("DoStatement",
-					(MethodDecl) memberDecl("BUTree<SDoStmt> DoStatement();").build(),
+			production("DoStatement", type("BUTree<SDoStmt>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<? extends SExpr> condition;").build(),
 							stmt("BUTree<? extends SStmt> body;").build()
@@ -4552,8 +4713,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("ForStatement",
-					(MethodDecl) memberDecl("BUTree<? extends SStmt> ForStatement();").build(),
+			production("ForStatement", type("BUTree<? extends SStmt>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SVariableDeclarationExpr> varExpr = null;").build(),
 							stmt("BUTree<? extends SExpr> expr = null;").build(),
@@ -4602,8 +4764,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("ForInit",
-					(MethodDecl) memberDecl("BUTree<SNodeList> ForInit();").build(),
+			production("ForInit", type("BUTree<SNodeList>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> ret;").build(),
 							stmt("BUTree<? extends SExpr> expr;").build()
@@ -4633,8 +4796,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("ExpressionList",
-					(MethodDecl) memberDecl("BUTree<SNodeList> ExpressionList();").build(),
+			production("ExpressionList", type("BUTree<SNodeList>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> ret = emptyList();").build(),
 							stmt("BUTree<? extends SExpr> expr;").build()
@@ -4662,8 +4826,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("ForUpdate",
-					(MethodDecl) memberDecl("BUTree<SNodeList> ForUpdate();").build(),
+			production("ForUpdate", type("BUTree<SNodeList>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> ret;").build()
 					),
@@ -4676,8 +4841,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("BreakStatement",
-					(MethodDecl) memberDecl("BUTree<SBreakStmt> BreakStatement();").build(),
+			production("BreakStatement", type("BUTree<SBreakStmt>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SName> id = null;").build()
 					),
@@ -4699,8 +4865,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("ContinueStatement",
-					(MethodDecl) memberDecl("BUTree<SContinueStmt> ContinueStatement();").build(),
+			production("ContinueStatement", type("BUTree<SContinueStmt>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SName> id = null;").build()
 					),
@@ -4722,8 +4889,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("ReturnStatement",
-					(MethodDecl) memberDecl("BUTree<SReturnStmt> ReturnStatement();").build(),
+			production("ReturnStatement", type("BUTree<SReturnStmt>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<? extends SExpr> expr = null;").build()
 					),
@@ -4745,8 +4913,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("ThrowStatement",
-					(MethodDecl) memberDecl("BUTree<SThrowStmt> ThrowStatement();").build(),
+			production("ThrowStatement", type("BUTree<SThrowStmt>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<? extends SExpr> expr;").build()
 					),
@@ -4766,8 +4935,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("SynchronizedStatement",
-					(MethodDecl) memberDecl("BUTree<SSynchronizedStmt> SynchronizedStatement();").build(),
+			production("SynchronizedStatement", type("BUTree<SSynchronizedStmt>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<? extends SExpr> expr;").build(),
 							stmt("BUTree<SBlockStmt> block;").build()
@@ -4790,8 +4960,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("TryStatement",
-					(MethodDecl) memberDecl("BUTree<STryStmt> TryStatement();").build(),
+			production("TryStatement", type("BUTree<STryStmt>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> resources = null;").build(),
 							stmt("ByRef<Boolean> trailingSemiColon = new ByRef<Boolean>(false);").build(),
@@ -4844,8 +5015,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("CatchClauses",
-					(MethodDecl) memberDecl("BUTree<SNodeList> CatchClauses();").build(),
+			production("CatchClauses", type("BUTree<SNodeList>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> catchClauses = emptyList();").build(),
 							stmt("BUTree<SCatchClause> catchClause;").build()
@@ -4866,8 +5038,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("CatchClause",
-					(MethodDecl) memberDecl("BUTree<SCatchClause> CatchClause();").build(),
+			production("CatchClause", type("BUTree<SCatchClause>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SFormalParameter> param;").build(),
 							stmt("BUTree<SBlockStmt> catchBlock;").build()
@@ -4890,8 +5063,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("CatchFormalParameter",
-					(MethodDecl) memberDecl("BUTree<SFormalParameter> CatchFormalParameter();").build(),
+			production("CatchFormalParameter", type("BUTree<SFormalParameter>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> modifiers;").build(),
 							stmt("BUTree<? extends SType> exceptType;").build(),
@@ -4945,8 +5119,11 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("ResourceSpecification",
-					(MethodDecl) memberDecl("BUTree<SNodeList> ResourceSpecification(ByRef<Boolean> trailingSemiColon);").build(),
+			production("ResourceSpecification", type("BUTree<SNodeList>").build(),
+					emptyList(),
+					listOf(
+							param("ByRef<Boolean> trailingSemiColon").build()
+					),
 					listOf(
 							stmt("BUTree<SNodeList> vars = emptyList();").build(),
 							stmt("BUTree<SVariableDeclarationExpr> var;").build()
@@ -4986,8 +5163,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("RUNSIGNEDSHIFT",
-					(MethodDecl) memberDecl("void RUNSIGNEDSHIFT();").build(),
+			production("RUNSIGNEDSHIFT", null,
+					emptyList(),
+					emptyList(),
 					emptyList(),
 					sequence(
 							lookAhead(
@@ -5003,8 +5181,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("RSIGNEDSHIFT",
-					(MethodDecl) memberDecl("void RSIGNEDSHIFT();").build(),
+			production("RSIGNEDSHIFT", null,
+					emptyList(),
+					emptyList(),
 					emptyList(),
 					sequence(
 							lookAhead(
@@ -5019,8 +5198,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("Annotations",
-					(MethodDecl) memberDecl("BUTree<SNodeList> Annotations();").build(),
+			production("Annotations", type("BUTree<SNodeList>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> annotations = emptyList();").build(),
 							stmt("BUTree<? extends SAnnotationExpr> annotation;").build()
@@ -5041,8 +5221,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("Annotation",
-					(MethodDecl) memberDecl("BUTree<? extends SAnnotationExpr> Annotation();").build(),
+			production("Annotation", type("BUTree<? extends SAnnotationExpr>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<? extends SAnnotationExpr> ret;").build()
 					),
@@ -5086,8 +5267,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("NormalAnnotation",
-					(MethodDecl) memberDecl("BUTree<SNormalAnnotationExpr> NormalAnnotation();").build(),
+			production("NormalAnnotation", type("BUTree<SNormalAnnotationExpr>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SQualifiedName> name;").build(),
 							stmt("BUTree<SNodeList> pairs = null;").build()
@@ -5112,8 +5294,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("MarkerAnnotation",
-					(MethodDecl) memberDecl("BUTree<SMarkerAnnotationExpr> MarkerAnnotation();").build(),
+			production("MarkerAnnotation", type("BUTree<SMarkerAnnotationExpr>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SQualifiedName> name;").build()
 					),
@@ -5132,8 +5315,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("SingleMemberAnnotation",
-					(MethodDecl) memberDecl("BUTree<SSingleMemberAnnotationExpr> SingleMemberAnnotation();").build(),
+			production("SingleMemberAnnotation", type("BUTree<SSingleMemberAnnotationExpr>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SQualifiedName> name;").build(),
 							stmt("BUTree<? extends SExpr> memberVal;").build()
@@ -5156,8 +5340,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("MemberValuePairs",
-					(MethodDecl) memberDecl("BUTree<SNodeList> MemberValuePairs();").build(),
+			production("MemberValuePairs", type("BUTree<SNodeList>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> ret = emptyList();").build(),
 							stmt("BUTree<SMemberValuePair> pair;").build()
@@ -5185,8 +5370,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("MemberValuePair",
-					(MethodDecl) memberDecl("BUTree<SMemberValuePair> MemberValuePair();").build(),
+			production("MemberValuePair", type("BUTree<SMemberValuePair>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SName> name;").build(),
 							stmt("BUTree<? extends SExpr> value;").build()
@@ -5207,8 +5393,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("MemberValue",
-					(MethodDecl) memberDecl("BUTree<? extends SExpr> MemberValue();").build(),
+			production("MemberValue", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<? extends SExpr> ret;").build()
 					),
@@ -5225,8 +5412,9 @@ public class Grammar {
 							)
 					)
 			),
-			new GProduction("MemberValueArrayInitializer",
-					(MethodDecl) memberDecl("BUTree<? extends SExpr> MemberValueArrayInitializer();").build(),
+			production("MemberValueArrayInitializer", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> ret = emptyList();").build(),
 							stmt("BUTree<? extends SExpr> member;").build(),
