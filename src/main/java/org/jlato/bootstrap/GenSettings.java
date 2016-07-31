@@ -5,6 +5,6 @@ package org.jlato.bootstrap;
  */
 public class GenSettings {
 
-	public static final boolean replace = true;
+	public static final boolean replace = false;
 	public static final boolean generateDocs = true;
 }
