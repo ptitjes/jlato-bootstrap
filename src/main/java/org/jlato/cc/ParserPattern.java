@@ -152,7 +152,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 			}
 			case NonTerminal: {
 				Expr call = methodInvocationExpr(name("parse" + upperCaseFirst(expansion.symbol)))
-						.withArgs(expansion.arguments);
+						.withArgs(expansion.hints.appendAll(expansion.arguments));
 				stmts = stmts.append(expressionStmt(
 						expansion.name == null ? call :
 								assignExpr(name(expansion.name), AssignOp.Normal, call)
@@ -363,7 +363,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				return matchMethodCall(namePrefix, outerLookahead, args);
 			}
 			case NonTerminal: {
-				return createMatchMethodAndCallFor(expansion.symbol, outerLookahead, expansion.arguments);
+				return createMatchMethodAndCallFor(expansion.symbol, outerLookahead, expansion.hints);
 			}
 			case Terminal: {
 				return matchCall(expansion.symbol, LOOKAHEAD);

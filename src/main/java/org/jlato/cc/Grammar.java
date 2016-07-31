@@ -1359,44 +1359,9 @@ public class Grammar {
 									stmt("run();").build()
 							)),
 							terminal("LBRACE"),
-							zeroOrOne(
-									choice(
-											sequence(
-													lookAhead(2),
-													choice(
-															sequence(
-																	lookAhead(
-																			nonTerminal("ExplicitConstructorInvocation")
-																	),
-																	nonTerminal("stmt", "ExplicitConstructorInvocation"),
-																	action(listOf(
-																			stmt("stmts = append(stmts, stmt);").build()
-																	))
-															),
-															sequence(
-																	lookAhead(2),
-																	nonTerminal("stmt", "BlockStatement"),
-																	action(listOf(
-																			stmt("stmts = append(stmts, stmt);").build()
-																	))
-															)
-													),
-													zeroOrMore(
-															lookAhead(2),
-															nonTerminal("stmt", "BlockStatement"),
-															action(listOf(
-																	stmt("stmts = append(stmts, stmt);").build()
-															))
-													)
-											),
-											sequence(
-													lookAhead(
-															expr("quotesMode").build()
-													),
-													nonTerminal("stmts", "NodeListVar")
-											)
-									)
-							),
+							nonTerminal("stmts", "Statements", listOf(
+									expr("true").build()
+							)),
 							terminal("RBRACE"),
 							action(listOf(
 									stmt("block = dress(SBlockStmt.make(stmts));").build()
@@ -1461,7 +1426,9 @@ public class Grammar {
 					)
 			),
 			production("Statements", type("BUTree<SNodeList>").build(),
-					emptyList(),
+					listOf(
+							param("boolean inConstructor").build()
+					),
 					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> ret = null;").build(),
@@ -1469,13 +1436,28 @@ public class Grammar {
 					),
 					sequence(
 							zeroOrOne(
-									lookAhead(2),
 									choice(
-											oneOrMore(
-													nonTerminal("stmt", "BlockStatement"),
-													action(listOf(
-															stmt("ret = append(ret, stmt);").build()
-													))
+											sequence(
+													lookAhead(2),
+													zeroOrOne(
+															lookAhead(
+																	expr("inConstructor").build()
+															),
+															lookAhead(
+																	nonTerminal("ExplicitConstructorInvocation")
+															),
+															nonTerminal("stmt", "ExplicitConstructorInvocation"),
+															action(listOf(
+																	stmt("ret = append(ret, stmt);").build()
+															))
+													),
+													zeroOrMore(
+															lookAhead(2),
+															nonTerminal("stmt", "BlockStatement"),
+															action(listOf(
+																	stmt("ret = append(ret, stmt);").build()
+															))
+													)
 											),
 											sequence(
 													lookAhead(
@@ -3663,7 +3645,9 @@ public class Grammar {
 									stmt("run();").build()
 							)),
 							terminal("LBRACE"),
-							nonTerminal("stmts", "Statements"),
+							nonTerminal("stmts", "Statements", listOf(
+									expr("false").build()
+							)),
 							terminal("RBRACE"),
 							action(listOf(
 									stmt("return dress(SBlockStmt.make(ensureNotNull(stmts)));").build()
@@ -3864,7 +3848,9 @@ public class Grammar {
 									terminal("DEFAULT")
 							),
 							terminal("COLON"),
-							nonTerminal("stmts", "Statements"),
+							nonTerminal("stmts", "Statements", listOf(
+									expr("false").build()
+							)),
 							action(listOf(
 									stmt("return dress(SSwitchCase.make(optionOf(label), ensureNotNull(stmts)));").build()
 							))

@@ -137,8 +137,8 @@ public class GExpansion {
 		this.children = children;
 		this.name = name;
 		this.symbol = symbol;
-		this.hints = hints;
-		this.arguments = arguments;
+		this.hints = hints == null ? emptyList() : hints;
+		this.arguments = arguments == null ? emptyList() : arguments;
 		this.action = action;
 		this.amount = amount;
 		this.semanticLookahead = semanticLookahead;
@@ -197,12 +197,12 @@ public class GExpansion {
 				if (name != null) {
 					factoryArgs = factoryArgs.prepend(literalExpr(name));
 				}
-				if (hints != null) {
+				if (hints != null && !hints.isEmpty()) {
 					factoryArgs = factoryArgs.append(reifyList("expr", hints));
-				} else if (arguments != null) {
+				} else if (arguments != null && !arguments.isEmpty()) {
 					factoryArgs = factoryArgs.append(nullLiteralExpr());
 				}
-				if (arguments != null) {
+				if (arguments != null && !arguments.isEmpty()) {
 					factoryArgs = factoryArgs.append(reifyList("expr", arguments));
 				}
 				return factoryCall(factoryArgs);
