@@ -57,7 +57,6 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				importDecl(qualifiedName("org.jlato.internal.parser.Token")),
 				importDecl(qualifiedName("org.jlato.internal.parser.TokenType")),
 				importDecl(qualifiedName("org.jlato.tree.Problem.Severity")),
-				importDecl(qualifiedName("org.jlato.parser.ParserInterface.TypeKind")),
 				importDecl(qualifiedName("org.jlato.parser.ParseException")),
 				importDecl(qualifiedName("org.jlato.tree.expr.AssignOp")),
 				importDecl(qualifiedName("org.jlato.tree.expr.BinaryOp")),
