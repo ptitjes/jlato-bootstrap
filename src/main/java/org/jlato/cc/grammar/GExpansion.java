@@ -82,12 +82,16 @@ public class GExpansion {
 		return new GExpansion(Kind.LookAhead, Arrays.asList(children), null, null, null, null, null, -1, null);
 	}
 
-	public static GExpansion lookAhead(int amount) {
-		return new GExpansion(Kind.LookAhead, null, null, null, null, null, null, amount, null);
-	}
-
 	public static GExpansion lookAhead(Expr semanticLookahead) {
 		return new GExpansion(Kind.LookAhead, null, null, null, null, null, null, -1, semanticLookahead);
+	}
+
+	public static GExpansion lookAhead(Expr semanticLookahead, GExpansion... children) {
+		return new GExpansion(Kind.LookAhead, Arrays.asList(children), null, null, null, null, null, -1, semanticLookahead);
+	}
+
+	public static GExpansion lookAhead(int amount) {
+		return new GExpansion(Kind.LookAhead, null, null, null, null, null, null, amount, null);
 	}
 
 	public static GExpansion nonTerminal(String symbol) {

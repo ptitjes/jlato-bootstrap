@@ -1441,9 +1441,7 @@ public class Grammar {
 													lookAhead(2),
 													zeroOrOne(
 															lookAhead(
-																	expr("inConstructor").build()
-															),
-															lookAhead(
+																	expr("inConstructor").build(),
 																	nonTerminal("ExplicitConstructorInvocation")
 															),
 															nonTerminal("stmt", "ExplicitConstructorInvocation"),

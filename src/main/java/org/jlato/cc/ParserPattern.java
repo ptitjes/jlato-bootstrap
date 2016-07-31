@@ -189,22 +189,33 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		if (expansion.children != null && !expansion.children.isEmpty()) {
 			GExpansion firstChild = expansion.children.get(0);
 			if (firstChild.kind == GExpansion.Kind.LookAhead) {
-				Expr semanticLookahead = firstChild.semanticLookahead;
-				if (semanticLookahead != null) {
-					if (semanticLookahead.equals(methodInvocationExpr(name("isLambda")))) {
-						semanticLookahead = methodInvocationExpr(name("isLambda")).withArgs(listOf(literalExpr(0)));
+				Expr lookaheadCondition = null;
+
+				Expr semanticLookaheadCondition = firstChild.semanticLookahead;
+				int amount = firstChild.amount;
+				List<GExpansion> children = firstChild.children;
+
+				if (semanticLookaheadCondition != null) {
+					if (semanticLookaheadCondition.equals(methodInvocationExpr(name("isLambda")))) {
+						semanticLookaheadCondition = methodInvocationExpr(name("isLambda")).withArgs(listOf(literalExpr(0)));
 					}
-					return semanticLookahead;
-				} else {
-					int amount = firstChild.amount;
-					if (amount == -1) {
-						String matchMethodName = "match" + symbol + "_lookahead" + incrementCount(symbol);
-						Expr call = createMatchMethodAndCallFor(symbol, matchMethodName, GExpansion.sequence(firstChild.children), literalExpr(0), emptyList(), emptyList());
-						return binaryExpr(call, BinaryOp.NotEqual, literalExpr(-1));
-					} else {
-						return buildLookaheadWithAmountCondition(symbol, expansion, amount);
-					}
+					lookaheadCondition = semanticLookaheadCondition;
 				}
+				if (amount != -1) {
+					Expr amountLookaheadCondition = buildLookaheadWithAmountCondition(symbol, expansion, amount);
+					lookaheadCondition = lookaheadCondition == null ? amountLookaheadCondition :
+							binaryExpr(lookaheadCondition, BinaryOp.And, amountLookaheadCondition);
+				}
+				if (children != null) {
+					String matchMethodName = "match" + symbol + "_lookahead" + incrementCount(symbol);
+					Expr call = createMatchMethodAndCallFor(symbol, matchMethodName, GExpansion.sequence(children), literalExpr(0), emptyList(), emptyList());
+					Expr descriptiveLookaheadCondition = binaryExpr(call, BinaryOp.NotEqual, literalExpr(-1));
+
+					lookaheadCondition = lookaheadCondition == null ? descriptiveLookaheadCondition :
+							binaryExpr(lookaheadCondition, BinaryOp.And, descriptiveLookaheadCondition);
+				}
+
+				return lookaheadCondition;
 			}
 		}
 		return binaryExpr(matchCall(firstTerminalsOf(expansion), literalExpr(0)), BinaryOp.NotEqual, FAILED_LOOKAHEAD);
