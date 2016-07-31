@@ -194,6 +194,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				Expr semanticLookaheadCondition = firstChild.semanticLookahead;
 				int amount = firstChild.amount;
 				List<GExpansion> children = firstChild.children;
+				boolean negativeLookahead = firstChild.negativeLookahead;
 
 				if (semanticLookaheadCondition != null) {
 					if (semanticLookaheadCondition.equals(methodInvocationExpr(name("isLambda")))) {
@@ -209,7 +210,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				if (children != null) {
 					String matchMethodName = "match" + symbol + "_lookahead" + incrementCount(symbol);
 					Expr call = createMatchMethodAndCallFor(symbol, matchMethodName, GExpansion.sequence(children), literalExpr(0), emptyList(), emptyList());
-					Expr descriptiveLookaheadCondition = binaryExpr(call, BinaryOp.NotEqual, literalExpr(-1));
+					Expr descriptiveLookaheadCondition = binaryExpr(call, negativeLookahead ? BinaryOp.Equal : BinaryOp.NotEqual, literalExpr(-1));
 
 					lookaheadCondition = lookaheadCondition == null ? descriptiveLookaheadCondition :
 							binaryExpr(lookaheadCondition, BinaryOp.And, descriptiveLookaheadCondition);

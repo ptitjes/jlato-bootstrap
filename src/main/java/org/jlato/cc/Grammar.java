@@ -1165,7 +1165,10 @@ public class Grammar {
 											stmt("values = append(values, val);").build()
 									)),
 									zeroOrMore(
-											lookAhead(2),
+											lookAhead(
+													zeroOrOne(terminal("COMMA")),
+													terminal("RBRACE")
+											).setNegative(),
 											terminal("COMMA"),
 											nonTerminal("val", "VariableInitializer"),
 											action(listOf(
@@ -3338,7 +3341,7 @@ public class Grammar {
 							zeroOrOne(
 									choice(
 											sequence(
-													lookAhead(1),
+//													lookAhead(1),
 													nonTerminal("expr", "Expression"),
 													action(listOf(
 															stmt("ret = append(ret, expr);").build()
@@ -4287,6 +4290,10 @@ public class Grammar {
 									stmt("vars = append(vars, var);").build()
 							)),
 							zeroOrMore(
+									lookAhead(
+										zeroOrOne(terminal("SEMICOLON")),
+										terminal("RPAREN")
+									).setNegative(),
 									lookAhead(2),
 									terminal("SEMICOLON"),
 									nonTerminal("var", "VariableDeclExpression"),
@@ -4295,7 +4302,6 @@ public class Grammar {
 									))
 							),
 							zeroOrOne(
-//									lookAhead(2),
 									terminal("SEMICOLON"),
 									action(listOf(
 											stmt("trailingSemiColon.value = true;").build()
@@ -4541,7 +4547,10 @@ public class Grammar {
 											stmt("ret = append(ret, member);").build()
 									)),
 									zeroOrMore(
-											lookAhead(2),
+											lookAhead(
+													zeroOrOne(terminal("COMMA")),
+													terminal("RBRACE")
+											).setNegative(),
 											terminal("COMMA"),
 											nonTerminal("member", "MemberValue"),
 											action(listOf(
