@@ -1,6 +1,6 @@
 package org.jlato.bootstrap.util;
 
-import org.jlato.rewrite.Pattern;
+import org.jlato.pattern.Pattern;
 import org.jlato.tree.decl.Decl;
 
 /**

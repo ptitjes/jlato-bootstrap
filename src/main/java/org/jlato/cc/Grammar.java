@@ -2,10 +2,10 @@ package org.jlato.cc;
 
 import org.jlato.cc.grammar.GProductions;
 
-import static org.jlato.rewrite.Quotes.expr;
-import static org.jlato.rewrite.Quotes.param;
-import static org.jlato.rewrite.Quotes.stmt;
-import static org.jlato.rewrite.Quotes.type;
+import static org.jlato.pattern.Quotes.expr;
+import static org.jlato.pattern.Quotes.param;
+import static org.jlato.pattern.Quotes.stmt;
+import static org.jlato.pattern.Quotes.type;
 import static org.jlato.tree.Trees.emptyList;
 import static org.jlato.tree.Trees.listOf;
 import static org.jlato.cc.grammar.GExpansion.*;

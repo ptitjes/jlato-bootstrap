@@ -2,14 +2,14 @@ package org.jlato.bootstrap.util;
 
 import org.jlato.bootstrap.GenSettings;
 import org.jlato.bootstrap.Utils;
-import org.jlato.rewrite.MatchVisitor;
-import org.jlato.rewrite.Matcher;
-import org.jlato.rewrite.Pattern;
+import org.jlato.pattern.MatchVisitor;
+import org.jlato.pattern.Matcher;
+import org.jlato.pattern.Pattern;
 import org.jlato.tree.decl.*;
 
 import java.util.Collections;
 
-import static org.jlato.rewrite.Quotes.typeDecl;
+import static org.jlato.pattern.Quotes.typeDecl;
 import static org.jlato.tree.Trees.emptyList;
 
 /**

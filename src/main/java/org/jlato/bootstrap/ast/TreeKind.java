@@ -6,15 +6,15 @@ import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.util.DeclContribution;
 import org.jlato.bootstrap.util.DeclPattern;
 import org.jlato.bootstrap.util.ImportManager;
-import org.jlato.rewrite.Pattern;
+import org.jlato.pattern.Pattern;
 import org.jlato.tree.decl.Decl;
 import org.jlato.tree.decl.MemberDecl;
 import org.jlato.tree.decl.MethodDecl;
 
 import java.util.Arrays;
 
-import static org.jlato.rewrite.Quotes.memberDecl;
-import static org.jlato.rewrite.Quotes.stmt;
+import static org.jlato.pattern.Quotes.memberDecl;
+import static org.jlato.pattern.Quotes.stmt;
 import static org.jlato.tree.Trees.*;
 
 /**

@@ -5,7 +5,7 @@ import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.descriptors.TreeTypeDescriptor;
 import org.jlato.bootstrap.util.ImportManager;
 import org.jlato.printer.Printer;
-import org.jlato.rewrite.Matcher;
+import org.jlato.pattern.Matcher;
 import org.jlato.tree.NodeList;
 import org.jlato.tree.Tree;
 import org.jlato.tree.TreeCombinators;
@@ -26,7 +26,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import static org.jlato.rewrite.Quotes.expr;
+import static org.jlato.pattern.Quotes.expr;
 import static org.jlato.tree.Trees.*;
 import static org.jlato.tree.expr.BinaryOp.Less;
 import static org.jlato.tree.expr.UnaryOp.PostIncrement;

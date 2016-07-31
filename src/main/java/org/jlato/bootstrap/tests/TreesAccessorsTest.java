@@ -3,7 +3,7 @@ package org.jlato.bootstrap.tests;
 import org.jlato.bootstrap.descriptors.AllDescriptors;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.util.ImportManager;
-import org.jlato.rewrite.Quotes;
+import org.jlato.pattern.Quotes;
 import org.jlato.tree.NodeList;
 import org.jlato.tree.decl.FormalParameter;
 import org.jlato.tree.expr.Expr;

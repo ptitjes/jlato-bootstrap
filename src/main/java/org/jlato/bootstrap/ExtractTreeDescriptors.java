@@ -12,8 +12,8 @@ import org.jlato.tree.type.QualifiedType;
 
 import java.util.List;
 
-import static org.jlato.rewrite.Quotes.expr;
-import static org.jlato.rewrite.Quotes.memberDecl;
+import static org.jlato.pattern.Quotes.expr;
+import static org.jlato.pattern.Quotes.memberDecl;
 import static org.jlato.tree.Trees.*;
 
 /**

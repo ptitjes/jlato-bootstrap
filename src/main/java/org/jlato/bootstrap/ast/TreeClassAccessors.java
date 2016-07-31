@@ -18,7 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.jlato.bootstrap.Utils.*;
-import static org.jlato.rewrite.Quotes.stmt;
+import static org.jlato.pattern.Quotes.stmt;
 import static org.jlato.tree.Trees.*;
 
 /**

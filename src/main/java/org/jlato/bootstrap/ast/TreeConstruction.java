@@ -7,7 +7,7 @@ import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.util.DeclContribution;
 import org.jlato.bootstrap.util.DeclPattern;
 import org.jlato.bootstrap.util.ImportManager;
-import org.jlato.rewrite.Pattern;
+import org.jlato.pattern.Pattern;
 import org.jlato.tree.NodeList;
 import org.jlato.tree.decl.*;
 import org.jlato.tree.expr.ObjectCreationExpr;
@@ -17,7 +17,7 @@ import org.jlato.tree.type.Type;
 
 import java.util.Arrays;
 
-import static org.jlato.rewrite.Quotes.memberDecl;
+import static org.jlato.pattern.Quotes.memberDecl;
 import static org.jlato.tree.Trees.*;
 
 /**

@@ -51,10 +51,10 @@ public class ReworkGrammar {
 		CompilationUnit cu = compilationUnit(packageDecl(qualifiedName("org.jlato.cc")))
 				.withImports(listOf(
 						importDecl(qualifiedName("org.jlato.cc.grammar.GProductions"))/*.insertNewLineAfter()*/,
-						importDecl(qualifiedName("org.jlato.rewrite.Quotes.expr")).setStatic(true),
-						importDecl(qualifiedName("org.jlato.rewrite.Quotes.param")).setStatic(true),
-						importDecl(qualifiedName("org.jlato.rewrite.Quotes.stmt")).setStatic(true),
-						importDecl(qualifiedName("org.jlato.rewrite.Quotes.type")).setStatic(true),
+						importDecl(qualifiedName("org.jlato.pattern.Quotes.expr")).setStatic(true),
+						importDecl(qualifiedName("org.jlato.pattern.Quotes.param")).setStatic(true),
+						importDecl(qualifiedName("org.jlato.pattern.Quotes.stmt")).setStatic(true),
+						importDecl(qualifiedName("org.jlato.pattern.Quotes.type")).setStatic(true),
 						importDecl(qualifiedName("org.jlato.tree.Trees.emptyList")).setStatic(true),
 						importDecl(qualifiedName("org.jlato.tree.Trees.listOf")).setStatic(true),
 						importDecl(qualifiedName("org.jlato.cc.grammar.GExpansion")).setOnDemand(true).setStatic(true),

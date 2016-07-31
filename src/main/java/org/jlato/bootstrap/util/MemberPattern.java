@@ -2,10 +2,10 @@ package org.jlato.bootstrap.util;
 
 import org.jlato.bootstrap.GenSettings;
 import org.jlato.bootstrap.Utils;
-import org.jlato.rewrite.Pattern;
+import org.jlato.pattern.Pattern;
 import org.jlato.tree.decl.*;
 
-import static org.jlato.rewrite.Quotes.memberDecl;
+import static org.jlato.pattern.Quotes.memberDecl;
 
 /**
  * @author Didier Villevalois

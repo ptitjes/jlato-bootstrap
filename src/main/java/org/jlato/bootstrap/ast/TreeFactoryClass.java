@@ -5,7 +5,7 @@ import org.jlato.bootstrap.Utils;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.util.DeclPattern;
 import org.jlato.bootstrap.util.ImportManager;
-import org.jlato.rewrite.Pattern;
+import org.jlato.pattern.Pattern;
 import org.jlato.tree.NodeList;
 import org.jlato.tree.decl.*;
 import org.jlato.tree.expr.Expr;
@@ -16,7 +16,7 @@ import org.jlato.tree.type.QualifiedType;
 import org.jlato.tree.type.Type;
 import org.jlato.util.Function1;
 
-import static org.jlato.rewrite.Quotes.*;
+import static org.jlato.pattern.Quotes.*;
 import static org.jlato.tree.Trees.*;
 import static org.jlato.tree.Trees.importDecl;
 import static org.jlato.tree.Trees.qualifiedName;

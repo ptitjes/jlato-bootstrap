@@ -4,13 +4,13 @@ import org.jlato.bootstrap.GenSettings;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.util.DeclPattern;
 import org.jlato.bootstrap.util.ImportManager;
-import org.jlato.rewrite.Pattern;
+import org.jlato.pattern.Pattern;
 import org.jlato.tree.decl.Decl;
 import org.jlato.tree.decl.EnumConstantDecl;
 import org.jlato.tree.decl.EnumDecl;
 import org.jlato.tree.decl.Modifier;
 
-import static org.jlato.rewrite.Quotes.typeDecl;
+import static org.jlato.pattern.Quotes.typeDecl;
 import static org.jlato.tree.Trees.*;
 
 /**

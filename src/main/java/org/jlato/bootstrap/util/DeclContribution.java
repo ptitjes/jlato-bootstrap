@@ -1,7 +1,7 @@
 package org.jlato.bootstrap.util;
 
-import org.jlato.rewrite.Pattern;
-import org.jlato.rewrite.Substitution;
+import org.jlato.pattern.Pattern;
+import org.jlato.pattern.Substitution;
 import org.jlato.tree.NodeList;
 import org.jlato.tree.decl.Decl;
 import org.jlato.tree.decl.FieldDecl;

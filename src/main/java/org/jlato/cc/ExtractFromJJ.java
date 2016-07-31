@@ -58,9 +58,9 @@ public class ExtractFromJJ {
 						importDecl(qualifiedName("org.jlato.cc.grammar.GProduction")),
 						importDecl(qualifiedName("org.jlato.cc.grammar.GProductions")),
 						importDecl(qualifiedName("org.jlato.tree.decl.MethodDecl")).insertNewLineAfter(),
-						importDecl(qualifiedName("org.jlato.rewrite.Quotes.expr")).setStatic(true),
-						importDecl(qualifiedName("org.jlato.rewrite.Quotes.memberDecl")).setStatic(true),
-						importDecl(qualifiedName("org.jlato.rewrite.Quotes.stmt")).setStatic(true),
+						importDecl(qualifiedName("org.jlato.pattern.Quotes.expr")).setStatic(true),
+						importDecl(qualifiedName("org.jlato.pattern.Quotes.memberDecl")).setStatic(true),
+						importDecl(qualifiedName("org.jlato.pattern.Quotes.stmt")).setStatic(true),
 						importDecl(qualifiedName("org.jlato.tree.Trees.emptyList")).setStatic(true),
 						importDecl(qualifiedName("org.jlato.tree.Trees.listOf")).setStatic(true)
 				))

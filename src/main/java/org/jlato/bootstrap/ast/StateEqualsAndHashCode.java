@@ -6,8 +6,8 @@ import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.util.DeclContribution;
 import org.jlato.bootstrap.util.DeclPattern;
 import org.jlato.bootstrap.util.ImportManager;
-import org.jlato.rewrite.Pattern;
-import org.jlato.rewrite.Substitution;
+import org.jlato.pattern.Pattern;
+import org.jlato.pattern.Substitution;
 import org.jlato.tree.NodeList;
 import org.jlato.tree.decl.Decl;
 import org.jlato.tree.decl.FormalParameter;
@@ -22,7 +22,7 @@ import org.jlato.tree.type.Type;
 
 import java.util.Arrays;
 
-import static org.jlato.rewrite.Quotes.*;
+import static org.jlato.pattern.Quotes.*;
 import static org.jlato.tree.Trees.*;
 import static org.jlato.tree.expr.BinaryOp.Equal;
 import static org.jlato.tree.expr.BinaryOp.NotEqual;
