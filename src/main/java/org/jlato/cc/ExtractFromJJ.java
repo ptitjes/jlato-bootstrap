@@ -39,6 +39,10 @@ public class ExtractFromJJ {
 
 		productions.recomputeReferences();
 
+		writeGrammar(productions);
+	}
+
+	private void writeGrammar(GProductions productions) throws IOException {
 		ObjectCreationExpr productionListExpr =
 				objectCreationExpr(qualifiedType(name("GProductions"))).withArgs(insertNewLineAfterLast(
 						listOf(
@@ -94,7 +98,7 @@ public class ExtractFromJJ {
 					if (e.children.size() == 1) {
 						GExpansion child = e.children.get(0);
 						if (child.kind == GExpansion.Kind.Sequence)
-							return new GExpansion(e.kind, child.children, null, null, null, null, -1, null);
+							return new GExpansion(e.kind, child.children, null, null, null, null, null, -1, null);
 					}
 				default:
 			}
