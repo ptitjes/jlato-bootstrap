@@ -90,11 +90,14 @@ public class GExpansion {
 		return new GExpansion(Kind.LookAhead, null, null, null, null, null, null, -1, semanticLookahead);
 	}
 
-	/*
-		public static GExpansion nonTerminal(String symbol) {
-			return new GExpansion(Kind.NonTerminal, null, null, symbol, null, null, null, -1, null);
-		}
-	*/
+	public static GExpansion nonTerminal(String symbol) {
+		return new GExpansion(Kind.NonTerminal, null, null, symbol, null, null, null, -1, null);
+	}
+
+	public static GExpansion nonTerminal(String symbol, NodeList<Expr> hints) {
+		return new GExpansion(Kind.NonTerminal, null, null, symbol, hints, null, null, -1, null);
+	}
+
 	public static GExpansion nonTerminal(String name, String symbol) {
 		return new GExpansion(Kind.NonTerminal, null, name, symbol, null, null, null, -1, null);
 	}
@@ -105,6 +108,10 @@ public class GExpansion {
 
 	public static GExpansion nonTerminal(String name, String symbol, NodeList<Expr> hints, NodeList<Expr> arguments) {
 		return new GExpansion(Kind.NonTerminal, null, name, symbol, hints, arguments, null, -1, null);
+	}
+
+	public static GExpansion terminal(String symbol) {
+		return new GExpansion(Kind.Terminal, null, null, symbol, null, null, null, -1, null);
 	}
 
 	public static GExpansion terminal(String name, String symbol) {
@@ -185,9 +192,11 @@ public class GExpansion {
 				)));
 			case NonTerminal: {
 				NodeList<Expr> factoryArgs = listOf(
-						name == null ? nullLiteralExpr() : literalExpr(name),
 						literalExpr(symbol)
 				);
+				if (name != null) {
+					factoryArgs = factoryArgs.prepend(literalExpr(name));
+				}
 				if (hints != null) {
 					factoryArgs = factoryArgs.append(reifyList("expr", hints));
 				} else if (arguments != null) {
@@ -198,11 +207,18 @@ public class GExpansion {
 				}
 				return factoryCall(factoryArgs);
 			}
-			case Terminal:
-				return factoryCall(listOf(name == null ? nullLiteralExpr() : literalExpr(name), literalExpr(symbol)));
+			case Terminal: {
+				NodeList<Expr> factoryArgs = listOf(
+						literalExpr(symbol)
+				);
+				if (name != null) {
+					factoryArgs = factoryArgs.prepend(literalExpr(name));
+				}
+				return factoryCall(factoryArgs);
+			}
 			case Action:
 				return factoryCall(listOf(
-						reifyList("stmt", action).insertNewLineBefore().insertNewLineAfter()
+						reifyList("stmt", action)
 				));
 			default:
 				throw new IllegalArgumentException();
