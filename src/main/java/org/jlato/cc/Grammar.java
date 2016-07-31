@@ -563,7 +563,13 @@ public class Grammar {
 															stmt("constants = append(constants, entry);").build()
 													)),
 													zeroOrMore(
-															lookAhead(2),
+															lookAhead(
+																	zeroOrOne(terminal("COMMA")),
+																	choice(
+																			terminal("SEMICOLON"),
+																			terminal("RBRACE")
+																	)
+															).setNegative(),
 															terminal("COMMA"),
 															nonTerminal("entry", "EnumConstantDecl"),
 															action(listOf(
@@ -4291,8 +4297,8 @@ public class Grammar {
 							)),
 							zeroOrMore(
 									lookAhead(
-										zeroOrOne(terminal("SEMICOLON")),
-										terminal("RPAREN")
+											zeroOrOne(terminal("SEMICOLON")),
+											terminal("RPAREN")
 									).setNegative(),
 									lookAhead(2),
 									terminal("SEMICOLON"),
