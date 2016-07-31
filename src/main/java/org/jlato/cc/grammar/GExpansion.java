@@ -2,12 +2,10 @@ package org.jlato.cc.grammar;
 
 import org.jlato.bootstrap.Utils;
 import org.jlato.printer.Printer;
-import org.jlato.tree.Kind;
 import org.jlato.tree.NodeList;
 import org.jlato.tree.expr.Expr;
 import org.jlato.tree.expr.MethodInvocationExpr;
 import org.jlato.tree.name.Name;
-import org.jlato.tree.stmt.IfStmt;
 import org.jlato.tree.stmt.Stmt;
 
 import java.util.Arrays;
@@ -37,87 +35,102 @@ public class GExpansion {
 	}
 
 	public static GExpansion choice(List<GExpansion> children) {
-		return new GExpansion(Kind.Choice, children, null, null, null, null, -1, null);
+		return new GExpansion(Kind.Choice, children, null, null, null, null, null, -1, null);
 	}
 
 	public static GExpansion choice(GExpansion... children) {
-		return new GExpansion(Kind.Choice, Arrays.asList(children), null, null, null, null, -1, null);
+		return new GExpansion(Kind.Choice, Arrays.asList(children), null, null, null, null, null, -1, null);
 	}
 
 	public static GExpansion sequence(List<GExpansion> children) {
-		return new GExpansion(Kind.Sequence, children, null, null, null, null, -1, null);
+		return new GExpansion(Kind.Sequence, children, null, null, null, null, null, -1, null);
 	}
 
 	public static GExpansion sequence(GExpansion... children) {
-		return new GExpansion(Kind.Sequence, Arrays.asList(children), null, null, null, null, -1, null);
+		return new GExpansion(Kind.Sequence, Arrays.asList(children), null, null, null, null, null, -1, null);
 	}
 
 	public static GExpansion zeroOrOne(List<GExpansion> children) {
-		return new GExpansion(Kind.ZeroOrOne, children, null, null, null, null, -1, null);
+		return new GExpansion(Kind.ZeroOrOne, children, null, null, null, null, null, -1, null);
 	}
 
 	public static GExpansion zeroOrOne(GExpansion... children) {
-		return new GExpansion(Kind.ZeroOrOne, Arrays.asList(children), null, null, null, null, -1, null);
+		return new GExpansion(Kind.ZeroOrOne, Arrays.asList(children), null, null, null, null, null, -1, null);
 	}
 
 	public static GExpansion zeroOrMore(List<GExpansion> children) {
-		return new GExpansion(Kind.ZeroOrMore, children, null, null, null, null, -1, null);
+		return new GExpansion(Kind.ZeroOrMore, children, null, null, null, null, null, -1, null);
 	}
 
 	public static GExpansion zeroOrMore(GExpansion... children) {
-		return new GExpansion(Kind.ZeroOrMore, Arrays.asList(children), null, null, null, null, -1, null);
+		return new GExpansion(Kind.ZeroOrMore, Arrays.asList(children), null, null, null, null, null, -1, null);
 	}
 
 	public static GExpansion oneOrMore(List<GExpansion> children) {
-		return new GExpansion(Kind.OneOrMore, children, null, null, null, null, -1, null);
+		return new GExpansion(Kind.OneOrMore, children, null, null, null, null, null, -1, null);
 	}
 
 	public static GExpansion oneOrMore(GExpansion... children) {
-		return new GExpansion(Kind.OneOrMore, Arrays.asList(children), null, null, null, null, -1, null);
+		return new GExpansion(Kind.OneOrMore, Arrays.asList(children), null, null, null, null, null, -1, null);
 	}
 
 	public static GExpansion lookAhead(List<GExpansion> children) {
-		return new GExpansion(Kind.LookAhead, children, null, null, null, null, -1, null);
+		return new GExpansion(Kind.LookAhead, children, null, null, null, null, null, -1, null);
 	}
 
 	public static GExpansion lookAhead(GExpansion... children) {
-		return new GExpansion(Kind.LookAhead, Arrays.asList(children), null, null, null, null, -1, null);
+		return new GExpansion(Kind.LookAhead, Arrays.asList(children), null, null, null, null, null, -1, null);
 	}
 
 	public static GExpansion lookAhead(int amount) {
-		return new GExpansion(Kind.LookAhead, null, null, null, null, null, amount, null);
+		return new GExpansion(Kind.LookAhead, null, null, null, null, null, null, amount, null);
 	}
 
 	public static GExpansion lookAhead(Expr semanticLookahead) {
-		return new GExpansion(Kind.LookAhead, null, null, null, null, null, -1, semanticLookahead);
+		return new GExpansion(Kind.LookAhead, null, null, null, null, null, null, -1, semanticLookahead);
 	}
 
-	public static GExpansion nonTerminal(String name, String symbol, NodeList<Expr> arguments) {
-		return new GExpansion(Kind.NonTerminal, null, name, symbol, arguments, null, -1, null);
+	/*
+		public static GExpansion nonTerminal(String symbol) {
+			return new GExpansion(Kind.NonTerminal, null, null, symbol, null, null, null, -1, null);
+		}
+	*/
+	public static GExpansion nonTerminal(String name, String symbol) {
+		return new GExpansion(Kind.NonTerminal, null, name, symbol, null, null, null, -1, null);
+	}
+
+	public static GExpansion nonTerminal(String name, String symbol, NodeList<Expr> hints) {
+		return new GExpansion(Kind.NonTerminal, null, name, symbol, hints, null, null, -1, null);
+	}
+
+	public static GExpansion nonTerminal(String name, String symbol, NodeList<Expr> hints, NodeList<Expr> arguments) {
+		return new GExpansion(Kind.NonTerminal, null, name, symbol, hints, arguments, null, -1, null);
 	}
 
 	public static GExpansion terminal(String name, String symbol) {
-		return new GExpansion(Kind.Terminal, null, name, symbol, null, null, -1, null);
+		return new GExpansion(Kind.Terminal, null, name, symbol, null, null, null, -1, null);
 	}
 
 	public static GExpansion action(NodeList<Stmt> action) {
-		return new GExpansion(Kind.Action, null, null, null, null, action, -1, null);
+		return new GExpansion(Kind.Action, null, null, null, null, null, action, -1, null);
 	}
 
 	public final Kind kind;
 	public final List<GExpansion> children;
 	public final String name;
 	public final String symbol;
+	public final NodeList<Expr> hints;
 	public final NodeList<Expr> arguments;
 	public final NodeList<Stmt> action;
 	public final int amount;
 	public final Expr semanticLookahead;
 
-	public GExpansion(Kind kind, List<GExpansion> children, String name, String symbol, NodeList<Expr> arguments, NodeList<Stmt> action, int amount, Expr semanticLookahead) {
+	public GExpansion(Kind kind, List<GExpansion> children, String name, String symbol, NodeList<Expr> hints, NodeList<Expr> arguments, NodeList<Stmt> action, int amount, Expr semanticLookahead) {
 		this.kind = kind;
 		this.children = children;
 		this.name = name;
 		this.symbol = symbol;
+		this.hints = hints;
 		this.arguments = arguments;
 		this.action = action;
 		this.amount = amount;
@@ -137,7 +150,7 @@ public class GExpansion {
 			case OneOrMore:
 				List<GExpansion> rewroteChildren =
 						children.stream().map(e -> e.rewrite(f)).collect(Collectors.toList());
-				return f.apply(new GExpansion(kind, rewroteChildren, null, null, null, null, amount, null));
+				return f.apply(new GExpansion(kind, rewroteChildren, null, null, hints, null, null, amount, null));
 			case NonTerminal:
 			case Terminal:
 			case Action:
@@ -170,12 +183,21 @@ public class GExpansion {
 				return factoryCall(insertNewLineAfterLast(listOf(
 						children.stream().map(c -> c.toExpr()).collect(Collectors.toList())
 				)));
-			case NonTerminal:
-				return factoryCall(listOf(
+			case NonTerminal: {
+				NodeList<Expr> factoryArgs = listOf(
 						name == null ? nullLiteralExpr() : literalExpr(name),
-						literalExpr(symbol),
-						reifyList("expr", arguments)
-				));
+						literalExpr(symbol)
+				);
+				if (hints != null) {
+					factoryArgs = factoryArgs.append(reifyList("expr", hints));
+				} else if (arguments != null) {
+					factoryArgs = factoryArgs.append(nullLiteralExpr());
+				}
+				if (arguments != null) {
+					factoryArgs = factoryArgs.append(reifyList("expr", arguments));
+				}
+				return factoryCall(factoryArgs);
+			}
 			case Terminal:
 				return factoryCall(listOf(name == null ? nullLiteralExpr() : literalExpr(name), literalExpr(symbol)));
 			case Action:

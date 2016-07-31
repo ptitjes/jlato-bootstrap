@@ -5,7 +5,9 @@ import org.jlato.cc.grammar.GProduction;
 import org.jlato.cc.grammar.GProductions;
 import org.jlato.tree.decl.MethodDecl;
 
-import static org.jlato.rewrite.Quotes.*;
+import static org.jlato.rewrite.Quotes.expr;
+import static org.jlato.rewrite.Quotes.memberDecl;
+import static org.jlato.rewrite.Quotes.stmt;
 import static org.jlato.tree.Trees.emptyList;
 import static org.jlato.tree.Trees.listOf;
 
@@ -56,18 +58,18 @@ public class Grammar {
 							),
 							GExpansion.zeroOrOne(
 									GExpansion.lookAhead(
-											GExpansion.nonTerminal(null, "PackageDecl", emptyList())
+											GExpansion.nonTerminal(null, "PackageDecl")
 									),
-									GExpansion.nonTerminal("packageDecl", "PackageDecl", emptyList())
+									GExpansion.nonTerminal("packageDecl", "PackageDecl")
 							),
-							GExpansion.nonTerminal("imports", "ImportDecls", emptyList()),
-							GExpansion.nonTerminal("types", "TypeDecls", emptyList()),
+							GExpansion.nonTerminal("imports", "ImportDecls"),
+							GExpansion.nonTerminal("types", "TypeDecls"),
 							GExpansion.action(
 									listOf(
 											stmt("compilationUnit = dress(SCompilationUnit.make(packageDecl, imports, types));").build()
 									)
 							),
-							GExpansion.nonTerminal(null, "Epilog", emptyList()),
+							GExpansion.nonTerminal(null, "Epilog"),
 							GExpansion.action(
 									listOf(
 											stmt("return dressWithPrologAndEpilog(compilationUnit);").build()
@@ -95,9 +97,9 @@ public class Grammar {
 											stmt("run();").build()
 									)
 							),
-							GExpansion.nonTerminal("annotations", "Annotations", emptyList()),
+							GExpansion.nonTerminal("annotations", "Annotations"),
 							GExpansion.terminal(null, "PACKAGE"),
-							GExpansion.nonTerminal("name", "QualifiedName", emptyList()),
+							GExpansion.nonTerminal("name", "QualifiedName"),
 							GExpansion.terminal(null, "SEMICOLON"),
 							GExpansion.action(
 									listOf(
@@ -114,7 +116,7 @@ public class Grammar {
 					),
 					GExpansion.sequence(
 							GExpansion.zeroOrMore(
-									GExpansion.nonTerminal("importDecl", "ImportDecl", emptyList()),
+									GExpansion.nonTerminal("importDecl", "ImportDecl"),
 									GExpansion.action(
 											listOf(
 													stmt("imports = append(imports, importDecl);").build()
@@ -150,7 +152,7 @@ public class Grammar {
 											)
 									)
 							),
-							GExpansion.nonTerminal("name", "QualifiedName", emptyList()),
+							GExpansion.nonTerminal("name", "QualifiedName"),
 							GExpansion.zeroOrOne(
 									GExpansion.terminal(null, "DOT"),
 									GExpansion.terminal(null, "STAR"),
@@ -176,7 +178,7 @@ public class Grammar {
 					),
 					GExpansion.sequence(
 							GExpansion.zeroOrMore(
-									GExpansion.nonTerminal("typeDecl", "TypeDecl", emptyList()),
+									GExpansion.nonTerminal("typeDecl", "TypeDecl"),
 									GExpansion.action(
 											listOf(
 													stmt("types = append(types, typeDecl);").build()
@@ -297,7 +299,7 @@ public class Grammar {
 													)
 											),
 											GExpansion.sequence(
-													GExpansion.nonTerminal("ann", "Annotation", emptyList()),
+													GExpansion.nonTerminal("ann", "Annotation"),
 													GExpansion.action(
 															listOf(
 																	stmt("modifiers = append(modifiers, ann);").build()
@@ -412,7 +414,7 @@ public class Grammar {
 													)
 											),
 											GExpansion.sequence(
-													GExpansion.nonTerminal("ann", "Annotation", emptyList()),
+													GExpansion.nonTerminal("ann", "Annotation"),
 													GExpansion.action(
 															listOf(
 																	stmt("modifiers = append(modifiers, ann);").build()
@@ -450,15 +452,15 @@ public class Grammar {
 											)
 									),
 									GExpansion.sequence(
-											GExpansion.nonTerminal("modifiers", "Modifiers", emptyList()),
+											GExpansion.nonTerminal("modifiers", "Modifiers"),
 											GExpansion.choice(
-													GExpansion.nonTerminal("ret", "ClassOrInterfaceDecl", listOf(
+													GExpansion.nonTerminal("ret", "ClassOrInterfaceDecl", null, listOf(
 															expr("modifiers").build()
 													)),
-													GExpansion.nonTerminal("ret", "EnumDecl", listOf(
+													GExpansion.nonTerminal("ret", "EnumDecl", null, listOf(
 															expr("modifiers").build()
 													)),
-													GExpansion.nonTerminal("ret", "AnnotationTypeDecl", listOf(
+													GExpansion.nonTerminal("ret", "AnnotationTypeDecl", null, listOf(
 															expr("modifiers").build()
 													))
 											)
@@ -492,16 +494,16 @@ public class Grammar {
 															stmt("typeKind = TypeKind.Class;").build()
 													)
 											),
-											GExpansion.nonTerminal("name", "Name", emptyList()),
+											GExpansion.nonTerminal("name", "Name"),
 											GExpansion.zeroOrOne(
-													GExpansion.nonTerminal("typeParams", "TypeParameters", emptyList())
+													GExpansion.nonTerminal("typeParams", "TypeParameters")
 											),
 											GExpansion.zeroOrOne(
 													GExpansion.terminal(null, "EXTENDS"),
-													GExpansion.nonTerminal("superClassType", "AnnotatedQualifiedType", emptyList())
+													GExpansion.nonTerminal("superClassType", "AnnotatedQualifiedType")
 											),
 											GExpansion.zeroOrOne(
-													GExpansion.nonTerminal("implementsClause", "ImplementsList", listOf(
+													GExpansion.nonTerminal("implementsClause", "ImplementsList", null, listOf(
 															expr("typeKind").build(),
 															expr("problem").build()
 													))
@@ -514,16 +516,16 @@ public class Grammar {
 															stmt("typeKind = TypeKind.Interface;").build()
 													)
 											),
-											GExpansion.nonTerminal("name", "Name", emptyList()),
+											GExpansion.nonTerminal("name", "Name"),
 											GExpansion.zeroOrOne(
-													GExpansion.nonTerminal("typeParams", "TypeParameters", emptyList())
+													GExpansion.nonTerminal("typeParams", "TypeParameters")
 											),
 											GExpansion.zeroOrOne(
-													GExpansion.nonTerminal("extendsClause", "ExtendsList", emptyList())
+													GExpansion.nonTerminal("extendsClause", "ExtendsList")
 											)
 									)
 							),
-							GExpansion.nonTerminal("members", "ClassOrInterfaceBody", listOf(
+							GExpansion.nonTerminal("members", "ClassOrInterfaceBody", null, listOf(
 									expr("typeKind").build()
 							)),
 							GExpansion.action(
@@ -544,7 +546,7 @@ public class Grammar {
 							GExpansion.terminal(null, "EXTENDS"),
 							GExpansion.choice(
 									GExpansion.sequence(
-											GExpansion.nonTerminal("cit", "AnnotatedQualifiedType", emptyList()),
+											GExpansion.nonTerminal("cit", "AnnotatedQualifiedType"),
 											GExpansion.action(
 													listOf(
 															stmt("ret = append(ret, cit);").build()
@@ -552,7 +554,7 @@ public class Grammar {
 											),
 											GExpansion.zeroOrMore(
 													GExpansion.terminal(null, "COMMA"),
-													GExpansion.nonTerminal("cit", "AnnotatedQualifiedType", emptyList()),
+													GExpansion.nonTerminal("cit", "AnnotatedQualifiedType"),
 													GExpansion.action(
 															listOf(
 																	stmt("ret = append(ret, cit);").build()
@@ -564,7 +566,7 @@ public class Grammar {
 											GExpansion.lookAhead(
 													expr("quotesMode").build()
 											),
-											GExpansion.nonTerminal("ret", "NodeListVar", emptyList())
+											GExpansion.nonTerminal("ret", "NodeListVar")
 									)
 							),
 							GExpansion.action(
@@ -585,7 +587,7 @@ public class Grammar {
 							GExpansion.terminal(null, "IMPLEMENTS"),
 							GExpansion.choice(
 									GExpansion.sequence(
-											GExpansion.nonTerminal("cit", "AnnotatedQualifiedType", emptyList()),
+											GExpansion.nonTerminal("cit", "AnnotatedQualifiedType"),
 											GExpansion.action(
 													listOf(
 															stmt("ret = append(ret, cit);").build()
@@ -593,7 +595,7 @@ public class Grammar {
 											),
 											GExpansion.zeroOrMore(
 													GExpansion.terminal(null, "COMMA"),
-													GExpansion.nonTerminal("cit", "AnnotatedQualifiedType", emptyList()),
+													GExpansion.nonTerminal("cit", "AnnotatedQualifiedType"),
 													GExpansion.action(
 															listOf(
 																	stmt("ret = append(ret, cit);").build()
@@ -610,7 +612,7 @@ public class Grammar {
 											GExpansion.lookAhead(
 													expr("quotesMode").build()
 											),
-											GExpansion.nonTerminal("ret", "NodeListVar", emptyList())
+											GExpansion.nonTerminal("ret", "NodeListVar")
 									)
 							),
 							GExpansion.action(
@@ -633,9 +635,9 @@ public class Grammar {
 					),
 					GExpansion.sequence(
 							GExpansion.terminal(null, "ENUM"),
-							GExpansion.nonTerminal("name", "Name", emptyList()),
+							GExpansion.nonTerminal("name", "Name"),
 							GExpansion.zeroOrOne(
-									GExpansion.nonTerminal("implementsClause", "ImplementsList", listOf(
+									GExpansion.nonTerminal("implementsClause", "ImplementsList", null, listOf(
 											expr("TypeKind.Enum").build(),
 											expr("problem").build()
 									))
@@ -644,7 +646,7 @@ public class Grammar {
 							GExpansion.zeroOrOne(
 									GExpansion.choice(
 											GExpansion.sequence(
-													GExpansion.nonTerminal("entry", "EnumConstantDecl", emptyList()),
+													GExpansion.nonTerminal("entry", "EnumConstantDecl"),
 													GExpansion.action(
 															listOf(
 																	stmt("constants = append(constants, entry);").build()
@@ -653,7 +655,7 @@ public class Grammar {
 													GExpansion.zeroOrMore(
 															GExpansion.lookAhead(2),
 															GExpansion.terminal(null, "COMMA"),
-															GExpansion.nonTerminal("entry", "EnumConstantDecl", emptyList()),
+															GExpansion.nonTerminal("entry", "EnumConstantDecl"),
 															GExpansion.action(
 																	listOf(
 																			stmt("constants = append(constants, entry);").build()
@@ -665,7 +667,7 @@ public class Grammar {
 													GExpansion.lookAhead(
 															expr("quotesMode").build()
 													),
-													GExpansion.nonTerminal("constants", "NodeListVar", emptyList())
+													GExpansion.nonTerminal("constants", "NodeListVar")
 											)
 									)
 							),
@@ -679,7 +681,7 @@ public class Grammar {
 							),
 							GExpansion.zeroOrOne(
 									GExpansion.terminal(null, "SEMICOLON"),
-									GExpansion.nonTerminal("members", "ClassOrInterfaceBodyDecls", listOf(
+									GExpansion.nonTerminal("members", "ClassOrInterfaceBodyDecls", null, listOf(
 											expr("TypeKind.Enum").build()
 									))
 							),
@@ -705,13 +707,13 @@ public class Grammar {
 											stmt("run();").build()
 									)
 							),
-							GExpansion.nonTerminal("modifiers", "Modifiers", emptyList()),
-							GExpansion.nonTerminal("name", "Name", emptyList()),
+							GExpansion.nonTerminal("modifiers", "Modifiers"),
+							GExpansion.nonTerminal("name", "Name"),
 							GExpansion.zeroOrOne(
-									GExpansion.nonTerminal("args", "Arguments", emptyList())
+									GExpansion.nonTerminal("args", "Arguments")
 							),
 							GExpansion.zeroOrOne(
-									GExpansion.nonTerminal("classBody", "ClassOrInterfaceBody", listOf(
+									GExpansion.nonTerminal("classBody", "ClassOrInterfaceBody", null, listOf(
 											expr("TypeKind.Class").build()
 									))
 							),
@@ -731,8 +733,8 @@ public class Grammar {
 					GExpansion.sequence(
 							GExpansion.terminal(null, "AT"),
 							GExpansion.terminal(null, "INTERFACE"),
-							GExpansion.nonTerminal("name", "Name", emptyList()),
-							GExpansion.nonTerminal("members", "AnnotationTypeBody", emptyList()),
+							GExpansion.nonTerminal("name", "Name"),
+							GExpansion.nonTerminal("members", "AnnotationTypeBody"),
 							GExpansion.action(
 									listOf(
 											stmt("return dress(SAnnotationDecl.make(modifiers, name, members));").build()
@@ -751,7 +753,7 @@ public class Grammar {
 							GExpansion.zeroOrOne(
 									GExpansion.choice(
 											GExpansion.oneOrMore(
-													GExpansion.nonTerminal("member", "AnnotationTypeBodyDecl", emptyList()),
+													GExpansion.nonTerminal("member", "AnnotationTypeBodyDecl"),
 													GExpansion.action(
 															listOf(
 																	stmt("ret = append(ret, member);").build()
@@ -762,7 +764,7 @@ public class Grammar {
 													GExpansion.lookAhead(
 															expr("quotesMode").build()
 													),
-													GExpansion.nonTerminal("ret", "NodeListVar", emptyList())
+													GExpansion.nonTerminal("ret", "NodeListVar")
 											)
 									)
 							),
@@ -796,28 +798,28 @@ public class Grammar {
 											)
 									),
 									GExpansion.sequence(
-											GExpansion.nonTerminal("modifiers", "Modifiers", emptyList()),
+											GExpansion.nonTerminal("modifiers", "Modifiers"),
 											GExpansion.choice(
 													GExpansion.sequence(
 															GExpansion.lookAhead(
-																	GExpansion.nonTerminal(null, "Type", emptyList()),
-																	GExpansion.nonTerminal(null, "Name", emptyList()),
+																	GExpansion.nonTerminal(null, "Type"),
+																	GExpansion.nonTerminal(null, "Name"),
 																	GExpansion.terminal(null, "LPAREN")
 															),
-															GExpansion.nonTerminal("ret", "AnnotationTypeMemberDecl", listOf(
+															GExpansion.nonTerminal("ret", "AnnotationTypeMemberDecl", null, listOf(
 																	expr("modifiers").build()
 															))
 													),
-													GExpansion.nonTerminal("ret", "ClassOrInterfaceDecl", listOf(
+													GExpansion.nonTerminal("ret", "ClassOrInterfaceDecl", null, listOf(
 															expr("modifiers").build()
 													)),
-													GExpansion.nonTerminal("ret", "EnumDecl", listOf(
+													GExpansion.nonTerminal("ret", "EnumDecl", null, listOf(
 															expr("modifiers").build()
 													)),
-													GExpansion.nonTerminal("ret", "AnnotationTypeDecl", listOf(
+													GExpansion.nonTerminal("ret", "AnnotationTypeDecl", null, listOf(
 															expr("modifiers").build()
 													)),
-													GExpansion.nonTerminal("ret", "FieldDecl", listOf(
+													GExpansion.nonTerminal("ret", "FieldDecl", null, listOf(
 															expr("modifiers").build()
 													))
 											)
@@ -840,16 +842,16 @@ public class Grammar {
 							stmt("BUTree<? extends SExpr> val = null;").build()
 					),
 					GExpansion.sequence(
-							GExpansion.nonTerminal("type", "Type", listOf(
+							GExpansion.nonTerminal("type", "Type", null, listOf(
 									expr("null").build()
 							)),
-							GExpansion.nonTerminal("name", "Name", emptyList()),
+							GExpansion.nonTerminal("name", "Name"),
 							GExpansion.terminal(null, "LPAREN"),
 							GExpansion.terminal(null, "RPAREN"),
-							GExpansion.nonTerminal("dims", "ArrayDims", emptyList()),
+							GExpansion.nonTerminal("dims", "ArrayDims"),
 							GExpansion.zeroOrOne(
 									GExpansion.terminal(null, "DEFAULT"),
-									GExpansion.nonTerminal("val", "MemberValue", emptyList()),
+									GExpansion.nonTerminal("val", "MemberValue"),
 									GExpansion.action(
 											listOf(
 													stmt("defaultVal = optionOf(val);").build()
@@ -874,7 +876,7 @@ public class Grammar {
 							GExpansion.terminal(null, "LT"),
 							GExpansion.choice(
 									GExpansion.sequence(
-											GExpansion.nonTerminal("tp", "TypeParameter", emptyList()),
+											GExpansion.nonTerminal("tp", "TypeParameter"),
 											GExpansion.action(
 													listOf(
 															stmt("ret = append(ret, tp);").build()
@@ -882,7 +884,7 @@ public class Grammar {
 											),
 											GExpansion.zeroOrMore(
 													GExpansion.terminal(null, "COMMA"),
-													GExpansion.nonTerminal("tp", "TypeParameter", emptyList()),
+													GExpansion.nonTerminal("tp", "TypeParameter"),
 													GExpansion.action(
 															listOf(
 																	stmt("ret = append(ret, tp);").build()
@@ -894,7 +896,7 @@ public class Grammar {
 											GExpansion.lookAhead(
 													expr("quotesMode").build()
 											),
-											GExpansion.nonTerminal("ret", "NodeListVar", emptyList())
+											GExpansion.nonTerminal("ret", "NodeListVar")
 									)
 							),
 							GExpansion.terminal(null, "GT"),
@@ -918,10 +920,10 @@ public class Grammar {
 											stmt("run();").build()
 									)
 							),
-							GExpansion.nonTerminal("annotations", "Annotations", emptyList()),
-							GExpansion.nonTerminal("name", "Name", emptyList()),
+							GExpansion.nonTerminal("annotations", "Annotations"),
+							GExpansion.nonTerminal("name", "Name"),
 							GExpansion.zeroOrOne(
-									GExpansion.nonTerminal("typeBounds", "TypeBounds", emptyList())
+									GExpansion.nonTerminal("typeBounds", "TypeBounds")
 							),
 							GExpansion.action(
 									listOf(
@@ -941,7 +943,7 @@ public class Grammar {
 							GExpansion.terminal(null, "EXTENDS"),
 							GExpansion.choice(
 									GExpansion.sequence(
-											GExpansion.nonTerminal("cit", "AnnotatedQualifiedType", emptyList()),
+											GExpansion.nonTerminal("cit", "AnnotatedQualifiedType"),
 											GExpansion.action(
 													listOf(
 															stmt("ret = append(ret, cit);").build()
@@ -949,7 +951,7 @@ public class Grammar {
 											),
 											GExpansion.zeroOrMore(
 													GExpansion.terminal(null, "BIT_AND"),
-													GExpansion.nonTerminal("cit", "AnnotatedQualifiedType", emptyList()),
+													GExpansion.nonTerminal("cit", "AnnotatedQualifiedType"),
 													GExpansion.action(
 															listOf(
 																	stmt("ret = append(ret, cit);").build()
@@ -961,7 +963,7 @@ public class Grammar {
 											GExpansion.lookAhead(
 													expr("quotesMode").build()
 											),
-											GExpansion.nonTerminal("ret", "NodeListVar", emptyList())
+											GExpansion.nonTerminal("ret", "NodeListVar")
 									)
 							),
 							GExpansion.action(
@@ -979,7 +981,7 @@ public class Grammar {
 					),
 					GExpansion.sequence(
 							GExpansion.terminal(null, "LBRACE"),
-							GExpansion.nonTerminal("ret", "ClassOrInterfaceBodyDecls", listOf(
+							GExpansion.nonTerminal("ret", "ClassOrInterfaceBodyDecls", null, listOf(
 									expr("typeKind").build()
 							)),
 							GExpansion.terminal(null, "RBRACE"),
@@ -1000,7 +1002,7 @@ public class Grammar {
 							GExpansion.zeroOrOne(
 									GExpansion.choice(
 											GExpansion.oneOrMore(
-													GExpansion.nonTerminal("member", "ClassOrInterfaceBodyDecl", listOf(
+													GExpansion.nonTerminal("member", "ClassOrInterfaceBodyDecl", null, listOf(
 															expr("typeKind").build()
 													)),
 													GExpansion.action(
@@ -1013,7 +1015,7 @@ public class Grammar {
 													GExpansion.lookAhead(
 															expr("quotesMode").build()
 													),
-													GExpansion.nonTerminal("ret", "NodeListVar", emptyList())
+													GExpansion.nonTerminal("ret", "NodeListVar")
 											)
 									)
 							),
@@ -1047,7 +1049,7 @@ public class Grammar {
 											)
 									),
 									GExpansion.sequence(
-											GExpansion.nonTerminal("modifiers", "Modifiers", emptyList()),
+											GExpansion.nonTerminal("modifiers", "Modifiers"),
 											GExpansion.action(
 													listOf(
 															stmt("if (modifiers != null && contains(modifiers, SModifier.make(ModifierKeyword.Default)) && typeKind != TypeKind.Interface) problem = new BUProblem(Severity.ERROR, \"Only interfaces can have default members\");\n" + "").build()
@@ -1055,7 +1057,7 @@ public class Grammar {
 											),
 											GExpansion.choice(
 													GExpansion.sequence(
-															GExpansion.nonTerminal("ret", "InitializerDecl", listOf(
+															GExpansion.nonTerminal("ret", "InitializerDecl", null, listOf(
 																	expr("modifiers").build()
 															)),
 															GExpansion.action(
@@ -1064,24 +1066,24 @@ public class Grammar {
 																	)
 															)
 													),
-													GExpansion.nonTerminal("ret", "ClassOrInterfaceDecl", listOf(
+													GExpansion.nonTerminal("ret", "ClassOrInterfaceDecl", null, listOf(
 															expr("modifiers").build()
 													)),
-													GExpansion.nonTerminal("ret", "EnumDecl", listOf(
+													GExpansion.nonTerminal("ret", "EnumDecl", null, listOf(
 															expr("modifiers").build()
 													)),
-													GExpansion.nonTerminal("ret", "AnnotationTypeDecl", listOf(
+													GExpansion.nonTerminal("ret", "AnnotationTypeDecl", null, listOf(
 															expr("modifiers").build()
 													)),
 													GExpansion.sequence(
 															GExpansion.lookAhead(
 																	GExpansion.zeroOrOne(
-																			GExpansion.nonTerminal(null, "TypeParameters", emptyList())
+																			GExpansion.nonTerminal(null, "TypeParameters")
 																	),
-																	GExpansion.nonTerminal(null, "Name", emptyList()),
+																	GExpansion.nonTerminal(null, "Name"),
 																	GExpansion.terminal(null, "LPAREN")
 															),
-															GExpansion.nonTerminal("ret", "ConstructorDecl", listOf(
+															GExpansion.nonTerminal("ret", "ConstructorDecl", null, listOf(
 																	expr("modifiers").build()
 															)),
 															GExpansion.action(
@@ -1092,8 +1094,8 @@ public class Grammar {
 													),
 													GExpansion.sequence(
 															GExpansion.lookAhead(
-																	GExpansion.nonTerminal(null, "Type", emptyList()),
-																	GExpansion.nonTerminal(null, "Name", emptyList()),
+																	GExpansion.nonTerminal(null, "Type"),
+																	GExpansion.nonTerminal(null, "Name"),
 																	GExpansion.zeroOrMore(
 																			GExpansion.terminal(null, "LBRACKET"),
 																			GExpansion.terminal(null, "RBRACKET")
@@ -1104,11 +1106,11 @@ public class Grammar {
 																			GExpansion.terminal(null, "SEMICOLON")
 																	)
 															),
-															GExpansion.nonTerminal("ret", "FieldDecl", listOf(
+															GExpansion.nonTerminal("ret", "FieldDecl", null, listOf(
 																	expr("modifiers").build()
 															))
 													),
-													GExpansion.nonTerminal("ret", "MethodDecl", listOf(
+													GExpansion.nonTerminal("ret", "MethodDecl", null, listOf(
 															expr("modifiers").build()
 													))
 											)
@@ -1129,10 +1131,10 @@ public class Grammar {
 							stmt("BUTree<SVariableDeclarator> val;").build()
 					),
 					GExpansion.sequence(
-							GExpansion.nonTerminal("type", "Type", listOf(
+							GExpansion.nonTerminal("type", "Type", null, listOf(
 									expr("null").build()
 							)),
-							GExpansion.nonTerminal("variables", "VariableDeclarators", emptyList()),
+							GExpansion.nonTerminal("variables", "VariableDeclarators"),
 							GExpansion.terminal(null, "SEMICOLON"),
 							GExpansion.action(
 									listOf(
@@ -1148,10 +1150,10 @@ public class Grammar {
 							stmt("BUTree<SNodeList> variables = emptyList();").build()
 					),
 					GExpansion.sequence(
-							GExpansion.nonTerminal("type", "Type", listOf(
+							GExpansion.nonTerminal("type", "Type", null, listOf(
 									expr("null").build()
 							)),
-							GExpansion.nonTerminal("variables", "VariableDeclarators", emptyList()),
+							GExpansion.nonTerminal("variables", "VariableDeclarators"),
 							GExpansion.action(
 									listOf(
 											stmt("return dress(SLocalVariableDecl.make(modifiers, type, variables));").build()
@@ -1166,7 +1168,7 @@ public class Grammar {
 							stmt("BUTree<SVariableDeclarator> val;").build()
 					),
 					GExpansion.sequence(
-							GExpansion.nonTerminal("val", "VariableDeclarator", emptyList()),
+							GExpansion.nonTerminal("val", "VariableDeclarator"),
 							GExpansion.action(
 									listOf(
 											stmt("variables = append(variables, val);").build()
@@ -1174,7 +1176,7 @@ public class Grammar {
 							),
 							GExpansion.zeroOrMore(
 									GExpansion.terminal(null, "COMMA"),
-									GExpansion.nonTerminal("val", "VariableDeclarator", emptyList()),
+									GExpansion.nonTerminal("val", "VariableDeclarator"),
 									GExpansion.action(
 											listOf(
 													stmt("variables = append(variables, val);").build()
@@ -1201,10 +1203,10 @@ public class Grammar {
 											stmt("run();").build()
 									)
 							),
-							GExpansion.nonTerminal("id", "VariableDeclaratorId", emptyList()),
+							GExpansion.nonTerminal("id", "VariableDeclaratorId"),
 							GExpansion.zeroOrOne(
 									GExpansion.terminal(null, "ASSIGN"),
-									GExpansion.nonTerminal("initExpr", "VariableInitializer", emptyList()),
+									GExpansion.nonTerminal("initExpr", "VariableInitializer"),
 									GExpansion.action(
 											listOf(
 													stmt("init = optionOf(initExpr);").build()
@@ -1230,8 +1232,8 @@ public class Grammar {
 											stmt("run();").build()
 									)
 							),
-							GExpansion.nonTerminal("name", "Name", emptyList()),
-							GExpansion.nonTerminal("arrayDims", "ArrayDims", emptyList()),
+							GExpansion.nonTerminal("name", "Name"),
+							GExpansion.nonTerminal("arrayDims", "ArrayDims"),
 							GExpansion.action(
 									listOf(
 											stmt("return dress(SVariableDeclaratorId.make(name, arrayDims));").build()
@@ -1248,7 +1250,7 @@ public class Grammar {
 					GExpansion.sequence(
 							GExpansion.zeroOrMore(
 									GExpansion.lookAhead(
-											GExpansion.nonTerminal(null, "Annotations", emptyList()),
+											GExpansion.nonTerminal(null, "Annotations"),
 											GExpansion.terminal(null, "LBRACKET"),
 											GExpansion.terminal(null, "RBRACKET")
 									),
@@ -1257,7 +1259,7 @@ public class Grammar {
 													stmt("run();").build()
 											)
 									),
-									GExpansion.nonTerminal("annotations", "Annotations", emptyList()),
+									GExpansion.nonTerminal("annotations", "Annotations"),
 									GExpansion.terminal(null, "LBRACKET"),
 									GExpansion.terminal(null, "RBRACKET"),
 									GExpansion.action(
@@ -1280,8 +1282,8 @@ public class Grammar {
 					),
 					GExpansion.sequence(
 							GExpansion.choice(
-									GExpansion.nonTerminal("ret", "ArrayInitializer", emptyList()),
-									GExpansion.nonTerminal("ret", "Expression", emptyList())
+									GExpansion.nonTerminal("ret", "ArrayInitializer"),
+									GExpansion.nonTerminal("ret", "Expression")
 							),
 							GExpansion.action(
 									listOf(
@@ -1305,7 +1307,7 @@ public class Grammar {
 							),
 							GExpansion.terminal(null, "LBRACE"),
 							GExpansion.zeroOrOne(
-									GExpansion.nonTerminal("val", "VariableInitializer", emptyList()),
+									GExpansion.nonTerminal("val", "VariableInitializer"),
 									GExpansion.action(
 											listOf(
 													stmt("values = append(values, val);").build()
@@ -1314,7 +1316,7 @@ public class Grammar {
 									GExpansion.zeroOrMore(
 											GExpansion.lookAhead(2),
 											GExpansion.terminal(null, "COMMA"),
-											GExpansion.nonTerminal("val", "VariableInitializer", emptyList()),
+											GExpansion.nonTerminal("val", "VariableInitializer"),
 											GExpansion.action(
 													listOf(
 															stmt("values = append(values, val);").build()
@@ -1352,17 +1354,17 @@ public class Grammar {
 					),
 					GExpansion.sequence(
 							GExpansion.zeroOrOne(
-									GExpansion.nonTerminal("typeParameters", "TypeParameters", emptyList())
+									GExpansion.nonTerminal("typeParameters", "TypeParameters")
 							),
-							GExpansion.nonTerminal("type", "ResultType", emptyList()),
-							GExpansion.nonTerminal("name", "Name", emptyList()),
-							GExpansion.nonTerminal("parameters", "FormalParameters", emptyList()),
-							GExpansion.nonTerminal("arrayDims", "ArrayDims", emptyList()),
+							GExpansion.nonTerminal("type", "ResultType"),
+							GExpansion.nonTerminal("name", "Name"),
+							GExpansion.nonTerminal("parameters", "FormalParameters"),
+							GExpansion.nonTerminal("arrayDims", "ArrayDims"),
 							GExpansion.zeroOrOne(
-									GExpansion.nonTerminal("throwsClause", "ThrowsClause", emptyList())
+									GExpansion.nonTerminal("throwsClause", "ThrowsClause")
 							),
 							GExpansion.choice(
-									GExpansion.nonTerminal("block", "Block", emptyList()),
+									GExpansion.nonTerminal("block", "Block"),
 									GExpansion.sequence(
 											GExpansion.terminal(null, "SEMICOLON"),
 											GExpansion.action(
@@ -1388,7 +1390,7 @@ public class Grammar {
 					GExpansion.sequence(
 							GExpansion.terminal(null, "LPAREN"),
 							GExpansion.zeroOrOne(
-									GExpansion.nonTerminal("ret", "FormalParameterList", emptyList())
+									GExpansion.nonTerminal("ret", "FormalParameterList")
 							),
 							GExpansion.terminal(null, "RPAREN"),
 							GExpansion.action(
@@ -1407,7 +1409,7 @@ public class Grammar {
 					GExpansion.sequence(
 							GExpansion.choice(
 									GExpansion.sequence(
-											GExpansion.nonTerminal("par", "FormalParameter", emptyList()),
+											GExpansion.nonTerminal("par", "FormalParameter"),
 											GExpansion.action(
 													listOf(
 															stmt("ret = append(ret, par);").build()
@@ -1415,7 +1417,7 @@ public class Grammar {
 											),
 											GExpansion.zeroOrMore(
 													GExpansion.terminal(null, "COMMA"),
-													GExpansion.nonTerminal("par", "FormalParameter", emptyList()),
+													GExpansion.nonTerminal("par", "FormalParameter"),
 													GExpansion.action(
 															listOf(
 																	stmt("ret = append(ret, par);").build()
@@ -1427,7 +1429,7 @@ public class Grammar {
 											GExpansion.lookAhead(
 													expr("quotesMode").build()
 											),
-											GExpansion.nonTerminal("ret", "NodeListVar", emptyList())
+											GExpansion.nonTerminal("ret", "NodeListVar")
 									)
 							),
 							GExpansion.action(
@@ -1451,8 +1453,8 @@ public class Grammar {
 											stmt("run();").build()
 									)
 							),
-							GExpansion.nonTerminal("modifiers", "Modifiers", emptyList()),
-							GExpansion.nonTerminal("type", "Type", listOf(
+							GExpansion.nonTerminal("modifiers", "Modifiers"),
+							GExpansion.nonTerminal("type", "Type", null, listOf(
 									expr("null").build()
 							)),
 							GExpansion.zeroOrOne(
@@ -1463,7 +1465,7 @@ public class Grammar {
 											)
 									)
 							),
-							GExpansion.nonTerminal("id", "VariableDeclaratorId", emptyList()),
+							GExpansion.nonTerminal("id", "VariableDeclaratorId"),
 							GExpansion.action(
 									listOf(
 											stmt("return dress(SFormalParameter.make(modifiers, type, isVarArg, id));").build()
@@ -1479,7 +1481,7 @@ public class Grammar {
 					),
 					GExpansion.sequence(
 							GExpansion.terminal(null, "THROWS"),
-							GExpansion.nonTerminal("cit", "AnnotatedQualifiedType", emptyList()),
+							GExpansion.nonTerminal("cit", "AnnotatedQualifiedType"),
 							GExpansion.action(
 									listOf(
 											stmt("ret = append(ret, cit);").build()
@@ -1487,7 +1489,7 @@ public class Grammar {
 							),
 							GExpansion.zeroOrMore(
 									GExpansion.terminal(null, "COMMA"),
-									GExpansion.nonTerminal("cit", "AnnotatedQualifiedType", emptyList()),
+									GExpansion.nonTerminal("cit", "AnnotatedQualifiedType"),
 									GExpansion.action(
 											listOf(
 													stmt("ret = append(ret, cit);").build()
@@ -1515,12 +1517,12 @@ public class Grammar {
 					),
 					GExpansion.sequence(
 							GExpansion.zeroOrOne(
-									GExpansion.nonTerminal("typeParameters", "TypeParameters", emptyList())
+									GExpansion.nonTerminal("typeParameters", "TypeParameters")
 							),
-							GExpansion.nonTerminal("name", "Name", emptyList()),
-							GExpansion.nonTerminal("parameters", "FormalParameters", emptyList()),
+							GExpansion.nonTerminal("name", "Name"),
+							GExpansion.nonTerminal("parameters", "FormalParameters"),
 							GExpansion.zeroOrOne(
-									GExpansion.nonTerminal("throwsClause", "ThrowsClause", emptyList())
+									GExpansion.nonTerminal("throwsClause", "ThrowsClause")
 							),
 							GExpansion.action(
 									listOf(
@@ -1535,9 +1537,9 @@ public class Grammar {
 													GExpansion.choice(
 															GExpansion.sequence(
 																	GExpansion.lookAhead(
-																			GExpansion.nonTerminal(null, "ExplicitConstructorInvocation", emptyList())
+																			GExpansion.nonTerminal(null, "ExplicitConstructorInvocation")
 																	),
-																	GExpansion.nonTerminal("stmt", "ExplicitConstructorInvocation", emptyList()),
+																	GExpansion.nonTerminal("stmt", "ExplicitConstructorInvocation"),
 																	GExpansion.action(
 																			listOf(
 																					stmt("stmts = append(stmts, stmt);").build()
@@ -1546,7 +1548,7 @@ public class Grammar {
 															),
 															GExpansion.sequence(
 																	GExpansion.lookAhead(2),
-																	GExpansion.nonTerminal("stmt", "BlockStatement", emptyList()),
+																	GExpansion.nonTerminal("stmt", "BlockStatement"),
 																	GExpansion.action(
 																			listOf(
 																					stmt("stmts = append(stmts, stmt);").build()
@@ -1556,7 +1558,7 @@ public class Grammar {
 													),
 													GExpansion.zeroOrMore(
 															GExpansion.lookAhead(2),
-															GExpansion.nonTerminal("stmt", "BlockStatement", emptyList()),
+															GExpansion.nonTerminal("stmt", "BlockStatement"),
 															GExpansion.action(
 																	listOf(
 																			stmt("stmts = append(stmts, stmt);").build()
@@ -1568,7 +1570,7 @@ public class Grammar {
 													GExpansion.lookAhead(
 															expr("quotesMode").build()
 													),
-													GExpansion.nonTerminal("stmts", "NodeListVar", emptyList())
+													GExpansion.nonTerminal("stmts", "NodeListVar")
 											)
 									)
 							),
@@ -1603,13 +1605,13 @@ public class Grammar {
 									GExpansion.sequence(
 											GExpansion.lookAhead(
 													GExpansion.zeroOrOne(
-															GExpansion.nonTerminal(null, "TypeArguments", emptyList())
+															GExpansion.nonTerminal(null, "TypeArguments")
 													),
 													GExpansion.terminal(null, "THIS"),
 													GExpansion.terminal(null, "LPAREN")
 											),
 											GExpansion.zeroOrOne(
-													GExpansion.nonTerminal("typeArgs", "TypeArguments", emptyList())
+													GExpansion.nonTerminal("typeArgs", "TypeArguments")
 											),
 											GExpansion.terminal(null, "THIS"),
 											GExpansion.action(
@@ -1617,23 +1619,23 @@ public class Grammar {
 															stmt("isThis = true;").build()
 													)
 											),
-											GExpansion.nonTerminal("args", "Arguments", emptyList()),
+											GExpansion.nonTerminal("args", "Arguments"),
 											GExpansion.terminal(null, "SEMICOLON")
 									),
 									GExpansion.sequence(
 											GExpansion.zeroOrOne(
 													GExpansion.lookAhead(
-															GExpansion.nonTerminal(null, "PrimaryExpressionWithoutSuperSuffix", emptyList()),
+															GExpansion.nonTerminal(null, "PrimaryExpressionWithoutSuperSuffix"),
 															GExpansion.terminal(null, "DOT")
 													),
-													GExpansion.nonTerminal("expr", "PrimaryExpressionWithoutSuperSuffix", emptyList()),
+													GExpansion.nonTerminal("expr", "PrimaryExpressionWithoutSuperSuffix"),
 													GExpansion.terminal(null, "DOT")
 											),
 											GExpansion.zeroOrOne(
-													GExpansion.nonTerminal("typeArgs", "TypeArguments", emptyList())
+													GExpansion.nonTerminal("typeArgs", "TypeArguments")
 											),
 											GExpansion.terminal(null, "SUPER"),
-											GExpansion.nonTerminal("args", "Arguments", emptyList()),
+											GExpansion.nonTerminal("args", "Arguments"),
 											GExpansion.terminal(null, "SEMICOLON")
 									)
 							),
@@ -1655,7 +1657,7 @@ public class Grammar {
 									GExpansion.lookAhead(2),
 									GExpansion.choice(
 											GExpansion.oneOrMore(
-													GExpansion.nonTerminal("stmt", "BlockStatement", emptyList()),
+													GExpansion.nonTerminal("stmt", "BlockStatement"),
 													GExpansion.action(
 															listOf(
 																	stmt("ret = append(ret, stmt);").build()
@@ -1666,7 +1668,7 @@ public class Grammar {
 													GExpansion.lookAhead(
 															expr("quotesMode").build()
 													),
-													GExpansion.nonTerminal("ret", "NodeListVar", emptyList())
+													GExpansion.nonTerminal("ret", "NodeListVar")
 											)
 									)
 							),
@@ -1683,7 +1685,7 @@ public class Grammar {
 							stmt("BUTree<SBlockStmt> block;").build()
 					),
 					GExpansion.sequence(
-							GExpansion.nonTerminal("block", "Block", emptyList()),
+							GExpansion.nonTerminal("block", "Block"),
 							GExpansion.action(
 									listOf(
 											stmt("return dress(SInitializerDecl.make(modifiers, block));").build()
@@ -1701,12 +1703,12 @@ public class Grammar {
 					GExpansion.sequence(
 							GExpansion.choice(
 									GExpansion.sequence(
-											GExpansion.nonTerminal("primitiveType", "PrimitiveType", listOf(
+											GExpansion.nonTerminal("primitiveType", "PrimitiveType", null, listOf(
 													expr("annotations").build()
 											)),
 											GExpansion.zeroOrOne(
 													GExpansion.lookAhead(
-															GExpansion.nonTerminal(null, "Annotations", emptyList()),
+															GExpansion.nonTerminal(null, "Annotations"),
 															GExpansion.terminal(null, "LBRACKET")
 													),
 													GExpansion.action(
@@ -1714,7 +1716,7 @@ public class Grammar {
 																	stmt("lateRun();").build()
 															)
 													),
-													GExpansion.nonTerminal("arrayDims", "ArrayDimsMandatory", emptyList()),
+													GExpansion.nonTerminal("arrayDims", "ArrayDimsMandatory"),
 													GExpansion.action(
 															listOf(
 																	stmt("type = dress(SArrayType.make(primitiveType, arrayDims));").build()
@@ -1723,12 +1725,12 @@ public class Grammar {
 											)
 									),
 									GExpansion.sequence(
-											GExpansion.nonTerminal("type", "QualifiedType", listOf(
+											GExpansion.nonTerminal("type", "QualifiedType", null, listOf(
 													expr("annotations").build()
 											)),
 											GExpansion.zeroOrOne(
 													GExpansion.lookAhead(
-															GExpansion.nonTerminal(null, "Annotations", emptyList()),
+															GExpansion.nonTerminal(null, "Annotations"),
 															GExpansion.terminal(null, "LBRACKET")
 													),
 													GExpansion.action(
@@ -1736,7 +1738,7 @@ public class Grammar {
 																	stmt("lateRun();").build()
 															)
 													),
-													GExpansion.nonTerminal("arrayDims", "ArrayDimsMandatory", emptyList()),
+													GExpansion.nonTerminal("arrayDims", "ArrayDimsMandatory"),
 													GExpansion.action(
 															listOf(
 																	stmt("type = dress(SArrayType.make(type, arrayDims));").build()
@@ -1762,7 +1764,7 @@ public class Grammar {
 					GExpansion.sequence(
 							GExpansion.choice(
 									GExpansion.sequence(
-											GExpansion.nonTerminal("primitiveType", "PrimitiveType", listOf(
+											GExpansion.nonTerminal("primitiveType", "PrimitiveType", null, listOf(
 													expr("annotations").build()
 											)),
 											GExpansion.action(
@@ -1770,7 +1772,7 @@ public class Grammar {
 															stmt("lateRun();").build()
 													)
 											),
-											GExpansion.nonTerminal("arrayDims", "ArrayDimsMandatory", emptyList()),
+											GExpansion.nonTerminal("arrayDims", "ArrayDimsMandatory"),
 											GExpansion.action(
 													listOf(
 															stmt("type = dress(SArrayType.make(primitiveType, arrayDims));").build()
@@ -1778,12 +1780,12 @@ public class Grammar {
 											)
 									),
 									GExpansion.sequence(
-											GExpansion.nonTerminal("type", "QualifiedType", listOf(
+											GExpansion.nonTerminal("type", "QualifiedType", null, listOf(
 													expr("annotations").build()
 											)),
 											GExpansion.zeroOrOne(
 													GExpansion.lookAhead(
-															GExpansion.nonTerminal(null, "Annotations", emptyList()),
+															GExpansion.nonTerminal(null, "Annotations"),
 															GExpansion.terminal(null, "LBRACKET")
 													),
 													GExpansion.action(
@@ -1791,7 +1793,7 @@ public class Grammar {
 																	stmt("lateRun();").build()
 															)
 													),
-													GExpansion.nonTerminal("arrayDims", "ArrayDimsMandatory", emptyList()),
+													GExpansion.nonTerminal("arrayDims", "ArrayDimsMandatory"),
 													GExpansion.action(
 															listOf(
 																	stmt("type = dress(SArrayType.make(type, arrayDims));").build()
@@ -1821,10 +1823,10 @@ public class Grammar {
 											stmt("if (annotations == null) {\n" + "\trun();\n" + "\tannotations = emptyList();\n" + "}").build()
 									)
 							),
-							GExpansion.nonTerminal("name", "Name", emptyList()),
+							GExpansion.nonTerminal("name", "Name"),
 							GExpansion.zeroOrOne(
 									GExpansion.lookAhead(2),
-									GExpansion.nonTerminal("typeArgs", "TypeArgumentsOrDiamond", emptyList())
+									GExpansion.nonTerminal("typeArgs", "TypeArgumentsOrDiamond")
 							),
 							GExpansion.action(
 									listOf(
@@ -1844,11 +1846,11 @@ public class Grammar {
 													stmt("scope = optionOf(ret);").build()
 											)
 									),
-									GExpansion.nonTerminal("annotations", "Annotations", emptyList()),
-									GExpansion.nonTerminal("name", "Name", emptyList()),
+									GExpansion.nonTerminal("annotations", "Annotations"),
+									GExpansion.nonTerminal("name", "Name"),
 									GExpansion.zeroOrOne(
 											GExpansion.lookAhead(2),
-											GExpansion.nonTerminal("typeArgs", "TypeArgumentsOrDiamond", emptyList())
+											GExpansion.nonTerminal("typeArgs", "TypeArgumentsOrDiamond")
 									),
 									GExpansion.action(
 											listOf(
@@ -1872,7 +1874,7 @@ public class Grammar {
 					GExpansion.sequence(
 							GExpansion.terminal(null, "LT"),
 							GExpansion.zeroOrOne(
-									GExpansion.nonTerminal("ret", "TypeArgumentList", emptyList())
+									GExpansion.nonTerminal("ret", "TypeArgumentList")
 							),
 							GExpansion.terminal(null, "GT"),
 							GExpansion.action(
@@ -1891,7 +1893,7 @@ public class Grammar {
 					GExpansion.sequence(
 							GExpansion.terminal(null, "LT"),
 							GExpansion.zeroOrOne(
-									GExpansion.nonTerminal("ret", "TypeArgumentList", emptyList())
+									GExpansion.nonTerminal("ret", "TypeArgumentList")
 							),
 							GExpansion.terminal(null, "GT"),
 							GExpansion.action(
@@ -1910,7 +1912,7 @@ public class Grammar {
 					),
 					GExpansion.choice(
 							GExpansion.sequence(
-									GExpansion.nonTerminal("type", "TypeArgument", emptyList()),
+									GExpansion.nonTerminal("type", "TypeArgument"),
 									GExpansion.action(
 											listOf(
 													stmt("ret = append(ret, type);").build()
@@ -1918,7 +1920,7 @@ public class Grammar {
 									),
 									GExpansion.zeroOrMore(
 											GExpansion.terminal(null, "COMMA"),
-											GExpansion.nonTerminal("type", "TypeArgument", emptyList()),
+											GExpansion.nonTerminal("type", "TypeArgument"),
 											GExpansion.action(
 													listOf(
 															stmt("ret = append(ret, type);").build()
@@ -1956,12 +1958,12 @@ public class Grammar {
 											stmt("run();").build()
 									)
 							),
-							GExpansion.nonTerminal("annotations", "Annotations", emptyList()),
+							GExpansion.nonTerminal("annotations", "Annotations"),
 							GExpansion.choice(
-									GExpansion.nonTerminal("ret", "ReferenceType", listOf(
+									GExpansion.nonTerminal("ret", "ReferenceType", null, listOf(
 											expr("annotations").build()
 									)),
-									GExpansion.nonTerminal("ret", "Wildcard", listOf(
+									GExpansion.nonTerminal("ret", "Wildcard", null, listOf(
 											expr("annotations").build()
 									))
 							),
@@ -1995,8 +1997,8 @@ public class Grammar {
 																	stmt("run();").build()
 															)
 													),
-													GExpansion.nonTerminal("boundAnnotations", "Annotations", emptyList()),
-													GExpansion.nonTerminal("ext", "ReferenceType", listOf(
+													GExpansion.nonTerminal("boundAnnotations", "Annotations"),
+													GExpansion.nonTerminal("ext", "ReferenceType", null, listOf(
 															expr("boundAnnotations").build()
 													))
 											),
@@ -2007,8 +2009,8 @@ public class Grammar {
 																	stmt("run();").build()
 															)
 													),
-													GExpansion.nonTerminal("boundAnnotations", "Annotations", emptyList()),
-													GExpansion.nonTerminal("sup", "ReferenceType", listOf(
+													GExpansion.nonTerminal("boundAnnotations", "Annotations"),
+													GExpansion.nonTerminal("sup", "ReferenceType", null, listOf(
 															expr("boundAnnotations").build()
 													))
 											)
@@ -2125,7 +2127,7 @@ public class Grammar {
 													)
 											)
 									),
-									GExpansion.nonTerminal("ret", "Type", listOf(
+									GExpansion.nonTerminal("ret", "Type", null, listOf(
 											expr("null").build()
 									))
 							),
@@ -2148,8 +2150,8 @@ public class Grammar {
 											stmt("run();").build()
 									)
 							),
-							GExpansion.nonTerminal("annotations", "Annotations", emptyList()),
-							GExpansion.nonTerminal("ret", "QualifiedType", listOf(
+							GExpansion.nonTerminal("annotations", "Annotations"),
+							GExpansion.nonTerminal("ret", "QualifiedType", null, listOf(
 									expr("annotations").build()
 							)),
 							GExpansion.action(
@@ -2172,7 +2174,7 @@ public class Grammar {
 											stmt("run();").build()
 									)
 							),
-							GExpansion.nonTerminal("name", "Name", emptyList()),
+							GExpansion.nonTerminal("name", "Name"),
 							GExpansion.action(
 									listOf(
 											stmt("ret = dress(SQualifiedName.make(qualifier, name));").build()
@@ -2191,7 +2193,7 @@ public class Grammar {
 													stmt("qualifier = optionOf(ret);").build()
 											)
 									),
-									GExpansion.nonTerminal("name", "Name", emptyList()),
+									GExpansion.nonTerminal("name", "Name"),
 									GExpansion.action(
 											listOf(
 													stmt("ret = dress(SQualifiedName.make(qualifier, name));").build()
@@ -2230,7 +2232,7 @@ public class Grammar {
 											GExpansion.lookAhead(
 													expr("quotesMode").build()
 											),
-											GExpansion.nonTerminal("name", "NodeVar", emptyList())
+											GExpansion.nonTerminal("name", "NodeVar")
 									)
 							),
 							GExpansion.action(
@@ -2252,7 +2254,7 @@ public class Grammar {
 							GExpansion.choice(
 									GExpansion.sequence(
 											GExpansion.lookAhead(
-													GExpansion.nonTerminal(null, "Name", emptyList()),
+													GExpansion.nonTerminal(null, "Name"),
 													GExpansion.terminal(null, "ARROW")
 											),
 											GExpansion.action(
@@ -2260,9 +2262,9 @@ public class Grammar {
 															stmt("run();").build()
 													)
 											),
-											GExpansion.nonTerminal("ret", "Name", emptyList()),
+											GExpansion.nonTerminal("ret", "Name"),
 											GExpansion.terminal(null, "ARROW"),
-											GExpansion.nonTerminal("ret", "LambdaBody", listOf(
+											GExpansion.nonTerminal("ret", "LambdaBody", null, listOf(
 													expr("singletonList(makeFormalParameter((BUTree<SName>) ret))").build(),
 													expr("false").build()
 											))
@@ -2281,7 +2283,7 @@ public class Grammar {
 											GExpansion.terminal(null, "LPAREN"),
 											GExpansion.terminal(null, "RPAREN"),
 											GExpansion.terminal(null, "ARROW"),
-											GExpansion.nonTerminal("ret", "LambdaBody", listOf(
+											GExpansion.nonTerminal("ret", "LambdaBody", null, listOf(
 													expr("emptyList()").build(),
 													expr("true").build()
 											))
@@ -2289,7 +2291,7 @@ public class Grammar {
 									GExpansion.sequence(
 											GExpansion.lookAhead(
 													GExpansion.terminal(null, "LPAREN"),
-													GExpansion.nonTerminal(null, "Name", emptyList()),
+													GExpansion.nonTerminal(null, "Name"),
 													GExpansion.terminal(null, "RPAREN"),
 													GExpansion.terminal(null, "ARROW")
 											),
@@ -2299,10 +2301,10 @@ public class Grammar {
 													)
 											),
 											GExpansion.terminal(null, "LPAREN"),
-											GExpansion.nonTerminal("ret", "Name", emptyList()),
+											GExpansion.nonTerminal("ret", "Name"),
 											GExpansion.terminal(null, "RPAREN"),
 											GExpansion.terminal(null, "ARROW"),
-											GExpansion.nonTerminal("ret", "LambdaBody", listOf(
+											GExpansion.nonTerminal("ret", "LambdaBody", null, listOf(
 													expr("singletonList(makeFormalParameter((BUTree<SName>) ret))").build(),
 													expr("true").build()
 											))
@@ -2310,7 +2312,7 @@ public class Grammar {
 									GExpansion.sequence(
 											GExpansion.lookAhead(
 													GExpansion.terminal(null, "LPAREN"),
-													GExpansion.nonTerminal(null, "Name", emptyList()),
+													GExpansion.nonTerminal(null, "Name"),
 													GExpansion.terminal(null, "COMMA")
 											),
 											GExpansion.action(
@@ -2319,16 +2321,16 @@ public class Grammar {
 													)
 											),
 											GExpansion.terminal(null, "LPAREN"),
-											GExpansion.nonTerminal("params", "InferredFormalParameterList", emptyList()),
+											GExpansion.nonTerminal("params", "InferredFormalParameterList"),
 											GExpansion.terminal(null, "RPAREN"),
 											GExpansion.terminal(null, "ARROW"),
-											GExpansion.nonTerminal("ret", "LambdaBody", listOf(
+											GExpansion.nonTerminal("ret", "LambdaBody", null, listOf(
 													expr("params").build(),
 													expr("true").build()
 											))
 									),
 									GExpansion.sequence(
-											GExpansion.nonTerminal("ret", "ConditionalExpression", emptyList()),
+											GExpansion.nonTerminal("ret", "ConditionalExpression"),
 											GExpansion.zeroOrOne(
 													GExpansion.lookAhead(2),
 													GExpansion.action(
@@ -2336,8 +2338,8 @@ public class Grammar {
 																	stmt("lateRun();").build()
 															)
 													),
-													GExpansion.nonTerminal("op", "AssignmentOperator", emptyList()),
-													GExpansion.nonTerminal("value", "Expression", emptyList()),
+													GExpansion.nonTerminal("op", "AssignmentOperator"),
+													GExpansion.nonTerminal("value", "Expression"),
 													GExpansion.action(
 															listOf(
 																	stmt("ret = dress(SAssignExpr.make(ret, op, value));").build()
@@ -2363,7 +2365,7 @@ public class Grammar {
 					GExpansion.sequence(
 							GExpansion.choice(
 									GExpansion.sequence(
-											GExpansion.nonTerminal("expr", "Expression", emptyList()),
+											GExpansion.nonTerminal("expr", "Expression"),
 											GExpansion.action(
 													listOf(
 															stmt("ret = dress(SLambdaExpr.make(parameters, parenthesis, left(expr)));").build()
@@ -2371,7 +2373,7 @@ public class Grammar {
 											)
 									),
 									GExpansion.sequence(
-											GExpansion.nonTerminal("block", "Block", emptyList()),
+											GExpansion.nonTerminal("block", "Block"),
 											GExpansion.action(
 													listOf(
 															stmt("ret = dress(SLambdaExpr.make(parameters, parenthesis, right(block)));").build()
@@ -2393,7 +2395,7 @@ public class Grammar {
 							stmt("BUTree<SFormalParameter> param;").build()
 					),
 					GExpansion.sequence(
-							GExpansion.nonTerminal("param", "InferredFormalParameter", emptyList()),
+							GExpansion.nonTerminal("param", "InferredFormalParameter"),
 							GExpansion.action(
 									listOf(
 											stmt("ret = append(ret, param);").build()
@@ -2401,7 +2403,7 @@ public class Grammar {
 							),
 							GExpansion.zeroOrMore(
 									GExpansion.terminal(null, "COMMA"),
-									GExpansion.nonTerminal("param", "InferredFormalParameter", emptyList()),
+									GExpansion.nonTerminal("param", "InferredFormalParameter"),
 									GExpansion.action(
 											listOf(
 													stmt("ret = append(ret, param);").build()
@@ -2421,7 +2423,7 @@ public class Grammar {
 							stmt("BUTree<SName> name;").build()
 					),
 					GExpansion.sequence(
-							GExpansion.nonTerminal("name", "Name", emptyList()),
+							GExpansion.nonTerminal("name", "Name"),
 							GExpansion.action(
 									listOf(
 											stmt("return makeFormalParameter(name);").build()
@@ -2548,7 +2550,7 @@ public class Grammar {
 							stmt("BUTree<? extends SExpr> right;").build()
 					),
 					GExpansion.sequence(
-							GExpansion.nonTerminal("ret", "ConditionalOrExpression", emptyList()),
+							GExpansion.nonTerminal("ret", "ConditionalOrExpression"),
 							GExpansion.zeroOrOne(
 									GExpansion.lookAhead(2),
 									GExpansion.action(
@@ -2557,9 +2559,9 @@ public class Grammar {
 											)
 									),
 									GExpansion.terminal(null, "HOOK"),
-									GExpansion.nonTerminal("left", "Expression", emptyList()),
+									GExpansion.nonTerminal("left", "Expression"),
 									GExpansion.terminal(null, "COLON"),
-									GExpansion.nonTerminal("right", "ConditionalExpression", emptyList()),
+									GExpansion.nonTerminal("right", "ConditionalExpression"),
 									GExpansion.action(
 											listOf(
 													stmt("ret = dress(SConditionalExpr.make(ret, left, right));").build()
@@ -2580,7 +2582,7 @@ public class Grammar {
 							stmt("BUTree<? extends SExpr> right;").build()
 					),
 					GExpansion.sequence(
-							GExpansion.nonTerminal("ret", "ConditionalAndExpression", emptyList()),
+							GExpansion.nonTerminal("ret", "ConditionalAndExpression"),
 							GExpansion.zeroOrMore(
 									GExpansion.lookAhead(2),
 									GExpansion.action(
@@ -2589,7 +2591,7 @@ public class Grammar {
 											)
 									),
 									GExpansion.terminal(null, "SC_OR"),
-									GExpansion.nonTerminal("right", "ConditionalAndExpression", emptyList()),
+									GExpansion.nonTerminal("right", "ConditionalAndExpression"),
 									GExpansion.action(
 											listOf(
 													stmt("ret = dress(SBinaryExpr.make(ret, BinaryOp.Or, right));").build()
@@ -2610,7 +2612,7 @@ public class Grammar {
 							stmt("BUTree<? extends SExpr> right;").build()
 					),
 					GExpansion.sequence(
-							GExpansion.nonTerminal("ret", "InclusiveOrExpression", emptyList()),
+							GExpansion.nonTerminal("ret", "InclusiveOrExpression"),
 							GExpansion.zeroOrMore(
 									GExpansion.lookAhead(2),
 									GExpansion.action(
@@ -2619,7 +2621,7 @@ public class Grammar {
 											)
 									),
 									GExpansion.terminal(null, "SC_AND"),
-									GExpansion.nonTerminal("right", "InclusiveOrExpression", emptyList()),
+									GExpansion.nonTerminal("right", "InclusiveOrExpression"),
 									GExpansion.action(
 											listOf(
 													stmt("ret = dress(SBinaryExpr.make(ret, BinaryOp.And, right));").build()
@@ -2640,7 +2642,7 @@ public class Grammar {
 							stmt("BUTree<? extends SExpr> right;").build()
 					),
 					GExpansion.sequence(
-							GExpansion.nonTerminal("ret", "ExclusiveOrExpression", emptyList()),
+							GExpansion.nonTerminal("ret", "ExclusiveOrExpression"),
 							GExpansion.zeroOrMore(
 									GExpansion.lookAhead(2),
 									GExpansion.action(
@@ -2649,7 +2651,7 @@ public class Grammar {
 											)
 									),
 									GExpansion.terminal(null, "BIT_OR"),
-									GExpansion.nonTerminal("right", "ExclusiveOrExpression", emptyList()),
+									GExpansion.nonTerminal("right", "ExclusiveOrExpression"),
 									GExpansion.action(
 											listOf(
 													stmt("ret = dress(SBinaryExpr.make(ret, BinaryOp.BinOr, right));").build()
@@ -2670,7 +2672,7 @@ public class Grammar {
 							stmt("BUTree<? extends SExpr> right;").build()
 					),
 					GExpansion.sequence(
-							GExpansion.nonTerminal("ret", "AndExpression", emptyList()),
+							GExpansion.nonTerminal("ret", "AndExpression"),
 							GExpansion.zeroOrMore(
 									GExpansion.lookAhead(2),
 									GExpansion.action(
@@ -2679,7 +2681,7 @@ public class Grammar {
 											)
 									),
 									GExpansion.terminal(null, "XOR"),
-									GExpansion.nonTerminal("right", "AndExpression", emptyList()),
+									GExpansion.nonTerminal("right", "AndExpression"),
 									GExpansion.action(
 											listOf(
 													stmt("ret = dress(SBinaryExpr.make(ret, BinaryOp.XOr, right));").build()
@@ -2700,7 +2702,7 @@ public class Grammar {
 							stmt("BUTree<? extends SExpr> right;").build()
 					),
 					GExpansion.sequence(
-							GExpansion.nonTerminal("ret", "EqualityExpression", emptyList()),
+							GExpansion.nonTerminal("ret", "EqualityExpression"),
 							GExpansion.zeroOrMore(
 									GExpansion.lookAhead(2),
 									GExpansion.action(
@@ -2709,7 +2711,7 @@ public class Grammar {
 											)
 									),
 									GExpansion.terminal(null, "BIT_AND"),
-									GExpansion.nonTerminal("right", "EqualityExpression", emptyList()),
+									GExpansion.nonTerminal("right", "EqualityExpression"),
 									GExpansion.action(
 											listOf(
 													stmt("ret = dress(SBinaryExpr.make(ret, BinaryOp.BinAnd, right));").build()
@@ -2731,7 +2733,7 @@ public class Grammar {
 							stmt("BinaryOp op;").build()
 					),
 					GExpansion.sequence(
-							GExpansion.nonTerminal("ret", "InstanceOfExpression", emptyList()),
+							GExpansion.nonTerminal("ret", "InstanceOfExpression"),
 							GExpansion.zeroOrMore(
 									GExpansion.lookAhead(2),
 									GExpansion.action(
@@ -2757,7 +2759,7 @@ public class Grammar {
 													)
 											)
 									),
-									GExpansion.nonTerminal("right", "InstanceOfExpression", emptyList()),
+									GExpansion.nonTerminal("right", "InstanceOfExpression"),
 									GExpansion.action(
 											listOf(
 													stmt("ret = dress(SBinaryExpr.make(ret, op, right));").build()
@@ -2779,7 +2781,7 @@ public class Grammar {
 							stmt("BUTree<? extends SType> type;").build()
 					),
 					GExpansion.sequence(
-							GExpansion.nonTerminal("ret", "RelationalExpression", emptyList()),
+							GExpansion.nonTerminal("ret", "RelationalExpression"),
 							GExpansion.zeroOrOne(
 									GExpansion.lookAhead(2),
 									GExpansion.action(
@@ -2793,8 +2795,8 @@ public class Grammar {
 													stmt("run();").build()
 											)
 									),
-									GExpansion.nonTerminal("annotations", "Annotations", emptyList()),
-									GExpansion.nonTerminal("type", "Type", listOf(
+									GExpansion.nonTerminal("annotations", "Annotations"),
+									GExpansion.nonTerminal("type", "Type", null, listOf(
 											expr("annotations").build()
 									)),
 									GExpansion.action(
@@ -2818,7 +2820,7 @@ public class Grammar {
 							stmt("BinaryOp op;").build()
 					),
 					GExpansion.sequence(
-							GExpansion.nonTerminal("ret", "ShiftExpression", emptyList()),
+							GExpansion.nonTerminal("ret", "ShiftExpression"),
 							GExpansion.zeroOrMore(
 									GExpansion.lookAhead(2),
 									GExpansion.action(
@@ -2860,7 +2862,7 @@ public class Grammar {
 													)
 											)
 									),
-									GExpansion.nonTerminal("right", "ShiftExpression", emptyList()),
+									GExpansion.nonTerminal("right", "ShiftExpression"),
 									GExpansion.action(
 											listOf(
 													stmt("ret = dress(SBinaryExpr.make(ret, op, right));").build()
@@ -2882,7 +2884,7 @@ public class Grammar {
 							stmt("BinaryOp op;").build()
 					),
 					GExpansion.sequence(
-							GExpansion.nonTerminal("ret", "AdditiveExpression", emptyList()),
+							GExpansion.nonTerminal("ret", "AdditiveExpression"),
 							GExpansion.zeroOrMore(
 									GExpansion.lookAhead(2),
 									GExpansion.action(
@@ -2901,7 +2903,7 @@ public class Grammar {
 											),
 											GExpansion.sequence(
 													GExpansion.lookAhead(3),
-													GExpansion.nonTerminal(null, "RUNSIGNEDSHIFT", emptyList()),
+													GExpansion.nonTerminal(null, "RUNSIGNEDSHIFT"),
 													GExpansion.action(
 															listOf(
 																	stmt("op = BinaryOp.RightUnsignedShift;").build()
@@ -2910,7 +2912,7 @@ public class Grammar {
 											),
 											GExpansion.sequence(
 													GExpansion.lookAhead(2),
-													GExpansion.nonTerminal(null, "RSIGNEDSHIFT", emptyList()),
+													GExpansion.nonTerminal(null, "RSIGNEDSHIFT"),
 													GExpansion.action(
 															listOf(
 																	stmt("op = BinaryOp.RightSignedShift;").build()
@@ -2918,7 +2920,7 @@ public class Grammar {
 													)
 											)
 									),
-									GExpansion.nonTerminal("right", "AdditiveExpression", emptyList()),
+									GExpansion.nonTerminal("right", "AdditiveExpression"),
 									GExpansion.action(
 											listOf(
 													stmt("ret = dress(SBinaryExpr.make(ret, op, right));").build()
@@ -2940,7 +2942,7 @@ public class Grammar {
 							stmt("BinaryOp op;").build()
 					),
 					GExpansion.sequence(
-							GExpansion.nonTerminal("ret", "MultiplicativeExpression", emptyList()),
+							GExpansion.nonTerminal("ret", "MultiplicativeExpression"),
 							GExpansion.zeroOrMore(
 									GExpansion.lookAhead(2),
 									GExpansion.action(
@@ -2966,7 +2968,7 @@ public class Grammar {
 													)
 											)
 									),
-									GExpansion.nonTerminal("right", "MultiplicativeExpression", emptyList()),
+									GExpansion.nonTerminal("right", "MultiplicativeExpression"),
 									GExpansion.action(
 											listOf(
 													stmt("ret = dress(SBinaryExpr.make(ret, op, right));").build()
@@ -2988,7 +2990,7 @@ public class Grammar {
 							stmt("BinaryOp op;").build()
 					),
 					GExpansion.sequence(
-							GExpansion.nonTerminal("ret", "UnaryExpression", emptyList()),
+							GExpansion.nonTerminal("ret", "UnaryExpression"),
 							GExpansion.zeroOrMore(
 									GExpansion.lookAhead(2),
 									GExpansion.action(
@@ -3022,7 +3024,7 @@ public class Grammar {
 													)
 											)
 									),
-									GExpansion.nonTerminal("right", "UnaryExpression", emptyList()),
+									GExpansion.nonTerminal("right", "UnaryExpression"),
 									GExpansion.action(
 											listOf(
 													stmt("ret = dress(SBinaryExpr.make(ret, op, right));").build()
@@ -3044,7 +3046,7 @@ public class Grammar {
 					),
 					GExpansion.sequence(
 							GExpansion.choice(
-									GExpansion.nonTerminal("ret", "PrefixExpression", emptyList()),
+									GExpansion.nonTerminal("ret", "PrefixExpression"),
 									GExpansion.sequence(
 											GExpansion.action(
 													listOf(
@@ -3069,14 +3071,14 @@ public class Grammar {
 															)
 													)
 											),
-											GExpansion.nonTerminal("ret", "UnaryExpression", emptyList()),
+											GExpansion.nonTerminal("ret", "UnaryExpression"),
 											GExpansion.action(
 													listOf(
 															stmt("ret = dress(SUnaryExpr.make(op, ret));").build()
 													)
 											)
 									),
-									GExpansion.nonTerminal("ret", "UnaryExpressionNotPlusMinus", emptyList())
+									GExpansion.nonTerminal("ret", "UnaryExpressionNotPlusMinus")
 							),
 							GExpansion.action(
 									listOf(
@@ -3115,7 +3117,7 @@ public class Grammar {
 											)
 									)
 							),
-							GExpansion.nonTerminal("ret", "UnaryExpression", emptyList()),
+							GExpansion.nonTerminal("ret", "UnaryExpression"),
 							GExpansion.action(
 									listOf(
 											stmt("return dress(SUnaryExpr.make(op, ret));").build()
@@ -3155,7 +3157,7 @@ public class Grammar {
 															)
 													)
 											),
-											GExpansion.nonTerminal("ret", "UnaryExpression", emptyList()),
+											GExpansion.nonTerminal("ret", "UnaryExpression"),
 											GExpansion.action(
 													listOf(
 															stmt("ret = dress(SUnaryExpr.make(op, ret));").build()
@@ -3164,11 +3166,11 @@ public class Grammar {
 									),
 									GExpansion.sequence(
 											GExpansion.lookAhead(
-													GExpansion.nonTerminal(null, "CastExpression", emptyList())
+													GExpansion.nonTerminal(null, "CastExpression")
 											),
-											GExpansion.nonTerminal("ret", "CastExpression", emptyList())
+											GExpansion.nonTerminal("ret", "CastExpression")
 									),
-									GExpansion.nonTerminal("ret", "PostfixExpression", emptyList())
+									GExpansion.nonTerminal("ret", "PostfixExpression")
 							),
 							GExpansion.action(
 									listOf(
@@ -3184,7 +3186,7 @@ public class Grammar {
 							stmt("UnaryOp op;").build()
 					),
 					GExpansion.sequence(
-							GExpansion.nonTerminal("ret", "PrimaryExpression", emptyList()),
+							GExpansion.nonTerminal("ret", "PrimaryExpression"),
 							GExpansion.zeroOrOne(
 									GExpansion.lookAhead(2),
 									GExpansion.action(
@@ -3244,16 +3246,16 @@ public class Grammar {
 											stmt("run();").build()
 									)
 							),
-							GExpansion.nonTerminal("annotations", "Annotations", emptyList()),
+							GExpansion.nonTerminal("annotations", "Annotations"),
 							GExpansion.choice(
 									GExpansion.sequence(
-											GExpansion.nonTerminal("primitiveType", "PrimitiveType", listOf(
+											GExpansion.nonTerminal("primitiveType", "PrimitiveType", null, listOf(
 													expr("annotations").build()
 											)),
 											GExpansion.choice(
 													GExpansion.sequence(
 															GExpansion.terminal(null, "RPAREN"),
-															GExpansion.nonTerminal("ret", "UnaryExpression", emptyList()),
+															GExpansion.nonTerminal("ret", "UnaryExpression"),
 															GExpansion.action(
 																	listOf(
 																			stmt("ret = dress(SCastExpr.make(primitiveType, ret));").build()
@@ -3266,17 +3268,17 @@ public class Grammar {
 																			stmt("lateRun();").build()
 																	)
 															),
-															GExpansion.nonTerminal("arrayDims", "ArrayDimsMandatory", emptyList()),
+															GExpansion.nonTerminal("arrayDims", "ArrayDimsMandatory"),
 															GExpansion.action(
 																	listOf(
 																			stmt("type = dress(SArrayType.make(primitiveType, arrayDims));").build()
 																	)
 															),
-															GExpansion.nonTerminal("type", "ReferenceCastTypeRest", listOf(
+															GExpansion.nonTerminal("type", "ReferenceCastTypeRest", null, listOf(
 																	expr("type").build()
 															)),
 															GExpansion.terminal(null, "RPAREN"),
-															GExpansion.nonTerminal("ret", "UnaryExpressionNotPlusMinus", emptyList()),
+															GExpansion.nonTerminal("ret", "UnaryExpressionNotPlusMinus"),
 															GExpansion.action(
 																	listOf(
 																			stmt("ret = dress(SCastExpr.make(type, ret));").build()
@@ -3286,12 +3288,12 @@ public class Grammar {
 											)
 									),
 									GExpansion.sequence(
-											GExpansion.nonTerminal("type", "QualifiedType", listOf(
+											GExpansion.nonTerminal("type", "QualifiedType", null, listOf(
 													expr("annotations").build()
 											)),
 											GExpansion.zeroOrOne(
 													GExpansion.lookAhead(
-															GExpansion.nonTerminal(null, "Annotations", emptyList()),
+															GExpansion.nonTerminal(null, "Annotations"),
 															GExpansion.terminal(null, "LBRACKET")
 													),
 													GExpansion.action(
@@ -3299,18 +3301,18 @@ public class Grammar {
 																	stmt("lateRun();").build()
 															)
 													),
-													GExpansion.nonTerminal("arrayDims", "ArrayDimsMandatory", emptyList()),
+													GExpansion.nonTerminal("arrayDims", "ArrayDimsMandatory"),
 													GExpansion.action(
 															listOf(
 																	stmt("type = dress(SArrayType.make(type, arrayDims));").build()
 															)
 													)
 											),
-											GExpansion.nonTerminal("type", "ReferenceCastTypeRest", listOf(
+											GExpansion.nonTerminal("type", "ReferenceCastTypeRest", null, listOf(
 													expr("type").build()
 											)),
 											GExpansion.terminal(null, "RPAREN"),
-											GExpansion.nonTerminal("ret", "UnaryExpressionNotPlusMinus", emptyList()),
+											GExpansion.nonTerminal("ret", "UnaryExpressionNotPlusMinus"),
 											GExpansion.action(
 													listOf(
 															stmt("ret = dress(SCastExpr.make(type, ret));").build()
@@ -3353,8 +3355,8 @@ public class Grammar {
 															stmt("run();").build()
 													)
 											),
-											GExpansion.nonTerminal("annotations", "Annotations", emptyList()),
-											GExpansion.nonTerminal("type", "ReferenceType", listOf(
+											GExpansion.nonTerminal("annotations", "Annotations"),
+											GExpansion.nonTerminal("type", "ReferenceType", null, listOf(
 													expr("annotations").build()
 											)),
 											GExpansion.action(
@@ -3475,7 +3477,7 @@ public class Grammar {
 							stmt("BUTree<? extends SExpr> ret;").build()
 					),
 					GExpansion.sequence(
-							GExpansion.nonTerminal("ret", "PrimaryPrefix", emptyList()),
+							GExpansion.nonTerminal("ret", "PrimaryPrefix"),
 							GExpansion.zeroOrMore(
 									GExpansion.lookAhead(2),
 									GExpansion.action(
@@ -3483,7 +3485,7 @@ public class Grammar {
 													stmt("lateRun();").build()
 											)
 									),
-									GExpansion.nonTerminal("ret", "PrimarySuffix", listOf(
+									GExpansion.nonTerminal("ret", "PrimarySuffix", null, listOf(
 											expr("ret").build()
 									))
 							),
@@ -3500,17 +3502,17 @@ public class Grammar {
 							stmt("BUTree<? extends SExpr> ret;").build()
 					),
 					GExpansion.sequence(
-							GExpansion.nonTerminal("ret", "PrimaryPrefix", emptyList()),
+							GExpansion.nonTerminal("ret", "PrimaryPrefix"),
 							GExpansion.zeroOrMore(
 									GExpansion.lookAhead(
-											GExpansion.nonTerminal(null, "PrimarySuffixWithoutSuper", emptyList())
+											GExpansion.nonTerminal(null, "PrimarySuffixWithoutSuper")
 									),
 									GExpansion.action(
 											listOf(
 													stmt("lateRun();").build()
 											)
 									),
-									GExpansion.nonTerminal("ret", "PrimarySuffixWithoutSuper", listOf(
+									GExpansion.nonTerminal("ret", "PrimarySuffixWithoutSuper", null, listOf(
 											expr("ret").build()
 									))
 							),
@@ -3531,7 +3533,7 @@ public class Grammar {
 					),
 					GExpansion.sequence(
 							GExpansion.choice(
-									GExpansion.nonTerminal("ret", "Literal", emptyList()),
+									GExpansion.nonTerminal("ret", "Literal"),
 									GExpansion.sequence(
 											GExpansion.action(
 													listOf(
@@ -3569,16 +3571,16 @@ public class Grammar {
 																	GExpansion.sequence(
 																			GExpansion.lookAhead(
 																					GExpansion.zeroOrOne(
-																							GExpansion.nonTerminal(null, "TypeArguments", emptyList())
+																							GExpansion.nonTerminal(null, "TypeArguments")
 																					),
-																					GExpansion.nonTerminal(null, "Name", emptyList()),
+																					GExpansion.nonTerminal(null, "Name"),
 																					GExpansion.terminal(null, "LPAREN")
 																			),
-																			GExpansion.nonTerminal("ret", "MethodInvocation", listOf(
+																			GExpansion.nonTerminal("ret", "MethodInvocation", null, listOf(
 																					expr("ret").build()
 																			))
 																	),
-																	GExpansion.nonTerminal("ret", "FieldAccess", listOf(
+																	GExpansion.nonTerminal("ret", "FieldAccess", null, listOf(
 																			expr("ret").build()
 																	))
 															)
@@ -3589,18 +3591,18 @@ public class Grammar {
 																			stmt("lateRun();").build()
 																	)
 															),
-															GExpansion.nonTerminal("ret", "MethodReferenceSuffix", listOf(
+															GExpansion.nonTerminal("ret", "MethodReferenceSuffix", null, listOf(
 																	expr("ret").build()
 															))
 													)
 											)
 									),
-									GExpansion.nonTerminal("ret", "AllocationExpression", listOf(
+									GExpansion.nonTerminal("ret", "AllocationExpression", null, listOf(
 											expr("null").build()
 									)),
 									GExpansion.sequence(
 											GExpansion.lookAhead(
-													GExpansion.nonTerminal(null, "ResultType", emptyList()),
+													GExpansion.nonTerminal(null, "ResultType"),
 													GExpansion.terminal(null, "DOT"),
 													GExpansion.terminal(null, "CLASS")
 											),
@@ -3609,7 +3611,7 @@ public class Grammar {
 															stmt("run();").build()
 													)
 											),
-											GExpansion.nonTerminal("type", "ResultType", emptyList()),
+											GExpansion.nonTerminal("type", "ResultType"),
 											GExpansion.terminal(null, "DOT"),
 											GExpansion.terminal(null, "CLASS"),
 											GExpansion.action(
@@ -3620,7 +3622,7 @@ public class Grammar {
 									),
 									GExpansion.sequence(
 											GExpansion.lookAhead(
-													GExpansion.nonTerminal(null, "ResultType", emptyList()),
+													GExpansion.nonTerminal(null, "ResultType"),
 													GExpansion.terminal(null, "DOUBLECOLON")
 											),
 											GExpansion.action(
@@ -3628,22 +3630,22 @@ public class Grammar {
 															stmt("run();").build()
 													)
 											),
-											GExpansion.nonTerminal("type", "ResultType", emptyList()),
+											GExpansion.nonTerminal("type", "ResultType"),
 											GExpansion.action(
 													listOf(
 															stmt("ret = STypeExpr.make(type);").build()
 													)
 											),
-											GExpansion.nonTerminal("ret", "MethodReferenceSuffix", listOf(
+											GExpansion.nonTerminal("ret", "MethodReferenceSuffix", null, listOf(
 													expr("ret").build()
 											))
 									),
 									GExpansion.sequence(
 											GExpansion.lookAhead(
 													GExpansion.zeroOrOne(
-															GExpansion.nonTerminal(null, "TypeArguments", emptyList())
+															GExpansion.nonTerminal(null, "TypeArguments")
 													),
-													GExpansion.nonTerminal(null, "Name", emptyList()),
+													GExpansion.nonTerminal(null, "Name"),
 													GExpansion.terminal(null, "LPAREN")
 											),
 											GExpansion.action(
@@ -3651,12 +3653,12 @@ public class Grammar {
 															stmt("run();").build()
 													)
 											),
-											GExpansion.nonTerminal("ret", "MethodInvocation", listOf(
+											GExpansion.nonTerminal("ret", "MethodInvocation", null, listOf(
 													expr("null").build()
 											))
 									),
 									GExpansion.sequence(
-											GExpansion.nonTerminal("ret", "Name", emptyList()),
+											GExpansion.nonTerminal("ret", "Name"),
 											GExpansion.zeroOrOne(
 													GExpansion.action(
 															listOf(
@@ -3664,7 +3666,7 @@ public class Grammar {
 															)
 													),
 													GExpansion.terminal(null, "ARROW"),
-													GExpansion.nonTerminal("ret", "LambdaBody", listOf(
+													GExpansion.nonTerminal("ret", "LambdaBody", null, listOf(
 															expr("singletonList(makeFormalParameter((BUTree<SName>) ret))").build(),
 															expr("false").build()
 													))
@@ -3681,34 +3683,34 @@ public class Grammar {
 													GExpansion.sequence(
 															GExpansion.terminal(null, "RPAREN"),
 															GExpansion.terminal(null, "ARROW"),
-															GExpansion.nonTerminal("ret", "LambdaBody", listOf(
+															GExpansion.nonTerminal("ret", "LambdaBody", null, listOf(
 																	expr("emptyList()").build(),
 																	expr("true").build()
 															))
 													),
 													GExpansion.sequence(
 															GExpansion.lookAhead(
-																	GExpansion.nonTerminal(null, "Name", emptyList()),
+																	GExpansion.nonTerminal(null, "Name"),
 																	GExpansion.terminal(null, "RPAREN"),
 																	GExpansion.terminal(null, "ARROW")
 															),
-															GExpansion.nonTerminal("ret", "Name", emptyList()),
+															GExpansion.nonTerminal("ret", "Name"),
 															GExpansion.terminal(null, "RPAREN"),
 															GExpansion.terminal(null, "ARROW"),
-															GExpansion.nonTerminal("ret", "LambdaBody", listOf(
+															GExpansion.nonTerminal("ret", "LambdaBody", null, listOf(
 																	expr("singletonList(makeFormalParameter((BUTree<SName>) ret))").build(),
 																	expr("true").build()
 															))
 													),
 													GExpansion.sequence(
 															GExpansion.lookAhead(
-																	GExpansion.nonTerminal(null, "Name", emptyList()),
+																	GExpansion.nonTerminal(null, "Name"),
 																	GExpansion.terminal(null, "COMMA")
 															),
-															GExpansion.nonTerminal("params", "InferredFormalParameterList", emptyList()),
+															GExpansion.nonTerminal("params", "InferredFormalParameterList"),
 															GExpansion.terminal(null, "RPAREN"),
 															GExpansion.terminal(null, "ARROW"),
-															GExpansion.nonTerminal("ret", "LambdaBody", listOf(
+															GExpansion.nonTerminal("ret", "LambdaBody", null, listOf(
 																	expr("params").build(),
 																	expr("true").build()
 															))
@@ -3717,16 +3719,16 @@ public class Grammar {
 															GExpansion.lookAhead(
 																	expr("isLambda()").build()
 															),
-															GExpansion.nonTerminal("params", "FormalParameterList", emptyList()),
+															GExpansion.nonTerminal("params", "FormalParameterList"),
 															GExpansion.terminal(null, "RPAREN"),
 															GExpansion.terminal(null, "ARROW"),
-															GExpansion.nonTerminal("ret", "LambdaBody", listOf(
+															GExpansion.nonTerminal("ret", "LambdaBody", null, listOf(
 																	expr("params").build(),
 																	expr("true").build()
 															))
 													),
 													GExpansion.sequence(
-															GExpansion.nonTerminal("ret", "Expression", emptyList()),
+															GExpansion.nonTerminal("ret", "Expression"),
 															GExpansion.terminal(null, "RPAREN"),
 															GExpansion.action(
 																	listOf(
@@ -3753,7 +3755,7 @@ public class Grammar {
 							GExpansion.choice(
 									GExpansion.sequence(
 											GExpansion.lookAhead(2),
-											GExpansion.nonTerminal("ret", "PrimarySuffixWithoutSuper", listOf(
+											GExpansion.nonTerminal("ret", "PrimarySuffixWithoutSuper", null, listOf(
 													expr("scope").build()
 											))
 									),
@@ -3766,7 +3768,7 @@ public class Grammar {
 													)
 											)
 									),
-									GExpansion.nonTerminal("ret", "MethodReferenceSuffix", listOf(
+									GExpansion.nonTerminal("ret", "MethodReferenceSuffix", null, listOf(
 											expr("scope").build()
 									))
 							),
@@ -3796,29 +3798,29 @@ public class Grammar {
 																	)
 															)
 													),
-													GExpansion.nonTerminal("ret", "AllocationExpression", listOf(
+													GExpansion.nonTerminal("ret", "AllocationExpression", null, listOf(
 															expr("scope").build()
 													)),
 													GExpansion.sequence(
 															GExpansion.lookAhead(
 																	GExpansion.zeroOrOne(
-																			GExpansion.nonTerminal(null, "TypeArguments", emptyList())
+																			GExpansion.nonTerminal(null, "TypeArguments")
 																	),
-																	GExpansion.nonTerminal(null, "Name", emptyList()),
+																	GExpansion.nonTerminal(null, "Name"),
 																	GExpansion.terminal(null, "LPAREN")
 															),
-															GExpansion.nonTerminal("ret", "MethodInvocation", listOf(
+															GExpansion.nonTerminal("ret", "MethodInvocation", null, listOf(
 																	expr("scope").build()
 															))
 													),
-													GExpansion.nonTerminal("ret", "FieldAccess", listOf(
+													GExpansion.nonTerminal("ret", "FieldAccess", null, listOf(
 															expr("scope").build()
 													))
 											)
 									),
 									GExpansion.sequence(
 											GExpansion.terminal(null, "LBRACKET"),
-											GExpansion.nonTerminal("ret", "Expression", emptyList()),
+											GExpansion.nonTerminal("ret", "Expression"),
 											GExpansion.terminal(null, "RBRACKET"),
 											GExpansion.action(
 													listOf(
@@ -3840,7 +3842,7 @@ public class Grammar {
 							stmt("BUTree<SName> name;").build()
 					),
 					GExpansion.sequence(
-							GExpansion.nonTerminal("name", "Name", emptyList()),
+							GExpansion.nonTerminal("name", "Name"),
 							GExpansion.action(
 									listOf(
 											stmt("return dress(SFieldAccessExpr.make(optionOf(scope), name));").build()
@@ -3858,10 +3860,10 @@ public class Grammar {
 					),
 					GExpansion.sequence(
 							GExpansion.zeroOrOne(
-									GExpansion.nonTerminal("typeArgs", "TypeArguments", emptyList())
+									GExpansion.nonTerminal("typeArgs", "TypeArguments")
 							),
-							GExpansion.nonTerminal("name", "Name", emptyList()),
-							GExpansion.nonTerminal("args", "Arguments", emptyList()),
+							GExpansion.nonTerminal("name", "Name"),
+							GExpansion.nonTerminal("args", "Arguments"),
 							GExpansion.action(
 									listOf(
 											stmt("return dress(SMethodInvocationExpr.make(optionOf(scope), ensureNotNull(typeArgs), name, args));").build()
@@ -3881,7 +3883,7 @@ public class Grammar {
 									GExpansion.choice(
 											GExpansion.sequence(
 													GExpansion.lookAhead(1),
-													GExpansion.nonTerminal("expr", "Expression", emptyList()),
+													GExpansion.nonTerminal("expr", "Expression"),
 													GExpansion.action(
 															listOf(
 																	stmt("ret = append(ret, expr);").build()
@@ -3889,7 +3891,7 @@ public class Grammar {
 													),
 													GExpansion.zeroOrMore(
 															GExpansion.terminal(null, "COMMA"),
-															GExpansion.nonTerminal("expr", "Expression", emptyList()),
+															GExpansion.nonTerminal("expr", "Expression"),
 															GExpansion.action(
 																	listOf(
 																			stmt("ret = append(ret, expr);").build()
@@ -3901,7 +3903,7 @@ public class Grammar {
 													GExpansion.lookAhead(
 															expr("quotesMode").build()
 													),
-													GExpansion.nonTerminal("ret", "NodeListVar", emptyList())
+													GExpansion.nonTerminal("ret", "NodeListVar")
 											)
 									)
 							),
@@ -3923,10 +3925,10 @@ public class Grammar {
 					GExpansion.sequence(
 							GExpansion.terminal(null, "DOUBLECOLON"),
 							GExpansion.zeroOrOne(
-									GExpansion.nonTerminal("typeArgs", "TypeArguments", emptyList())
+									GExpansion.nonTerminal("typeArgs", "TypeArguments")
 							),
 							GExpansion.choice(
-									GExpansion.nonTerminal("name", "Name", emptyList()),
+									GExpansion.nonTerminal("name", "Name"),
 									GExpansion.sequence(
 											GExpansion.terminal(null, "NEW"),
 											GExpansion.action(
@@ -3966,38 +3968,38 @@ public class Grammar {
 							),
 							GExpansion.terminal(null, "NEW"),
 							GExpansion.zeroOrOne(
-									GExpansion.nonTerminal("typeArgs", "TypeArguments", emptyList())
+									GExpansion.nonTerminal("typeArgs", "TypeArguments")
 							),
 							GExpansion.action(
 									listOf(
 											stmt("run();").build()
 									)
 							),
-							GExpansion.nonTerminal("annotations", "Annotations", emptyList()),
+							GExpansion.nonTerminal("annotations", "Annotations"),
 							GExpansion.choice(
 									GExpansion.sequence(
-											GExpansion.nonTerminal("type", "PrimitiveType", listOf(
+											GExpansion.nonTerminal("type", "PrimitiveType", null, listOf(
 													expr("annotations").build()
 											)),
-											GExpansion.nonTerminal("ret", "ArrayCreationExpr", listOf(
+											GExpansion.nonTerminal("ret", "ArrayCreationExpr", null, listOf(
 													expr("type").build()
 											))
 									),
 									GExpansion.sequence(
-											GExpansion.nonTerminal("type", "QualifiedType", listOf(
+											GExpansion.nonTerminal("type", "QualifiedType", null, listOf(
 													expr("annotations").build()
 											)),
 											GExpansion.choice(
-													GExpansion.nonTerminal("ret", "ArrayCreationExpr", listOf(
+													GExpansion.nonTerminal("ret", "ArrayCreationExpr", null, listOf(
 															expr("type").build()
 													)),
 													GExpansion.sequence(
-															GExpansion.nonTerminal("args", "Arguments", emptyList()),
+															GExpansion.nonTerminal("args", "Arguments"),
 															GExpansion.zeroOrOne(
 																	GExpansion.lookAhead(
 																			GExpansion.terminal(null, "LBRACE")
 																	),
-																	GExpansion.nonTerminal("anonymousBody", "ClassOrInterfaceBody", listOf(
+																	GExpansion.nonTerminal("anonymousBody", "ClassOrInterfaceBody", null, listOf(
 																			expr("TypeKind.Class").build()
 																	))
 															),
@@ -4029,13 +4031,13 @@ public class Grammar {
 					GExpansion.choice(
 							GExpansion.sequence(
 									GExpansion.lookAhead(
-											GExpansion.nonTerminal(null, "Annotations", emptyList()),
+											GExpansion.nonTerminal(null, "Annotations"),
 											GExpansion.terminal(null, "LBRACKET"),
-											GExpansion.nonTerminal(null, "Expression", emptyList()),
+											GExpansion.nonTerminal(null, "Expression"),
 											GExpansion.terminal(null, "RBRACKET")
 									),
-									GExpansion.nonTerminal("arrayDimExprs", "ArrayDimExprsMandatory", emptyList()),
-									GExpansion.nonTerminal("arrayDims", "ArrayDims", emptyList()),
+									GExpansion.nonTerminal("arrayDimExprs", "ArrayDimExprsMandatory"),
+									GExpansion.nonTerminal("arrayDims", "ArrayDims"),
 									GExpansion.action(
 											listOf(
 													stmt("return dress(SArrayCreationExpr.make(componentType, arrayDimExprs, arrayDims, none()));").build()
@@ -4043,8 +4045,8 @@ public class Grammar {
 									)
 							),
 							GExpansion.sequence(
-									GExpansion.nonTerminal("arrayDims", "ArrayDimsMandatory", emptyList()),
-									GExpansion.nonTerminal("initializer", "ArrayInitializer", emptyList()),
+									GExpansion.nonTerminal("arrayDims", "ArrayDimsMandatory"),
+									GExpansion.nonTerminal("initializer", "ArrayInitializer"),
 									GExpansion.action(
 											listOf(
 													stmt("return dress(SArrayCreationExpr.make(componentType, arrayDimExprs, arrayDims, optionOf(initializer)));").build()
@@ -4063,9 +4065,9 @@ public class Grammar {
 					GExpansion.sequence(
 							GExpansion.oneOrMore(
 									GExpansion.lookAhead(
-											GExpansion.nonTerminal(null, "Annotations", emptyList()),
+											GExpansion.nonTerminal(null, "Annotations"),
 											GExpansion.terminal(null, "LBRACKET"),
-											GExpansion.nonTerminal(null, "Expression", emptyList()),
+											GExpansion.nonTerminal(null, "Expression"),
 											GExpansion.terminal(null, "RBRACKET")
 									),
 									GExpansion.action(
@@ -4073,9 +4075,9 @@ public class Grammar {
 													stmt("run();").build()
 											)
 									),
-									GExpansion.nonTerminal("annotations", "Annotations", emptyList()),
+									GExpansion.nonTerminal("annotations", "Annotations"),
 									GExpansion.terminal(null, "LBRACKET"),
-									GExpansion.nonTerminal("expr", "Expression", emptyList()),
+									GExpansion.nonTerminal("expr", "Expression"),
 									GExpansion.terminal(null, "RBRACKET"),
 									GExpansion.action(
 											listOf(
@@ -4099,7 +4101,7 @@ public class Grammar {
 					GExpansion.sequence(
 							GExpansion.oneOrMore(
 									GExpansion.lookAhead(
-											GExpansion.nonTerminal(null, "Annotations", emptyList()),
+											GExpansion.nonTerminal(null, "Annotations"),
 											GExpansion.terminal(null, "LBRACKET"),
 											GExpansion.terminal(null, "RBRACKET")
 									),
@@ -4108,7 +4110,7 @@ public class Grammar {
 													stmt("run();").build()
 											)
 									),
-									GExpansion.nonTerminal("annotations", "Annotations", emptyList()),
+									GExpansion.nonTerminal("annotations", "Annotations"),
 									GExpansion.terminal(null, "LBRACKET"),
 									GExpansion.terminal(null, "RBRACKET"),
 									GExpansion.action(
@@ -4133,23 +4135,23 @@ public class Grammar {
 							GExpansion.choice(
 									GExpansion.sequence(
 											GExpansion.lookAhead(2),
-											GExpansion.nonTerminal("ret", "LabeledStatement", emptyList())
+											GExpansion.nonTerminal("ret", "LabeledStatement")
 									),
-									GExpansion.nonTerminal("ret", "AssertStatement", emptyList()),
-									GExpansion.nonTerminal("ret", "Block", emptyList()),
-									GExpansion.nonTerminal("ret", "EmptyStatement", emptyList()),
-									GExpansion.nonTerminal("ret", "StatementExpression", emptyList()),
-									GExpansion.nonTerminal("ret", "SwitchStatement", emptyList()),
-									GExpansion.nonTerminal("ret", "IfStatement", emptyList()),
-									GExpansion.nonTerminal("ret", "WhileStatement", emptyList()),
-									GExpansion.nonTerminal("ret", "DoStatement", emptyList()),
-									GExpansion.nonTerminal("ret", "ForStatement", emptyList()),
-									GExpansion.nonTerminal("ret", "BreakStatement", emptyList()),
-									GExpansion.nonTerminal("ret", "ContinueStatement", emptyList()),
-									GExpansion.nonTerminal("ret", "ReturnStatement", emptyList()),
-									GExpansion.nonTerminal("ret", "ThrowStatement", emptyList()),
-									GExpansion.nonTerminal("ret", "SynchronizedStatement", emptyList()),
-									GExpansion.nonTerminal("ret", "TryStatement", emptyList())
+									GExpansion.nonTerminal("ret", "AssertStatement"),
+									GExpansion.nonTerminal("ret", "Block"),
+									GExpansion.nonTerminal("ret", "EmptyStatement"),
+									GExpansion.nonTerminal("ret", "StatementExpression"),
+									GExpansion.nonTerminal("ret", "SwitchStatement"),
+									GExpansion.nonTerminal("ret", "IfStatement"),
+									GExpansion.nonTerminal("ret", "WhileStatement"),
+									GExpansion.nonTerminal("ret", "DoStatement"),
+									GExpansion.nonTerminal("ret", "ForStatement"),
+									GExpansion.nonTerminal("ret", "BreakStatement"),
+									GExpansion.nonTerminal("ret", "ContinueStatement"),
+									GExpansion.nonTerminal("ret", "ReturnStatement"),
+									GExpansion.nonTerminal("ret", "ThrowStatement"),
+									GExpansion.nonTerminal("ret", "SynchronizedStatement"),
+									GExpansion.nonTerminal("ret", "TryStatement")
 							),
 							GExpansion.action(
 									listOf(
@@ -4171,10 +4173,10 @@ public class Grammar {
 									)
 							),
 							GExpansion.terminal(null, "ASSERT"),
-							GExpansion.nonTerminal("check", "Expression", emptyList()),
+							GExpansion.nonTerminal("check", "Expression"),
 							GExpansion.zeroOrOne(
 									GExpansion.terminal(null, "COLON"),
-									GExpansion.nonTerminal("msg", "Expression", emptyList())
+									GExpansion.nonTerminal("msg", "Expression")
 							),
 							GExpansion.terminal(null, "SEMICOLON"),
 							GExpansion.action(
@@ -4196,9 +4198,9 @@ public class Grammar {
 											stmt("run();").build()
 									)
 							),
-							GExpansion.nonTerminal("label", "Name", emptyList()),
+							GExpansion.nonTerminal("label", "Name"),
 							GExpansion.terminal(null, "COLON"),
-							GExpansion.nonTerminal("stmt", "Statement", emptyList()),
+							GExpansion.nonTerminal("stmt", "Statement"),
 							GExpansion.action(
 									listOf(
 											stmt("return dress(SLabeledStmt.make(label, stmt));").build()
@@ -4218,7 +4220,7 @@ public class Grammar {
 									)
 							),
 							GExpansion.terminal(null, "LBRACE"),
-							GExpansion.nonTerminal("stmts", "Statements", emptyList()),
+							GExpansion.nonTerminal("stmts", "Statements"),
 							GExpansion.terminal(null, "RBRACE"),
 							GExpansion.action(
 									listOf(
@@ -4239,7 +4241,7 @@ public class Grammar {
 							GExpansion.choice(
 									GExpansion.sequence(
 											GExpansion.lookAhead(
-													GExpansion.nonTerminal(null, "ModifiersNoDefault", emptyList()),
+													GExpansion.nonTerminal(null, "ModifiersNoDefault"),
 													GExpansion.choice(
 															GExpansion.terminal(null, "CLASS"),
 															GExpansion.terminal(null, "INTERFACE")
@@ -4255,8 +4257,8 @@ public class Grammar {
 															stmt("run();").build()
 													)
 											),
-											GExpansion.nonTerminal("modifiers", "ModifiersNoDefault", emptyList()),
-											GExpansion.nonTerminal("typeDecl", "ClassOrInterfaceDecl", listOf(
+											GExpansion.nonTerminal("modifiers", "ModifiersNoDefault"),
+											GExpansion.nonTerminal("typeDecl", "ClassOrInterfaceDecl", null, listOf(
 													expr("modifiers").build()
 											)),
 											GExpansion.action(
@@ -4267,14 +4269,14 @@ public class Grammar {
 									),
 									GExpansion.sequence(
 											GExpansion.lookAhead(
-													GExpansion.nonTerminal(null, "VariableDeclExpression", emptyList())
+													GExpansion.nonTerminal(null, "VariableDeclExpression")
 											),
 											GExpansion.action(
 													listOf(
 															stmt("run();").build()
 													)
 											),
-											GExpansion.nonTerminal("expr", "VariableDeclExpression", emptyList()),
+											GExpansion.nonTerminal("expr", "VariableDeclExpression"),
 											GExpansion.terminal(null, "SEMICOLON"),
 											GExpansion.action(
 													listOf(
@@ -4282,7 +4284,7 @@ public class Grammar {
 													)
 											)
 									),
-									GExpansion.nonTerminal("ret", "Statement", emptyList())
+									GExpansion.nonTerminal("ret", "Statement")
 							),
 							GExpansion.action(
 									listOf(
@@ -4308,8 +4310,8 @@ public class Grammar {
 											stmt("run();").build()
 									)
 							),
-							GExpansion.nonTerminal("modifiers", "ModifiersNoDefault", emptyList()),
-							GExpansion.nonTerminal("variableDecl", "VariableDecl", listOf(
+							GExpansion.nonTerminal("modifiers", "ModifiersNoDefault"),
+							GExpansion.nonTerminal("variableDecl", "VariableDecl", null, listOf(
 									expr("modifiers").build()
 							)),
 							GExpansion.action(
@@ -4350,9 +4352,9 @@ public class Grammar {
 									)
 							),
 							GExpansion.choice(
-									GExpansion.nonTerminal("expr", "PrefixExpression", emptyList()),
+									GExpansion.nonTerminal("expr", "PrefixExpression"),
 									GExpansion.sequence(
-											GExpansion.nonTerminal("expr", "PrimaryExpression", emptyList()),
+											GExpansion.nonTerminal("expr", "PrimaryExpression"),
 											GExpansion.zeroOrOne(
 													GExpansion.choice(
 															GExpansion.sequence(
@@ -4387,8 +4389,8 @@ public class Grammar {
 																					stmt("lateRun();").build()
 																			)
 																	),
-																	GExpansion.nonTerminal("op", "AssignmentOperator", emptyList()),
-																	GExpansion.nonTerminal("value", "Expression", emptyList()),
+																	GExpansion.nonTerminal("op", "AssignmentOperator"),
+																	GExpansion.nonTerminal("value", "Expression"),
 																	GExpansion.action(
 																			listOf(
 																					stmt("expr = dress(SAssignExpr.make(expr, op, value));").build()
@@ -4422,11 +4424,11 @@ public class Grammar {
 							),
 							GExpansion.terminal(null, "SWITCH"),
 							GExpansion.terminal(null, "LPAREN"),
-							GExpansion.nonTerminal("selector", "Expression", emptyList()),
+							GExpansion.nonTerminal("selector", "Expression"),
 							GExpansion.terminal(null, "RPAREN"),
 							GExpansion.terminal(null, "LBRACE"),
 							GExpansion.zeroOrMore(
-									GExpansion.nonTerminal("entry", "SwitchEntry", emptyList()),
+									GExpansion.nonTerminal("entry", "SwitchEntry"),
 									GExpansion.action(
 											listOf(
 													stmt("entries = append(entries, entry);").build()
@@ -4456,12 +4458,12 @@ public class Grammar {
 							GExpansion.choice(
 									GExpansion.sequence(
 											GExpansion.terminal(null, "CASE"),
-											GExpansion.nonTerminal("label", "Expression", emptyList())
+											GExpansion.nonTerminal("label", "Expression")
 									),
 									GExpansion.terminal(null, "DEFAULT")
 							),
 							GExpansion.terminal(null, "COLON"),
-							GExpansion.nonTerminal("stmts", "Statements", emptyList()),
+							GExpansion.nonTerminal("stmts", "Statements"),
 							GExpansion.action(
 									listOf(
 											stmt("return dress(SSwitchCase.make(optionOf(label), ensureNotNull(stmts)));").build()
@@ -4484,13 +4486,13 @@ public class Grammar {
 							),
 							GExpansion.terminal(null, "IF"),
 							GExpansion.terminal(null, "LPAREN"),
-							GExpansion.nonTerminal("condition", "Expression", emptyList()),
+							GExpansion.nonTerminal("condition", "Expression"),
 							GExpansion.terminal(null, "RPAREN"),
-							GExpansion.nonTerminal("thenStmt", "Statement", emptyList()),
+							GExpansion.nonTerminal("thenStmt", "Statement"),
 							GExpansion.zeroOrOne(
 									GExpansion.lookAhead(1),
 									GExpansion.terminal(null, "ELSE"),
-									GExpansion.nonTerminal("elseStmt", "Statement", emptyList())
+									GExpansion.nonTerminal("elseStmt", "Statement")
 							),
 							GExpansion.action(
 									listOf(
@@ -4513,9 +4515,9 @@ public class Grammar {
 							),
 							GExpansion.terminal(null, "WHILE"),
 							GExpansion.terminal(null, "LPAREN"),
-							GExpansion.nonTerminal("condition", "Expression", emptyList()),
+							GExpansion.nonTerminal("condition", "Expression"),
 							GExpansion.terminal(null, "RPAREN"),
-							GExpansion.nonTerminal("body", "Statement", emptyList()),
+							GExpansion.nonTerminal("body", "Statement"),
 							GExpansion.action(
 									listOf(
 											stmt("return dress(SWhileStmt.make(condition, body));").build()
@@ -4536,10 +4538,10 @@ public class Grammar {
 									)
 							),
 							GExpansion.terminal(null, "DO"),
-							GExpansion.nonTerminal("body", "Statement", emptyList()),
+							GExpansion.nonTerminal("body", "Statement"),
 							GExpansion.terminal(null, "WHILE"),
 							GExpansion.terminal(null, "LPAREN"),
-							GExpansion.nonTerminal("condition", "Expression", emptyList()),
+							GExpansion.nonTerminal("condition", "Expression"),
 							GExpansion.terminal(null, "RPAREN"),
 							GExpansion.terminal(null, "SEMICOLON"),
 							GExpansion.action(
@@ -4569,29 +4571,29 @@ public class Grammar {
 							GExpansion.choice(
 									GExpansion.sequence(
 											GExpansion.lookAhead(
-													GExpansion.nonTerminal(null, "VariableDeclExpression", emptyList()),
+													GExpansion.nonTerminal(null, "VariableDeclExpression"),
 													GExpansion.terminal(null, "COLON")
 											),
-											GExpansion.nonTerminal("varExpr", "VariableDeclExpression", emptyList()),
+											GExpansion.nonTerminal("varExpr", "VariableDeclExpression"),
 											GExpansion.terminal(null, "COLON"),
-											GExpansion.nonTerminal("expr", "Expression", emptyList())
+											GExpansion.nonTerminal("expr", "Expression")
 									),
 									GExpansion.sequence(
 											GExpansion.zeroOrOne(
-													GExpansion.nonTerminal("init", "ForInit", emptyList())
+													GExpansion.nonTerminal("init", "ForInit")
 											),
 											GExpansion.terminal(null, "SEMICOLON"),
 											GExpansion.zeroOrOne(
-													GExpansion.nonTerminal("expr", "Expression", emptyList())
+													GExpansion.nonTerminal("expr", "Expression")
 											),
 											GExpansion.terminal(null, "SEMICOLON"),
 											GExpansion.zeroOrOne(
-													GExpansion.nonTerminal("update", "ForUpdate", emptyList())
+													GExpansion.nonTerminal("update", "ForUpdate")
 											)
 									)
 							),
 							GExpansion.terminal(null, "RPAREN"),
-							GExpansion.nonTerminal("body", "Statement", emptyList()),
+							GExpansion.nonTerminal("body", "Statement"),
 							GExpansion.action(
 									listOf(
 											stmt("if (varExpr != null)\n" + "\treturn dress(SForeachStmt.make(varExpr, expr, body));\n" + "else\n" + "\treturn dress(SForStmt.make(init, expr, update, body));\n" + "").build()
@@ -4609,11 +4611,11 @@ public class Grammar {
 							GExpansion.choice(
 									GExpansion.sequence(
 											GExpansion.lookAhead(
-													GExpansion.nonTerminal(null, "Modifiers", emptyList()),
-													GExpansion.nonTerminal(null, "Type", emptyList()),
-													GExpansion.nonTerminal(null, "Name", emptyList())
+													GExpansion.nonTerminal(null, "Modifiers"),
+													GExpansion.nonTerminal(null, "Type"),
+													GExpansion.nonTerminal(null, "Name")
 											),
-											GExpansion.nonTerminal("expr", "VariableDeclExpression", emptyList()),
+											GExpansion.nonTerminal("expr", "VariableDeclExpression"),
 											GExpansion.action(
 													listOf(
 															stmt("ret = emptyList();").build(),
@@ -4621,7 +4623,7 @@ public class Grammar {
 													)
 											)
 									),
-									GExpansion.nonTerminal("ret", "ExpressionList", emptyList())
+									GExpansion.nonTerminal("ret", "ExpressionList")
 							),
 							GExpansion.action(
 									listOf(
@@ -4637,7 +4639,7 @@ public class Grammar {
 							stmt("BUTree<? extends SExpr> expr;").build()
 					),
 					GExpansion.sequence(
-							GExpansion.nonTerminal("expr", "Expression", emptyList()),
+							GExpansion.nonTerminal("expr", "Expression"),
 							GExpansion.action(
 									listOf(
 											stmt("ret = append(ret, expr);").build()
@@ -4645,7 +4647,7 @@ public class Grammar {
 							),
 							GExpansion.zeroOrMore(
 									GExpansion.terminal(null, "COMMA"),
-									GExpansion.nonTerminal("expr", "Expression", emptyList()),
+									GExpansion.nonTerminal("expr", "Expression"),
 									GExpansion.action(
 											listOf(
 													stmt("ret = append(ret, expr);").build()
@@ -4665,7 +4667,7 @@ public class Grammar {
 							stmt("BUTree<SNodeList> ret;").build()
 					),
 					GExpansion.sequence(
-							GExpansion.nonTerminal("ret", "ExpressionList", emptyList()),
+							GExpansion.nonTerminal("ret", "ExpressionList"),
 							GExpansion.action(
 									listOf(
 											stmt("return ret;").build()
@@ -4686,7 +4688,7 @@ public class Grammar {
 							),
 							GExpansion.terminal(null, "BREAK"),
 							GExpansion.zeroOrOne(
-									GExpansion.nonTerminal("id", "Name", emptyList())
+									GExpansion.nonTerminal("id", "Name")
 							),
 							GExpansion.terminal(null, "SEMICOLON"),
 							GExpansion.action(
@@ -4709,7 +4711,7 @@ public class Grammar {
 							),
 							GExpansion.terminal(null, "CONTINUE"),
 							GExpansion.zeroOrOne(
-									GExpansion.nonTerminal("id", "Name", emptyList())
+									GExpansion.nonTerminal("id", "Name")
 							),
 							GExpansion.terminal(null, "SEMICOLON"),
 							GExpansion.action(
@@ -4732,7 +4734,7 @@ public class Grammar {
 							),
 							GExpansion.terminal(null, "RETURN"),
 							GExpansion.zeroOrOne(
-									GExpansion.nonTerminal("expr", "Expression", emptyList())
+									GExpansion.nonTerminal("expr", "Expression")
 							),
 							GExpansion.terminal(null, "SEMICOLON"),
 							GExpansion.action(
@@ -4754,7 +4756,7 @@ public class Grammar {
 									)
 							),
 							GExpansion.terminal(null, "THROW"),
-							GExpansion.nonTerminal("expr", "Expression", emptyList()),
+							GExpansion.nonTerminal("expr", "Expression"),
 							GExpansion.terminal(null, "SEMICOLON"),
 							GExpansion.action(
 									listOf(
@@ -4777,9 +4779,9 @@ public class Grammar {
 							),
 							GExpansion.terminal(null, "SYNCHRONIZED"),
 							GExpansion.terminal(null, "LPAREN"),
-							GExpansion.nonTerminal("expr", "Expression", emptyList()),
+							GExpansion.nonTerminal("expr", "Expression"),
 							GExpansion.terminal(null, "RPAREN"),
-							GExpansion.nonTerminal("block", "Block", emptyList()),
+							GExpansion.nonTerminal("block", "Block"),
 							GExpansion.action(
 									listOf(
 											stmt("return dress(SSynchronizedStmt.make(expr, block));").build()
@@ -4805,31 +4807,31 @@ public class Grammar {
 							GExpansion.terminal(null, "TRY"),
 							GExpansion.choice(
 									GExpansion.sequence(
-											GExpansion.nonTerminal("resources", "ResourceSpecification", listOf(
+											GExpansion.nonTerminal("resources", "ResourceSpecification", null, listOf(
 													expr("trailingSemiColon").build()
 											)),
-											GExpansion.nonTerminal("tryBlock", "Block", emptyList()),
+											GExpansion.nonTerminal("tryBlock", "Block"),
 											GExpansion.zeroOrOne(
-													GExpansion.nonTerminal("catchClauses", "CatchClauses", emptyList())
+													GExpansion.nonTerminal("catchClauses", "CatchClauses")
 											),
 											GExpansion.zeroOrOne(
 													GExpansion.terminal(null, "FINALLY"),
-													GExpansion.nonTerminal("finallyBlock", "Block", emptyList())
+													GExpansion.nonTerminal("finallyBlock", "Block")
 											)
 									),
 									GExpansion.sequence(
-											GExpansion.nonTerminal("tryBlock", "Block", emptyList()),
+											GExpansion.nonTerminal("tryBlock", "Block"),
 											GExpansion.choice(
 													GExpansion.sequence(
-															GExpansion.nonTerminal("catchClauses", "CatchClauses", emptyList()),
+															GExpansion.nonTerminal("catchClauses", "CatchClauses"),
 															GExpansion.zeroOrOne(
 																	GExpansion.terminal(null, "FINALLY"),
-																	GExpansion.nonTerminal("finallyBlock", "Block", emptyList())
+																	GExpansion.nonTerminal("finallyBlock", "Block")
 															)
 													),
 													GExpansion.sequence(
 															GExpansion.terminal(null, "FINALLY"),
-															GExpansion.nonTerminal("finallyBlock", "Block", emptyList())
+															GExpansion.nonTerminal("finallyBlock", "Block")
 													)
 											)
 									)
@@ -4849,7 +4851,7 @@ public class Grammar {
 					),
 					GExpansion.sequence(
 							GExpansion.oneOrMore(
-									GExpansion.nonTerminal("catchClause", "CatchClause", emptyList()),
+									GExpansion.nonTerminal("catchClause", "CatchClause"),
 									GExpansion.action(
 											listOf(
 													stmt("catchClauses = append(catchClauses, catchClause);").build()
@@ -4877,9 +4879,9 @@ public class Grammar {
 							),
 							GExpansion.terminal(null, "CATCH"),
 							GExpansion.terminal(null, "LPAREN"),
-							GExpansion.nonTerminal("param", "CatchFormalParameter", emptyList()),
+							GExpansion.nonTerminal("param", "CatchFormalParameter"),
 							GExpansion.terminal(null, "RPAREN"),
-							GExpansion.nonTerminal("catchBlock", "Block", emptyList()),
+							GExpansion.nonTerminal("catchBlock", "Block"),
 							GExpansion.action(
 									listOf(
 											stmt("return dress(SCatchClause.make(param, catchBlock));").build()
@@ -4901,8 +4903,8 @@ public class Grammar {
 											stmt("run();").build()
 									)
 							),
-							GExpansion.nonTerminal("modifiers", "Modifiers", emptyList()),
-							GExpansion.nonTerminal("exceptType", "QualifiedType", listOf(
+							GExpansion.nonTerminal("modifiers", "Modifiers"),
+							GExpansion.nonTerminal("exceptType", "QualifiedType", null, listOf(
 									expr("null").build()
 							)),
 							GExpansion.action(
@@ -4921,7 +4923,7 @@ public class Grammar {
 									),
 									GExpansion.oneOrMore(
 											GExpansion.terminal(null, "BIT_OR"),
-											GExpansion.nonTerminal("exceptType", "AnnotatedQualifiedType", emptyList()),
+											GExpansion.nonTerminal("exceptType", "AnnotatedQualifiedType"),
 											GExpansion.action(
 													listOf(
 															stmt("exceptTypes = append(exceptTypes, exceptType);").build()
@@ -4934,7 +4936,7 @@ public class Grammar {
 											)
 									)
 							),
-							GExpansion.nonTerminal("exceptId", "VariableDeclaratorId", emptyList()),
+							GExpansion.nonTerminal("exceptId", "VariableDeclaratorId"),
 							GExpansion.action(
 									listOf(
 											stmt("return dress(SFormalParameter.make(modifiers, exceptType, false, exceptId));").build()
@@ -4950,7 +4952,7 @@ public class Grammar {
 					),
 					GExpansion.sequence(
 							GExpansion.terminal(null, "LPAREN"),
-							GExpansion.nonTerminal("var", "VariableDeclExpression", emptyList()),
+							GExpansion.nonTerminal("var", "VariableDeclExpression"),
 							GExpansion.action(
 									listOf(
 											stmt("vars = append(vars, var);").build()
@@ -4959,7 +4961,7 @@ public class Grammar {
 							GExpansion.zeroOrMore(
 									GExpansion.lookAhead(2),
 									GExpansion.terminal(null, "SEMICOLON"),
-									GExpansion.nonTerminal("var", "VariableDeclExpression", emptyList()),
+									GExpansion.nonTerminal("var", "VariableDeclExpression"),
 									GExpansion.action(
 											listOf(
 													stmt("vars = append(vars, var);").build()
@@ -5024,7 +5026,7 @@ public class Grammar {
 					),
 					GExpansion.sequence(
 							GExpansion.zeroOrMore(
-									GExpansion.nonTerminal("annotation", "Annotation", emptyList()),
+									GExpansion.nonTerminal("annotation", "Annotation"),
 									GExpansion.action(
 											listOf(
 													stmt("annotations = append(annotations, annotation);").build()
@@ -5048,32 +5050,32 @@ public class Grammar {
 									GExpansion.sequence(
 											GExpansion.lookAhead(
 													GExpansion.terminal(null, "AT"),
-													GExpansion.nonTerminal(null, "QualifiedName", emptyList()),
+													GExpansion.nonTerminal(null, "QualifiedName"),
 													GExpansion.terminal(null, "LPAREN"),
 													GExpansion.choice(
 															GExpansion.sequence(
-																	GExpansion.nonTerminal(null, "Name", emptyList()),
+																	GExpansion.nonTerminal(null, "Name"),
 																	GExpansion.terminal(null, "ASSIGN")
 															),
 															GExpansion.terminal(null, "RPAREN")
 													)
 											),
-											GExpansion.nonTerminal("ret", "NormalAnnotation", emptyList())
+											GExpansion.nonTerminal("ret", "NormalAnnotation")
 									),
 									GExpansion.sequence(
 											GExpansion.lookAhead(
 													GExpansion.terminal(null, "AT"),
-													GExpansion.nonTerminal(null, "QualifiedName", emptyList()),
+													GExpansion.nonTerminal(null, "QualifiedName"),
 													GExpansion.terminal(null, "LPAREN")
 											),
-											GExpansion.nonTerminal("ret", "SingleMemberAnnotation", emptyList())
+											GExpansion.nonTerminal("ret", "SingleMemberAnnotation")
 									),
 									GExpansion.sequence(
 											GExpansion.lookAhead(
 													GExpansion.terminal(null, "AT"),
-													GExpansion.nonTerminal(null, "QualifiedName", emptyList())
+													GExpansion.nonTerminal(null, "QualifiedName")
 											),
-											GExpansion.nonTerminal("ret", "MarkerAnnotation", emptyList())
+											GExpansion.nonTerminal("ret", "MarkerAnnotation")
 									)
 							),
 							GExpansion.action(
@@ -5096,10 +5098,10 @@ public class Grammar {
 									)
 							),
 							GExpansion.terminal(null, "AT"),
-							GExpansion.nonTerminal("name", "QualifiedName", emptyList()),
+							GExpansion.nonTerminal("name", "QualifiedName"),
 							GExpansion.terminal(null, "LPAREN"),
 							GExpansion.zeroOrOne(
-									GExpansion.nonTerminal("pairs", "MemberValuePairs", emptyList())
+									GExpansion.nonTerminal("pairs", "MemberValuePairs")
 							),
 							GExpansion.terminal(null, "RPAREN"),
 							GExpansion.action(
@@ -5121,7 +5123,7 @@ public class Grammar {
 									)
 							),
 							GExpansion.terminal(null, "AT"),
-							GExpansion.nonTerminal("name", "QualifiedName", emptyList()),
+							GExpansion.nonTerminal("name", "QualifiedName"),
 							GExpansion.action(
 									listOf(
 											stmt("return dress(SMarkerAnnotationExpr.make(name));").build()
@@ -5142,9 +5144,9 @@ public class Grammar {
 									)
 							),
 							GExpansion.terminal(null, "AT"),
-							GExpansion.nonTerminal("name", "QualifiedName", emptyList()),
+							GExpansion.nonTerminal("name", "QualifiedName"),
 							GExpansion.terminal(null, "LPAREN"),
-							GExpansion.nonTerminal("memberVal", "MemberValue", emptyList()),
+							GExpansion.nonTerminal("memberVal", "MemberValue"),
 							GExpansion.terminal(null, "RPAREN"),
 							GExpansion.action(
 									listOf(
@@ -5160,7 +5162,7 @@ public class Grammar {
 							stmt("BUTree<SMemberValuePair> pair;").build()
 					),
 					GExpansion.sequence(
-							GExpansion.nonTerminal("pair", "MemberValuePair", emptyList()),
+							GExpansion.nonTerminal("pair", "MemberValuePair"),
 							GExpansion.action(
 									listOf(
 											stmt("ret = append(ret, pair);").build()
@@ -5168,7 +5170,7 @@ public class Grammar {
 							),
 							GExpansion.zeroOrMore(
 									GExpansion.terminal(null, "COMMA"),
-									GExpansion.nonTerminal("pair", "MemberValuePair", emptyList()),
+									GExpansion.nonTerminal("pair", "MemberValuePair"),
 									GExpansion.action(
 											listOf(
 													stmt("ret = append(ret, pair);").build()
@@ -5194,9 +5196,9 @@ public class Grammar {
 											stmt("run();").build()
 									)
 							),
-							GExpansion.nonTerminal("name", "Name", emptyList()),
+							GExpansion.nonTerminal("name", "Name"),
 							GExpansion.terminal(null, "ASSIGN"),
-							GExpansion.nonTerminal("value", "MemberValue", emptyList()),
+							GExpansion.nonTerminal("value", "MemberValue"),
 							GExpansion.action(
 									listOf(
 											stmt("return dress(SMemberValuePair.make(name, value));").build()
@@ -5211,9 +5213,9 @@ public class Grammar {
 					),
 					GExpansion.sequence(
 							GExpansion.choice(
-									GExpansion.nonTerminal("ret", "Annotation", emptyList()),
-									GExpansion.nonTerminal("ret", "MemberValueArrayInitializer", emptyList()),
-									GExpansion.nonTerminal("ret", "ConditionalExpression", emptyList())
+									GExpansion.nonTerminal("ret", "Annotation"),
+									GExpansion.nonTerminal("ret", "MemberValueArrayInitializer"),
+									GExpansion.nonTerminal("ret", "ConditionalExpression")
 							),
 							GExpansion.action(
 									listOf(
@@ -5237,7 +5239,7 @@ public class Grammar {
 							),
 							GExpansion.terminal(null, "LBRACE"),
 							GExpansion.zeroOrOne(
-									GExpansion.nonTerminal("member", "MemberValue", emptyList()),
+									GExpansion.nonTerminal("member", "MemberValue"),
 									GExpansion.action(
 											listOf(
 													stmt("ret = append(ret, member);").build()
@@ -5246,7 +5248,7 @@ public class Grammar {
 									GExpansion.zeroOrMore(
 											GExpansion.lookAhead(2),
 											GExpansion.terminal(null, "COMMA"),
-											GExpansion.nonTerminal("member", "MemberValue", emptyList()),
+											GExpansion.nonTerminal("member", "MemberValue"),
 											GExpansion.action(
 													listOf(
 															stmt("ret = append(ret, member);").build()
