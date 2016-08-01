@@ -3696,7 +3696,14 @@ public class Grammar {
 									),
 									sequence(
 											lookAhead(
-													nonTerminal("VariableDeclExpression")
+													nonTerminal("ModifiersNoDefault"),
+													nonTerminal("Type"),
+													nonTerminal("VariableDeclaratorId"),
+													choice(
+															terminal("ASSIGN"),
+															terminal("COMMA"),
+															terminal("SEMICOLON")
+													)
 											),
 											action(listOf(
 													stmt("run();").build()
@@ -3953,7 +3960,9 @@ public class Grammar {
 							choice(
 									sequence(
 											lookAhead(
-													nonTerminal("VariableDeclExpression"),
+													nonTerminal("Modifiers"),
+													nonTerminal("Type"),
+													nonTerminal("VariableDeclaratorId"),
 													terminal("COLON")
 											),
 											nonTerminal("varExpr", "VariableDeclExpression"),
