@@ -1261,6 +1261,7 @@ public class Grammar {
 					),
 					sequence(
 							choice(
+									// TODO Handle a receiver parameter as first parameter
 									sequence(
 											nonTerminal("par", "FormalParameter"),
 											action(listOf(
