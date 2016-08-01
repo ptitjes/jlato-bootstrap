@@ -1973,6 +1973,7 @@ public class Grammar {
 					),
 					sequence(
 							choice(
+									// TODO Handle LambdaExpressions in a LambdaExpressions production here
 									sequence(
 											lookAhead(
 													nonTerminal("Name"),
@@ -2819,6 +2820,7 @@ public class Grammar {
 																	expr("type").build()
 															)),
 															terminal("RPAREN"),
+															// TODO Handle LambdaExpressions here
 															nonTerminal("ret", "UnaryExpressionNotPlusMinus"),
 															action(listOf(
 																	stmt("ret = dress(SCastExpr.make(type, ret));").build()
@@ -2847,6 +2849,7 @@ public class Grammar {
 													expr("type").build()
 											)),
 											terminal("RPAREN"),
+											// TODO Handle LambdaExpressions here
 											nonTerminal("ret", "UnaryExpressionNotPlusMinus"),
 											action(listOf(
 													stmt("ret = dress(SCastExpr.make(type, ret));").build()
@@ -3137,6 +3140,7 @@ public class Grammar {
 													action(listOf(
 															stmt("lateRun();").build()
 													)),
+													// TODO Do not handle LambdaExpressions here
 													terminal("ARROW"),
 													nonTerminal("ret", "LambdaBody", null, listOf(
 															expr("singletonList(makeFormalParameter((BUTree<SName>) ret))").build(),
@@ -3148,6 +3152,7 @@ public class Grammar {
 											action(listOf(
 													stmt("run();").build()
 											)),
+											// TODO Do not handle LambdaExpressions here but just parenthesized expression
 											terminal("LPAREN"),
 											choice(
 													sequence(
