@@ -71,7 +71,7 @@ public abstract class CompilationUnitPattern<A> {
 
 		ImportManager importManager = new ImportManager(packageName, newCU.imports());
 		newCU = rewrite(newCU, importManager, arg);
-		newCU = newCU.withImports(importManager.imports());
+		newCU = importManager.organiseAndSet(newCU);
 		return newCU;
 	}
 

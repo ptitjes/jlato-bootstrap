@@ -1294,7 +1294,9 @@ public class Grammar {
 							stmt("BUTree<SNodeList> modifiers;").build(),
 							stmt("BUTree<? extends SType> type;").build(),
 							stmt("boolean isVarArg = false;").build(),
-							stmt("BUTree<SVariableDeclaratorId> id;").build()
+							stmt("BUTree<SVariableDeclaratorId> id = null;").build(),
+							stmt("boolean isReceiver = false;").build(),
+							stmt("BUTree<SName> receiverTypeName = null;").build()
 					),
 					sequence(
 							action(listOf(
@@ -1310,9 +1312,28 @@ public class Grammar {
 											stmt("isVarArg = true;").build()
 									))
 							),
-							nonTerminal("id", "VariableDeclaratorId"),
+							choice(
+									sequence(
+											lookAhead(
+													zeroOrOne(
+															nonTerminal("Name"),
+															terminal("DOT")
+													),
+													terminal("THIS")
+											),
+											zeroOrOne(
+													nonTerminal("receiverTypeName", "Name"),
+													terminal("DOT")
+											),
+											terminal("THIS"),
+											action(listOf(
+													stmt("isReceiver = true;").build()
+											))
+									),
+									nonTerminal("id", "VariableDeclaratorId")
+							),
 							action(listOf(
-									stmt("return dress(SFormalParameter.make(modifiers, type, isVarArg, id));").build()
+									stmt("return dress(SFormalParameter.make(modifiers, type, isVarArg, optionOf(id), isReceiver, optionOf(receiverTypeName)));").build()
 							))
 					)
 			),
@@ -4291,7 +4312,7 @@ public class Grammar {
 							),
 							nonTerminal("exceptId", "VariableDeclaratorId"),
 							action(listOf(
-									stmt("return dress(SFormalParameter.make(modifiers, exceptType, false, exceptId));").build()
+									stmt("return dress(SFormalParameter.make(modifiers, exceptType, false, optionOf(exceptId), false, none()));").build()
 							))
 					)
 			),

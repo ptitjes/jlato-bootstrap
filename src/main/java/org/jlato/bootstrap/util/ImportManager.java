@@ -1,14 +1,18 @@
 package org.jlato.bootstrap.util;
 
+import org.jlato.pattern.Quotes;
 import org.jlato.tree.NodeList;
 import org.jlato.tree.NodeOption;
 import org.jlato.tree.Trees;
+import org.jlato.tree.decl.CompilationUnit;
 import org.jlato.tree.decl.ImportDecl;
+import org.jlato.tree.name.Name;
 import org.jlato.tree.name.QualifiedName;
 import org.jlato.util.Function1;
 
 import java.util.*;
 
+import static org.jlato.tree.Trees.emptyList;
 import static org.jlato.tree.Trees.importDecl;
 import static org.jlato.tree.Trees.listOf;
 
@@ -48,6 +52,27 @@ public class ImportManager {
 				.appendAll(listOf(sortedImports))
 				.appendAll(listOf(sortedJavaImports))
 				.appendAll(listOf(sortedStaticImports));
+	}
+
+	public CompilationUnit organiseAndSet(CompilationUnit unit) {
+		HashSet<String> names = new HashSet<>();
+		for (Name name : unit.withImports(emptyList()).findAll(Quotes.names())) {
+			names.add(name.id());
+		}
+
+		for (QualifiedName name : new HashSet<>(singleImports)) {
+			if (!names.contains(name.name().id())) {
+				singleImports.remove(name);
+			}
+		}
+
+		for (QualifiedName name : new HashSet<>(singleStaticImports)) {
+			if (!names.contains(name.name().id())) {
+				singleStaticImports.remove(name);
+			}
+		}
+
+		return unit.withImports(imports());
 	}
 
 	private boolean otherImport(String name) {

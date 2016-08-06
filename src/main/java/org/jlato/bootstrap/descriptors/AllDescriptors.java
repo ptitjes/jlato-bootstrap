@@ -652,12 +652,16 @@ public class AllDescriptors {
 							param("NodeList<ExtendedModifier> modifiers").build(),
 							param("Type type").build(),
 							param("boolean isVarArgs").build(),
-							param("VariableDeclaratorId id").build()
+							param("NodeOption<VariableDeclaratorId> id").build(),
+							param("boolean isReceiver").build(),
+							param("NodeOption<Name> receiverTypeName").build()
 					),
 					listOf(
 							(Expr) null,
 							(Expr) null,
+							(Expr) literalExpr(false),
 							(Expr) null,
+							(Expr) literalExpr(false),
 							(Expr) null
 					),
 					false
@@ -1634,7 +1638,7 @@ public class AllDescriptors {
 					listOf(
 							memberDecl("public static final LexicalShape shape = token(new LSToken.Provider() {\n" +
 									"\t\tpublic LToken tokenFor(" + AllDescriptors.BU_TREE + " tree) {\n" +
-									"\t\t\treturn new LToken(ParserImplConstants.IDENTIFIER, ((SName) tree.state).id);\n" +
+									"\t\t\treturn new LToken(TokenType.IDENTIFIER, ((SName) tree.state).id);\n" +
 									"\t\t}\n" +
 									"\t});").build()
 					),

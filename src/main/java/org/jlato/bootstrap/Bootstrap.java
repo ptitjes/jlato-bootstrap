@@ -108,8 +108,7 @@ public class Bootstrap {
 		final Pattern<? extends Decl> matcher = pattern.matcher(descriptor);
 		ImportManager importManager = new ImportManager(makePackageName(path), cu.imports());
 		final MatchVisitor<Decl> visitor = (c, s) -> pattern.rewrite((T) (GenSettings.replace ? matcher.build() : c), importManager, descriptor);
-		final CompilationUnit newCU = cu.forAll(matcher, visitor)
-				.withImports(importManager.imports());
+		final CompilationUnit newCU = importManager.organiseAndSet(cu.forAll(matcher, visitor));
 		return nodeMap.put(path, newCU);
 	}
 
