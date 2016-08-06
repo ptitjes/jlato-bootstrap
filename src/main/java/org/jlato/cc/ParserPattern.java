@@ -94,7 +94,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 
 		NodeList<Stmt> stmts = emptyList();
 		stmts = stmts.appendAll(production.declarations);
-		stmts = stmts.appendAll(parseStatementsFor(production.symbol, production.expansion));
+		stmts = stmts.appendAll(parseStatementsFor(production.symbol, production.expansion, production.hintParams));
 
 		return methodDecl(type, name("parse" + upperCaseFirst(production.symbol)))
 				.withModifiers(listOf(Modifier.Protected))
@@ -104,38 +104,38 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				.insertLeadingComment(production.expansion.toString(), true);
 	}
 
-	private NodeList<Stmt> parseStatementsFor(String symbol, GExpansion expansion) {
+	private NodeList<Stmt> parseStatementsFor(String symbol, GExpansion expansion, NodeList<FormalParameter> hintParams) {
 		NodeList<Stmt> stmts = emptyList();
 		switch (expansion.kind) {
 			case Sequence:
-				stmts = stmts.appendAll(parseStatementsForChildren(symbol, expansion));
+				stmts = stmts.appendAll(parseStatementsForChildren(symbol, expansion, hintParams));
 				break;
 			case ZeroOrOne: {
 				stmts = stmts.append(ifStmt(
-						matchCondition(symbol, expansion),
-						blockStmt().withStmts(parseStatementsForChildren(symbol, expansion))
+						matchCondition(symbol, expansion, hintParams, hintParams.map(p -> p.id().name())),
+						blockStmt().withStmts(parseStatementsForChildren(symbol, expansion, hintParams))
 				));
 				break;
 			}
 			case ZeroOrMore: {
 				stmts = stmts.append(whileStmt(
-						matchCondition(symbol, expansion),
-						blockStmt().withStmts(parseStatementsForChildren(symbol, expansion))
+						matchCondition(symbol, expansion, hintParams, hintParams.map(p -> p.id().name())),
+						blockStmt().withStmts(parseStatementsForChildren(symbol, expansion, hintParams))
 				));
 				break;
 			}
 			case OneOrMore: {
 				stmts = stmts.append(doStmt(
-						blockStmt().withStmts(parseStatementsForChildren(symbol, expansion)),
-						matchCondition(symbol, expansion)
+						blockStmt().withStmts(parseStatementsForChildren(symbol, expansion, hintParams)),
+						matchCondition(symbol, expansion, hintParams, hintParams.map(p -> p.id().name()))
 				));
 				break;
 			}
 			case Choice: {
 				List<IfStmt> expansionsIfStmt = expansion.children.stream()
 						.map(e -> ifStmt(
-								matchCondition(symbol, e),
-								blockStmt().withStmts(parseStatementsFor(symbol, e))
+								matchCondition(symbol, e, hintParams, hintParams.map(p -> p.id().name())),
+								blockStmt().withStmts(parseStatementsFor(symbol, e, hintParams))
 						))
 						.collect(Collectors.toList());
 				Collections.reverse(expansionsIfStmt);
@@ -176,15 +176,15 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		return stmts;
 	}
 
-	private NodeList<Stmt> parseStatementsForChildren(String symbol, GExpansion expansion) {
+	private NodeList<Stmt> parseStatementsForChildren(String symbol, GExpansion expansion, NodeList<FormalParameter> hintParams) {
 		NodeList<Stmt> stmts = emptyList();
 		for (GExpansion child : expansion.children) {
-			stmts = stmts.appendAll(parseStatementsFor(symbol, child));
+			stmts = stmts.appendAll(parseStatementsFor(symbol, child, hintParams));
 		}
 		return stmts;
 	}
 
-	private Expr matchCondition(String symbol, GExpansion expansion) {
+	private Expr matchCondition(String symbol, GExpansion expansion, NodeList<FormalParameter> params, NodeList<Expr> args) {
 		if (expansion.children != null && !expansion.children.isEmpty()) {
 			GExpansion firstChild = expansion.children.get(0);
 			if (firstChild.kind == GExpansion.Kind.LookAhead) {
@@ -202,13 +202,13 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 					lookaheadCondition = semanticLookaheadCondition;
 				}
 				if (amount != -1) {
-					Expr amountLookaheadCondition = buildLookaheadWithAmountCondition(symbol, expansion, amount);
+					Expr amountLookaheadCondition = buildLookaheadWithAmountCondition(symbol, expansion, amount, params, args);
 					lookaheadCondition = lookaheadCondition == null ? amountLookaheadCondition :
 							binaryExpr(lookaheadCondition, BinaryOp.And, amountLookaheadCondition);
 				}
 				if (children != null) {
 					String matchMethodName = "match" + symbol + "_lookahead" + incrementCount(symbol);
-					Expr call = createMatchMethodAndCallFor(symbol, matchMethodName, GExpansion.sequence(children), literalExpr(0), emptyList(), emptyList());
+					Expr call = createMatchMethodAndCallFor(symbol, matchMethodName, GExpansion.sequence(children), literalExpr(0), params, args);
 					Expr descriptiveLookaheadCondition = binaryExpr(call, negativeLookahead ? BinaryOp.Equal : BinaryOp.NotEqual, literalExpr(-1));
 
 					lookaheadCondition = lookaheadCondition == null ? descriptiveLookaheadCondition :
@@ -228,15 +228,15 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		return newCount;
 	}
 
-	private Expr buildLookaheadWithAmountCondition(String symbol, GExpansion expansion, int amount) {
+	private Expr buildLookaheadWithAmountCondition(String symbol, GExpansion expansion, int amount, NodeList<FormalParameter> params, NodeList<Expr> args) {
 		String matchMethodName = "match" + symbol + "_lookahead" + incrementCount(symbol);
-		NodeList<Stmt> stmts = buildLookaheadWithAmountCondition(Collections.singletonList(expansion.location()), 0, amount);
+		NodeList<Stmt> stmts = buildLookaheadWithAmountCondition(Collections.singletonList(expansion.location()), 0, amount, params, args);
 		stmts = stmts.append(returnStmt().withExpr(FAILED_LOOKAHEAD));
 		createMatchMethod(symbol, matchMethodName, expansion, stmts, emptyList());
 		return binaryExpr(matchMethodCall(matchMethodName, literalExpr(0), emptyList()), BinaryOp.NotEqual, FAILED_LOOKAHEAD);
 	}
 
-	private NodeList<Stmt> buildLookaheadWithAmountCondition(List<GLocation> location, int lookahead, int amount) {
+	private NodeList<Stmt> buildLookaheadWithAmountCondition(List<GLocation> location, int lookahead, int amount, NodeList<FormalParameter> params, NodeList<Expr> args) {
 		NodeList<Stmt> stmts = emptyList();
 		if (amount == 0) {
 			stmts = stmts.append(returnStmt().withExpr(LOOKAHEAD));
@@ -254,7 +254,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 
 					stmts = stmts.append(ifStmt(
 							binaryExpr(matchCall(terminal, literalExpr(lookahead)), BinaryOp.NotEqual, FAILED_LOOKAHEAD),
-							blockStmt().withStmts(buildLookaheadWithAmountCondition(following, lookahead + 1, amount - 1))
+							blockStmt().withStmts(buildLookaheadWithAmountCondition(following, lookahead + 1, amount - 1, params, args))
 					));
 				}
 			}

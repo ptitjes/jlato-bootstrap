@@ -1,15 +1,17 @@
 package org.jlato.cc;
 
 import org.jlato.cc.grammar.GProductions;
+import org.jlato.internal.parser.Token;
+import org.jlato.internal.parser.TokenType;
+import org.jlato.tree.expr.BinaryOp;
 
 import static org.jlato.pattern.Quotes.expr;
 import static org.jlato.pattern.Quotes.param;
 import static org.jlato.pattern.Quotes.stmt;
 import static org.jlato.pattern.Quotes.type;
-import static org.jlato.tree.Trees.emptyList;
-import static org.jlato.tree.Trees.listOf;
 import static org.jlato.cc.grammar.GExpansion.*;
 import static org.jlato.cc.grammar.GProduction.*;
+import static org.jlato.tree.Trees.*;
 
 public class Grammar {
 
@@ -2248,7 +2250,7 @@ public class Grammar {
 							stmt("BUTree<? extends SExpr> right;").build()
 					),
 					sequence(
-							nonTerminal("ret", "ConditionalOrExpression"),
+							nonTerminal("ret", "BinaryExpression", listOf(expr("1").build())),
 							zeroOrOne(
 //									lookAhead(2),
 									action(listOf(
@@ -2267,378 +2269,228 @@ public class Grammar {
 							))
 					)
 			),
-			production("ConditionalOrExpression", type("BUTree<? extends SExpr>").build(),
-					emptyList(),
-					emptyList(),
+			production("BinaryExpression", type("BUTree<? extends SExpr>").build(),
 					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build(),
-							stmt("BUTree<? extends SExpr> right;").build()
+							param("int minPrecedence").build()
 					),
-					sequence(
-							nonTerminal("ret", "ConditionalAndExpression"),
-							zeroOrMore(
-//									lookAhead(2),
-									action(listOf(
-											stmt("lateRun();").build()
-									)),
-									terminal("SC_OR"),
-									nonTerminal("right", "ConditionalAndExpression"),
-									action(listOf(
-											stmt("ret = dress(SBinaryExpr.make(ret, BinaryOp.Or, right));").build()
-									))
-							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
-					)
-			),
-			production("ConditionalAndExpression", type("BUTree<? extends SExpr>").build(),
-					emptyList(),
 					emptyList(),
 					listOf(
 							stmt("BUTree<? extends SExpr> ret;").build(),
-							stmt("BUTree<? extends SExpr> right;").build()
-					),
-					sequence(
-							nonTerminal("ret", "InclusiveOrExpression"),
-							zeroOrMore(
-//									lookAhead(2),
-									action(listOf(
-											stmt("lateRun();").build()
-									)),
-									terminal("SC_AND"),
-									nonTerminal("right", "InclusiveOrExpression"),
-									action(listOf(
-											stmt("ret = dress(SBinaryExpr.make(ret, BinaryOp.And, right));").build()
-									))
-							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
-					)
-			),
-			production("InclusiveOrExpression", type("BUTree<? extends SExpr>").build(),
-					emptyList(),
-					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build(),
-							stmt("BUTree<? extends SExpr> right;").build()
-					),
-					sequence(
-							nonTerminal("ret", "ExclusiveOrExpression"),
-							zeroOrMore(
-//									lookAhead(2),
-									action(listOf(
-											stmt("lateRun();").build()
-									)),
-									terminal("BIT_OR"),
-									nonTerminal("right", "ExclusiveOrExpression"),
-									action(listOf(
-											stmt("ret = dress(SBinaryExpr.make(ret, BinaryOp.BinOr, right));").build()
-									))
-							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
-					)
-			),
-			production("ExclusiveOrExpression", type("BUTree<? extends SExpr>").build(),
-					emptyList(),
-					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build(),
-							stmt("BUTree<? extends SExpr> right;").build()
-					),
-					sequence(
-							nonTerminal("ret", "AndExpression"),
-							zeroOrMore(
-//									lookAhead(2),
-									action(listOf(
-											stmt("lateRun();").build()
-									)),
-									terminal("XOR"),
-									nonTerminal("right", "AndExpression"),
-									action(listOf(
-											stmt("ret = dress(SBinaryExpr.make(ret, BinaryOp.XOr, right));").build()
-									))
-							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
-					)
-			),
-			production("AndExpression", type("BUTree<? extends SExpr>").build(),
-					emptyList(),
-					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build(),
-							stmt("BUTree<? extends SExpr> right;").build()
-					),
-					sequence(
-							nonTerminal("ret", "EqualityExpression"),
-							zeroOrMore(
-//									lookAhead(2),
-									action(listOf(
-											stmt("lateRun();").build()
-									)),
-									terminal("BIT_AND"),
-									nonTerminal("right", "EqualityExpression"),
-									action(listOf(
-											stmt("ret = dress(SBinaryExpr.make(ret, BinaryOp.BinAnd, right));").build()
-									))
-							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
-					)
-			),
-			production("EqualityExpression", type("BUTree<? extends SExpr>").build(),
-					emptyList(),
-					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build(),
-							stmt("BUTree<? extends SExpr> right;").build(),
-							stmt("BinaryOp op;").build()
-					),
-					sequence(
-							nonTerminal("ret", "InstanceOfExpression"),
-							zeroOrMore(
-//									lookAhead(2),
-									action(listOf(
-											stmt("lateRun();").build()
-									)),
-									choice(
-											sequence(
-													terminal("EQ"),
-													action(listOf(
-															stmt("op = BinaryOp.Equal;").build()
-													))
-											),
-											sequence(
-													terminal("NE"),
-													action(listOf(
-															stmt("op = BinaryOp.NotEqual;").build()
-													))
-											)
-									),
-									nonTerminal("right", "InstanceOfExpression"),
-									action(listOf(
-											stmt("ret = dress(SBinaryExpr.make(ret, op, right));").build()
-									))
-							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
-					)
-			),
-			production("InstanceOfExpression", type("BUTree<? extends SExpr>").build(),
-					emptyList(),
-					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build(),
+							stmt("BUTree<? extends SExpr> rhs;").build(),
+							stmt("BinaryOp op;").build(),
 							stmt("BUTree<SNodeList> annotations;").build(),
 							stmt("BUTree<? extends SType> type;").build()
 					),
 					sequence(
-							nonTerminal("ret", "RelationalExpression"),
-							zeroOrOne(
-//									lookAhead(2),
-									action(listOf(
-											stmt("lateRun();").build()
-									)),
-									terminal("INSTANCEOF"),
-									action(listOf(
-											stmt("run();").build()
-									)),
-									nonTerminal("annotations", "Annotations"),
-									nonTerminal("type", "Type", null, listOf(
-											expr("annotations").build()
-									)),
-									action(listOf(
-											stmt("ret = dress(SInstanceOfExpr.make(ret, type));").build()
-									))
-							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
-					)
-			),
-			production("RelationalExpression", type("BUTree<? extends SExpr>").build(),
-					emptyList(),
-					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build(),
-							stmt("BUTree<? extends SExpr> right;").build(),
-							stmt("BinaryOp op;").build()
-					),
-					sequence(
-							nonTerminal("ret", "ShiftExpression"),
-							zeroOrMore(
-//									lookAhead(2),
-									action(listOf(
-											stmt("lateRun();").build()
-									)),
-									choice(
-											sequence(
-													terminal("LT"),
-													action(listOf(
-															stmt("op = BinaryOp.Less;").build()
-													))
-											),
-											sequence(
-													terminal("GT"),
-													action(listOf(
-															stmt("op = BinaryOp.Greater;").build()
-													))
-											),
-											sequence(
-													terminal("LE"),
-													action(listOf(
-															stmt("op = BinaryOp.LessOrEqual;").build()
-													))
-											),
-											sequence(
-													terminal("GE"),
-													action(listOf(
-															stmt("op = BinaryOp.GreaterOrEqual;").build()
-													))
-											)
-									),
-									nonTerminal("right", "ShiftExpression"),
-									action(listOf(
-											stmt("ret = dress(SBinaryExpr.make(ret, op, right));").build()
-									))
-							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
-					)
-			),
-			production("ShiftExpression", type("BUTree<? extends SExpr>").build(),
-					emptyList(),
-					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build(),
-							stmt("BUTree<? extends SExpr> right;").build(),
-							stmt("BinaryOp op;").build()
-					),
-					sequence(
-							nonTerminal("ret", "AdditiveExpression"),
-							zeroOrMore(
-									lookAhead(2),
-									action(listOf(
-											stmt("lateRun();").build()
-									)),
-									choice(
-											sequence(
-													terminal("LSHIFT"),
-													action(listOf(
-															stmt("op = BinaryOp.LeftShift;").build()
-													))
-											),
-											sequence(
-													lookAhead(3),
-													nonTerminal("RUNSIGNEDSHIFT"),
-													action(listOf(
-															stmt("op = BinaryOp.RightUnsignedShift;").build()
-													))
-											),
-											sequence(
-													lookAhead(2),
-													nonTerminal("RSIGNEDSHIFT"),
-													action(listOf(
-															stmt("op = BinaryOp.RightSignedShift;").build()
-													))
-											)
-									),
-									nonTerminal("right", "AdditiveExpression"),
-									action(listOf(
-											stmt("ret = dress(SBinaryExpr.make(ret, op, right));").build()
-									))
-							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
-					)
-			),
-			production("AdditiveExpression", type("BUTree<? extends SExpr>").build(),
-					emptyList(),
-					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build(),
-							stmt("BUTree<? extends SExpr> right;").build(),
-							stmt("BinaryOp op;").build()
-					),
-					sequence(
-							nonTerminal("ret", "MultiplicativeExpression"),
-							zeroOrMore(
-//									lookAhead(2),
-									action(listOf(
-											stmt("lateRun();").build()
-									)),
-									choice(
-											sequence(
-													terminal("PLUS"),
-													action(listOf(
-															stmt("op = BinaryOp.Plus;").build()
-													))
-											),
-											sequence(
-													terminal("MINUS"),
-													action(listOf(
-															stmt("op = BinaryOp.Minus;").build()
-													))
-											)
-									),
-									nonTerminal("right", "MultiplicativeExpression"),
-									action(listOf(
-											stmt("ret = dress(SBinaryExpr.make(ret, op, right));").build()
-									))
-							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
-					)
-			),
-			production("MultiplicativeExpression", type("BUTree<? extends SExpr>").build(),
-					emptyList(),
-					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build(),
-							stmt("BUTree<? extends SExpr> right;").build(),
-							stmt("BinaryOp op;").build()
-					),
-					sequence(
 							nonTerminal("ret", "UnaryExpression"),
 							zeroOrMore(
-//									lookAhead(2),
+									lookAhead(
+											choice(
+													sequence(
+															lookAhead(expr("precedenceForInstanceOf() >= minPrecedence").build()),
+															terminal("INSTANCEOF")
+													),
+													nonTerminal("op", "BinaryOperator", listOf(
+															expr("minPrecedence").build()
+													))
+											)
+									),
 									action(listOf(
 											stmt("lateRun();").build()
 									)),
 									choice(
 											sequence(
-													terminal("STAR"),
+													lookAhead(
+															expr("precedenceForInstanceOf() >= minPrecedence").build(),
+															terminal("INSTANCEOF")
+													),
+													terminal("INSTANCEOF"),
 													action(listOf(
-															stmt("op = BinaryOp.Times;").build()
+															stmt("run();").build()
+													)),
+													nonTerminal("annotations", "Annotations"),
+													nonTerminal("type", "Type", null, listOf(
+															expr("annotations").build()
+													)),
+													action(listOf(
+															stmt("ret = dress(SInstanceOfExpr.make(ret, type));").build()
 													))
 											),
 											sequence(
-													terminal("SLASH"),
+													lookAhead(
+															nonTerminal("op", "BinaryOperator", listOf(
+																	expr("minPrecedence").build()
+															))
+													),
+													nonTerminal("op", "BinaryOperator", listOf(
+															expr("minPrecedence").build()
+													)),
 													action(listOf(
-															stmt("op = BinaryOp.Divide;").build()
-													))
-											),
-											sequence(
-													terminal("REM"),
+															stmt("int oldPrecedence = minPrecedence;").build(),
+															stmt("minPrecedence = precedenceFor(op) + (leftAssociative(op) ? 1 : 0);").build()
+													)),
+													nonTerminal("rhs", "BinaryExpression", listOf(
+															expr("minPrecedence").build()
+													)),
 													action(listOf(
-															stmt("op = BinaryOp.Remainder;").build()
+															stmt("minPrecedence = oldPrecedence;").build()
+													)),
+													action(listOf(
+															stmt("ret = dress(SBinaryExpr.make(ret, op, rhs));").build()
 													))
 											)
+									)
+							),
+							action(listOf(
+									stmt("return ret;").build()
+							))
+					)
+			),
+			production("BinaryOperator", type("BinaryOp").build(),
+					listOf(
+							param("int minPrecedence").build()
+					),
+					emptyList(),
+					listOf(
+							stmt("BinaryOp ret;").build()
+					),
+					sequence(
+							choice(
+									sequence(
+											lookAhead(expr("precedenceFor(BinaryOp.Or) >= minPrecedence").build(), terminal("SC_OR")),
+											terminal("SC_OR"),
+											action(listOf(
+													stmt("ret = BinaryOp.Or;").build()
+											))
 									),
-									nonTerminal("right", "UnaryExpression"),
-									action(listOf(
-											stmt("ret = dress(SBinaryExpr.make(ret, op, right));").build()
-									))
+									sequence(
+											lookAhead(expr("precedenceFor(BinaryOp.Plus) >= minPrecedence").build(), terminal("SC_AND")),
+											terminal("SC_AND"),
+											action(listOf(
+													stmt("ret = BinaryOp.And;").build()
+											))
+									),
+									sequence(
+											lookAhead(expr("precedenceFor(BinaryOp.Plus) >= minPrecedence").build(), terminal("BIT_OR")),
+											terminal("BIT_OR"),
+											action(listOf(
+													stmt("ret = BinaryOp.BinOr;").build()
+											))
+									),
+									sequence(
+											lookAhead(expr("precedenceFor(BinaryOp.BinAnd) >= minPrecedence").build(), terminal("BIT_AND")),
+											terminal("BIT_AND"),
+											action(listOf(
+													stmt("ret = BinaryOp.BinAnd;").build()
+											))
+									),
+									sequence(
+											lookAhead(expr("precedenceFor(BinaryOp.XOr) >= minPrecedence").build(), terminal("XOR")),
+											terminal("XOR"),
+											action(listOf(
+													stmt("ret = BinaryOp.XOr;").build()
+											))
+									),
+									sequence(
+											lookAhead(expr("precedenceFor(BinaryOp.Equal) >= minPrecedence").build(), terminal("EQ")),
+											terminal("EQ"),
+											action(listOf(
+													stmt("ret = BinaryOp.Equal;").build()
+											))
+									),
+									sequence(
+											lookAhead(expr("precedenceFor(BinaryOp.NotEqual) >= minPrecedence").build(), terminal("NE")),
+											terminal("NE"),
+											action(listOf(
+													stmt("ret = BinaryOp.NotEqual;").build()
+											))
+									),
+									sequence(
+											lookAhead(expr("precedenceFor(BinaryOp.Less) >= minPrecedence").build(), terminal("LT")),
+											terminal("LT"),
+											action(listOf(
+													stmt("ret = BinaryOp.Less;").build()
+											))
+									),
+									sequence(
+											lookAhead(expr("precedenceFor(BinaryOp.RightUnsignedShift) >= minPrecedence").build(), terminal("GT"), terminal("GT"), terminal("GT")),
+											terminal("GT"), terminal("GT"), terminal("GT"),
+											action(listOf(
+													stmt("popNewWhitespaces(2);").build(),
+													stmt("ret = BinaryOp.RightUnsignedShift;").build()
+											))
+									),
+									sequence(
+											lookAhead(expr("precedenceFor(BinaryOp.RightSignedShift) >= minPrecedence").build(), terminal("GT"), terminal("GT")),
+											terminal("GT"), terminal("GT"),
+											action(listOf(
+													stmt("popNewWhitespaces(1);").build(),
+													stmt("ret = BinaryOp.RightSignedShift;").build()
+											))
+									),
+									sequence(
+											lookAhead(expr("precedenceFor(BinaryOp.Greater) >= minPrecedence").build(), terminal("GT")),
+											terminal("GT"),
+											action(listOf(
+													stmt("ret = BinaryOp.Greater;").build()
+											))
+									),
+									sequence(
+											lookAhead(expr("precedenceFor(BinaryOp.LessOrEqual) >= minPrecedence").build(), terminal("LE")),
+											terminal("LE"),
+											action(listOf(
+													stmt("ret = BinaryOp.LessOrEqual;").build()
+											))
+									),
+									sequence(
+											lookAhead(expr("precedenceFor(BinaryOp.GreaterOrEqual) >= minPrecedence").build(), terminal("GE")),
+											terminal("GE"),
+											action(listOf(
+													stmt("ret = BinaryOp.GreaterOrEqual;").build()
+											))
+									),
+									sequence(
+											lookAhead(expr("precedenceFor(BinaryOp.LeftShift) >= minPrecedence").build(), terminal("LSHIFT")),
+											terminal("LSHIFT"),
+											action(listOf(
+													stmt("ret = BinaryOp.LeftShift;").build()
+											))
+									),
+									sequence(
+											lookAhead(expr("precedenceFor(BinaryOp.Plus) >= minPrecedence").build(), terminal("PLUS")),
+											terminal("PLUS"),
+											action(listOf(
+													stmt("ret = BinaryOp.Plus;").build()
+											))
+									),
+									sequence(
+											lookAhead(expr("precedenceFor(BinaryOp.Minus) >= minPrecedence").build(), terminal("MINUS")),
+											terminal("MINUS"),
+											action(listOf(
+													stmt("ret = BinaryOp.Minus;").build()
+											))
+									),
+									sequence(
+											lookAhead(expr("precedenceFor(BinaryOp.Times) >= minPrecedence").build(), terminal("STAR")),
+											terminal("STAR"),
+											action(listOf(
+													stmt("ret = BinaryOp.Times;").build()
+											))
+									),
+									sequence(
+											lookAhead(expr("precedenceFor(BinaryOp.Divide) >= minPrecedence").build(), terminal("SLASH")),
+											terminal("SLASH"),
+											action(listOf(
+													stmt("ret = BinaryOp.Divide;").build()
+											))
+									),
+									sequence(
+											lookAhead(expr("precedenceFor(BinaryOp.Remainder) >= minPrecedence").build(), terminal("REM")),
+											terminal("REM"),
+											action(listOf(
+													stmt("ret = BinaryOp.Remainder;").build()
+											))
+									)
 							),
 							action(listOf(
 									stmt("return ret;").build()
@@ -4355,31 +4207,6 @@ public class Grammar {
 							))
 					)
 			),
-			production("RUNSIGNEDSHIFT", null,
-					emptyList(),
-					emptyList(),
-					emptyList(),
-					sequence(
-							terminal("GT"),
-							terminal("GT"),
-							terminal("GT"),
-							action(listOf(
-									stmt("popNewWhitespaces(2);").build()
-							))
-					)
-			),
-			production("RSIGNEDSHIFT", null,
-					emptyList(),
-					emptyList(),
-					emptyList(),
-					sequence(
-							terminal("GT"),
-							terminal("GT"),
-							action(listOf(
-									stmt("popNewWhitespaces(1);").build()
-							))
-					)
-			),
 			production("Annotations", type("BUTree<SNodeList>").build(),
 					emptyList(),
 					emptyList(),
@@ -4607,4 +4434,42 @@ public class Grammar {
 					)
 			)
 	);
+
+	static int precedenceFor(String op) {
+		switch (op) {
+			case "SC_OR":
+				return 12;
+			case "SC_AND":
+				return 11;
+			case "BIT_OR":
+				return 10;
+			case "XOR":
+				return 9;
+			case "BIT_AND":
+				return 8;
+			case "EQ":
+			case "NE":
+				return 7;
+			case "INSTANCEOF":
+				return 6;
+			case "LT":
+			case "GT":
+			case "LE":
+			case "GE":
+				return 5;
+			case "LSHIFT":
+			case "RSIGNEDSHIFT":
+			case "RUNSIGNEDSHIFT":
+				return 4;
+			case "PLUS":
+			case "MINUS":
+				return 3;
+			case "STAR":
+			case "SLASH":
+			case "REM":
+				return 2;
+			default:
+				return -1;
+		}
+	}
 }
