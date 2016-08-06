@@ -4360,9 +4360,6 @@ public class Grammar {
 					emptyList(),
 					emptyList(),
 					sequence(
-							lookAhead(
-									expr("getToken(1).kind == TokenType.GT && getToken(1).realKind == TokenType.RUNSIGNEDSHIFT").build()
-							),
 							terminal("GT"),
 							terminal("GT"),
 							terminal("GT"),
@@ -4376,9 +4373,6 @@ public class Grammar {
 					emptyList(),
 					emptyList(),
 					sequence(
-							lookAhead(
-									expr("getToken(1).kind == TokenType.GT && getToken(1).realKind == TokenType.RSIGNEDSHIFT").build()
-							),
 							terminal("GT"),
 							terminal("GT"),
 							action(listOf(
