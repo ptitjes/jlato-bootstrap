@@ -99,11 +99,11 @@ public class TreeConstruction implements DeclContribution<TreeClassDescriptor, M
 									.withScope(arg.stateTypeName())
 									.withArgs(parameters.map(p -> {
 										Type treeType = p.type();
-										if (propertyFieldType(treeType)) return p.id().name();
+										if (propertyFieldType(treeType)) return p.id().get().name();
 										else return methodInvocationExpr(name("treeOf"))
 												.withScope(AllDescriptors.TD_TREE)
 												.withTypeArgs(listOf(treeTypeToStateType((QualifiedType) treeType)))
-												.withArgs(listOf(p.id().name()));
+												.withArgs(listOf(p.id().get().name()));
 									}))
 					));
 
@@ -122,7 +122,7 @@ public class TreeConstruction implements DeclContribution<TreeClassDescriptor, M
 				decl = decl.withDocComment(
 						genDoc(decl,
 								"Creates " + arg.prefixedDescription() + " with the specified child trees.",
-								paramDoc(parameters, p -> "the " + makeDocumentationName(p.id().name()) + " child tree.")
+								paramDoc(parameters, p -> "the " + makeDocumentationName(p.id().get().name()) + " child tree.")
 						)
 				);
 			}

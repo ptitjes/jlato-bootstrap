@@ -49,21 +49,21 @@ public class TreesAccessorsTest extends TestPattern {
 		stmts = stmts.append(newVarStmt(ARBITRARY_TYPE, ARBITRARY_VAR, objectCreationExpr(ARBITRARY_TYPE).withArgs(listOf(name("true")))));
 
 		loopStmts = loopStmts.appendAll(
-				params.map(p -> newVarStmt(p.type(), p.id().name(), arbitraryCall(ARBITRARY_VAR, p.type())))
+				params.map(p -> newVarStmt(p.type(), p.id().get().name(), arbitraryCall(ARBITRARY_VAR, p.type())))
 		);
 
 		// Using factory methods without argument
 		loopStmts = loopStmts.append(newVarStmt(descriptor.interfaceType(), tested,
 				params.foldLeft(factoryCall(descriptor, importManager),
 						(e, p) -> methodInvocationExpr(name(propertySetterName(p)))
-								.withScope(e/*.insertNewLineAfter()*/).withArgs(listOf(p.id().name()))
+								.withScope(e/*.insertNewLineAfter()*/).withArgs(listOf(p.id().get().name()))
 				)
 		).insertNewLineBefore().insertLeadingComment("Use factory method without argument"));
 
 		loopStmts = loopStmts.appendAll(params.map(p ->
 				junitAssert("assertEquals",
-						p.id().name(),
-						methodInvocationExpr(p.id().name()).withScope(tested)
+						p.id().get().name(),
+						methodInvocationExpr(p.id().get().name()).withScope(tested)
 				)
 		));
 
@@ -73,17 +73,17 @@ public class TreesAccessorsTest extends TestPattern {
 					params.filter(p -> descriptor.hasKnownValueFor(p)).foldLeft(
 							factoryCall(descriptor, importManager).withArgs(
 									params.filter(p -> !descriptor.hasKnownValueFor(p))
-											.map(p -> p.id().name())
+											.map(p -> p.id().get().name())
 							),
 							(e, p) -> methodInvocationExpr(name(propertySetterName(p)))
-									.withScope(e/*.insertNewLineAfter()*/).withArgs(listOf(p.id().name()))
+									.withScope(e/*.insertNewLineAfter()*/).withArgs(listOf(p.id().get().name()))
 					)
 			).insertNewLineBefore().insertLeadingComment("Use factory method with arguments"));
 
 			loopStmts = loopStmts.appendAll(params.map(p ->
 					junitAssert("assertEquals",
-							p.id().name(),
-							methodInvocationExpr(p.id().name()).withScope(tested)
+							p.id().get().name(),
+							methodInvocationExpr(p.id().get().name()).withScope(tested)
 					)
 			));
 		}
@@ -95,15 +95,15 @@ public class TreesAccessorsTest extends TestPattern {
 					nameParameters.foldLeft((Expr) tested,
 							(e, p) -> methodInvocationExpr(name(propertySetterName(p)))
 									.withScope(e).withArgs(listOf(
-											methodInvocationExpr(name("id")).withScope(p.id().name())
+											methodInvocationExpr(name("id")).withScope(p.id().get().name())
 									))
 					)
 			).insertNewLineBefore().insertLeadingComment("Use specialized name mutators"));
 
 			loopStmts = loopStmts.appendAll(nameParameters.map(p ->
 					junitAssert("assertEquals",
-							p.id().name(),
-							methodInvocationExpr(p.id().name()).withScope(tested)
+							p.id().get().name(),
+							methodInvocationExpr(p.id().get().name()).withScope(tested)
 					)
 			));
 		}
@@ -115,15 +115,15 @@ public class TreesAccessorsTest extends TestPattern {
 					optionParameters.foldLeft((Expr) tested,
 							(e, p) -> methodInvocationExpr(name(propertySetterName(p)))
 									.withScope(e).withArgs(listOf(
-											methodInvocationExpr(name("get")).withScope(p.id().name())
+											methodInvocationExpr(name("get")).withScope(p.id().get().name())
 									))
 					)
 			).insertNewLineBefore().insertLeadingComment("Use specialized NodeOption.some() mutators"));
 
 			loopStmts = loopStmts.appendAll(optionParameters.map(p ->
 					junitAssert("assertEquals",
-							p.id().name(),
-							methodInvocationExpr(p.id().name()).withScope(tested)
+							p.id().get().name(),
+							methodInvocationExpr(p.id().get().name()).withScope(tested)
 					)
 			));
 
@@ -137,7 +137,7 @@ public class TreesAccessorsTest extends TestPattern {
 			loopStmts = loopStmts.appendAll(optionParameters.map(p ->
 					junitAssert("assertEquals",
 							Quotes.expr("Trees.<" + firstTypeArg(p) + ">none()").build(),
-							methodInvocationExpr(p.id().name()).withScope(tested)
+							methodInvocationExpr(p.id().get().name()).withScope(tested)
 					)
 			));
 		}
@@ -146,18 +146,18 @@ public class TreesAccessorsTest extends TestPattern {
 			NodeList<FormalParameter> optionParameters = params.filter(p -> eitherFieldType(p.type()));
 
 			loopStmts = loopStmts.appendAll(optionParameters.map(p ->
-					ifStmt(methodInvocationExpr(name("isLeft")).withScope(p.id().name()),
+					ifStmt(methodInvocationExpr(name("isLeft")).withScope(p.id().get().name()),
 							assignVarStmt(descriptor.interfaceType(), tested,
 									methodInvocationExpr(name(propertySetterName(p)))
 											.withScope(tested).withArgs(listOf(
-											methodInvocationExpr(name("left")).withScope(p.id().name())
+											methodInvocationExpr(name("left")).withScope(p.id().get().name())
 									))
 							)
 					).withElseStmt(
 							assignVarStmt(descriptor.interfaceType(), tested,
 									methodInvocationExpr(name(propertySetterName(p)))
 											.withScope(tested).withArgs(listOf(
-											methodInvocationExpr(name("right")).withScope(p.id().name())
+											methodInvocationExpr(name("right")).withScope(p.id().get().name())
 									))
 							)
 					).insertNewLineBefore().insertLeadingComment("Use specialized NodeEither mutators")
@@ -166,8 +166,8 @@ public class TreesAccessorsTest extends TestPattern {
 
 			loopStmts = loopStmts.appendAll(optionParameters.map(p ->
 					junitAssert("assertEquals",
-							p.id().name(),
-							methodInvocationExpr(p.id().name()).withScope(tested)
+							p.id().get().name(),
+							methodInvocationExpr(p.id().get().name()).withScope(tested)
 					)
 			));
 		}

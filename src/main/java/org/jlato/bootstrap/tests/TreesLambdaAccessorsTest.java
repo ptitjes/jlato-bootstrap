@@ -89,36 +89,36 @@ public class TreesLambdaAccessorsTest extends TestPattern {
 
 		stmts = stmts.append(newVarStmt(ARBITRARY_TYPE, ARBITRARY_VAR, objectCreationExpr(ARBITRARY_TYPE)));
 
-		loopStmts = loopStmts.appendAll(params.map(p -> newVarStmt(p.type(), p.id().name(), Utils.arbitraryCall(ARBITRARY_VAR, p.type()))));
+		loopStmts = loopStmts.appendAll(params.map(p -> newVarStmt(p.type(), p.id().get().name(), Utils.arbitraryCall(ARBITRARY_VAR, p.type()))));
 		loopStmts = loopStmts.append(newVarStmt(descriptor.interfaceType(), tested,
 				params.foldLeft(factoryCall(descriptor, importManager),
-						(e, p) -> methodInvocationExpr(name(propertySetterName(p.id().name().id(), p.type())))
-								.withScope(e).withArgs(listOf(p.id().name()))
+						(e, p) -> methodInvocationExpr(name(propertySetterName(p.id().get().name().id(), p.type())))
+								.withScope(e).withArgs(listOf(p.id().get().name()))
 				)
 		));
 
-		loopStmts = loopStmts.appendAll(params.map(p -> junitAssert("assertEquals", p.id().name(),
-						methodInvocationExpr(p.id().name()).withScope(tested))
+		loopStmts = loopStmts.appendAll(params.map(p -> junitAssert("assertEquals", p.id().get().name(),
+						methodInvocationExpr(p.id().get().name()).withScope(tested))
 		));
 
-		loopStmts = loopStmts.appendAll(params.map(p -> newVarStmt(p.type(), p.id().name().withId(s -> s + "2"), Utils.arbitraryCall(ARBITRARY_VAR, p.type()))));
+		loopStmts = loopStmts.appendAll(params.map(p -> newVarStmt(p.type(), p.id().get().name().withId(s -> s + "2"), Utils.arbitraryCall(ARBITRARY_VAR, p.type()))));
 		loopStmts = loopStmts.append(newVarStmt(descriptor.interfaceType(), tested.withId(s -> s + "2"),
 				params.<Expr>foldLeft(tested,
-						(e, p) -> methodInvocationExpr(name(propertySetterName(p.id().name().id(), p.type())))
+						(e, p) -> methodInvocationExpr(name(propertySetterName(p.id().get().name().id(), p.type())))
 								.withScope(e).withArgs(listOf(
 										methodInvocationExpr(name("mutationBy"))
 												.withArgs(listOf(
-														p.id().name(),
-														p.id().name().withId(s -> s + "2")
+														p.id().get().name(),
+														p.id().get().name().withId(s -> s + "2")
 												))
 								))
 				)
 		));
 
 		loopStmts = loopStmts.appendAll(params.map(p -> {
-					Expr expected = p.id().name().withId(s -> s + "2");
+					Expr expected = p.id().get().name().withId(s -> s + "2");
 					return junitAssert("assertEquals", expected,
-							methodInvocationExpr(p.id().name()).withScope(tested.withId(s -> s + "2"))
+							methodInvocationExpr(p.id().get().name()).withScope(tested.withId(s -> s + "2"))
 					);
 				}
 		));

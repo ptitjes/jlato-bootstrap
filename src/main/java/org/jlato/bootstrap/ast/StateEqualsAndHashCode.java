@@ -68,7 +68,7 @@ public class StateEqualsAndHashCode implements DeclContribution<TreeClassDescrip
 				final Name state = name("state");
 
 				stmts = stmts.appendAll(params.map(p -> {
-					final Name thisField = p.id().name();
+					final Name thisField = p.id().get().name();
 					final FieldAccessExpr otherField = fieldAccessExpr(thisField).withScope(state);
 
 					Expr equalTest = p.type() instanceof PrimitiveType ?
@@ -117,7 +117,7 @@ public class StateEqualsAndHashCode implements DeclContribution<TreeClassDescrip
 
 			for (FormalParameter param : arg.parameters) {
 				final Type type = param.type();
-				final Name thisField = param.id().name();
+				final Name thisField = param.id().get().name();
 
 				Expr hashExpr = null;
 				if (type instanceof PrimitiveType) {
