@@ -58,7 +58,7 @@ public class TreePureInterfaceAccessors implements DeclContribution<TreeTypeDesc
 
 		@Override
 		protected String makeQuote(TreeTypeDescriptor arg) {
-			return param.type() + " " + param.id().name() + "();";
+			return param.type() + " " + param.id().get().name() + "();";
 		}
 
 		@Override

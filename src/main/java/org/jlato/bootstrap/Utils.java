@@ -51,7 +51,7 @@ public class Utils {
 	}
 
 	public static String constantName(FormalParameter parameter) {
-		return constantName(parameter.id().name().id(), parameter.type());
+		return constantName(parameter.id().get().name().id(), parameter.type());
 	}
 
 	public static String constantName(String propertyName, Type propertyType) {
@@ -67,11 +67,11 @@ public class Utils {
 	}
 
 	public static String propertySetterName(FormalParameter parameter) {
-		return propertySetterName(parameter.id().name().id(), parameter.type());
+		return propertySetterName(parameter.id().get().name().id(), parameter.type());
 	}
 
 	public static String propertySetterName(FormalParameter parameter, String modifier) {
-		return propertySetterName(parameter.id().name().id(), parameter.type(), modifier);
+		return propertySetterName(parameter.id().get().name().id(), parameter.type(), modifier);
 	}
 
 	public static String propertySetterName(String propertyName, Type propertyType) {
@@ -131,7 +131,7 @@ public class Utils {
 
 			Type stateParamType = treeTypeToSTreeType(treeType);
 			stateConstructorParams = stateConstructorParams.append(
-					formalParameter(stateParamType, param.id())
+					formalParameter(stateParamType, param.id().get())
 			);
 		}
 		return stateConstructorParams;
@@ -301,14 +301,14 @@ public class Utils {
 	private static void appendParamsDoc(NodeList<FormalParameter> parameters, String[] paramDescription, StringBuilder builder) {
 		int maxNameLength = 0;
 		for (FormalParameter param : parameters) {
-			Name name = param.id().name();
+			Name name = param.id().get().name();
 			int length = name.id().length();
 			maxNameLength = Math.max(maxNameLength, length);
 		}
 
 		int index = 0;
 		for (FormalParameter param : parameters) {
-			Name name = param.id().name();
+			Name name = param.id().get().name();
 			builder.append("@param ").append(name);
 			for (int i = 0; i < maxNameLength - name.id().length(); i++) {
 				builder.append(' ');
@@ -496,15 +496,15 @@ public class Utils {
 		if (type instanceof PrimitiveType &&
 				((PrimitiveType) type).primitive() == Primitive.Boolean) {
 			return genDoc(decl,
-					"Tests whether this " + arg.description + " " + makeDocumentationName(param.id().name()) + ".",
+					"Tests whether this " + arg.description + " " + makeDocumentationName(param.id().get().name()) + ".",
 					new String[]{},
-					"<code>true</code> if this " + arg.description + " " + makeDocumentationName(param.id().name()) + ", <code>false</code> otherwise."
+					"<code>true</code> if this " + arg.description + " " + makeDocumentationName(param.id().get().name()) + ", <code>false</code> otherwise."
 			);
 		} else {
 			return genDoc(decl,
-					"Returns the " + makeDocumentationName(param.id().name()) + " of this " + arg.description + ".",
+					"Returns the " + makeDocumentationName(param.id().get().name()) + " of this " + arg.description + ".",
 					new String[]{},
-					"the " + makeDocumentationName(param.id().name()) + " of this " + arg.description + "."
+					"the " + makeDocumentationName(param.id().get().name()) + " of this " + arg.description + "."
 			);
 		}
 	}
@@ -514,14 +514,14 @@ public class Utils {
 		if (type instanceof PrimitiveType &&
 				((PrimitiveType) type).primitive() == Primitive.Boolean) {
 			return genDoc(decl,
-					"Sets whether this " + arg.description + " " + makeDocumentationName(param.id().name()) + ".",
-					new String[]{"<code>true</code> if this " + arg.description + " " + makeDocumentationName(param.id().name()) + ", <code>false</code> otherwise."},
+					"Sets whether this " + arg.description + " " + makeDocumentationName(param.id().get().name()) + ".",
+					new String[]{"<code>true</code> if this " + arg.description + " " + makeDocumentationName(param.id().get().name()) + ", <code>false</code> otherwise."},
 					"the resulting mutated " + arg.description + "."
 			);
 		} else {
 			return genDoc(decl,
-					"Replaces the " + makeDocumentationName(param.id().name()) + " of this " + arg.description + ".",
-					new String[]{"the replacement for the " + makeDocumentationName(param.id().name()) + " of this " + arg.description + "."},
+					"Replaces the " + makeDocumentationName(param.id().get().name()) + " of this " + arg.description + ".",
+					new String[]{"the replacement for the " + makeDocumentationName(param.id().get().name()) + " of this " + arg.description + "."},
 					"the resulting mutated " + arg.description + "."
 			);
 		}
@@ -532,14 +532,14 @@ public class Utils {
 		if (type instanceof PrimitiveType &&
 				((PrimitiveType) type).primitive() == Primitive.Boolean) {
 			return genDoc(decl,
-					"Mutates whether this " + arg.description + " " + makeDocumentationName(param.id().name()) + ".",
-					new String[]{"the mutation to apply to whether this " + arg.description + " " + makeDocumentationName(param.id().name()) + "."},
+					"Mutates whether this " + arg.description + " " + makeDocumentationName(param.id().get().name()) + ".",
+					new String[]{"the mutation to apply to whether this " + arg.description + " " + makeDocumentationName(param.id().get().name()) + "."},
 					"the resulting mutated " + arg.description + "."
 			);
 		} else {
 			return genDoc(decl,
-					"Mutates the " + makeDocumentationName(param.id().name()) + " of this " + arg.description + ".",
-					new String[]{"the mutation to apply to the " + makeDocumentationName(param.id().name()) + " of this " + arg.description + "."},
+					"Mutates the " + makeDocumentationName(param.id().get().name()) + " of this " + arg.description + ".",
+					new String[]{"the mutation to apply to the " + makeDocumentationName(param.id().get().name()) + " of this " + arg.description + "."},
 					"the resulting mutated " + arg.description + "."
 			);
 		}

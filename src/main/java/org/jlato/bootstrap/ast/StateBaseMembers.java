@@ -96,7 +96,7 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 			// Make BUTree creation expression from STrees
 			final ObjectCreationExpr sTreeCreationExpr = objectCreationExpr(treeType)
 					.withArgs(listOf(
-							objectCreationExpr(stateType).withArgs(parameters.map(p -> p.id().name()))
+							objectCreationExpr(stateType).withArgs(parameters.map(p -> p.id().get().name()))
 					));
 
 			// Add BUTree factory method
@@ -112,7 +112,7 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 		protected String makeDoc(MethodDecl decl, TreeClassDescriptor arg) {
 			return genDoc(decl,
 					"Creates a <code>BUTree</code> with a new " + arg.description + ".",
-					paramDoc(arg.parameters, p -> "the " + makeDocumentationName(p.id().name()) + " child <code>BUTree</code>."),
+					paramDoc(arg.parameters, p -> "the " + makeDocumentationName(p.id().get().name()) + " child <code>BUTree</code>."),
 					"the new <code>BUTree</code> with " + arg.prefixedDescription() + "."
 			);
 		}
@@ -132,7 +132,7 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 					.withParams(stateParameters)
 					.withBody(blockStmt().withStmts(
 							stateParameters.map(p -> expressionStmt(
-									assignExpr(fieldAccessExpr(p.id().name()).withScope(thisExpr()), Normal, p.id().name())
+									assignExpr(fieldAccessExpr(p.id().get().name()).withScope(thisExpr()), Normal, p.id().get().name())
 							))
 					));
 		}
@@ -141,7 +141,7 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 		protected String makeDoc(ConstructorDecl decl, TreeClassDescriptor arg) {
 			return genDoc(decl,
 					"Constructs " + arg.prefixedDescription() + " state.",
-					paramDoc(arg.parameters, p -> "the " + makeDocumentationName(p.id().name()) + " child <code>BUTree</code>.")
+					paramDoc(arg.parameters, p -> "the " + makeDocumentationName(p.id().get().name()) + " child <code>BUTree</code>.")
 			);
 		}
 	}
@@ -316,7 +316,7 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 
 		@Override
 		protected String makeQuote(TreeClassDescriptor arg) {
-			return "public final " + treeTypeToSTreeType(param.type()) + " " + param.id().name() + ";";
+			return "public final " + treeTypeToSTreeType(param.type()) + " " + param.id().get().name() + ";";
 		}
 
 		@Override
@@ -340,7 +340,7 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 		@Override
 		protected String makeDoc(FieldDecl decl, TreeClassDescriptor arg) {
 			return genDoc(decl,
-					"The " + makeDocumentationName(param.id().name()) + " of this " + arg.description + " state."
+					"The " + makeDocumentationName(param.id().get().name()) + " of this " + arg.description + " state."
 			);
 		}
 	}
@@ -355,22 +355,22 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 
 		@Override
 		protected String makeQuote(TreeClassDescriptor arg) {
-			return "public " + treeTypeToSTreeType(param.type()) + " " + param.id().name() + "() { ..$_ }";
+			return "public " + treeTypeToSTreeType(param.type()) + " " + param.id().get().name() + "() { ..$_ }";
 		}
 
 		@Override
 		protected MethodDecl makeDecl(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
 			return decl.withBody(blockStmt().withStmts(listOf(
-					returnStmt().withExpr(param.id().name())
+					returnStmt().withExpr(param.id().get().name())
 			)));
 		}
 
 		@Override
 		protected String makeDoc(MethodDecl decl, TreeClassDescriptor arg) {
 			return genDoc(decl,
-					"Returns the " + makeDocumentationName(param.id().name()) + " of this " + arg.description + " state.",
+					"Returns the " + makeDocumentationName(param.id().get().name()) + " of this " + arg.description + " state.",
 					new String[]{},
-					"the " + makeDocumentationName(param.id().name()) + " of this " + arg.description + " state."
+					"the " + makeDocumentationName(param.id().get().name()) + " of this " + arg.description + " state."
 			);
 		}
 	}
@@ -385,13 +385,13 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 
 		@Override
 		protected String makeQuote(TreeClassDescriptor arg) {
-			return "public " + arg.stateType() + " " + propertySetterName(param) + "(" + treeTypeToSTreeType(param.type()) + " " + param.id().name() + ") { ..$_ }";
+			return "public " + arg.stateType() + " " + propertySetterName(param) + "(" + treeTypeToSTreeType(param.type()) + " " + param.id().get().name() + ") { ..$_ }";
 		}
 
 		@Override
 		protected MethodDecl makeDecl(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
 			final ObjectCreationExpr stateCreationExpr = objectCreationExpr(arg.stateType())
-					.withArgs(arg.parameters.map(p -> p.id().name()));
+					.withArgs(arg.parameters.map(p -> p.id().get().name()));
 
 			return decl.withBody(blockStmt().withStmts(listOf(
 					returnStmt().withExpr(stateCreationExpr)
@@ -401,8 +401,8 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 		@Override
 		protected String makeDoc(MethodDecl decl, TreeClassDescriptor arg) {
 			return genDoc(decl,
-					"Replaces the " + makeDocumentationName(param.id().name()) + " of this " + arg.description + " state.",
-					new String[]{"the replacement for the " + makeDocumentationName(param.id().name()) + " of this " + arg.description + " state."},
+					"Replaces the " + makeDocumentationName(param.id().get().name()) + " of this " + arg.description + " state.",
+					new String[]{"the replacement for the " + makeDocumentationName(param.id().get().name()) + " of this " + arg.description + " state."},
 					"the resulting mutated " + arg.description + " state."
 			);
 		}

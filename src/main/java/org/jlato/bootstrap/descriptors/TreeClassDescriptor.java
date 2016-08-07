@@ -70,7 +70,7 @@ public class TreeClassDescriptor extends TreeTypeDescriptor {
 		int index = 0;
 		for (FormalParameter parameter : stateParameters) {
 			// TODO Do that well...
-			paramDescriptions[index] = parameter.id().name().id();
+			paramDescriptions[index] = parameter.id().get().name().id();
 			index++;
 		}
 		return paramDescriptions;

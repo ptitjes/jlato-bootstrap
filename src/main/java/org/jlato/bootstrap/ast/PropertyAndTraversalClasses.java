@@ -78,7 +78,7 @@ public class PropertyAndTraversalClasses extends Utils implements DeclContributi
 			AllDescriptors.addImports(importManager, param.type());
 
 			Type treeType = param.type();
-			String traversalName = param.id().name().id();
+			String traversalName = param.id().get().name().id();
 			String constantName = constantName(traversalName, treeType);
 
 			final QualifiedType stateType = arg.stateType();
@@ -170,7 +170,7 @@ public class PropertyAndTraversalClasses extends Utils implements DeclContributi
 			importManager.addImportByName(qualifiedName("org.jlato.internal.bu.STypeSafeProperty"));
 
 			Type treeType = param.type();
-			String traversalName = param.id().name().id();
+			String traversalName = param.id().get().name().id();
 			String constantName = constantName(traversalName, treeType);
 
 			final QualifiedType stateType = arg.stateType();
@@ -192,7 +192,7 @@ public class PropertyAndTraversalClasses extends Utils implements DeclContributi
 					.withParams(listOf(typedStateParam))
 					.withBody(blockStmt().withStmts(listOf(
 							returnStmt().withExpr(
-									fieldAccessExpr(param.id().name()).withScope(stateParamName)
+									fieldAccessExpr(param.id().get().name()).withScope(stateParamName)
 							)
 					)));
 

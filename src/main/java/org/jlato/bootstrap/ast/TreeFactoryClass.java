@@ -169,7 +169,7 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 					default:
 						if (noNulls) {
 							params = params.append(param);
-							args = args.append(param.id().name());
+							args = args.append(param.id().get().name());
 						} else {
 							args = args.append(expr((castNeeded ? "(" + param.type() + ") " : "") + "null").build());
 						}
@@ -201,7 +201,7 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 			method = method.withDocComment(
 					genDoc(method,
 							"Creates " + descriptor.prefixedDescription() + ".",
-							paramDoc(params, p -> "the " + makeDocumentationName(p.id().name()) + " child tree."),
+							paramDoc(params, p -> "the " + makeDocumentationName(p.id().get().name()) + " child tree."),
 							"the new " + descriptor.description + " instance."
 					)
 			);
