@@ -112,14 +112,14 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				break;
 			case ZeroOrOne: {
 				stmts = stmts.append(ifStmt(
-						matchCondition(symbol, expansion, hintParams, hintParams.map(p -> p.id().name())),
+						matchCondition(symbol, expansion, hintParams, hintParams.map(p -> p.id().get().name())),
 						blockStmt().withStmts(parseStatementsForChildren(symbol, expansion, hintParams))
 				));
 				break;
 			}
 			case ZeroOrMore: {
 				stmts = stmts.append(whileStmt(
-						matchCondition(symbol, expansion, hintParams, hintParams.map(p -> p.id().name())),
+						matchCondition(symbol, expansion, hintParams, hintParams.map(p -> p.id().get().name())),
 						blockStmt().withStmts(parseStatementsForChildren(symbol, expansion, hintParams))
 				));
 				break;
@@ -127,14 +127,14 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 			case OneOrMore: {
 				stmts = stmts.append(doStmt(
 						blockStmt().withStmts(parseStatementsForChildren(symbol, expansion, hintParams)),
-						matchCondition(symbol, expansion, hintParams, hintParams.map(p -> p.id().name()))
+						matchCondition(symbol, expansion, hintParams, hintParams.map(p -> p.id().get().name()))
 				));
 				break;
 			}
 			case Choice: {
 				List<IfStmt> expansionsIfStmt = expansion.children.stream()
 						.map(e -> ifStmt(
-								matchCondition(symbol, e, hintParams, hintParams.map(p -> p.id().name())),
+								matchCondition(symbol, e, hintParams, hintParams.map(p -> p.id().get().name())),
 								blockStmt().withStmts(parseStatementsFor(symbol, e, hintParams))
 						))
 						.collect(Collectors.toList());
@@ -198,6 +198,8 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				if (semanticLookaheadCondition != null) {
 					if (semanticLookaheadCondition.equals(methodInvocationExpr(name("isLambda")))) {
 						semanticLookaheadCondition = methodInvocationExpr(name("isLambda")).withArgs(listOf(literalExpr(0)));
+					} else if (semanticLookaheadCondition.equals(methodInvocationExpr(name("isCast")))) {
+						semanticLookaheadCondition = methodInvocationExpr(name("isCast")).withArgs(listOf(literalExpr(0)));
 					}
 					lookaheadCondition = semanticLookaheadCondition;
 				}
@@ -278,6 +280,8 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				if (semanticLookahead != null) {
 					if (semanticLookahead.equals(methodInvocationExpr(name("isLambda")))) {
 						semanticLookahead = methodInvocationExpr(name("isLambda")).withArgs(listOf(outerLookahead));
+					} else if (semanticLookahead.equals(methodInvocationExpr(name("isCast")))) {
+						semanticLookahead = methodInvocationExpr(name("isCast")).withArgs(listOf(outerLookahead));
 					}
 					return conditionalExpr(semanticLookahead, outerLookahead, FAILED_LOOKAHEAD);
 				}
@@ -286,7 +290,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				NodeList<Stmt> stmts = emptyList();
 				int count = 0;
 				for (GExpansion child : expansion.children) {
-					Expr childCall = createMatchMethodAndCallFor(symbol, namePrefix + "_" + ++count, child, LOOKAHEAD, params, params.map(p -> p.id().name()));
+					Expr childCall = createMatchMethodAndCallFor(symbol, namePrefix + "_" + ++count, child, LOOKAHEAD, params, params.map(p -> p.id().get().name()));
 					if (childCall == null) continue;
 					stmts = stmts.append(expressionStmt(assignExpr(LOOKAHEAD, AssignOp.Normal, childCall)));
 					stmts = stmts.append(ifStmt(binaryExpr(LOOKAHEAD, BinaryOp.Equal, FAILED_LOOKAHEAD), returnStmt().withExpr(FAILED_LOOKAHEAD)));
@@ -304,7 +308,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				)));
 				int count = 0;
 				for (GExpansion child : expansion.children) {
-					Expr childCall = createMatchMethodAndCallFor(symbol, namePrefix + "_" + ++count, child, LOOKAHEAD, params, params.map(p -> p.id().name()));
+					Expr childCall = createMatchMethodAndCallFor(symbol, namePrefix + "_" + ++count, child, LOOKAHEAD, params, params.map(p -> p.id().get().name()));
 					if (childCall == null) continue;
 					stmts = stmts.append(expressionStmt(assignExpr(LOOKAHEAD_NEW, AssignOp.Normal, childCall)));
 					stmts = stmts.append(ifStmt(binaryExpr(LOOKAHEAD_NEW, BinaryOp.NotEqual, FAILED_LOOKAHEAD), returnStmt().withExpr(LOOKAHEAD_NEW)));
@@ -321,7 +325,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 								.withVariables(listOf(variableDeclarator(variableDeclaratorId(LOOKAHEAD_NEW))))
 				)));
 
-				Expr childCall = createMatchMethodAndCallFor(symbol, namePrefix + "_" + 1, GExpansion.sequence(expansion.children), LOOKAHEAD, params, params.map(p -> p.id().name()));
+				Expr childCall = createMatchMethodAndCallFor(symbol, namePrefix + "_" + 1, GExpansion.sequence(expansion.children), LOOKAHEAD, params, params.map(p -> p.id().get().name()));
 				stmts = stmts.append(expressionStmt(assignExpr(LOOKAHEAD_NEW, AssignOp.Normal, childCall)));
 				stmts = stmts.append(ifStmt(binaryExpr(LOOKAHEAD_NEW, BinaryOp.NotEqual, FAILED_LOOKAHEAD), returnStmt().withExpr(LOOKAHEAD_NEW)));
 
@@ -337,7 +341,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 								.withVariables(listOf(variableDeclarator(variableDeclaratorId(LOOKAHEAD_NEW))))
 				)));
 
-				Expr childCall = createMatchMethodAndCallFor(symbol, namePrefix + "_" + 1, GExpansion.sequence(expansion.children), LOOKAHEAD, params, params.map(p -> p.id().name()));
+				Expr childCall = createMatchMethodAndCallFor(symbol, namePrefix + "_" + 1, GExpansion.sequence(expansion.children), LOOKAHEAD, params, params.map(p -> p.id().get().name()));
 				stmts = stmts.append(expressionStmt(assignExpr(LOOKAHEAD_NEW, AssignOp.Normal, childCall)));
 				stmts = stmts.append(whileStmt(
 						binaryExpr(LOOKAHEAD_NEW, BinaryOp.NotEqual, FAILED_LOOKAHEAD),
@@ -358,7 +362,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 								.withVariables(listOf(variableDeclarator(variableDeclaratorId(LOOKAHEAD_NEW))))
 				)));
 
-				Expr childCall = createMatchMethodAndCallFor(symbol, namePrefix + "_" + 1, GExpansion.sequence(expansion.children), LOOKAHEAD, params, params.map(p -> p.id().name()));
+				Expr childCall = createMatchMethodAndCallFor(symbol, namePrefix + "_" + 1, GExpansion.sequence(expansion.children), LOOKAHEAD, params, params.map(p -> p.id().get().name()));
 				stmts = stmts.append(expressionStmt(assignExpr(LOOKAHEAD_NEW, AssignOp.Normal, childCall)));
 				stmts = stmts.append(ifStmt(binaryExpr(LOOKAHEAD_NEW, BinaryOp.Equal, FAILED_LOOKAHEAD), returnStmt().withExpr(FAILED_LOOKAHEAD)));
 				stmts = stmts.append(whileStmt(
