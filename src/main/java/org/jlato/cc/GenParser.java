@@ -35,7 +35,7 @@ public class GenParser {
 
 	private void generateParser(GProductions productions, String rootDirectory, String implementationName) throws org.jlato.parser.ParseException, IOException {
 		final TreeClassDescriptor[] classDescriptors = AllDescriptors.ALL_CLASSES;
-		CompilationUnitPattern.of(new ParserPattern(productions))
+		CompilationUnitPattern.of(new ParserPattern(productions, implementationName))
 				.withFormatting(true, FormattingSettings.Default.withCommentFormatting(true))
 				.apply(rootDirectory, "org/jlato/internal/parser/" + implementationName + ".java", classDescriptors);
 	}

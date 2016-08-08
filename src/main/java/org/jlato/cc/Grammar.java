@@ -2750,7 +2750,7 @@ public class Grammar {
 									),
 									sequence(
 											lookAhead(
-													expr("isCast()").build()
+													nonTerminal("CastExpression")
 											),
 											nonTerminal("ret", "CastExpression")
 									),

@@ -24,21 +24,22 @@ import static org.jlato.tree.Trees.*;
  */
 public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 
-	public static final String NAME = "ParserImplementation";
 	public static final Name MATCH = name("match");
 	public static final Name LOOKAHEAD = name("lookahead");
 	public static final LiteralExpr<Integer> FAILED_LOOKAHEAD = literalExpr(-1);
 	public static final Name LOOKAHEAD_NEW = name("newLookahead");
 
 	private final GProductions productions;
+	private final String implementationName;
 
-	public ParserPattern(GProductions productions) {
+	public ParserPattern(GProductions productions, String implementationName) {
 		this.productions = productions;
+		this.implementationName = implementationName;
 	}
 
 	@Override
 	protected String makeQuote(TreeClassDescriptor[] arg) {
-		return "public class " + NAME + " extends ParserNewBase { ..$_ }";
+		return "public class " + implementationName + " extends ParserNewBase { ..$_ }";
 	}
 
 	private Set<String> symbolToMatchNames = new HashSet<>();
