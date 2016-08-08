@@ -3,10 +3,7 @@ package org.jlato.cc;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.util.ImportManager;
 import org.jlato.bootstrap.util.TypePattern;
-import org.jlato.cc.grammar.GContinuations;
-import org.jlato.cc.grammar.GExpansion;
-import org.jlato.cc.grammar.GLocation;
-import org.jlato.cc.grammar.GProduction;
+import org.jlato.cc.grammar.*;
 import org.jlato.tree.NodeList;
 import org.jlato.tree.Trees;
 import org.jlato.tree.decl.*;
@@ -32,6 +29,12 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 	public static final Name LOOKAHEAD = name("lookahead");
 	public static final LiteralExpr<Integer> FAILED_LOOKAHEAD = literalExpr(-1);
 	public static final Name LOOKAHEAD_NEW = name("newLookahead");
+
+	private final GProductions productions;
+
+	public ParserPattern(GProductions productions) {
+		this.productions = productions;
+	}
 
 	@Override
 	protected String makeQuote(TreeClassDescriptor[] arg) {
@@ -65,7 +68,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				importDecl(qualifiedName("org.jlato.tree.type.Primitive"))
 		));
 
-		for (GProduction production : Grammar.productions.getAll()) {
+		for (GProduction production : productions.getAll()) {
 			if (excluded(production)) continue;
 
 			parseMethods = parseMethods.append(parseMethod(importManager, production));
@@ -243,7 +246,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		if (amount == 0) {
 			stmts = stmts.append(returnStmt().withExpr(LOOKAHEAD));
 		} else {
-			GContinuations c = new GContinuations(location, Grammar.productions, lookahead > 0);
+			GContinuations c = new GContinuations(location, productions, lookahead > 0);
 			c.next();
 
 			Map<String, List<GLocation>> terminals = c.perTerminalLocations();
@@ -267,7 +270,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 	private Expr createMatchMethodAndCallFor(String symbol, Expr outerLookahead, NodeList<Expr> args) {
 		if (!symbolToMatchNames.contains(symbol)) {
 			symbolToMatchNames.add(symbol);
-			GProduction production = Grammar.productions.get(symbol);
+			GProduction production = productions.get(symbol);
 			GExpansion symbolExpansion = production.expansion;
 			return createMatchMethodAndCallFor(symbol, matchMethodName(symbol), symbolExpansion, outerLookahead, production.hintParams, args);
 		} else return matchMethodCall(matchMethodName(symbol), outerLookahead, args);
@@ -439,7 +442,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 	}
 
 	private List<String> firstTerminalsOf(GExpansion expansion) {
-		GContinuations c = new GContinuations(expansion.location(), Grammar.productions, false);
+		GContinuations c = new GContinuations(expansion.location(), productions, false);
 		c.next();
 		return c.terminals();
 	}

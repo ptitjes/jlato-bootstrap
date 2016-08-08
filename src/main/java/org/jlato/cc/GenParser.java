@@ -25,17 +25,18 @@ public class GenParser {
 	}
 
 	private void generate() throws IOException, ParseException, org.jlato.parser.ParseException {
-		GProductions productions = Grammar.productions;
-
 		String pathToJLaTo = System.getProperty("path.to.jlato");
 		String rootDirectory = pathToJLaTo + "src/main/java";
 
+		generateParser(Grammar.productions, rootDirectory, "ParserImplementation");
+		generateParser(Grammar2.productions, rootDirectory, "ParserImplementation2");
+		generateParser(Grammar3.productions, rootDirectory, "ParserImplementation3");
+	}
+
+	private void generateParser(GProductions productions, String rootDirectory, String implementationName) throws org.jlato.parser.ParseException, IOException {
 		final TreeClassDescriptor[] classDescriptors = AllDescriptors.ALL_CLASSES;
-
-		// Generate unit test classes
-
-		CompilationUnitPattern.of(new ParserPattern())
+		CompilationUnitPattern.of(new ParserPattern(productions))
 				.withFormatting(true, FormattingSettings.Default.withCommentFormatting(true))
-				.apply(rootDirectory, "org/jlato/internal/parser/ParserImplementation.java", classDescriptors);
+				.apply(rootDirectory, "org/jlato/internal/parser/" + implementationName + ".java", classDescriptors);
 	}
 }
