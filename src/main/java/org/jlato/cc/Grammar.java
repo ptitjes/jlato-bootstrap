@@ -265,7 +265,7 @@ public class Grammar {
 									stmt("return modifiers;").build()
 							))
 					)
-			),
+			).memoizeMatches(),
 			production("ModifiersNoDefault", type("BUTree<SNodeList>").build(),
 					emptyList(),
 					emptyList(),
@@ -355,7 +355,7 @@ public class Grammar {
 									stmt("return modifiers;").build()
 							))
 					)
-			),
+			).memoizeMatches(),
 			production("TypeDecl", type("BUTree<? extends STypeDecl>").build(),
 					emptyList(),
 					emptyList(),
@@ -1569,7 +1569,7 @@ public class Grammar {
 									stmt("return type == null ? primitiveType : type;").build()
 							))
 					)
-			),
+			).memoizeMatches(),
 			production("ReferenceType", type("BUTree<? extends SReferenceType>").build(),
 					emptyList(),
 					listOf(
@@ -1664,7 +1664,7 @@ public class Grammar {
 									stmt("return ret;").build()
 							))
 					)
-			),
+			).memoizeMatches(),
 			production("TypeArguments", type("BUTree<SNodeList>").build(),
 					emptyList(),
 					emptyList(),
@@ -1682,7 +1682,7 @@ public class Grammar {
 									stmt("return ret;").build()
 							))
 					)
-			),
+			).memoizeMatches(),
 			production("TypeArgumentsOrDiamond", type("BUTree<SNodeList>").build(),
 					emptyList(),
 					emptyList(),
@@ -1953,7 +1953,7 @@ public class Grammar {
 									stmt("return ret;").build()
 							))
 					)
-			),
+			).memoizeMatches(),
 			production("Name", type("BUTree<SName>").build(),
 					emptyList(),
 					emptyList(),
@@ -2882,7 +2882,7 @@ public class Grammar {
 									stmt("return ret;").build()
 							))
 					)
-			),
+			).memoizeMatches(),
 			production("ReferenceCastTypeRest", type("BUTree<? extends SType>").build(),
 					emptyList(),
 					listOf(
@@ -3042,7 +3042,7 @@ public class Grammar {
 									stmt("return ret;").build()
 							))
 					)
-			),
+			).memoizeMatches(),
 			production("PrimaryPrefix", type("BUTree<? extends SExpr>").build(),
 					emptyList(),
 					emptyList(),
@@ -3432,7 +3432,7 @@ public class Grammar {
 									stmt("return ret;").build()
 							))
 					)
-			),
+			).memoizeMatches(),
 			production("AllocationExpression", type("BUTree<? extends SExpr>").build(),
 					emptyList(),
 					listOf(
@@ -3592,7 +3592,7 @@ public class Grammar {
 									stmt("return arrayDims;").build()
 							))
 					)
-			),
+			).memoizeMatches(),
 			production("Statement", type("BUTree<? extends SStmt>").build(),
 					emptyList(),
 					emptyList(),
@@ -4398,7 +4398,7 @@ public class Grammar {
 									stmt("return annotations;").build()
 							))
 					)
-			),
+			).memoizeMatches(),
 			production("Annotation", type("BUTree<? extends SAnnotationExpr>").build(),
 					emptyList(),
 					emptyList(),
