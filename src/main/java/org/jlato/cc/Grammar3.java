@@ -1291,6 +1291,7 @@ public class Grammar3 {
 							stmt("BUTree<SNodeList> modifiers;").build(),
 							stmt("BUTree<? extends SType> type;").build(),
 							stmt("boolean isVarArg = false;").build(),
+							stmt("BUTree<SNodeList> ellipsisAnnotations = null;").build(),
 							stmt("BUTree<SVariableDeclaratorId> id = null;").build(),
 							stmt("boolean isReceiver = false;").build(),
 							stmt("BUTree<SName> receiverTypeName = null;").build()
@@ -1304,6 +1305,7 @@ public class Grammar3 {
 									expr("null").build()
 							)),
 							zeroOrOne(
+									nonTerminal("ellipsisAnnotations", "Annotations"),
 									terminal("ELLIPSIS"),
 									action(listOf(
 											stmt("isVarArg = true;").build()
@@ -1330,7 +1332,7 @@ public class Grammar3 {
 									nonTerminal("id", "VariableDeclaratorId")
 							),
 							action(listOf(
-									stmt("return dress(SFormalParameter.make(modifiers, type, isVarArg, optionOf(id), isReceiver, optionOf(receiverTypeName)));").build()
+									stmt("return dress(SFormalParameter.make(modifiers, type, isVarArg, ensureNotNull(ellipsisAnnotations), optionOf(id), isReceiver, optionOf(receiverTypeName)));").build()
 							))
 					)
 			),
@@ -4159,7 +4161,7 @@ public class Grammar3 {
 							),
 							nonTerminal("exceptId", "VariableDeclaratorId"),
 							action(listOf(
-									stmt("return dress(SFormalParameter.make(modifiers, exceptType, false, optionOf(exceptId), false, none()));").build()
+									stmt("return dress(SFormalParameter.make(modifiers, exceptType, false, emptyList(), optionOf(exceptId), false, none()));").build()
 							))
 					)
 			),

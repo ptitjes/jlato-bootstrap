@@ -299,8 +299,6 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				NodeList<Stmt> stmts = emptyList();
 				int count = 0;
 				for (GExpansion child : expansion.children) {
-					child = traverseUniqueChildSequences(child);
-
 					Expr childCall = createMatchMethodAndCallFor(symbol, namePrefix + "_" + ++count, child, LOOKAHEAD, params, params.map(p -> p.id().get().name()), false);
 					if (childCall == null) continue;
 					stmts = stmts.append(expressionStmt(assignExpr(LOOKAHEAD, AssignOp.Normal, childCall)));
@@ -320,7 +318,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 
 				stmts = stmts.append(
 						memoize ? stmt("return memoizeMatch(initialLookahead, " + index + ", lookahead);").build() :
-						stmt("return lookahead;").build()
+								stmt("return lookahead;").build()
 				);
 
 				createMatchMethod(symbol, namePrefix, expansion, stmts, params);
@@ -419,18 +417,20 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 	}
 
 	private GExpansion traverseUniqueChildSequences(GExpansion expansion) {
-//		main: while (expansion.kind == GExpansion.Kind.Sequence) {
-//			GExpansion child = null;
-//			List<GExpansion> children = expansion.children;
-//			for (int i = 0; i < children.size(); i++) {
-//				GExpansion otherChild = children.get(i);
-//				if (otherChild.kind != GExpansion.Kind.LookAhead) {
-//					if (child == null) child = otherChild;
-//					else break main;
-//				}
-//			}
-//			expansion = child;
-//		}
+		main:
+		while (expansion.kind == GExpansion.Kind.Sequence) {
+			GExpansion child = null;
+			List<GExpansion> children = expansion.children;
+			for (int i = 0; i < children.size(); i++) {
+				GExpansion otherChild = children.get(i);
+				if ((otherChild.kind != GExpansion.Kind.LookAhead || otherChild.semanticLookahead == null) &&
+						otherChild.kind != GExpansion.Kind.Action) {
+					if (child == null) child = otherChild;
+					else break main;
+				}
+			}
+			expansion = child;
+		}
 		return expansion;
 	}
 

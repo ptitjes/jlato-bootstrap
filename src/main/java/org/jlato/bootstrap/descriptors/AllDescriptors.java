@@ -638,9 +638,23 @@ public class AllDescriptors {
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(MODIFIERS, SExtendedModifier.singleLineShape),\n" +
 									"\t\t\tchild(TYPE),\n" +
-									"\t\t\twhen(data(VAR_ARGS), token(LToken.Ellipsis)),\n" +
+									"\t\t\twhen(data(VAR_ARGS),\n" +
+									"\t\t\t\t\talternative(childIs(ELLIPSIS_ANNOTATIONS, not(empty())),\n" +
+									"\t\t\t\t\t\t\tcomposite(\n" +
+									"\t\t\t\t\t\t\t\t\tchild(ELLIPSIS_ANNOTATIONS, org.jlato.internal.bu.expr.SAnnotationExpr.singleLineAnnotationsShapeWithSpaceBefore),\n" +
+									"\t\t\t\t\t\t\t\t\ttoken(LToken.Ellipsis)\n" +
+									"\t\t\t\t\t\t\t),\n" +
+									"\t\t\t\t\t\t\ttoken(LToken.Ellipsis)\n" +
+									"\t\t\t\t\t)\n" +
+									"\t\t\t),\n" +
 									"\t\t\twhen(not(childIs(TYPE, withKind(Kind.UnknownType))), none().withSpacingAfter(space())),\n" +
-									"\t\t\tchild(ID)\n" +
+									"\t\t\talternative(data(RECEIVER),\n" +
+									"\t\t\t\t\tcomposite(\n" +
+									"\t\t\t\t\t\t\tchild(RECEIVER_TYPE_NAME, when(some(), composite(element(), token(LToken.Dot)))),\n" +
+									"\t\t\t\t\t\t\ttoken(LToken.This)\n" +
+									"\t\t\t\t\t),\n" +
+									"\t\t\t\t\tchild(ID, element())\n" +
+									"\t\t\t)\n" +
 									"\t);").build(),
 							memberDecl("public static final LexicalShape listShape = list(true,\n" +
 									"\t\t\tnone(),\n" +
@@ -652,6 +666,7 @@ public class AllDescriptors {
 							param("NodeList<ExtendedModifier> modifiers").build(),
 							param("Type type").build(),
 							param("boolean isVarArgs").build(),
+							param("NodeList<AnnotationExpr> ellipsisAnnotations").build(),
 							param("NodeOption<VariableDeclaratorId> id").build(),
 							param("boolean isReceiver").build(),
 							param("NodeOption<Name> receiverTypeName").build()
@@ -660,6 +675,7 @@ public class AllDescriptors {
 							(Expr) null,
 							(Expr) null,
 							(Expr) literalExpr(false),
+							(Expr) null,
 							(Expr) null,
 							(Expr) literalExpr(false),
 							(Expr) null
