@@ -69,6 +69,8 @@ public class ImportManager {
 			names.add(name.name().id());
 		}
 
+		// Remove unused imports
+
 		for (QualifiedName name : new HashSet<>(singleImports)) {
 			if (!names.contains(name.name().id())) {
 				singleImports.remove(name);
@@ -78,6 +80,47 @@ public class ImportManager {
 		for (QualifiedName name : new HashSet<>(singleStaticImports)) {
 			if (!names.contains(name.name().id())) {
 				singleStaticImports.remove(name);
+			}
+		}
+
+		// Make multiple imports
+
+		Map<QualifiedName, Integer> counts = new HashMap<>();
+		for (QualifiedName name : new HashSet<>(singleImports)) {
+			if (name.qualifier().isSome()) {
+				QualifiedName qualifier = name.qualifier().get();
+				Integer count = counts.get(qualifier);
+				count = count == null ? 1 : count + 1;
+				counts.put(qualifier, count);
+			}
+		}
+		Map<QualifiedName, Integer> staticCounts = new HashMap<>();
+		for (QualifiedName name : new HashSet<>(singleStaticImports)) {
+			if (name.qualifier().isSome()) {
+				QualifiedName qualifier = name.qualifier().get();
+				Integer count = staticCounts.get(qualifier);
+				count = count == null ? 1 : count + 1;
+				staticCounts.put(qualifier, count);
+			}
+		}
+
+		for (Map.Entry<QualifiedName, Integer> entry : counts.entrySet()) {
+			if (entry.getValue() > 5) onDemandImports.add(entry.getKey());
+		}
+		for (Map.Entry<QualifiedName, Integer> entry : staticCounts.entrySet()) {
+			if (entry.getValue() > 3) onDemandStaticImports.add(entry.getKey());
+		}
+
+		for (QualifiedName name : new HashSet<>(singleImports)) {
+			if (name.qualifier().isSome()) {
+				QualifiedName qualifier = name.qualifier().get();
+				if (onDemandImports.contains(qualifier)) singleImports.remove(name);
+			}
+		}
+		for (QualifiedName name : new HashSet<>(singleStaticImports)) {
+			if (name.qualifier().isSome()) {
+				QualifiedName qualifier = name.qualifier().get();
+				if (onDemandStaticImports.contains(qualifier)) singleStaticImports.remove(name);
 			}
 		}
 
