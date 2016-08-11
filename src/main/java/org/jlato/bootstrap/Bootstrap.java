@@ -23,16 +23,21 @@ import org.jlato.bootstrap.ast.*;
 import org.jlato.bootstrap.descriptors.AllDescriptors;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.descriptors.TreeInterfaceDescriptor;
+import org.jlato.bootstrap.tests.TreesAccessorsTest;
+import org.jlato.bootstrap.tests.TreesEqualsHashCodeTest;
+import org.jlato.bootstrap.tests.TreesKindTest;
+import org.jlato.bootstrap.tests.TreesLambdaAccessorsTest;
 import org.jlato.bootstrap.util.CompilationUnitPattern;
 import org.jlato.bootstrap.util.DeclPattern;
 import org.jlato.bootstrap.util.ImportManager;
+import org.jlato.cc.GenParser;
 import org.jlato.parser.ParseException;
 import org.jlato.parser.Parser;
 import org.jlato.parser.ParserConfiguration;
-import org.jlato.printer.FormattingSettings;
-import org.jlato.printer.Printer;
 import org.jlato.pattern.MatchVisitor;
 import org.jlato.pattern.Pattern;
+import org.jlato.printer.FormattingSettings;
+import org.jlato.printer.Printer;
 import org.jlato.tree.NodeMap;
 import org.jlato.tree.decl.CompilationUnit;
 import org.jlato.tree.decl.Decl;
@@ -54,10 +59,19 @@ public class Bootstrap {
 	}
 
 	public void generate() throws IOException, ParseException {
-		Parser parser = new Parser(ParserConfiguration.Default.preserveWhitespaces(true));
 		String pathToJLaTo = System.getProperty("path.to.jlato");
-		File rootDirectory = new File(pathToJLaTo + "src/main/java");
-		NodeMap<CompilationUnit> nodeMap = parser.parseAll(rootDirectory, "UTF-8");
+		String mainRootDirectory = pathToJLaTo + "src/main/java";
+		String testRootDirectory = pathToJLaTo + "src/test/java";
+
+		new GenParser().generate();
+
+		generateAST(mainRootDirectory);
+		generateUnitTests(testRootDirectory);
+	}
+
+	private void generateAST(String rootDirectory) throws ParseException, IOException {
+		Parser parser = new Parser(ParserConfiguration.Default.preserveWhitespaces(true));
+		NodeMap<CompilationUnit> nodeMap = parser.parseAll(new File(rootDirectory), "UTF-8");
 
 		final TreeInterfaceDescriptor[] interfaceDescriptors = AllDescriptors.ALL_INTERFACES;
 		final TreeClassDescriptor[] classDescriptors = AllDescriptors.ALL_CLASSES;
@@ -99,7 +113,25 @@ public class Bootstrap {
 		nodeMap = applyPattern(nodeMap, "org/jlato/tree/Trees.java", treeFactoryClassPattern, classDescriptors);
 
 		Printer printer = new Printer(false, FormattingSettings.Default);
-		printer.printAll(nodeMap, rootDirectory, "UTF-8");
+		printer.printAll(nodeMap, new File(rootDirectory), "UTF-8");
+	}
+
+	private void generateUnitTests(String rootDirectory) throws ParseException, IOException {
+		final TreeClassDescriptor[] classDescriptors = AllDescriptors.ALL_CLASSES;
+
+		// Generate unit test classes
+
+		CompilationUnitPattern.of(new TreesKindTest())
+				.apply(rootDirectory, "org/jlato/unit/tree/TreesKindTest.java", classDescriptors);
+
+		CompilationUnitPattern.of(new TreesEqualsHashCodeTest())
+				.apply(rootDirectory, "org/jlato/unit/tree/TreesEqualsHashCodeTest.java", classDescriptors);
+
+		CompilationUnitPattern.of(new TreesAccessorsTest())
+				.apply(rootDirectory, "org/jlato/unit/tree/TreesAccessorsTest.java", classDescriptors);
+
+		CompilationUnitPattern.of(new TreesLambdaAccessorsTest())
+				.apply(rootDirectory, "org/jlato/unit/tree/TreesLambdaAccessorsTest.java", classDescriptors);
 	}
 
 	private <A, T extends TypeDecl> NodeMap<CompilationUnit> applyPattern(NodeMap<CompilationUnit> nodeMap, String path, DeclPattern<A, T> pattern, A descriptor) {
