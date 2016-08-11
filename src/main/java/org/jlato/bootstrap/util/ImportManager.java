@@ -1,9 +1,9 @@
 package org.jlato.bootstrap.util;
 
+import org.jlato.pattern.Matcher;
 import org.jlato.pattern.Quotes;
-import org.jlato.tree.NodeList;
-import org.jlato.tree.NodeOption;
-import org.jlato.tree.Trees;
+import org.jlato.pattern.Substitution;
+import org.jlato.tree.*;
 import org.jlato.tree.decl.CompilationUnit;
 import org.jlato.tree.decl.ImportDecl;
 import org.jlato.tree.name.Name;
@@ -57,7 +57,16 @@ public class ImportManager {
 	public CompilationUnit organiseAndSet(CompilationUnit unit) {
 		HashSet<String> names = new HashSet<>();
 		for (Name name : unit.withImports(emptyList()).findAll(Quotes.names())) {
+			Tree parent = name.parent();
+			if (parent instanceof Node && ((Node) parent).kind() == Kind.QualifiedName) continue;
 			names.add(name.id());
+		}
+
+		for (QualifiedName name : unit.withImports(emptyList()).findAll((Matcher<QualifiedName>)
+				(Object o, Substitution s) -> o instanceof Node && ((Node) o).kind() == Kind.QualifiedName ? s : null
+		)) {
+			if (name.qualifier().isSome()) continue;
+			names.add(name.name().id());
 		}
 
 		for (QualifiedName name : new HashSet<>(singleImports)) {

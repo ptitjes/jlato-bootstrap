@@ -19,6 +19,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.jlato.pattern.Quotes.stmt;
+import static org.jlato.printer.Spacing.Unit.Line;
+import static org.jlato.printer.Spacing.Unit.Space;
 import static org.jlato.tree.Trees.*;
 import static org.jlato.tree.expr.AssignOp.Normal;
 
@@ -207,12 +209,75 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 
 		@Override
 		protected MethodDecl makeDecl(MethodDecl decl, ImportManager importManager, TreeClassDescriptor arg) {
-			// FIXME Imports for the mergeFields directive below
-			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes")).setOnDemand(true));
-			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.LexicalShape")).setOnDemand(true).setStatic(true));
-			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.LSCondition")).setOnDemand(true).setStatic(true));
+			// Imports for the mergeFields directive below
+
 			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.bu.LToken")));
 			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.parser.TokenType")));
+
+			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.LexicalShape")));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.LSToken")));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.LSCondition")));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.SpacingConstraint")));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.IndentationConstraint")));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.IndentationContext")));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.SpacingLocation")));
+
+			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.LexicalShape.none")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.LexicalShape.when")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.LexicalShape.alternative")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.LexicalShape.composite")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.LexicalShape.token")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.LexicalShape.keyword")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.LexicalShape.element")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.LexicalShape.leftOrRight")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.LexicalShape.child")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.LexicalShape.list")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.LexicalShape.defaultShape")).setStatic(true));
+
+			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.LSCondition.not")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.LSCondition.data")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.LSCondition.childIs")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.LSCondition.childHas")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.LSCondition.withKind")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.LSCondition.empty")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.LSCondition.some")).setStatic(true));
+
+			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.SpacingConstraint.space")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.SpacingConstraint.newLine")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.SpacingConstraint.spacing")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.IndentationConstraint.indent")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.IndentationConstraint.unIndent")).setStatic(true));
+
+			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.IndentationContext.TypeBody")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.IndentationContext.Block")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.IndentationContext.Parameters")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.IndentationContext.Statement")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.IndentationContext.Switch")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.IndentationContext.SwitchCase")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.IndentationContext.IfElse")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.IndentationContext.TryResources")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.IndentationContext.Label")).setStatic(true));
+
+			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.SpacingLocation.DefaultNewLine")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.SpacingLocation.CompilationUnit_AfterPackageDecl")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.SpacingLocation.CompilationUnit_AfterImports")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.SpacingLocation.CompilationUnit_BetweenTopLevelDecl")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.SpacingLocation.ClassBody_Empty")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.SpacingLocation.ClassBody_BeforeMembers")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.SpacingLocation.ClassBody_BetweenMembers")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.SpacingLocation.ClassBody_AfterMembers")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.SpacingLocation.EnumBody_BeforeConstants")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.SpacingLocation.EnumBody_BetweenConstants")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.SpacingLocation.EnumBody_AfterConstants")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.SpacingLocation.EnumConstant_AfterBody")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.SpacingLocation.DefaultSpace")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.SpacingLocation.LabeledStmt_AfterLabel")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.SpacingLocation.SwitchStmt_AfterSwitchKeyword")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.SpacingLocation.IfStmt_ThenExpressionStmt")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.SpacingLocation.IfStmt_ThenOtherStmt")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.SpacingLocation.IfStmt_ElseIfStmt")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.SpacingLocation.IfStmt_ElseExpressionStmt")).setStatic(true));
+			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.SpacingLocation.IfStmt_ElseOtherStmt")).setStatic(true));
 
 			return decl.withBody(blockStmt().withStmts(listOf(
 					stmt("return shape;").build()
