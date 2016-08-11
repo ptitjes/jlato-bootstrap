@@ -1,9 +1,9 @@
 package org.jlato.bootstrap.util;
 
+import org.jlato.pattern.Matcher;
 import org.jlato.pattern.Quotes;
-import org.jlato.tree.NodeList;
-import org.jlato.tree.NodeOption;
-import org.jlato.tree.Trees;
+import org.jlato.pattern.Substitution;
+import org.jlato.tree.*;
 import org.jlato.tree.decl.CompilationUnit;
 import org.jlato.tree.decl.ImportDecl;
 import org.jlato.tree.name.Name;
@@ -43,10 +43,10 @@ public class ImportManager {
 		ArrayList<ImportDecl> sortedStaticImports = filterImports(onDemandStaticImports, singleStaticImports, true, n -> true);
 
 		if (!sortedJavaImports.isEmpty())
-			sortedJavaImports.set(0, sortedJavaImports.get(0).insertNewLineBefore());
+			sortedJavaImports.set(0, sortedJavaImports.get(0).prependLeadingNewLine());
 
 		if (!sortedStaticImports.isEmpty())
-			sortedStaticImports.set(0, sortedStaticImports.get(0).insertNewLineBefore());
+			sortedStaticImports.set(0, sortedStaticImports.get(0).prependLeadingNewLine());
 
 		return Trees.<ImportDecl>emptyList()
 				.appendAll(listOf(sortedImports))
@@ -57,8 +57,19 @@ public class ImportManager {
 	public CompilationUnit organiseAndSet(CompilationUnit unit) {
 		HashSet<String> names = new HashSet<>();
 		for (Name name : unit.withImports(emptyList()).findAll(Quotes.names())) {
+			Tree parent = name.parent();
+			if (parent instanceof Node && ((Node) parent).kind() == Kind.QualifiedName) continue;
 			names.add(name.id());
 		}
+
+		for (QualifiedName name : unit.withImports(emptyList()).findAll((Matcher<QualifiedName>)
+				(Object o, Substitution s) -> o instanceof Node && ((Node) o).kind() == Kind.QualifiedName ? s : null
+		)) {
+			if (name.qualifier().isSome()) continue;
+			names.add(name.name().id());
+		}
+
+		// Remove unused imports
 
 		for (QualifiedName name : new HashSet<>(singleImports)) {
 			if (!names.contains(name.name().id())) {
@@ -69,6 +80,47 @@ public class ImportManager {
 		for (QualifiedName name : new HashSet<>(singleStaticImports)) {
 			if (!names.contains(name.name().id())) {
 				singleStaticImports.remove(name);
+			}
+		}
+
+		// Make multiple imports
+
+		Map<QualifiedName, Integer> counts = new HashMap<>();
+		for (QualifiedName name : new HashSet<>(singleImports)) {
+			if (name.qualifier().isSome()) {
+				QualifiedName qualifier = name.qualifier().get();
+				Integer count = counts.get(qualifier);
+				count = count == null ? 1 : count + 1;
+				counts.put(qualifier, count);
+			}
+		}
+		Map<QualifiedName, Integer> staticCounts = new HashMap<>();
+		for (QualifiedName name : new HashSet<>(singleStaticImports)) {
+			if (name.qualifier().isSome()) {
+				QualifiedName qualifier = name.qualifier().get();
+				Integer count = staticCounts.get(qualifier);
+				count = count == null ? 1 : count + 1;
+				staticCounts.put(qualifier, count);
+			}
+		}
+
+		for (Map.Entry<QualifiedName, Integer> entry : counts.entrySet()) {
+			if (entry.getValue() > 5) onDemandImports.add(entry.getKey());
+		}
+		for (Map.Entry<QualifiedName, Integer> entry : staticCounts.entrySet()) {
+			if (entry.getValue() > 3) onDemandStaticImports.add(entry.getKey());
+		}
+
+		for (QualifiedName name : new HashSet<>(singleImports)) {
+			if (name.qualifier().isSome()) {
+				QualifiedName qualifier = name.qualifier().get();
+				if (onDemandImports.contains(qualifier)) singleImports.remove(name);
+			}
+		}
+		for (QualifiedName name : new HashSet<>(singleStaticImports)) {
+			if (name.qualifier().isSome()) {
+				QualifiedName qualifier = name.qualifier().get();
+				if (onDemandStaticImports.contains(qualifier)) singleStaticImports.remove(name);
 			}
 		}
 

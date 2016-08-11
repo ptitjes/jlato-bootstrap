@@ -186,7 +186,7 @@ public class GExpansion {
 			case LookAhead:
 				if (semanticLookahead != null) {
 					return factoryCall(listOf(
-							reify("expr", semanticLookahead).insertNewLineBefore().insertNewLineAfter()
+							reify("expr", semanticLookahead).prependLeadingNewLine().appendTrailingNewLine()
 					));
 				}
 				if (amount != -1) {
@@ -238,7 +238,7 @@ public class GExpansion {
 	private MethodInvocationExpr factoryCall(NodeList<Expr> args) {
 		Name methodName = name(lowerCaseFirst(kind.name()));
 		return methodInvocationExpr(methodName).withArgs(args)
-				.insertNewLineBefore();
+				.prependLeadingNewLine();
 	}
 
 	@Override

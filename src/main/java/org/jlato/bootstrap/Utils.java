@@ -622,7 +622,7 @@ public class Utils {
 	}
 
 	public static MethodInvocationExpr reifyList(String kind, NodeList<? extends Tree> list) {
-		NodeList<MethodInvocationExpr> l = list.map(t -> reify(kind, t).insertNewLineBefore());
+		NodeList<MethodInvocationExpr> l = list.map(t -> reify(kind, t).prependLeadingNewLine());
 		return list.isEmpty() ?
 				methodInvocationExpr(name("emptyList")) :
 				methodInvocationExpr(name("listOf")).withArgs(insertNewLineAfterLast(l));
@@ -630,7 +630,7 @@ public class Utils {
 
 	@SuppressWarnings("unchecked")
 	public static <T extends TreeCombinators<T> & Expr> NodeList<Expr> insertNewLineAfterLast(NodeList<T> l) {
-		return (NodeList<Expr>) (l.isEmpty() ? l : l.last().insertNewLineAfter().parent());
+		return (NodeList<Expr>) (l.isEmpty() ? l : l.last().appendTrailingNewLine().parent());
 	}
 
 	public Stmt loopFor(int count, NodeList<Stmt> loopStmts) {

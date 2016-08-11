@@ -34,20 +34,29 @@ public class GProduction {
 	public final NodeList<FormalParameter> dataParams;
 	public final NodeList<Stmt> declarations;
 	public final GExpansion expansion;
+	public final boolean memoizeMatches;
+
 
 	public GProduction(String symbol, Type returnType,
 	                   NodeList<FormalParameter> hintParams, NodeList<FormalParameter> dataParams,
 	                   NodeList<Stmt> declarations, GExpansion expansion) {
+		this(symbol, returnType, hintParams, dataParams, declarations, expansion, false);
+	}
+
+	public GProduction(String symbol, Type returnType,
+	                   NodeList<FormalParameter> hintParams, NodeList<FormalParameter> dataParams,
+	                   NodeList<Stmt> declarations, GExpansion expansion, boolean memoizeMatches) {
 		this.symbol = symbol;
 		this.returnType = returnType == null ? voidType() : returnType;
 		this.hintParams = hintParams;
 		this.dataParams = dataParams;
 		this.declarations = declarations;
 		this.expansion = expansion;
+		this.memoizeMatches = memoizeMatches;
 	}
 
 	public GProduction rewrite(Function<GExpansion, GExpansion> f) {
-		return new GProduction(symbol, returnType, hintParams, dataParams, declarations, expansion.rewrite(f));
+		return new GProduction(symbol, returnType, hintParams, dataParams, declarations, expansion.rewrite(f), memoizeMatches);
 	}
 
 	public GLocation location() {
@@ -55,15 +64,19 @@ public class GProduction {
 	}
 
 	public MethodInvocationExpr toExpr() {
-		return methodInvocationExpr(name("production"))
+		MethodInvocationExpr creation = methodInvocationExpr(name("production"))
 				.withArgs(listOf(
 						literalExpr(symbol),
 						returnType.kind() == Kind.VoidType ? nullLiteralExpr() : reify("type", returnType),
-						reifyList("param", hintParams).insertNewLineBefore(),
-						reifyList("param", dataParams).insertNewLineBefore(),
-						reifyList("stmt", declarations).insertNewLineBefore(),
-						expansion.toExpr().insertNewLineAfter()
+						reifyList("param", hintParams).prependLeadingNewLine(),
+						reifyList("param", dataParams).prependLeadingNewLine(),
+						reifyList("stmt", declarations).prependLeadingNewLine(),
+						expansion.toExpr().appendTrailingNewLine()
 				));
+		if (memoizeMatches)
+			creation = methodInvocationExpr(name("memoizeMatches"))
+					.withScope(creation.appendTrailingNewLine());
+		return creation;
 	}
 
 	@Override
@@ -81,5 +94,9 @@ public class GProduction {
 
 		builder.append(expansion.toString());
 		return builder.toString();
+	}
+
+	public GProduction memoizeMatches() {
+		return new GProduction(symbol, returnType, hintParams, dataParams, declarations, expansion, true);
 	}
 }

@@ -43,14 +43,14 @@ public class ReworkGrammar {
 				objectCreationExpr(qualifiedType(name("GProductions"))).withArgs(insertNewLineAfterLast(
 						listOf(
 								productions.getAll().stream()
-										.map(c -> c.toExpr().insertNewLineBefore())
+										.map(c -> c.toExpr().prependLeadingNewLine())
 										.collect(Collectors.toList())
 						)
 				));
 
 		CompilationUnit cu = compilationUnit(packageDecl(qualifiedName("org.jlato.cc")))
 				.withImports(listOf(
-						importDecl(qualifiedName("org.jlato.cc.grammar.GProductions"))/*.insertNewLineAfter()*/,
+						importDecl(qualifiedName("org.jlato.cc.grammar.GProductions"))/*.appendTrailingNewLine()*/,
 						importDecl(qualifiedName("org.jlato.pattern.Quotes.expr")).setStatic(true),
 						importDecl(qualifiedName("org.jlato.pattern.Quotes.param")).setStatic(true),
 						importDecl(qualifiedName("org.jlato.pattern.Quotes.stmt")).setStatic(true),

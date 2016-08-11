@@ -35,7 +35,8 @@ public abstract class TestPattern extends TypePattern.OfClass<TreeClassDescripto
 	@Override
 	protected ClassDecl contributeBody(ClassDecl decl, ImportManager importManager, TreeClassDescriptor[] arg) {
 		importManager.addImports(listOf(
-				importDecl(qualifiedName("org.junit")).setOnDemand(true),
+				importDecl(qualifiedName("org.junit.Assert")),
+				importDecl(qualifiedName("org.junit.Test")),
 				importDecl(qualifiedName("org.junit.runner.RunWith")),
 				importDecl(qualifiedName("org.junit.runners.JUnit4"))
 		));

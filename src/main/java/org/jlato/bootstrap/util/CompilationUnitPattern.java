@@ -66,7 +66,9 @@ public abstract class CompilationUnitPattern<A> {
 
 		CompilationUnit newCU = cu;
 		if (cu == null || GenSettings.replace) {
-			newCU = create(path, packageName);
+			newCU = create(path, packageName)
+					.appendLeadingComment(GenSettings.copyright, true)
+					.appendLeadingNewLine();
 		}
 
 		ImportManager importManager = new ImportManager(packageName, newCU.imports());

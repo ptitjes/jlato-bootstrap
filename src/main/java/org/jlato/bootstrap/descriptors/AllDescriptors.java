@@ -214,17 +214,17 @@ public class AllDescriptors {
 									"\t\t\talternative(empty(),\n" +
 									"\t\t\t\t\ttoken(LToken.BraceLeft)\n" +
 									"\t\t\t\t\t\t\t.withSpacing(space(), newLine())\n" +
-									"\t\t\t\t\t\t\t.withIndentationAfter(indent(IndentationContext.TypeBody)),\n" +
+									"\t\t\t\t\t\t\t.withIndentationAfter(indent(TypeBody)),\n" +
 									"\t\t\t\t\ttoken(LToken.BraceLeft)\n" +
 									"\t\t\t\t\t\t\t.withSpacing(space(), spacing(ClassBody_BeforeMembers))\n" +
-									"\t\t\t\t\t\t\t.withIndentationAfter(indent(IndentationContext.TypeBody))\n" +
+									"\t\t\t\t\t\t\t.withIndentationAfter(indent(TypeBody))\n" +
 									"\t\t\t),\n" +
 									"\t\t\tnone().withSpacingAfter(spacing(ClassBody_BetweenMembers)),\n" +
 									"\t\t\talternative(empty(),\n" +
 									"\t\t\t\t\ttoken(LToken.BraceRight)\n" +
-									"\t\t\t\t\t\t\t.withIndentationBefore(unIndent(IndentationContext.TypeBody)),\n" +
+									"\t\t\t\t\t\t\t.withIndentationBefore(unIndent(TypeBody)),\n" +
 									"\t\t\t\t\ttoken(LToken.BraceRight)\n" +
-									"\t\t\t\t\t\t\t.withIndentationBefore(unIndent(IndentationContext.TypeBody))\n" +
+									"\t\t\t\t\t\t\t.withIndentationBefore(unIndent(TypeBody))\n" +
 									"\t\t\t\t\t\t\t.withSpacingBefore(spacing(ClassBody_AfterMembers))\n" +
 									"\t\t\t)\n" +
 									"\t);").build(),
@@ -360,7 +360,7 @@ public class AllDescriptors {
 							(QualifiedType) type("Documentable<AnnotationMemberDecl>").build()
 					),
 					listOf(
-							memberDecl("public static final LexicalShape defaultValShape = composite(token(LToken.Default).withSpacingBefore(space()), element());").build(),
+							memberDecl("public static final LexicalShape defaultValShape = composite(token(LToken.Default).withSpacing(space(), space()), element());").build(),
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(MODIFIERS, SExtendedModifier.multiLineShape),\n" +
 									"\t\t\tchild(TYPE),\n" +
@@ -569,7 +569,7 @@ public class AllDescriptors {
 									"\t\t\tchild(IMPLEMENTS_CLAUSE, org.jlato.internal.bu.type.SQualifiedType.implementsClauseShape),\n" +
 									"\t\t\ttoken(LToken.BraceLeft)\n" +
 									"\t\t\t\t\t.withSpacingBefore(space())\n" +
-									"\t\t\t\t\t.withIndentationAfter(indent(IndentationContext.TypeBody)),\n" +
+									"\t\t\t\t\t.withIndentationAfter(indent(TypeBody)),\n" +
 									"\t\t\tchild(ENUM_CONSTANTS, SEnumConstantDecl.listShape),\n" +
 									"\t\t\twhen(data(TRAILING_COMMA), token(LToken.Comma).withSpacingAfter(spacing(EnumBody_BetweenConstants))),\n" +
 									"\t\t\talternative(childIs(MEMBERS, empty()),\n" +
@@ -584,7 +584,7 @@ public class AllDescriptors {
 									"\t\t\t),\n" +
 									"\t\t\tchild(MEMBERS, SMemberDecl.membersShape),\n" +
 									"\t\t\ttoken(LToken.BraceRight)\n" +
-									"\t\t\t\t\t.withIndentationBefore(unIndent(IndentationContext.TypeBody))\n" +
+									"\t\t\t\t\t.withIndentationBefore(unIndent(TypeBody))\n" +
 									"\t);").build()
 					),
 					listOf(
@@ -638,9 +638,23 @@ public class AllDescriptors {
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(MODIFIERS, SExtendedModifier.singleLineShape),\n" +
 									"\t\t\tchild(TYPE),\n" +
-									"\t\t\twhen(data(VAR_ARGS), token(LToken.Ellipsis)),\n" +
+									"\t\t\twhen(data(VAR_ARGS),\n" +
+									"\t\t\t\t\talternative(childIs(ELLIPSIS_ANNOTATIONS, not(empty())),\n" +
+									"\t\t\t\t\t\t\tcomposite(\n" +
+									"\t\t\t\t\t\t\t\t\tchild(ELLIPSIS_ANNOTATIONS, org.jlato.internal.bu.expr.SAnnotationExpr.singleLineAnnotationsShapeWithSpaceBefore),\n" +
+									"\t\t\t\t\t\t\t\t\ttoken(LToken.Ellipsis)\n" +
+									"\t\t\t\t\t\t\t),\n" +
+									"\t\t\t\t\t\t\ttoken(LToken.Ellipsis)\n" +
+									"\t\t\t\t\t)\n" +
+									"\t\t\t),\n" +
 									"\t\t\twhen(not(childIs(TYPE, withKind(Kind.UnknownType))), none().withSpacingAfter(space())),\n" +
-									"\t\t\tchild(ID)\n" +
+									"\t\t\talternative(data(RECEIVER),\n" +
+									"\t\t\t\t\tcomposite(\n" +
+									"\t\t\t\t\t\t\tchild(RECEIVER_TYPE_NAME, when(some(), composite(element(), token(LToken.Dot)))),\n" +
+									"\t\t\t\t\t\t\ttoken(LToken.This)\n" +
+									"\t\t\t\t\t),\n" +
+									"\t\t\t\t\tchild(ID, element())\n" +
+									"\t\t\t)\n" +
 									"\t);").build(),
 							memberDecl("public static final LexicalShape listShape = list(true,\n" +
 									"\t\t\tnone(),\n" +
@@ -652,6 +666,7 @@ public class AllDescriptors {
 							param("NodeList<ExtendedModifier> modifiers").build(),
 							param("Type type").build(),
 							param("boolean isVarArgs").build(),
+							param("NodeList<AnnotationExpr> ellipsisAnnotations").build(),
 							param("NodeOption<VariableDeclaratorId> id").build(),
 							param("boolean isReceiver").build(),
 							param("NodeOption<Name> receiverTypeName").build()
@@ -660,6 +675,7 @@ public class AllDescriptors {
 							(Expr) null,
 							(Expr) null,
 							(Expr) literalExpr(false),
+							(Expr) null,
 							(Expr) null,
 							(Expr) literalExpr(false),
 							(Expr) null
@@ -1702,14 +1718,14 @@ public class AllDescriptors {
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\ttoken(LToken.BraceLeft)\n" +
 									"\t\t\t\t\t.withSpacingAfter(newLine())\n" +
-									"\t\t\t\t\t.withIndentationAfter(indent(IndentationContext.Block)),\n" +
+									"\t\t\t\t\t.withIndentationAfter(indent(Block)),\n" +
 									"\t\t\tchild(STMTS, listShape),\n" +
 									"\t\t\talternative(childIs(STMTS, not(empty())),\n" +
 									"\t\t\t\t\ttoken(LToken.BraceRight)\n" +
-									"\t\t\t\t\t\t\t.withIndentationBefore(unIndent(IndentationContext.Block))\n" +
+									"\t\t\t\t\t\t\t.withIndentationBefore(unIndent(Block))\n" +
 									"\t\t\t\t\t\t\t.withSpacingBefore(newLine()),\n" +
 									"\t\t\t\t\ttoken(LToken.BraceRight)\n" +
-									"\t\t\t\t\t\t\t.withIndentationBefore(unIndent(IndentationContext.Block))\n" +
+									"\t\t\t\t\t\t\t.withIndentationBefore(unIndent(Block))\n" +
 									"\t\t\t)\n" +
 									"\t);").build()
 					),
@@ -1939,13 +1955,13 @@ public class AllDescriptors {
 									"\t\t\t\t\t\t\talternative(withKind(Kind.ExpressionStmt),\n" +
 									"\t\t\t\t\t\t\t\t\tdefaultShape()\n" +
 									"\t\t\t\t\t\t\t\t\t\t\t.withSpacingBefore(spacing(IfStmt_ThenExpressionStmt))\n" +
-									"\t\t\t\t\t\t\t\t\t\t\t.withIndentationBefore(indent(IndentationContext.IfElse))\n" +
-									"\t\t\t\t\t\t\t\t\t\t\t.withIndentationAfter(unIndent(IndentationContext.IfElse))\n" +
+									"\t\t\t\t\t\t\t\t\t\t\t.withIndentationBefore(indent(IfElse))\n" +
+									"\t\t\t\t\t\t\t\t\t\t\t.withIndentationAfter(unIndent(IfElse))\n" +
 									"\t\t\t\t\t\t\t\t\t\t\t.withSpacingAfter(newLine()),\n" +
 									"\t\t\t\t\t\t\t\t\tdefaultShape()\n" +
 									"\t\t\t\t\t\t\t\t\t\t\t.withSpacingBefore(spacing(IfStmt_ThenOtherStmt))\n" +
-									"\t\t\t\t\t\t\t\t\t\t\t.withIndentationBefore(indent(IndentationContext.IfElse))\n" +
-									"\t\t\t\t\t\t\t\t\t\t\t.withIndentationAfter(unIndent(IndentationContext.IfElse))\n" +
+									"\t\t\t\t\t\t\t\t\t\t\t.withIndentationBefore(indent(IfElse))\n" +
+									"\t\t\t\t\t\t\t\t\t\t\t.withIndentationAfter(unIndent(IfElse))\n" +
 									"\t\t\t\t\t\t\t\t\t\t\t.withSpacingAfter(newLine())\n" +
 									"\t\t\t\t\t\t\t)\n" +
 									"\t\t\t\t\t)\n" +
@@ -1959,12 +1975,12 @@ public class AllDescriptors {
 									"\t\t\t\t\t\t\t\t\talternative(withKind(Kind.ExpressionStmt),\n" +
 									"\t\t\t\t\t\t\t\t\t\t\tdefaultShape()\n" +
 									"\t\t\t\t\t\t\t\t\t\t\t\t\t.withSpacingBefore(spacing(IfStmt_ElseExpressionStmt))\n" +
-									"\t\t\t\t\t\t\t\t\t\t\t\t\t.withIndentationBefore(indent(IndentationContext.IfElse))\n" +
-									"\t\t\t\t\t\t\t\t\t\t\t\t\t.withIndentationAfter(unIndent(IndentationContext.IfElse)),\n" +
+									"\t\t\t\t\t\t\t\t\t\t\t\t\t.withIndentationBefore(indent(IfElse))\n" +
+									"\t\t\t\t\t\t\t\t\t\t\t\t\t.withIndentationAfter(unIndent(IfElse)),\n" +
 									"\t\t\t\t\t\t\t\t\t\t\tdefaultShape()\n" +
 									"\t\t\t\t\t\t\t\t\t\t\t\t\t.withSpacingBefore(spacing(IfStmt_ElseOtherStmt))\n" +
-									"\t\t\t\t\t\t\t\t\t\t\t\t\t.withIndentationBefore(indent(IndentationContext.IfElse))\n" +
-									"\t\t\t\t\t\t\t\t\t\t\t\t\t.withIndentationAfter(unIndent(IndentationContext.IfElse))\n" +
+									"\t\t\t\t\t\t\t\t\t\t\t\t\t.withIndentationBefore(indent(IfElse))\n" +
+									"\t\t\t\t\t\t\t\t\t\t\t\t\t.withIndentationAfter(unIndent(IfElse))\n" +
 									"\t\t\t\t\t\t\t\t\t\t\t\t\t.withSpacingAfter(newLine())\n" +
 									"\t\t\t\t\t\t\t\t\t)\n" +
 									"\t\t\t\t\t\t\t)\n" +
@@ -1990,10 +2006,10 @@ public class AllDescriptors {
 					),
 					listOf(
 							memberDecl("public static final LexicalShape shape = composite(\n" +
-									"\t\t\tnone().withIndentationAfter(indent(IndentationContext.Label)),\n" +
+									"\t\t\tnone().withIndentationAfter(indent(Label)),\n" +
 									"\t\t\tchild(LABEL),\n" +
 									"\t\t\ttoken(LToken.Colon).withSpacingAfter(spacing(LabeledStmt_AfterLabel)),\n" +
-									"\t\t\tnone().withIndentationBefore(unIndent(IndentationContext.Label)),\n" +
+									"\t\t\tnone().withIndentationBefore(unIndent(Label)),\n" +
 									"\t\t\tchild(STMT)\n" +
 									"\t);").build()
 					),
@@ -2037,9 +2053,9 @@ public class AllDescriptors {
 									"\t\t\t\t\ttoken(LToken.Default)\n" +
 									"\t\t\t)),\n" +
 									"\t\t\ttoken(LToken.Colon).withSpacingAfter(newLine()),\n" +
-									"\t\t\tnone().withIndentationAfter(indent(IndentationContext.SwitchCase)),\n" +
+									"\t\t\tnone().withIndentationAfter(indent(SwitchCase)),\n" +
 									"\t\t\tchild(STMTS, SStmt.listShape),\n" +
-									"\t\t\tnone().withIndentationBefore(unIndent(IndentationContext.SwitchCase))\n" +
+									"\t\t\tnone().withIndentationBefore(unIndent(SwitchCase))\n" +
 									"\t);").build(),
 							memberDecl("public static final LexicalShape listShape = list(none().withSpacingAfter(newLine()));").build()
 					),
@@ -2065,14 +2081,14 @@ public class AllDescriptors {
 									"\t\t\ttoken(LToken.ParenthesisRight).withSpacingAfter(space()),\n" +
 									"\t\t\ttoken(LToken.BraceLeft)\n" +
 									"\t\t\t\t\t.withSpacingAfter(newLine())\n" +
-									"\t\t\t\t\t.withIndentationAfter(indent(IndentationContext.Switch)),\n" +
+									"\t\t\t\t\t.withIndentationAfter(indent(Switch)),\n" +
 									"\t\t\tchild(CASES, SSwitchCase.listShape),\n" +
 									"\t\t\talternative(childIs(CASES, not(empty())),\n" +
 									"\t\t\t\t\ttoken(LToken.BraceRight)\n" +
-									"\t\t\t\t\t\t\t.withIndentationBefore(unIndent(IndentationContext.Switch))\n" +
+									"\t\t\t\t\t\t\t.withIndentationBefore(unIndent(Switch))\n" +
 									"\t\t\t\t\t\t\t.withSpacingBefore(newLine()),\n" +
 									"\t\t\t\t\ttoken(LToken.BraceRight)\n" +
-									"\t\t\t\t\t\t\t.withIndentationBefore(unIndent(IndentationContext.Switch))\n" +
+									"\t\t\t\t\t\t\t.withIndentationBefore(unIndent(Switch))\n" +
 									"\t\t\t)\n" +
 									"\t);").build()
 					),
@@ -2135,13 +2151,13 @@ public class AllDescriptors {
 									"\t\t\tkeyword(LToken.Try),\n" +
 									"\t\t\twhen(childIs(RESOURCES, not(empty())),\n" +
 									"\t\t\t\t\ttoken(LToken.ParenthesisLeft)\n" +
-									"\t\t\t\t\t\t\t.withIndentationAfter(indent(IndentationContext.TryResources))\n" +
+									"\t\t\t\t\t\t\t.withIndentationAfter(indent(TryResources))\n" +
 									"\t\t\t),\n" +
 									"\t\t\tchild(RESOURCES, list(token(LToken.SemiColon).withSpacingAfter(newLine()))),\n" +
 									"\t\t\twhen(childIs(RESOURCES, not(empty())), when(data(TRAILING_SEMI_COLON), token(LToken.SemiColon))),\n" +
 									"\t\t\twhen(childIs(RESOURCES, not(empty())),\n" +
 									"\t\t\t\t\ttoken(LToken.ParenthesisRight)\n" +
-									"\t\t\t\t\t\t\t.withIndentationBefore(unIndent(IndentationContext.TryResources))\n" +
+									"\t\t\t\t\t\t\t.withIndentationBefore(unIndent(TryResources))\n" +
 									"\t\t\t\t\t\t\t.withSpacingAfter(space())\n" +
 									"\t\t\t),\n" +
 									"\t\t\tchild(TRY_BLOCK),\n" +

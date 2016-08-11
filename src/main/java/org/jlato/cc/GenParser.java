@@ -1,19 +1,13 @@
 package org.jlato.cc;
 
-import org.javacc.parser.ParseException;
 import org.jlato.bootstrap.descriptors.AllDescriptors;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
-import org.jlato.bootstrap.tests.TreesKindTest;
 import org.jlato.bootstrap.util.CompilationUnitPattern;
-import org.jlato.cc.grammar.GProduction;
 import org.jlato.cc.grammar.GProductions;
+import org.jlato.parser.ParseException;
 import org.jlato.printer.FormattingSettings;
 
-import javax.print.attribute.standard.MediaSize;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-
-import static org.jlato.tree.Trees.listOf;
 
 /**
  * @author Didier Villevalois
@@ -24,18 +18,19 @@ public class GenParser {
 		new GenParser().generate();
 	}
 
-	private void generate() throws IOException, ParseException, org.jlato.parser.ParseException {
-		GProductions productions = Grammar.productions;
-
+	public void generate() throws IOException, ParseException {
 		String pathToJLaTo = System.getProperty("path.to.jlato");
 		String rootDirectory = pathToJLaTo + "src/main/java";
 
+		generateParser(Grammar.productions, rootDirectory, "ParserImplementation");
+		generateParser(Grammar2.productions, rootDirectory, "ParserImplementation2");
+		generateParser(Grammar3.productions, rootDirectory, "ParserImplementation3");
+	}
+
+	private void generateParser(GProductions productions, String rootDirectory, String implementationName) throws org.jlato.parser.ParseException, IOException {
 		final TreeClassDescriptor[] classDescriptors = AllDescriptors.ALL_CLASSES;
-
-		// Generate unit test classes
-
-		CompilationUnitPattern.of(new ParserPattern())
+		CompilationUnitPattern.of(new ParserPattern(productions, implementationName))
 				.withFormatting(true, FormattingSettings.Default.withCommentFormatting(true))
-				.apply(rootDirectory, "org/jlato/internal/parser/ParserImplementation.java", classDescriptors);
+				.apply(rootDirectory, "org/jlato/internal/parser/" + implementationName + ".java", classDescriptors);
 	}
 }

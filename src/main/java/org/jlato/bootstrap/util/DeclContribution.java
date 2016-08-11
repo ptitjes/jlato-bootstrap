@@ -11,6 +11,9 @@ import org.jlato.util.Function1;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.jlato.tree.Trees.importDecl;
+import static org.jlato.tree.Trees.qualifiedName;
+
 /**
  * @author Didier Villevalois
  */
