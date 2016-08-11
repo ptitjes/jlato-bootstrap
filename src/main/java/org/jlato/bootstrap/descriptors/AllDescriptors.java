@@ -360,7 +360,7 @@ public class AllDescriptors {
 							(QualifiedType) type("Documentable<AnnotationMemberDecl>").build()
 					),
 					listOf(
-							memberDecl("public static final LexicalShape defaultValShape = composite(token(LToken.Default).withSpacingBefore(space()), element());").build(),
+							memberDecl("public static final LexicalShape defaultValShape = composite(token(LToken.Default).withSpacing(space(), space()), element());").build(),
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(MODIFIERS, SExtendedModifier.multiLineShape),\n" +
 									"\t\t\tchild(TYPE),\n" +
