@@ -212,12 +212,6 @@ public class StateBaseMembers extends Utils implements DeclContribution<TreeClas
 			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.LexicalShape")).setOnDemand(true).setStatic(true));
 			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.LSCondition")).setOnDemand(true).setStatic(true));
 			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.bu.LToken")));
-//			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.IndentationContext")));
-			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.SpacingLocation")));
-			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.IndentationContext")).setOnDemand(true).setStatic(true));
-			importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.SpacingLocation")).setOnDemand(true).setStatic(true));
-			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.SpacingConstraint")).setOnDemand(true).setStatic(true));
-			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.IndentationConstraint")).setOnDemand(true).setStatic(true));
 			importManager.addImport(importDecl(qualifiedName("org.jlato.internal.parser.TokenType")));
 
 			return decl.withBody(blockStmt().withStmts(listOf(

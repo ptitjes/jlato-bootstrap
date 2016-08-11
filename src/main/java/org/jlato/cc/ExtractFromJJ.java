@@ -47,7 +47,7 @@ public class ExtractFromJJ {
 				objectCreationExpr(qualifiedType(name("GProductions"))).withArgs(insertNewLineAfterLast(
 						listOf(
 								productions.getAll().stream()
-										.map(c -> c.toExpr().insertNewLineBefore())
+										.map(c -> c.toExpr().prependLeadingNewLine())
 										.collect(Collectors.toList())
 						)
 				));
@@ -57,7 +57,7 @@ public class ExtractFromJJ {
 						importDecl(qualifiedName("org.jlato.cc.grammar.GExpansion")),
 						importDecl(qualifiedName("org.jlato.cc.grammar.GProduction")),
 						importDecl(qualifiedName("org.jlato.cc.grammar.GProductions")),
-						importDecl(qualifiedName("org.jlato.tree.decl.MethodDecl")).insertNewLineAfter(),
+						importDecl(qualifiedName("org.jlato.tree.decl.MethodDecl")).appendTrailingNewLine(),
 						importDecl(qualifiedName("org.jlato.pattern.Quotes.expr")).setStatic(true),
 						importDecl(qualifiedName("org.jlato.pattern.Quotes.memberDecl")).setStatic(true),
 						importDecl(qualifiedName("org.jlato.pattern.Quotes.stmt")).setStatic(true),

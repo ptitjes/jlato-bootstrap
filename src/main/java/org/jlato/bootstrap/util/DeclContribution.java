@@ -11,6 +11,9 @@ import org.jlato.util.Function1;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.jlato.tree.Trees.importDecl;
+import static org.jlato.tree.Trees.qualifiedName;
+
 /**
  * @author Didier Villevalois
  */
@@ -45,6 +48,11 @@ public interface DeclContribution<A, D extends Decl> {
 
 						@Override
 						public FieldDecl rewrite(FieldDecl decl, ImportManager importManager, A arg) {
+							importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.SpacingConstraint")));
+							importManager.addImport(importDecl(qualifiedName("org.jlato.internal.shapes.IndentationConstraint")));
+							importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.IndentationContext")));
+							importManager.addImport(importDecl(qualifiedName("org.jlato.printer.FormattingSettings.SpacingLocation")));
+
 							return declaration;
 						}
 					});

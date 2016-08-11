@@ -56,9 +56,9 @@ public class TreesAccessorsTest extends TestPattern {
 		loopStmts = loopStmts.append(newVarStmt(descriptor.interfaceType(), tested,
 				params.foldLeft(factoryCall(descriptor, importManager),
 						(e, p) -> methodInvocationExpr(name(propertySetterName(p)))
-								.withScope(e/*.insertNewLineAfter()*/).withArgs(listOf(p.id().get().name()))
+								.withScope(e/*.appendTrailingNewLine()*/).withArgs(listOf(p.id().get().name()))
 				)
-		).insertNewLineBefore().insertLeadingComment("Use factory method without argument"));
+		).prependLeadingNewLine().appendLeadingComment("Use factory method without argument"));
 
 		loopStmts = loopStmts.appendAll(params.map(p ->
 				junitAssert("assertEquals",
@@ -76,9 +76,9 @@ public class TreesAccessorsTest extends TestPattern {
 											.map(p -> p.id().get().name())
 							),
 							(e, p) -> methodInvocationExpr(name(propertySetterName(p)))
-									.withScope(e/*.insertNewLineAfter()*/).withArgs(listOf(p.id().get().name()))
+									.withScope(e/*.appendTrailingNewLine()*/).withArgs(listOf(p.id().get().name()))
 					)
-			).insertNewLineBefore().insertLeadingComment("Use factory method with arguments"));
+			).prependLeadingNewLine().appendLeadingComment("Use factory method with arguments"));
 
 			loopStmts = loopStmts.appendAll(params.map(p ->
 					junitAssert("assertEquals",
@@ -98,7 +98,7 @@ public class TreesAccessorsTest extends TestPattern {
 											methodInvocationExpr(name("id")).withScope(p.id().get().name())
 									))
 					)
-			).insertNewLineBefore().insertLeadingComment("Use specialized name mutators"));
+			).prependLeadingNewLine().appendLeadingComment("Use specialized name mutators"));
 
 			loopStmts = loopStmts.appendAll(nameParameters.map(p ->
 					junitAssert("assertEquals",
@@ -118,7 +118,7 @@ public class TreesAccessorsTest extends TestPattern {
 											methodInvocationExpr(name("get")).withScope(p.id().get().name())
 									))
 					)
-			).insertNewLineBefore().insertLeadingComment("Use specialized NodeOption.some() mutators"));
+			).prependLeadingNewLine().appendLeadingComment("Use specialized NodeOption.some() mutators"));
 
 			loopStmts = loopStmts.appendAll(optionParameters.map(p ->
 					junitAssert("assertEquals",
@@ -132,7 +132,7 @@ public class TreesAccessorsTest extends TestPattern {
 							(e, p) -> methodInvocationExpr(name(propertySetterName(p, "No")))
 									.withScope(e).withArgs(emptyList())
 					)
-			).insertNewLineBefore().insertLeadingComment("Use specialized NodeOption.none() mutators"));
+			).prependLeadingNewLine().appendLeadingComment("Use specialized NodeOption.none() mutators"));
 
 			loopStmts = loopStmts.appendAll(optionParameters.map(p ->
 					junitAssert("assertEquals",
@@ -160,7 +160,7 @@ public class TreesAccessorsTest extends TestPattern {
 											methodInvocationExpr(name("right")).withScope(p.id().get().name())
 									))
 							)
-					).insertNewLineBefore().insertLeadingComment("Use specialized NodeEither mutators")
+					).prependLeadingNewLine().appendLeadingComment("Use specialized NodeEither mutators")
 
 			));
 

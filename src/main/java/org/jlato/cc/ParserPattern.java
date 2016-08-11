@@ -106,7 +106,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				.withParams(production.hintParams.appendAll(production.dataParams))
 				.withThrowsClause(listOf(qualifiedType(name("ParseException"))))
 				.withBody(blockStmt().withStmts(stmts))
-				.insertLeadingComment(production.expansion.toString(), true);
+				.appendLeadingComment(production.expansion.toString(), true);
 	}
 
 	private NodeList<Stmt> parseStatementsFor(String symbol, GExpansion expansion, NodeList<FormalParameter> hintParams) {
@@ -455,7 +455,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 								.appendAll(params)
 				)
 				.withBody(blockStmt().withStmts(stmts))
-				.insertLeadingComment(expansion.toString(e -> e.kind != GExpansion.Kind.Action), true);
+				.appendLeadingComment(expansion.toString(e -> e.kind != GExpansion.Kind.Action), true);
 	}
 
 	private MethodInvocationExpr matchMethodCall(String methodName, Expr lookahead, NodeList<Expr> args) {

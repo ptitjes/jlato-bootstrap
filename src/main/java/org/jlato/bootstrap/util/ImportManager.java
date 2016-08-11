@@ -43,10 +43,10 @@ public class ImportManager {
 		ArrayList<ImportDecl> sortedStaticImports = filterImports(onDemandStaticImports, singleStaticImports, true, n -> true);
 
 		if (!sortedJavaImports.isEmpty())
-			sortedJavaImports.set(0, sortedJavaImports.get(0).insertNewLineBefore());
+			sortedJavaImports.set(0, sortedJavaImports.get(0).prependLeadingNewLine());
 
 		if (!sortedStaticImports.isEmpty())
-			sortedStaticImports.set(0, sortedStaticImports.get(0).insertNewLineBefore());
+			sortedStaticImports.set(0, sortedStaticImports.get(0).prependLeadingNewLine());
 
 		return Trees.<ImportDecl>emptyList()
 				.appendAll(listOf(sortedImports))

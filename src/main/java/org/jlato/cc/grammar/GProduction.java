@@ -68,14 +68,14 @@ public class GProduction {
 				.withArgs(listOf(
 						literalExpr(symbol),
 						returnType.kind() == Kind.VoidType ? nullLiteralExpr() : reify("type", returnType),
-						reifyList("param", hintParams).insertNewLineBefore(),
-						reifyList("param", dataParams).insertNewLineBefore(),
-						reifyList("stmt", declarations).insertNewLineBefore(),
-						expansion.toExpr().insertNewLineAfter()
+						reifyList("param", hintParams).prependLeadingNewLine(),
+						reifyList("param", dataParams).prependLeadingNewLine(),
+						reifyList("stmt", declarations).prependLeadingNewLine(),
+						expansion.toExpr().appendTrailingNewLine()
 				));
 		if (memoizeMatches)
 			creation = methodInvocationExpr(name("memoizeMatches"))
-					.withScope(creation.insertNewLineAfter());
+					.withScope(creation.appendTrailingNewLine());
 		return creation;
 	}
 
