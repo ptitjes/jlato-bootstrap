@@ -28,13 +28,13 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 
 	@Override
 	public Pattern<? extends Decl> matcher(TreeClassDescriptor[] arg) {
-		return typeDecl("public abstract class Trees { ..$_ }");
+		return typeDecl("public final class Trees { ..$_ }");
 	}
 
 	@Override
 	public ClassDecl rewrite(ClassDecl decl, ImportManager importManager, TreeClassDescriptor[] arg) {
 		decl = classDecl(name("Trees"))
-				.withModifiers(m -> m.append(Modifier.Public).append(Modifier.Abstract));
+				.withModifiers(m -> m.append(Modifier.Public).append(Modifier.Final));
 
 		if (GenSettings.generateDocs)
 			decl = decl.withDocComment("A factory for tree nodes.");
@@ -48,8 +48,8 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 				"\t\treturn TDNodeOption.none();\n" +
 				"\t}").build());
 
-		factoryMethods = factoryMethods.append(memberDecl("public static <T extends Tree> NodeOption<T> T t {\n" +
-				"\t\treturn TDNodeOption.t;\n" +
+		factoryMethods = factoryMethods.append(memberDecl("public static <T extends Tree> NodeOption<T> some(T t) {\n" +
+				"\t\treturn TDNodeOption.some(t);\n" +
 				"\t}").build());
 
 		factoryMethods = factoryMethods.append(memberDecl("public static <T extends Tree> NodeOption<T> optionOf(T t) {\n" +

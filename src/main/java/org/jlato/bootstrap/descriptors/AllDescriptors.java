@@ -796,6 +796,9 @@ public class AllDescriptors {
 							memberDecl("public static final LexicalShape shape = composite(\n" +
 									"\t\t\tchild(MODIFIERS, SExtendedModifier.multiLineShape),\n" +
 									"\t\t\tchild(TYPE_PARAMS, STypeParameter.listShape),\n" +
+									"\t\t\twhen(childIs(TYPE_PARAMS, not(empty())),\n" +
+									"\t\t\t\t\tchild(ADDITIONAL_ANNOTATIONS, org.jlato.internal.bu.expr.SAnnotationExpr.multiLineShape)\n" +
+									"\t\t\t),\n" +
 									"\t\t\tchild(TYPE),\n" +
 									"\t\t\tchild(NAME).withSpacingBefore(space()),\n" +
 									"\t\t\ttoken(LToken.ParenthesisLeft),\n" +
@@ -812,6 +815,7 @@ public class AllDescriptors {
 					listOf(
 							param("NodeList<ExtendedModifier> modifiers").build(),
 							param("NodeList<TypeParameter> typeParams").build(),
+							param("NodeList<AnnotationExpr> additionalAnnotations").build(),
 							param("Type type").build(),
 							param("Name name").build(),
 							param("NodeList<FormalParameter> params").build(),
@@ -820,6 +824,7 @@ public class AllDescriptors {
 							param("NodeOption<BlockStmt> body").build()
 					),
 					listOf(
+							(Expr) null,
 							(Expr) null,
 							(Expr) null,
 							(Expr) null,

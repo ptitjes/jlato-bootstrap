@@ -1198,6 +1198,7 @@ public class Grammar2 {
 					),
 					listOf(
 							stmt("BUTree<SNodeList> typeParameters = null;").build(),
+							stmt("BUTree<SNodeList> additionalAnnotations = null;").build(),
 							stmt("BUTree<? extends SType> type;").build(),
 							stmt("BUTree<SName> name;").build(),
 							stmt("BUTree<SNodeList> parameters;").build(),
@@ -1208,7 +1209,8 @@ public class Grammar2 {
 					),
 					sequence(
 							zeroOrOne(
-									nonTerminal("typeParameters", "TypeParameters")
+									nonTerminal("typeParameters", "TypeParameters"),
+									nonTerminal("additionalAnnotations", "Annotations")
 							),
 							nonTerminal("type", "ResultType"),
 							nonTerminal("name", "Name"),
@@ -1227,7 +1229,7 @@ public class Grammar2 {
 									)
 							),
 							action(listOf(
-									stmt("return dress(SMethodDecl.make(modifiers, ensureNotNull(typeParameters), type, name, parameters, arrayDims, ensureNotNull(throwsClause), optionOf(block))).withProblem(problem);").build()
+									stmt("return dress(SMethodDecl.make(modifiers, ensureNotNull(typeParameters), ensureNotNull(additionalAnnotations), type, name, parameters, arrayDims, ensureNotNull(throwsClause), optionOf(block))).withProblem(problem);").build()
 							))
 					)
 			),
