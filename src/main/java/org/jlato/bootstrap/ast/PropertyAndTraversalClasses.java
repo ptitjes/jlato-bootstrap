@@ -86,17 +86,16 @@ public class PropertyAndTraversalClasses extends Utils implements DeclContributi
 
 			final Name childParamName = name("child");
 
-			final FormalParameter typedStateParam = formalParameter(stateType, variableDeclaratorId(stateParamName));
-			final FormalParameter stateParam = formalParameter(
-					qualifiedType(AllDescriptors.S_TREE),
-					variableDeclaratorId(stateParamName));
+			final FormalParameter typedStateParam = formalParameter(stateType).withId(variableDeclaratorId(stateParamName));
+			final FormalParameter stateParam = formalParameter(qualifiedType(AllDescriptors.S_TREE))
+					.withId(variableDeclaratorId(stateParamName));
 
 			QualifiedType childStateType = treeTypeToStateType((QualifiedType) treeType);
 			final Type childType = qualifiedType(AllDescriptors.BU_TREE)
 					.withTypeArgs(listOf(childStateType));
 			final Type childReturnType = qualifiedType(AllDescriptors.BU_TREE)
 					.withTypeArgs(listOf(wildcardType()));
-			final FormalParameter childParam = formalParameter(childType, variableDeclaratorId(childParamName));
+			final FormalParameter childParam = formalParameter(childType).withId(variableDeclaratorId(childParamName));
 
 			MethodDecl traverseMethod = methodDecl(childReturnType, name("doTraverse"))
 					.withModifiers(listOf(overrideAnn(), Modifier.Public))
@@ -178,14 +177,13 @@ public class PropertyAndTraversalClasses extends Utils implements DeclContributi
 
 			final Name childParamName = name("child");
 
-			final FormalParameter typedStateParam = formalParameter(stateType, variableDeclaratorId(stateParamName));
-			final FormalParameter stateParam = formalParameter(
-					qualifiedType(AllDescriptors.S_TREE),
-					variableDeclaratorId(stateParamName));
+			final FormalParameter typedStateParam = formalParameter(stateType).withId(variableDeclaratorId(stateParamName));
+			final FormalParameter stateParam = formalParameter(qualifiedType(AllDescriptors.S_TREE))
+					.withId(variableDeclaratorId(stateParamName));
 
 			final Name valueParamName = name("value");
 			final Type valueType = boxedType(param.type());
-			final FormalParameter valueParam = formalParameter(valueType, variableDeclaratorId(valueParamName));
+			final FormalParameter valueParam = formalParameter(valueType).withId(variableDeclaratorId(valueParamName));
 
 			MethodDecl retrieveMethod = methodDecl(valueType, name("doRetrieve"))
 					.withModifiers(listOf(overrideAnn(), Modifier.Public))

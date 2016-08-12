@@ -451,7 +451,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		return methodDecl(primitiveType(Primitive.Int), name(methodName))
 				.withModifiers(listOf(Modifier.Private))
 				.withParams(
-						listOf(formalParameter(primitiveType(Primitive.Int), variableDeclaratorId(LOOKAHEAD)))
+						listOf(formalParameter(primitiveType(Primitive.Int)).withId(variableDeclaratorId(LOOKAHEAD)))
 								.appendAll(params)
 				)
 				.withBody(blockStmt().withStmts(stmts))

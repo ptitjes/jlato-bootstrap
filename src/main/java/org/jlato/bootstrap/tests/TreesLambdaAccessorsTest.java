@@ -47,8 +47,8 @@ public class TreesLambdaAccessorsTest extends TestPattern {
 				.withModifiers(listOf(Modifier.Private))
 				.withTypeParams(listOf(typeParameter(name("T"))))
 				.withParams(listOf(
-						formalParameter(tType, variableDeclaratorId(beforeName)).withModifiers(listOf(Modifier.Final)),
-						formalParameter(tType, variableDeclaratorId(afterName)).withModifiers(listOf(Modifier.Final))
+						formalParameter(tType).withId(variableDeclaratorId(beforeName)).withModifiers(listOf(Modifier.Final)),
+						formalParameter(tType).withId(variableDeclaratorId(afterName)).withModifiers(listOf(Modifier.Final))
 				))
 				.withBody(blockStmt().withStmts(listOf(
 						returnStmt().withExpr(
@@ -57,7 +57,8 @@ public class TreesLambdaAccessorsTest extends TestPattern {
 												methodDecl(tType, name("mutate"))
 														.withModifiers(listOf(Modifier.Public))
 														.withParams(listOf(
-																formalParameter(tType, variableDeclaratorId(tName)).withModifiers(listOf(Modifier.Final))
+																formalParameter(tType).withId(variableDeclaratorId(tName))
+																		.withModifiers(listOf(Modifier.Final))
 														))
 														.withBody(blockStmt().withStmts(listOf(
 																junitAssert("assertEquals", beforeName, tName),

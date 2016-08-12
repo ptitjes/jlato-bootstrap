@@ -131,7 +131,7 @@ public class Utils {
 
 			Type stateParamType = treeTypeToSTreeType(treeType);
 			stateConstructorParams = stateConstructorParams.append(
-					formalParameter(stateParamType, param.id().get())
+					formalParameter(stateParamType).withId(param.id().get())
 			);
 		}
 		return stateConstructorParams;

@@ -52,7 +52,7 @@ public class TreeConstruction implements DeclContribution<TreeClassDescriptor, M
 			decl = constructorDecl(arg.className())
 					.withModifiers(listOf(Modifier.Public))
 					.withParams(listOf(
-							formalParameter(locationType, variableDeclaratorId(location))
+							formalParameter(locationType).withId(variableDeclaratorId(location))
 					))
 					.withBody(blockStmt().withStmts(listOf(
 							explicitConstructorInvocationStmt()

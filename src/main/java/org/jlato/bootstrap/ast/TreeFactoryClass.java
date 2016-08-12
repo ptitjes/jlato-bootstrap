@@ -44,6 +44,10 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 
 		NodeList<MemberDecl> factoryMethods = emptyList();
 
+		factoryMethods = factoryMethods.append(
+				constructorDecl(name("Trees")).withModifiers(listOf(Modifier.Private))
+		);
+
 		factoryMethods = factoryMethods.append(memberDecl("public static <T extends Tree> NodeOption<T> none() {\n" +
 				"\t\treturn TDNodeOption.none();\n" +
 				"\t}").build());
@@ -98,28 +102,28 @@ public class TreeFactoryClass extends Utils implements DeclPattern<TreeClassDesc
 						"\t}").build());
 			} else if (descriptor.name.id().equals("LiteralExpr")) {
 				factoryMethods = factoryMethods.append(memberDecl("public static LiteralExpr<Void> nullLiteralExpr() {\n" +
-						"\treturn new TDLiteralExpr<Void>(Void.class, Literals.from(Void.class, null));\n" +
+						"\t\treturn new TDLiteralExpr<Void>(Void.class, Literals.from(Void.class, null));\n" +
 						"}").build());
 				factoryMethods = factoryMethods.append(memberDecl("public static LiteralExpr<Boolean> literalExpr(boolean value) {\n" +
-						"\treturn new TDLiteralExpr<Boolean>(Boolean.class, Literals.from(Boolean.class, value));\n" +
+						"\t\treturn new TDLiteralExpr<Boolean>(Boolean.class, Literals.from(Boolean.class, value));\n" +
 						"}").build());
 				factoryMethods = factoryMethods.append(memberDecl("public static LiteralExpr<Integer> literalExpr(int value) {\n" +
-						"\treturn new TDLiteralExpr<Integer>(Integer.class, Literals.from(Integer.class, value));\n" +
+						"\t\treturn new TDLiteralExpr<Integer>(Integer.class, Literals.from(Integer.class, value));\n" +
 						"}").build());
 				factoryMethods = factoryMethods.append(memberDecl("public static LiteralExpr<Long> literalExpr(long value) {\n" +
-						"\treturn new TDLiteralExpr<Long>(Long.class, Literals.from(Long.class, value));\n" +
+						"\t\treturn new TDLiteralExpr<Long>(Long.class, Literals.from(Long.class, value));\n" +
 						"}").build());
 				factoryMethods = factoryMethods.append(memberDecl("public static LiteralExpr<Float> literalExpr(float value) {\n" +
-						"\treturn new TDLiteralExpr<Float>(Float.class, Literals.from(Float.class, value));\n" +
+						"\t\treturn new TDLiteralExpr<Float>(Float.class, Literals.from(Float.class, value));\n" +
 						"}").build());
 				factoryMethods = factoryMethods.append(memberDecl("public static LiteralExpr<Double> literalExpr(double value) {\n" +
-						"\treturn new TDLiteralExpr<Double>(Double.class, Literals.from(Double.class, value));\n" +
+						"\t\treturn new TDLiteralExpr<Double>(Double.class, Literals.from(Double.class, value));\n" +
 						"}").build());
 				factoryMethods = factoryMethods.append(memberDecl("public static LiteralExpr<Character> literalExpr(char value) {\n" +
-						"\treturn new TDLiteralExpr<Character>(Character.class, Literals.from(Character.class, value));\n" +
+						"\t\treturn new TDLiteralExpr<Character>(Character.class, Literals.from(Character.class, value));\n" +
 						"}").build());
 				factoryMethods = factoryMethods.append(memberDecl("public static LiteralExpr<String> literalExpr(String value) {\n" +
-						"\treturn new TDLiteralExpr<String>(String.class, Literals.from(String.class, value));\n" +
+						"\t\treturn new TDLiteralExpr<String>(String.class, Literals.from(String.class, value));\n" +
 						"}").build());
 			}
 		}
