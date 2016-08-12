@@ -24,7 +24,7 @@ public class GenParser {
 
 		generateParser(Grammar.productions, rootDirectory, "ParserImplementation");
 		generateParser(Grammar2.productions, rootDirectory, "ParserImplementation2");
-		generateParser(Grammar3.productions, rootDirectory, "ParserImplementation3");
+//		generateParser(Grammar3.productions, rootDirectory, "ParserImplementation3");
 	}
 
 	private void generateParser(GProductions productions, String rootDirectory, String implementationName) throws org.jlato.parser.ParseException, IOException {

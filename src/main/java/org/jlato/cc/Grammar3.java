@@ -10,6 +10,7 @@ import static org.jlato.tree.Trees.listOf;
 
 public class Grammar3 {
 
+	// Backup of grammar with precedence parsing of binary expressions
 	public static GProductions productions = new GProductions(
 			production("NodeListVar", type("BUTree<SNodeList>").build(),
 					emptyList(),
@@ -2601,7 +2602,7 @@ public class Grammar3 {
 									),
 									sequence(
 											lookAhead(
-													expr("isCast()").build()
+													nonTerminal("CastExpression")
 											),
 											nonTerminal("ret", "CastExpression")
 									),
