@@ -17,6 +17,7 @@ import org.jlato.tree.type.Type;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.jlato.pattern.Quotes.memberDecl;
 import static org.jlato.pattern.Quotes.stmt;
 import static org.jlato.tree.Trees.*;
 
@@ -70,13 +71,22 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				importDecl(qualifiedName("org.jlato.tree.type.Primitive"))
 		));
 
-		for (GProduction production : productions.getAll()) {
+		List<GProduction> allProductions = productions.getAll();
+
+		int memoizedProductionCount = 0;
+		for (GProduction production : allProductions) {
+			if (production.memoizeMatches) memoizedProductionCount++;
+		}
+
+		NodeList<MemberDecl> members = Trees.emptyList();
+		members = members.append(memberDecl("protected int memoizedProductionCount() { return " + memoizedProductionCount + "; }").build());
+
+		for (GProduction production : allProductions) {
 			if (excluded(production)) continue;
 
 			parseMethods = parseMethods.append(parseMethod(importManager, production));
 		}
 
-		NodeList<MemberDecl> members = Trees.emptyList();
 		for (MethodDecl parseMethod : parseMethods) {
 			members = members.append(parseMethod);
 
