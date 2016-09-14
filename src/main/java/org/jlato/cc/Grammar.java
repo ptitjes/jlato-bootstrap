@@ -1384,7 +1384,6 @@ public class Grammar {
 							stmt("BUTree<SName> name;").build(),
 							stmt("BUTree<SNodeList> parameters;").build(),
 							stmt("BUTree<SNodeList> throwsClause = null;").build(),
-							stmt("BUTree<SExplicitConstructorInvocationStmt> exConsInv = null;").build(),
 							stmt("BUTree<SBlockStmt> block;").build(),
 							stmt("BUTree<SNodeList> stmts = emptyList();").build(),
 							stmt("BUTree<? extends SStmt> stmt;").build()
@@ -1481,17 +1480,37 @@ public class Grammar {
 							zeroOrOne(
 									choice(
 											sequence(
-												lookAhead(
-														expr("quotesMode").build(),
-														nonTerminal("NodeListVar")
-												),
-												nonTerminal("ret", "NodeListVar")
+													lookAhead(
+															expr("quotesMode").build(),
+															nonTerminal("NodeListVar")
+													),
+													nonTerminal("ret", "NodeListVar")
 											),
 											sequence(
 													zeroOrOne(
 															lookAhead(
 																	expr("inConstructor").build(),
-																	nonTerminal("ExplicitConstructorInvocation")
+																	choice(
+																			sequence(
+																					zeroOrOne(
+																							nonTerminal("typeArgs", "TypeArguments")
+																					),
+																					choice(
+																							terminal("THIS"),
+																							terminal("SUPER")
+																					),
+																					terminal("LPAREN")
+																			),
+																			sequence(
+																					nonTerminal("PrimaryExpressionWithoutSuperSuffix"),
+																					terminal("DOT"),
+																					zeroOrOne(
+																							nonTerminal("typeArgs", "TypeArguments")
+																					),
+																					terminal("SUPER"),
+																					terminal("LPAREN")
+																			)
+																	)
 															),
 															nonTerminal("stmt", "ExplicitConstructorInvocation"),
 															action(listOf(
