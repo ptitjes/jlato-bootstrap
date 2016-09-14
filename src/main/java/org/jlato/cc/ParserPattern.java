@@ -109,7 +109,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 
 		NodeList<Stmt> stmts = emptyList();
 		stmts = stmts.appendAll(production.declarations);
-		stmts = stmts.appendAll(parseStatementsFor(production.symbol, production.expansion, production.hintParams));
+		stmts = stmts.appendAll(parseStatementsFor(production.symbol, production.expansion, production.hintParams, false));
 
 		return methodDecl(type, name("parse" + upperCaseFirst(production.symbol)))
 				.withModifiers(listOf(Modifier.Protected))
@@ -119,29 +119,33 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				.appendLeadingComment(production.expansion.toString(), true);
 	}
 
-	private NodeList<Stmt> parseStatementsFor(String symbol, GExpansion expansion, NodeList<FormalParameter> hintParams) {
+	private NodeList<Stmt> parseStatementsFor(String symbol, GExpansion expansion, NodeList<FormalParameter> hintParams, boolean optional) {
 		NodeList<Stmt> stmts = emptyList();
 		switch (expansion.kind) {
 			case Sequence:
-				stmts = stmts.appendAll(parseStatementsForChildren(symbol, expansion, hintParams));
+				stmts = stmts.appendAll(parseStatementsForChildren(symbol, expansion, hintParams, false));
 				break;
 			case ZeroOrOne: {
-				stmts = stmts.append(ifStmt(
-						matchCondition(symbol, expansion, hintParams, hintParams.map(p -> p.id().get().name())),
-						blockStmt().withStmts(parseStatementsForChildren(symbol, expansion, hintParams))
-				));
+				if (expansion.children.size() == 1 && expansion.children.get(0).kind == GExpansion.Kind.Choice) {
+					stmts = stmts.appendAll(parseStatementsForChildren(symbol, expansion, hintParams, true));
+				} else {
+					stmts = stmts.append(ifStmt(
+							matchCondition(symbol, expansion, hintParams, hintParams.map(p -> p.id().get().name())),
+							blockStmt().withStmts(parseStatementsForChildren(symbol, expansion, hintParams, false))
+					));
+				}
 				break;
 			}
 			case ZeroOrMore: {
 				stmts = stmts.append(whileStmt(
 						matchCondition(symbol, expansion, hintParams, hintParams.map(p -> p.id().get().name())),
-						blockStmt().withStmts(parseStatementsForChildren(symbol, expansion, hintParams))
+						blockStmt().withStmts(parseStatementsForChildren(symbol, expansion, hintParams, false))
 				));
 				break;
 			}
 			case OneOrMore: {
 				stmts = stmts.append(doStmt(
-						blockStmt().withStmts(parseStatementsForChildren(symbol, expansion, hintParams)),
+						blockStmt().withStmts(parseStatementsForChildren(symbol, expansion, hintParams, false)),
 						matchCondition(symbol, expansion, hintParams, hintParams.map(p -> p.id().get().name()))
 				));
 				break;
@@ -150,17 +154,18 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				List<IfStmt> expansionsIfStmt = expansion.children.stream()
 						.map(e -> ifStmt(
 								matchCondition(symbol, e, hintParams, hintParams.map(p -> p.id().get().name())),
-								blockStmt().withStmts(parseStatementsFor(symbol, e, hintParams))
+								blockStmt().withStmts(parseStatementsFor(symbol, e, hintParams, false))
 						))
 						.collect(Collectors.toList());
 				Collections.reverse(expansionsIfStmt);
 
 				stmts = stmts.append(listOf(expansionsIfStmt).foldRight(
-						(Stmt) blockStmt().withStmts(listOf(throwStmt(
+						(Stmt) (optional ? null : blockStmt().withStmts(listOf(throwStmt(
 								methodInvocationExpr(name("produceParseException"))
 										.withArgs(listOf(firstTerminalsOf(expansion).stream().map(this::prefixedConstant).collect(Collectors.toList())))
-						))),
-						(ifThenClause, elseClause) -> ifThenClause.withElseStmt(elseClause)
+						)))),
+						(ifThenClause, elseClause) ->
+							optional && elseClause == null ? ifThenClause : ifThenClause.withElseStmt(elseClause)
 				));
 				break;
 			}
@@ -191,10 +196,10 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		return stmts;
 	}
 
-	private NodeList<Stmt> parseStatementsForChildren(String symbol, GExpansion expansion, NodeList<FormalParameter> hintParams) {
+	private NodeList<Stmt> parseStatementsForChildren(String symbol, GExpansion expansion, NodeList<FormalParameter> hintParams, boolean optional) {
 		NodeList<Stmt> stmts = emptyList();
 		for (GExpansion child : expansion.children) {
-			stmts = stmts.appendAll(parseStatementsFor(symbol, child, hintParams));
+			stmts = stmts.appendAll(parseStatementsFor(symbol, child, hintParams, optional));
 		}
 		return stmts;
 	}
