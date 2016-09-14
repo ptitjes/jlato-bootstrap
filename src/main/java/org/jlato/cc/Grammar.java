@@ -1466,7 +1466,7 @@ public class Grammar {
 									stmt("return dress(SExplicitConstructorInvocationStmt.make(ensureNotNull(typeArgs), isThis, optionOf(expr), args));").build()
 							))
 					)
-			).memoizeMatches(),
+			),
 			production("Statements", type("BUTree<SNodeList>").build(),
 					listOf(
 							param("boolean inConstructor").build()
