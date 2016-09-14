@@ -2,15 +2,17 @@ package org.jlato.cc;
 
 import org.jlato.cc.grammar.GProductions;
 
-import static org.jlato.cc.grammar.GExpansion.*;
-import static org.jlato.cc.grammar.GProduction.production;
-import static org.jlato.pattern.Quotes.*;
+import static org.jlato.pattern.Quotes.expr;
+import static org.jlato.pattern.Quotes.param;
+import static org.jlato.pattern.Quotes.stmt;
+import static org.jlato.pattern.Quotes.type;
 import static org.jlato.tree.Trees.emptyList;
 import static org.jlato.tree.Trees.listOf;
+import static org.jlato.cc.grammar.GExpansion.*;
+import static org.jlato.cc.grammar.GProduction.*;
 
 public class Grammar2 {
 
-	// Backup of the grammar before refactoring declarations
 	public static GProductions productions = new GProductions(
 			production("NodeListVar", type("BUTree<SNodeList>").build(),
 					emptyList(),
@@ -463,6 +465,13 @@ public class Grammar2 {
 							terminal("EXTENDS"),
 							choice(
 									sequence(
+											lookAhead(
+													expr("quotesMode").build(),
+													nonTerminal("NodeListVar")
+											),
+											nonTerminal("ret", "NodeListVar")
+									),
+									sequence(
 											nonTerminal("cit", "AnnotatedQualifiedType"),
 											action(listOf(
 													stmt("ret = append(ret, cit);").build()
@@ -474,12 +483,6 @@ public class Grammar2 {
 															stmt("ret = append(ret, cit);").build()
 													))
 											)
-									),
-									sequence(
-											lookAhead(
-													expr("quotesMode").build()
-											),
-											nonTerminal("ret", "NodeListVar")
 									)
 							),
 							action(listOf(
@@ -502,6 +505,13 @@ public class Grammar2 {
 							terminal("IMPLEMENTS"),
 							choice(
 									sequence(
+											lookAhead(
+													expr("quotesMode").build(),
+													nonTerminal("NodeListVar")
+											),
+											nonTerminal("ret", "NodeListVar")
+									),
+									sequence(
 											nonTerminal("cit", "AnnotatedQualifiedType"),
 											action(listOf(
 													stmt("ret = append(ret, cit);").build()
@@ -516,12 +526,6 @@ public class Grammar2 {
 											action(listOf(
 													stmt("if (typeKind == TypeKind.Interface) problem.value = new BUProblem(Severity.ERROR, \"An interface cannot implement other interfaces\");\n" + "").build()
 											))
-									),
-									sequence(
-											lookAhead(
-													expr("quotesMode").build()
-											),
-											nonTerminal("ret", "NodeListVar")
 									)
 							),
 							action(listOf(
@@ -556,6 +560,13 @@ public class Grammar2 {
 							zeroOrOne(
 									choice(
 											sequence(
+													lookAhead(
+															expr("quotesMode").build(),
+															nonTerminal("NodeListVar")
+													),
+													nonTerminal("constants", "NodeListVar")
+											),
+											sequence(
 													nonTerminal("entry", "EnumConstantDecl"),
 													action(listOf(
 															stmt("constants = append(constants, entry);").build()
@@ -574,12 +585,6 @@ public class Grammar2 {
 																	stmt("constants = append(constants, entry);").build()
 															))
 													)
-											),
-											sequence(
-													lookAhead(
-															expr("quotesMode").build()
-													),
-													nonTerminal("constants", "NodeListVar")
 											)
 									)
 							),
@@ -659,17 +664,18 @@ public class Grammar2 {
 							terminal("LBRACE"),
 							zeroOrOne(
 									choice(
+											sequence(
+													lookAhead(
+															expr("quotesMode").build(),
+															nonTerminal("NodeListVar")
+													),
+													nonTerminal("ret", "NodeListVar")
+											),
 											oneOrMore(
 													nonTerminal("member", "AnnotationTypeBodyDecl"),
 													action(listOf(
 															stmt("ret = append(ret, member);").build()
 													))
-											),
-											sequence(
-													lookAhead(
-															expr("quotesMode").build()
-													),
-													nonTerminal("ret", "NodeListVar")
 											)
 									)
 							),
@@ -774,6 +780,13 @@ public class Grammar2 {
 							terminal("LT"),
 							choice(
 									sequence(
+											lookAhead(
+													expr("quotesMode").build(),
+													nonTerminal("NodeListVar")
+											),
+											nonTerminal("ret", "NodeListVar")
+									),
+									sequence(
 											nonTerminal("tp", "TypeParameter"),
 											action(listOf(
 													stmt("ret = append(ret, tp);").build()
@@ -785,12 +798,6 @@ public class Grammar2 {
 															stmt("ret = append(ret, tp);").build()
 													))
 											)
-									),
-									sequence(
-											lookAhead(
-													expr("quotesMode").build()
-											),
-											nonTerminal("ret", "NodeListVar")
 									)
 							),
 							terminal("GT"),
@@ -833,6 +840,13 @@ public class Grammar2 {
 							terminal("EXTENDS"),
 							choice(
 									sequence(
+											lookAhead(
+													expr("quotesMode").build(),
+													nonTerminal("NodeListVar")
+											),
+											nonTerminal("ret", "NodeListVar")
+									),
+									sequence(
 											nonTerminal("cit", "AnnotatedQualifiedType"),
 											action(listOf(
 													stmt("ret = append(ret, cit);").build()
@@ -844,12 +858,6 @@ public class Grammar2 {
 															stmt("ret = append(ret, cit);").build()
 													))
 											)
-									),
-									sequence(
-											lookAhead(
-													expr("quotesMode").build()
-											),
-											nonTerminal("ret", "NodeListVar")
 									)
 							),
 							action(listOf(
@@ -889,6 +897,13 @@ public class Grammar2 {
 					sequence(
 							zeroOrOne(
 									choice(
+											sequence(
+													lookAhead(
+															expr("quotesMode").build(),
+															nonTerminal("NodeListVar")
+													),
+													nonTerminal("ret", "NodeListVar")
+											),
 											oneOrMore(
 													nonTerminal("member", "ClassOrInterfaceBodyDecl", null, listOf(
 															expr("typeKind").build()
@@ -896,12 +911,6 @@ public class Grammar2 {
 													action(listOf(
 															stmt("ret = append(ret, member);").build()
 													))
-											),
-											sequence(
-													lookAhead(
-															expr("quotesMode").build()
-													),
-													nonTerminal("ret", "NodeListVar")
 											)
 									)
 							),
@@ -1261,6 +1270,13 @@ public class Grammar2 {
 					),
 					sequence(
 							choice(
+									sequence(
+											lookAhead(
+													expr("quotesMode").build(),
+													nonTerminal("NodeListVar")
+											),
+											nonTerminal("ret", "NodeListVar")
+									),
 									// TODO Handle a receiver parameter as first parameter
 									sequence(
 											nonTerminal("par", "FormalParameter"),
@@ -1274,12 +1290,6 @@ public class Grammar2 {
 															stmt("ret = append(ret, par);").build()
 													))
 											)
-									),
-									sequence(
-											lookAhead(
-													expr("quotesMode").build()
-											),
-											nonTerminal("ret", "NodeListVar")
 									)
 							),
 							action(listOf(
@@ -1457,7 +1467,7 @@ public class Grammar2 {
 									stmt("return dress(SExplicitConstructorInvocationStmt.make(ensureNotNull(typeArgs), isThis, optionOf(expr), args));").build()
 							))
 					)
-			),
+			).memoizeMatches(),
 			production("Statements", type("BUTree<SNodeList>").build(),
 					listOf(
 							param("boolean inConstructor").build()
@@ -1471,7 +1481,13 @@ public class Grammar2 {
 							zeroOrOne(
 									choice(
 											sequence(
-//													lookAhead(2),
+													lookAhead(
+															expr("quotesMode").build(),
+															nonTerminal("NodeListVar")
+													),
+													nonTerminal("ret", "NodeListVar")
+											),
+											sequence(
 													zeroOrOne(
 															lookAhead(
 																	expr("inConstructor").build(),
@@ -1483,18 +1499,11 @@ public class Grammar2 {
 															))
 													),
 													zeroOrMore(
-//															lookAhead(2),
 															nonTerminal("stmt", "BlockStatement"),
 															action(listOf(
 																	stmt("ret = append(ret, stmt);").build()
 															))
 													)
-											),
-											sequence(
-													lookAhead(
-															expr("quotesMode").build()
-													),
-													nonTerminal("ret", "NodeListVar")
 											)
 									)
 							),
@@ -1708,10 +1717,19 @@ public class Grammar2 {
 					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> ret = emptyList();").build(),
-							stmt("BUTree<? extends SType> type;").build(),
-							stmt("Token id;").build()
+							stmt("BUTree<? extends SType> type;").build()
 					),
 					choice(
+							sequence(
+									lookAhead(
+											expr("quotesMode").build(),
+											nonTerminal("NodeListVar")
+									),
+									nonTerminal("ret", "NodeListVar"),
+									action(listOf(
+											stmt("return ret;").build()
+									))
+							),
 							sequence(
 									nonTerminal("type", "TypeArgument"),
 									action(listOf(
@@ -1726,15 +1744,6 @@ public class Grammar2 {
 									),
 									action(listOf(
 											stmt("return ret;").build()
-									))
-							),
-							sequence(
-									lookAhead(
-											expr("quotesMode").build()
-									),
-									terminal("id", "NODE_LIST_VARIABLE"),
-									action(listOf(
-											stmt("return makeVar(id);").build()
 									))
 							)
 					)
@@ -1966,6 +1975,13 @@ public class Grammar2 {
 					sequence(
 							choice(
 									sequence(
+											lookAhead(
+													expr("quotesMode").build(),
+													nonTerminal("NodeVar")
+											),
+											nonTerminal("name", "NodeVar")
+									),
+									sequence(
 											action(listOf(
 													stmt("run();").build()
 											)),
@@ -1973,12 +1989,6 @@ public class Grammar2 {
 											action(listOf(
 													stmt("name = dress(SName.make(id.image));").build()
 											))
-									),
-									sequence(
-											lookAhead(
-													expr("quotesMode").build()
-											),
-											nonTerminal("name", "NodeVar")
 									)
 							),
 							action(listOf(
@@ -3376,7 +3386,13 @@ public class Grammar2 {
 							zeroOrOne(
 									choice(
 											sequence(
-//													lookAhead(1),
+													lookAhead(
+															expr("quotesMode").build(),
+															nonTerminal("NodeListVar")
+													),
+													nonTerminal("ret", "NodeListVar")
+											),
+											sequence(
 													nonTerminal("expr", "Expression"),
 													action(listOf(
 															stmt("ret = append(ret, expr);").build()
@@ -3388,12 +3404,6 @@ public class Grammar2 {
 																	stmt("ret = append(ret, expr);").build()
 															))
 													)
-											),
-											sequence(
-													lookAhead(
-															expr("quotesMode").build()
-													),
-													nonTerminal("ret", "NodeListVar")
 											)
 									)
 							),
@@ -4200,6 +4210,7 @@ public class Grammar2 {
 							terminal("TRY"),
 							choice(
 									sequence(
+											lookAhead(1),
 											nonTerminal("resources", "ResourceSpecification", null, listOf(
 													expr("trailingSemiColon").build()
 											)),
@@ -4213,6 +4224,7 @@ public class Grammar2 {
 											)
 									),
 									sequence(
+											lookAhead(1),
 											nonTerminal("tryBlock", "Block"),
 											choice(
 													sequence(

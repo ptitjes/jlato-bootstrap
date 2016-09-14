@@ -24,7 +24,7 @@ import static org.jlato.tree.Trees.*;
 /**
  * @author Didier Villevalois
  */
-public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
+public class ParserPattern2 extends TypePattern.OfClass<TreeClassDescriptor[]> {
 
 	public static final boolean MEMOIZE_MATCHES = true;
 	public static final boolean MEMOIZE_ALL_MATCHES = false;
@@ -35,9 +35,9 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 	public static final Name LOOKAHEAD_NEW = name("newLookahead");
 
 	private final GProductions productions;
-	public final String implementationName;
+	private final String implementationName;
 
-	public ParserPattern(GProductions productions, String implementationName) {
+	public ParserPattern2(GProductions productions, String implementationName) {
 		this.productions = productions;
 		this.implementationName = implementationName;
 	}
@@ -208,6 +208,49 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		}
 		return stmts;
 	}
+
+//	private Expr matchCondition(String symbol, GExpansion expansion, NodeList<FormalParameter> params, NodeList<Expr> args) {
+//		if (expansion.children != null && !expansion.children.isEmpty()) {
+//			List<GExpansion> children = expansion.children;
+//
+//			Expr lookaheadCondition = null;
+//			boolean negativeLookahead = false;
+//
+//			GExpansion firstChild = children.get(0);
+//			if (firstChild.kind == GExpansion.Kind.LookAhead) {
+//				Expr semanticLookaheadCondition = firstChild.semanticLookahead;
+//				int amount = firstChild.amount;
+//				children = firstChild.children;
+//				negativeLookahead = firstChild.negativeLookahead;
+//
+//				if (semanticLookaheadCondition != null) {
+//					if (semanticLookaheadCondition.equals(methodInvocationExpr(name("isLambda")))) {
+//						semanticLookaheadCondition = methodInvocationExpr(name("isLambda")).withArgs(listOf(literalExpr(0)));
+//					} else if (semanticLookaheadCondition.equals(methodInvocationExpr(name("isCast")))) {
+//						semanticLookaheadCondition = methodInvocationExpr(name("isCast")).withArgs(listOf(literalExpr(0)));
+//					}
+//					lookaheadCondition = negativeLookahead ? unaryExpr(UnaryOp.Not, semanticLookaheadCondition) : semanticLookaheadCondition;
+//				}
+//				if (amount != -1) {
+//					Expr amountLookaheadCondition = buildLookaheadWithAmountCondition(symbol, expansion, amount, params, args);
+//					lookaheadCondition = lookaheadCondition == null ? amountLookaheadCondition :
+//							binaryExpr(lookaheadCondition, BinaryOp.And, amountLookaheadCondition);
+//				}
+//			}
+//
+//			if (children != null) {
+//				String matchMethodName = "match" + symbol + "_lookahead" + incrementCount(symbol);
+//				Expr call = createMatchMethodAndCallFor(symbol, matchMethodName, GExpansion.sequence(children), literalExpr(0), params, args, false);
+//				Expr descriptiveLookaheadCondition = binaryExpr(call, negativeLookahead ? BinaryOp.Equal : BinaryOp.NotEqual, literalExpr(-1));
+//
+//				lookaheadCondition = lookaheadCondition == null ? descriptiveLookaheadCondition :
+//						binaryExpr(lookaheadCondition, negativeLookahead ? BinaryOp.Or : BinaryOp.And, descriptiveLookaheadCondition);
+//			}
+//
+//			return lookaheadCondition;
+//		}
+//		return binaryExpr(matchCall(firstTerminalsOf(expansion), literalExpr(0)), BinaryOp.NotEqual, FAILED_LOOKAHEAD);
+//	}
 
 	private Expr matchCondition(String symbol, GExpansion expansion, NodeList<FormalParameter> params, NodeList<Expr> args) {
 		if (expansion.children != null && !expansion.children.isEmpty()) {

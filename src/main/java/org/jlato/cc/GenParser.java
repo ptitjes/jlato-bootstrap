@@ -22,15 +22,14 @@ public class GenParser {
 		String pathToJLaTo = System.getProperty("path.to.jlato");
 		String rootDirectory = pathToJLaTo + "src/main/java";
 
-		generateParser(Grammar.productions, rootDirectory, "ParserImplementation");
-		generateParser(Grammar2.productions, rootDirectory, "ParserImplementation2");
-//		generateParser(Grammar3.productions, rootDirectory, "ParserImplementation3");
+		generateParser(new ParserPattern(Grammar.productions, "ParserImplementation"), rootDirectory);
+		generateParser(new ParserPattern(Grammar2.productions, "ParserImplementation2"), rootDirectory);
 	}
 
-	private void generateParser(GProductions productions, String rootDirectory, String implementationName) throws org.jlato.parser.ParseException, IOException {
+	private void generateParser(ParserPattern pattern, String rootDirectory) throws org.jlato.parser.ParseException, IOException {
 		final TreeClassDescriptor[] classDescriptors = AllDescriptors.ALL_CLASSES;
-		CompilationUnitPattern.of(new ParserPattern(productions, implementationName))
+		CompilationUnitPattern.of(pattern)
 				.withFormatting(true, FormattingSettings.Default.withCommentFormatting(true))
-				.apply(rootDirectory, "org/jlato/internal/parser/" + implementationName + ".java", classDescriptors);
+				.apply(rootDirectory, "org/jlato/internal/parser/" + pattern.implementationName + ".java", classDescriptors);
 	}
 }
