@@ -216,7 +216,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 					} else if (semanticLookaheadCondition.equals(methodInvocationExpr(name("isCast")))) {
 						semanticLookaheadCondition = methodInvocationExpr(name("isCast")).withArgs(listOf(literalExpr(0)));
 					}
-					lookaheadCondition = semanticLookaheadCondition;
+					lookaheadCondition = negativeLookahead ? unaryExpr(UnaryOp.Not, semanticLookaheadCondition) : semanticLookaheadCondition;
 				}
 				if (amount != -1) {
 					Expr amountLookaheadCondition = buildLookaheadWithAmountCondition(symbol, expansion, amount, params, args);
@@ -229,7 +229,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 					Expr descriptiveLookaheadCondition = binaryExpr(call, negativeLookahead ? BinaryOp.Equal : BinaryOp.NotEqual, literalExpr(-1));
 
 					lookaheadCondition = lookaheadCondition == null ? descriptiveLookaheadCondition :
-							binaryExpr(lookaheadCondition, BinaryOp.And, descriptiveLookaheadCondition);
+							binaryExpr(lookaheadCondition, negativeLookahead ? BinaryOp.Or : BinaryOp.And, descriptiveLookaheadCondition);
 				}
 
 				return lookaheadCondition;
