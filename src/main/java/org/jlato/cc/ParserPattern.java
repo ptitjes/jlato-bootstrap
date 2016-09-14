@@ -26,6 +26,9 @@ import static org.jlato.tree.Trees.*;
  */
 public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 
+	public static final boolean MEMOIZE_MATCHES = true;
+	public static final boolean MEMOIZE_ALL_MATCHES = false;
+
 	public static final Name MATCH = name("match");
 	public static final Name LOOKAHEAD = name("lookahead");
 	public static final LiteralExpr<Integer> FAILED_LOOKAHEAD = literalExpr(-1);
@@ -73,9 +76,11 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 
 		List<GProduction> allProductions = productions.getAll();
 
-		int memoizedProductionCount = 0;
-		for (GProduction production : allProductions) {
-			if (production.memoizeMatches) memoizedProductionCount++;
+		int memoizedProductionCount = MEMOIZE_ALL_MATCHES ? allProductions.size() : 0;
+		if (!MEMOIZE_ALL_MATCHES) {
+			for (GProduction production : allProductions) {
+				if (production.memoizeMatches) memoizedProductionCount++;
+			}
 		}
 
 		NodeList<MemberDecl> members = Trees.emptyList();
@@ -165,7 +170,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 										.withArgs(listOf(firstTerminalsOf(expansion).stream().map(this::prefixedConstant).collect(Collectors.toList())))
 						)))),
 						(ifThenClause, elseClause) ->
-							optional && elseClause == null ? ifThenClause : ifThenClause.withElseStmt(elseClause)
+								optional && elseClause == null ? ifThenClause : ifThenClause.withElseStmt(elseClause)
 				));
 				break;
 			}
@@ -289,7 +294,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 			symbolToMatchNames.add(symbol);
 			GProduction production = productions.get(symbol);
 			GExpansion symbolExpansion = production.expansion;
-			return createMatchMethodAndCallFor(symbol, matchMethodName(symbol), symbolExpansion, outerLookahead, production.hintParams, args, production.memoizeMatches);
+			return createMatchMethodAndCallFor(symbol, matchMethodName(symbol), symbolExpansion, outerLookahead, production.hintParams, args, MEMOIZE_MATCHES && (MEMOIZE_ALL_MATCHES || production.memoizeMatches));
 		} else return matchMethodCall(matchMethodName(symbol), outerLookahead, args);
 	}
 
