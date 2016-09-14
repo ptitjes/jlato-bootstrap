@@ -113,6 +113,10 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		Type type = production.returnType;
 
 		NodeList<Stmt> stmts = emptyList();
+
+		// Stats
+		stmts = stmts.append(stmt("validateMatches();").build());
+
 		stmts = stmts.appendAll(production.declarations);
 		stmts = stmts.appendAll(parseStatementsFor(production.symbol, production.expansion, production.hintParams, false));
 
@@ -455,6 +459,9 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 	}
 
 	private void createMatchMethod(String symbol, String namePrefix, GExpansion expansion, NodeList<Stmt> stmts, NodeList<FormalParameter> params) {
+		// Stats
+		stmts = stmts.prepend(stmt("historize(\"" + namePrefix + "\");").build());
+
 		List<MethodDecl> methods = perSymbolMatchMethods.get(symbol);
 		if (methods == null) {
 			methods = new ArrayList<>();
