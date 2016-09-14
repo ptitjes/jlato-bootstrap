@@ -26,6 +26,8 @@ import static org.jlato.tree.Trees.*;
  */
 public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 
+	public static final boolean STATISTICS = false;
+
 	public static final boolean MEMOIZE_MATCHES = true;
 	public static final boolean MEMOIZE_ALL_MATCHES = false;
 
@@ -114,8 +116,9 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 
 		NodeList<Stmt> stmts = emptyList();
 
-		// Stats
-		stmts = stmts.append(stmt("validateMatches();").build());
+		if (STATISTICS) {
+			stmts = stmts.append(stmt("validateMatches();").build());
+		}
 
 		stmts = stmts.appendAll(production.declarations);
 		stmts = stmts.appendAll(parseStatementsFor(production.symbol, production.expansion, production.hintParams, false));
@@ -459,8 +462,15 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 	}
 
 	private void createMatchMethod(String symbol, String namePrefix, GExpansion expansion, NodeList<Stmt> stmts, NodeList<FormalParameter> params) {
-		// Stats
-		stmts = stmts.prepend(stmt("historize(\"" + namePrefix + "\");").build());
+		if (STATISTICS) {
+			stmts = listOf(
+					stmt("historize(\"In " + namePrefix + "\");").build(),
+					tryStmt(blockStmt().withStmts(stmts))
+							.withFinallyBlock(blockStmt().withStmts(listOf(
+									stmt("historize(\"Out " + namePrefix + "\");").build()
+							)))
+			);
+		}
 
 		List<MethodDecl> methods = perSymbolMatchMethods.get(symbol);
 		if (methods == null) {
