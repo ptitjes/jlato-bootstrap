@@ -4,35 +4,25 @@ import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.util.ImportManager;
 import org.jlato.bootstrap.util.TypePattern;
 import org.jlato.cc.grammar.*;
+import org.jlato.tree.Kind;
 import org.jlato.tree.NodeList;
 import org.jlato.tree.Trees;
 import org.jlato.tree.decl.*;
 import org.jlato.tree.expr.*;
-import org.jlato.tree.name.Name;
-import org.jlato.tree.stmt.IfStmt;
 import org.jlato.tree.stmt.Stmt;
-import org.jlato.tree.type.Primitive;
+import org.jlato.tree.stmt.SwitchCase;
 import org.jlato.tree.type.Type;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.jlato.pattern.Quotes.memberDecl;
-import static org.jlato.pattern.Quotes.stmt;
 import static org.jlato.tree.Trees.*;
 
 /**
  * @author Didier Villevalois
  */
 public class ParserPattern2 extends TypePattern.OfClass<TreeClassDescriptor[]> {
-
-	public static final boolean MEMOIZE_MATCHES = true;
-	public static final boolean MEMOIZE_ALL_MATCHES = false;
-
-	public static final Name MATCH = name("match");
-	public static final Name LOOKAHEAD = name("lookahead");
-	public static final LiteralExpr<Integer> FAILED_LOOKAHEAD = literalExpr(-1);
-	public static final Name LOOKAHEAD_NEW = name("newLookahead");
 
 	private final GProductions productions;
 	private final String implementationName;
@@ -44,14 +34,10 @@ public class ParserPattern2 extends TypePattern.OfClass<TreeClassDescriptor[]> {
 
 	@Override
 	protected String makeQuote(TreeClassDescriptor[] arg) {
-		return "public class " + implementationName + " extends ParserNewBase { ..$_ }";
+		return "public class " + implementationName + " extends ParserNewBase2 { ..$_ }";
 	}
 
-	private Set<String> symbolToMatchNames = new HashSet<>();
-
-	private NodeList<MethodDecl> parseMethods = emptyList();
 	private Map<String, Integer> perSymbolLookaheadMethodCount = new HashMap<>();
-	private Map<String, List<MethodDecl>> perSymbolMatchMethods = new HashMap<>();
 
 	@Override
 	protected ClassDecl contributeBody(ClassDecl decl, ImportManager importManager, TreeClassDescriptor[] arg) {
@@ -76,45 +62,364 @@ public class ParserPattern2 extends TypePattern.OfClass<TreeClassDescriptor[]> {
 
 		List<GProduction> allProductions = productions.getAll();
 
-		int memoizedProductionCount = MEMOIZE_ALL_MATCHES ? allProductions.size() : 0;
-		if (!MEMOIZE_ALL_MATCHES) {
-			for (GProduction production : allProductions) {
-				if (production.memoizeMatches) memoizedProductionCount++;
-			}
-		}
-
 		NodeList<MemberDecl> members = Trees.emptyList();
-		members = members.append(memberDecl("protected int memoizedProductionCount() { return " + memoizedProductionCount + "; }").build());
+		members = members.append(memberDecl("protected Grammar initializeGrammar() { return new JavaGrammar(); }").build());
+
+		members = members.append(grammarClass(importManager, allProductions));
 
 		for (GProduction production : allProductions) {
 			if (excluded(production)) continue;
-
-			parseMethods = parseMethods.append(parseMethod(importManager, production));
-		}
-
-		for (MethodDecl parseMethod : parseMethods) {
-			members = members.append(parseMethod);
-
-			String id = parseMethod.name().id();
-			int indexOfUnderscore = id.indexOf('_');
-			String symbol = id.substring("parse".length(), indexOfUnderscore == -1 ? id.length() : indexOfUnderscore);
-
-			List<MethodDecl> methods = perSymbolMatchMethods.get(symbol);
-			if (methods != null) {
-				Collections.sort(methods, (m1, m2) -> m1.name().id().compareTo(m2.name().id()));
-				members = members.appendAll(listOf(methods));
-			}
+			members = members.append(parseMethod(importManager, production));
 		}
 
 		return decl.withMembers(members);
 	}
+
+	/* ALL(*) Grammar declaration */
+
+	private MemberDecl grammarClass(ImportManager importManager, List<GProduction> allProductions) {
+		importManager.addImports(listOf(
+				importDecl(qualifiedName("org.jlato.internal.parser.all.Grammar")),
+				importDecl(qualifiedName("org.jlato.internal.parser.TokenType"))
+		));
+
+		NodeList<MemberDecl> members = Trees.emptyList();
+
+		Map<String, MemberDecl> constants = new TreeMap<>();
+		for (GProduction production : allProductions) {
+			grammarConstants(production, constants);
+		}
+		for (MemberDecl memberDecl : constants.values()) {
+			members = members.append(memberDecl);
+		}
+
+		for (GProduction production : allProductions) {
+			members = grammarElements(production.symbol, production.expansion, members);
+		}
+
+		// Make initializePreductions method
+		NodeList<Stmt> stmts = emptyList();
+		for (GProduction production : allProductions) {
+			stmts = grammarDefStmts(production, stmts);
+		}
+
+		members = members.append(
+				methodDecl(voidType(), name("initializeProductions"))
+						.withModifiers(listOf(Modifier.Protected))
+						.withBody(blockStmt().withStmts(stmts))
+		);
+
+		return classDecl(name("JavaGrammar")).withExtendsClause(qType("Grammar"))
+				.withModifiers(listOf(Modifier.Static))
+				.withMembers(members);
+	}
+
+	static int constantCount = 1;
+
+	private void grammarConstants(GProduction production, Map<String, MemberDecl> members) {
+		String name = camelToConstant(lowerCaseFirst(production.symbol));
+		if (!members.containsKey(name)) {
+			members.put(name, fieldDecl(qType("int"))
+					.withModifiers(listOf(Modifier.Public, Modifier.Static, Modifier.Final))
+					.withVariables(listOf(
+							variableDeclarator(variableDeclaratorId(name(name)))
+									.withInit(literalExpr(constantCount++))
+					))
+			);
+		}
+
+		grammarConstants(production.symbol, production.expansion, members);
+	}
+
+	private void grammarConstants(String namePrefix, GExpansion expansion, Map<String, MemberDecl> members) {
+		switch (expansion.kind) {
+			case Choice:
+			case ZeroOrOne:
+			case ZeroOrMore:
+			case OneOrMore: {
+				String name = camelToConstant(lowerCaseFirst(namePrefix));
+				if (!members.containsKey(name)) {
+					members.put(name, fieldDecl(qType("int"))
+							.withModifiers(listOf(Modifier.Public, Modifier.Static, Modifier.Final))
+							.withVariables(listOf(
+									variableDeclarator(variableDeclaratorId(name(name)))
+											.withInit(literalExpr(constantCount++))
+							))
+					);
+				}
+			}
+			case Sequence: {
+				int count = 1;
+				for (GExpansion child : expansion.children) {
+					if (lookaheadOrAction(child)) continue;
+
+					String name = namePrefix + '_' + count++;
+					grammarConstants(name, child, members);
+				}
+				break;
+			}
+			case NonTerminal: {
+				String name = camelToConstant(lowerCaseFirst(expansion.symbol));
+				if (!members.containsKey(name)) {
+					members.put(name, fieldDecl(qType("int"))
+							.withModifiers(listOf(Modifier.Public, Modifier.Static, Modifier.Final))
+							.withVariables(listOf(
+									variableDeclarator(variableDeclaratorId(name(name)))
+											.withInit(literalExpr(constantCount++))
+							))
+					);
+				}
+				break;
+			}
+			default:
+		}
+	}
+
+	private NodeList<MemberDecl> grammarElements(String namePrefix, GExpansion expansion, NodeList<MemberDecl> members) {
+		switch (expansion.kind) {
+			case Choice: {
+				int count = 1;
+				NodeList<Expr> childrenExprs = emptyList();
+				for (GExpansion child : expansion.children) {
+					if (lookaheadOrAction(child)) continue;
+
+					String name = namePrefix + '_' + count++;
+					childrenExprs = grammarElementExpression(child, name, childrenExprs);
+					members = grammarElements(name, child, members);
+				}
+
+				members = members.append(fieldDecl(qType("Choice"))
+						.withModifiers(listOf(Modifier.Static, Modifier.Final))
+						.withVariables(listOf(
+								variableDeclarator(variableDeclaratorId(name(namePrefix))).withInit(
+										methodInvocationExpr(name("choice"))
+												.withArgs(childrenExprs.prepend(literalExpr(namePrefix)))
+								)
+						))
+				);
+				break;
+			}
+			case Sequence: {
+				int count = 1;
+				NodeList<Expr> childrenExprs = emptyList();
+				for (GExpansion child : expansion.children) {
+					if (lookaheadOrAction(child)) continue;
+
+					String name = namePrefix + '_' + count++;
+					childrenExprs = grammarElementExpression(child, name, childrenExprs);
+					members = grammarElements(name, child, members);
+				}
+
+				if (!namePrefix.contains("_")) {
+					members = members.append(fieldDecl(qType("Sequence"))
+							.withModifiers(listOf(Modifier.Static, Modifier.Final))
+							.withVariables(listOf(
+									variableDeclarator(variableDeclaratorId(name(namePrefix))).withInit(
+											methodInvocationExpr(name("sequence"))
+													.withArgs(childrenExprs.prepend(literalExpr(namePrefix)))
+									)
+							))
+					);
+				}
+				break;
+			}
+			case ZeroOrOne: {
+				NodeList<Expr> childrenExprs = emptyList();
+				GExpansion child = makeSequence(expansion);
+				String name = namePrefix + (child.kind != GExpansion.Kind.Sequence && child != expansion ? "_1" : "");
+
+				childrenExprs = grammarElementExpression(child, name, childrenExprs);
+				members = grammarElements(name, child, members);
+
+				members = members.append(fieldDecl(qType("ZeroOrOne"))
+						.withModifiers(listOf(Modifier.Static, Modifier.Final))
+						.withVariables(listOf(
+								variableDeclarator(variableDeclaratorId(name(namePrefix))).withInit(
+										methodInvocationExpr(name("zeroOrOne"))
+												.withArgs(childrenExprs.prepend(literalExpr(namePrefix)))
+								)
+						))
+				);
+				break;
+			}
+			case ZeroOrMore: {
+				NodeList<Expr> childrenExprs = emptyList();
+				GExpansion child = makeSequence(expansion);
+				String name = namePrefix + (child.kind != GExpansion.Kind.Sequence && child != expansion ? "_1" : "");
+
+				childrenExprs = grammarElementExpression(child, name, childrenExprs);
+				members = grammarElements(name, child, members);
+
+				members = members.append(fieldDecl(qType("ZeroOrMore"))
+						.withModifiers(listOf(Modifier.Static, Modifier.Final))
+						.withVariables(listOf(
+								variableDeclarator(variableDeclaratorId(name(namePrefix))).withInit(
+										methodInvocationExpr(name("zeroOrMore"))
+												.withArgs(childrenExprs.prepend(literalExpr(namePrefix)))
+								)
+						))
+				);
+				break;
+			}
+			case OneOrMore: {
+				NodeList<Expr> childrenExprs = emptyList();
+				GExpansion child = makeSequence(expansion);
+				String name = namePrefix + (child.kind != GExpansion.Kind.Sequence && child != expansion ? "_1" : "");
+
+				childrenExprs = grammarElementExpression(child, name, childrenExprs);
+				members = grammarElements(name, child, members);
+
+				members = members.append(fieldDecl(qType("OneOrMore"))
+						.withModifiers(listOf(Modifier.Static, Modifier.Final))
+						.withVariables(listOf(
+								variableDeclarator(variableDeclaratorId(name(namePrefix))).withInit(
+										methodInvocationExpr(name("oneOrMore"))
+												.withArgs(childrenExprs.prepend(literalExpr(namePrefix)))
+								)
+						))
+				);
+				break;
+			}
+			default:
+		}
+		return members;
+	}
+
+	private boolean lookaheadOrAction(GExpansion expansion) {
+		return expansion.kind == GExpansion.Kind.LookAhead || expansion.kind == GExpansion.Kind.Action;
+	}
+
+	private GExpansion makeSequence(GExpansion expansion) {
+		GExpansion uniqueChild = null;
+		for (GExpansion child : expansion.children) {
+			switch (child.kind) {
+				case LookAhead:
+				case Action:
+					break;
+				default:
+					if (uniqueChild == null) uniqueChild = child;
+					else return GExpansion.sequence(expansion.children);
+			}
+		}
+		return uniqueChild;
+	}
+
+	private List<GExpansion> filterLookaheadAndAction(List<GExpansion> children) {
+		if (children == null) return null;
+
+		List<GExpansion> filtered = new ArrayList<>();
+		for (GExpansion child : children) {
+			switch (child.kind) {
+				case LookAhead:
+				case Action:
+					break;
+				default:
+					filtered.add(child);
+			}
+		}
+		return filtered;
+	}
+
+	private NodeList<Expr> grammarElementExpression(GExpansion expansion, String namePrefix, NodeList<Expr> childrenExprs) {
+		int count = 1;
+		NodeList<Expr> localChildrenExprs = emptyList();
+		switch (expansion.kind) {
+			case Choice:
+				childrenExprs = childrenExprs.append(name(namePrefix));
+				break;
+			case Sequence: {
+				for (GExpansion child : expansion.children) {
+					if (lookaheadOrAction(child)) continue;
+
+					String name = namePrefix + '_' + count++;
+					localChildrenExprs = grammarElementExpression(child, name, localChildrenExprs);
+				}
+				childrenExprs = childrenExprs.append(methodInvocationExpr(name("sequence"))
+						.withArgs(localChildrenExprs.prepend(literalExpr(namePrefix))));
+				break;
+			}
+			case ZeroOrOne:
+				childrenExprs = childrenExprs.append(name(namePrefix));
+				break;
+			case ZeroOrMore:
+				childrenExprs = childrenExprs.append(name(namePrefix));
+				break;
+			case OneOrMore:
+				childrenExprs = childrenExprs.append(name(namePrefix));
+				break;
+			case NonTerminal: {
+				String name = camelToConstant(lowerCaseFirst(expansion.symbol));
+				childrenExprs = childrenExprs.append(methodInvocationExpr(name("nonTerminal"))
+						.withArgs(listOf(literalExpr(namePrefix), name(name)))
+				);
+				break;
+			}
+			case Terminal: {
+				String name = expansion.symbol;
+				childrenExprs = childrenExprs.append(methodInvocationExpr(name("terminal"))
+						.withArgs(listOf(literalExpr(namePrefix), fieldAccessExpr(name(name)).withScope(name("TokenType"))))
+				);
+				break;
+			}
+			default:
+		}
+		return childrenExprs;
+	}
+
+	private NodeList<Stmt> grammarDefStmts(GProduction production, NodeList<Stmt> stmts) {
+		String productionConstantName = camelToConstant(lowerCaseFirst(production.symbol));
+		stmts = stmts.append(
+				expressionStmt(
+						methodInvocationExpr(name("addProduction"))
+								.withArgs(listOf(name(productionConstantName), name(production.symbol)))
+				)
+		);
+
+		stmts = grammarDefStmts(production.symbol, production.expansion, stmts);
+		return stmts;
+	}
+
+	private NodeList<Stmt> grammarDefStmts(String namePrefix, GExpansion expansion, NodeList<Stmt> stmts) {
+		switch (expansion.kind) {
+			case Choice:
+			case ZeroOrOne:
+			case ZeroOrMore:
+			case OneOrMore: {
+				String constantName = camelToConstant(lowerCaseFirst(namePrefix));
+				stmts = stmts.append(
+						expressionStmt(
+								methodInvocationExpr(name("addChoicePoint"))
+										.withArgs(listOf(name(constantName), name(namePrefix)))
+						)
+				);
+			}
+			case Sequence: {
+				int count = 1;
+				for (GExpansion child : expansion.children) {
+					if (lookaheadOrAction(child)) continue;
+
+					String name = namePrefix + '_' + count++;
+					stmts = grammarDefStmts(name, child, stmts);
+				}
+				break;
+			}
+			default:
+		}
+		return stmts;
+	}
+
+	/* Parse methods */
 
 	private MethodDecl parseMethod(ImportManager importManager, GProduction production) {
 		Type type = production.returnType;
 
 		NodeList<Stmt> stmts = emptyList();
 		stmts = stmts.appendAll(production.declarations);
-		stmts = stmts.appendAll(parseStatementsFor(production.symbol, production.expansion, production.hintParams, false));
+		stmts = stmts.appendAll(parseStatementsFor(production.symbol, production.symbol, production.expansion, production.hintParams, false));
+
+		// Add push/pop callStack calls
+		String ntName = camelToConstant(lowerCaseFirst(production.symbol));
+		Expr constant = fieldAccessExpr(name(ntName)).withScope(name("JavaGrammar"));
 
 		return methodDecl(type, name("parse" + upperCaseFirst(production.symbol)))
 				.withModifiers(listOf(Modifier.Protected))
@@ -124,54 +429,60 @@ public class ParserPattern2 extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				.appendLeadingComment(production.expansion.toString(), true);
 	}
 
-	private NodeList<Stmt> parseStatementsFor(String symbol, GExpansion expansion, NodeList<FormalParameter> hintParams, boolean optional) {
+	private NodeList<Stmt> parseStatementsFor(String symbol, String namePrefix, GExpansion expansion, NodeList<FormalParameter> hintParams, boolean optional) {
 		NodeList<Stmt> stmts = emptyList();
 		switch (expansion.kind) {
 			case Sequence:
-				stmts = stmts.appendAll(parseStatementsForChildren(symbol, expansion, hintParams, false));
+				stmts = stmts.appendAll(parseStatementsForChildren(symbol, namePrefix, expansion, hintParams, false));
 				break;
 			case ZeroOrOne: {
 				if (expansion.children.size() == 1 && expansion.children.get(0).kind == GExpansion.Kind.Choice) {
-					stmts = stmts.appendAll(parseStatementsForChildren(symbol, expansion, hintParams, true));
+					stmts = stmts.appendAll(parseStatementsForChildren(symbol, namePrefix, expansion, hintParams, true));
 				} else {
 					stmts = stmts.append(ifStmt(
-							matchCondition(symbol, expansion, hintParams, hintParams.map(p -> p.id().get().name())),
-							blockStmt().withStmts(parseStatementsForChildren(symbol, expansion, hintParams, false))
+							binaryExpr(predictChoice(namePrefix, hintParams, hintParams.map(p -> p.id().get().name())), BinaryOp.Equal, literalExpr(1)),
+							blockStmt().withStmts(parseStatementsForChildren(symbol, namePrefix, expansion, hintParams, false))
 					));
 				}
 				break;
 			}
 			case ZeroOrMore: {
 				stmts = stmts.append(whileStmt(
-						matchCondition(symbol, expansion, hintParams, hintParams.map(p -> p.id().get().name())),
-						blockStmt().withStmts(parseStatementsForChildren(symbol, expansion, hintParams, false))
+						binaryExpr(predictChoice(namePrefix, hintParams, hintParams.map(p -> p.id().get().name())), BinaryOp.Equal, literalExpr(1)),
+						blockStmt().withStmts(parseStatementsForChildren(symbol, namePrefix, expansion, hintParams, false))
 				));
 				break;
 			}
 			case OneOrMore: {
 				stmts = stmts.append(doStmt(
-						blockStmt().withStmts(parseStatementsForChildren(symbol, expansion, hintParams, false)),
-						matchCondition(symbol, expansion, hintParams, hintParams.map(p -> p.id().get().name()))
+						blockStmt().withStmts(parseStatementsForChildren(symbol, namePrefix, expansion, hintParams, false)),
+						binaryExpr(predictChoice(namePrefix, hintParams, hintParams.map(p -> p.id().get().name())), BinaryOp.Equal, literalExpr(1))
 				));
 				break;
 			}
 			case Choice: {
-				List<IfStmt> expansionsIfStmt = expansion.children.stream()
-						.map(e -> ifStmt(
-								matchCondition(symbol, e, hintParams, hintParams.map(p -> p.id().get().name())),
-								blockStmt().withStmts(parseStatementsFor(symbol, e, hintParams, false))
-						))
-						.collect(Collectors.toList());
-				Collections.reverse(expansionsIfStmt);
+				Expr selector = predictChoice(namePrefix, hintParams, hintParams.map(p -> p.id().get().name()));
 
-				stmts = stmts.append(listOf(expansionsIfStmt).foldRight(
-						(Stmt) (optional ? null : blockStmt().withStmts(listOf(throwStmt(
-								methodInvocationExpr(name("produceParseException"))
-										.withArgs(listOf(firstTerminalsOf(expansion).stream().map(this::prefixedConstant).collect(Collectors.toList())))
-						)))),
-						(ifThenClause, elseClause) ->
-								optional && elseClause == null ? ifThenClause : ifThenClause.withElseStmt(elseClause)
-				));
+				NodeList<SwitchCase> cases = emptyList();
+
+				int count = 1;
+				for (GExpansion child : expansion.children) {
+					LiteralExpr<Integer> label = literalExpr(count);
+					String name = namePrefix + "_" + count++;
+
+					NodeList<Stmt> caseStmts = parseStatementsFor(symbol, name, child, hintParams, optional);
+					if (caseStmts.last().kind() != Kind.ReturnStmt) caseStmts = caseStmts.append(breakStmt());
+
+					cases = cases.append(switchCase().withLabel(label).withStmts(caseStmts));
+				}
+
+				cases = cases.append(switchCase().withStmts(listOf(throwStmt(
+						methodInvocationExpr(name("produceParseException"))
+								.withArgs(listOf(firstTerminalsOf(expansion).stream().map(this::prefixedConstant).collect(Collectors.toList())))
+				))));
+
+				stmts = stmts.append(switchStmt(selector).withCases(cases));
+
 				break;
 			}
 			case NonTerminal: {
@@ -201,336 +512,23 @@ public class ParserPattern2 extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		return stmts;
 	}
 
-	private NodeList<Stmt> parseStatementsForChildren(String symbol, GExpansion expansion, NodeList<FormalParameter> hintParams, boolean optional) {
+	private NodeList<Stmt> parseStatementsForChildren(String symbol, String namePrefix, GExpansion expansion, NodeList<FormalParameter> hintParams, boolean optional) {
+		int count = 1;
 		NodeList<Stmt> stmts = emptyList();
 		for (GExpansion child : expansion.children) {
-			stmts = stmts.appendAll(parseStatementsFor(symbol, child, hintParams, optional));
+			boolean lookaheadOrAction = lookaheadOrAction(child);
+			String name = namePrefix + (lookaheadOrAction ? "" : "_" + count++);
+
+			stmts = stmts.appendAll(parseStatementsFor(symbol, name, child, hintParams, optional));
 		}
 		return stmts;
 	}
 
-//	private Expr matchCondition(String symbol, GExpansion expansion, NodeList<FormalParameter> params, NodeList<Expr> args) {
-//		if (expansion.children != null && !expansion.children.isEmpty()) {
-//			List<GExpansion> children = expansion.children;
-//
-//			Expr lookaheadCondition = null;
-//			boolean negativeLookahead = false;
-//
-//			GExpansion firstChild = children.get(0);
-//			if (firstChild.kind == GExpansion.Kind.LookAhead) {
-//				Expr semanticLookaheadCondition = firstChild.semanticLookahead;
-//				int amount = firstChild.amount;
-//				children = firstChild.children;
-//				negativeLookahead = firstChild.negativeLookahead;
-//
-//				if (semanticLookaheadCondition != null) {
-//					if (semanticLookaheadCondition.equals(methodInvocationExpr(name("isLambda")))) {
-//						semanticLookaheadCondition = methodInvocationExpr(name("isLambda")).withArgs(listOf(literalExpr(0)));
-//					} else if (semanticLookaheadCondition.equals(methodInvocationExpr(name("isCast")))) {
-//						semanticLookaheadCondition = methodInvocationExpr(name("isCast")).withArgs(listOf(literalExpr(0)));
-//					}
-//					lookaheadCondition = negativeLookahead ? unaryExpr(UnaryOp.Not, semanticLookaheadCondition) : semanticLookaheadCondition;
-//				}
-//				if (amount != -1) {
-//					Expr amountLookaheadCondition = buildLookaheadWithAmountCondition(symbol, expansion, amount, params, args);
-//					lookaheadCondition = lookaheadCondition == null ? amountLookaheadCondition :
-//							binaryExpr(lookaheadCondition, BinaryOp.And, amountLookaheadCondition);
-//				}
-//			}
-//
-//			if (children != null) {
-//				String matchMethodName = "match" + symbol + "_lookahead" + incrementCount(symbol);
-//				Expr call = createMatchMethodAndCallFor(symbol, matchMethodName, GExpansion.sequence(children), literalExpr(0), params, args, false);
-//				Expr descriptiveLookaheadCondition = binaryExpr(call, negativeLookahead ? BinaryOp.Equal : BinaryOp.NotEqual, literalExpr(-1));
-//
-//				lookaheadCondition = lookaheadCondition == null ? descriptiveLookaheadCondition :
-//						binaryExpr(lookaheadCondition, negativeLookahead ? BinaryOp.Or : BinaryOp.And, descriptiveLookaheadCondition);
-//			}
-//
-//			return lookaheadCondition;
-//		}
-//		return binaryExpr(matchCall(firstTerminalsOf(expansion), literalExpr(0)), BinaryOp.NotEqual, FAILED_LOOKAHEAD);
-//	}
+	private Expr predictChoice(String namePrefix, NodeList<FormalParameter> params, NodeList<Expr> args) {
+		String name = camelToConstant(lowerCaseFirst(namePrefix));
+		Expr constant = fieldAccessExpr(name(name)).withScope(name("JavaGrammar"));
 
-	private Expr matchCondition(String symbol, GExpansion expansion, NodeList<FormalParameter> params, NodeList<Expr> args) {
-		if (expansion.children != null && !expansion.children.isEmpty()) {
-			GExpansion firstChild = expansion.children.get(0);
-			if (firstChild.kind == GExpansion.Kind.LookAhead) {
-				Expr lookaheadCondition = null;
-
-				Expr semanticLookaheadCondition = firstChild.semanticLookahead;
-				int amount = firstChild.amount;
-				List<GExpansion> children = firstChild.children;
-				boolean negativeLookahead = firstChild.negativeLookahead;
-
-				if (semanticLookaheadCondition != null) {
-					if (semanticLookaheadCondition.equals(methodInvocationExpr(name("isLambda")))) {
-						semanticLookaheadCondition = methodInvocationExpr(name("isLambda")).withArgs(listOf(literalExpr(0)));
-					} else if (semanticLookaheadCondition.equals(methodInvocationExpr(name("isCast")))) {
-						semanticLookaheadCondition = methodInvocationExpr(name("isCast")).withArgs(listOf(literalExpr(0)));
-					}
-					lookaheadCondition = negativeLookahead ? unaryExpr(UnaryOp.Not, semanticLookaheadCondition) : semanticLookaheadCondition;
-				}
-				if (amount != -1) {
-					Expr amountLookaheadCondition = buildLookaheadWithAmountCondition(symbol, expansion, amount, params, args);
-					lookaheadCondition = lookaheadCondition == null ? amountLookaheadCondition :
-							binaryExpr(lookaheadCondition, BinaryOp.And, amountLookaheadCondition);
-				}
-				if (children != null) {
-					String matchMethodName = "match" + symbol + "_lookahead" + incrementCount(symbol);
-					Expr call = createMatchMethodAndCallFor(symbol, matchMethodName, GExpansion.sequence(children), literalExpr(0), params, args, false);
-					Expr descriptiveLookaheadCondition = binaryExpr(call, negativeLookahead ? BinaryOp.Equal : BinaryOp.NotEqual, literalExpr(-1));
-
-					lookaheadCondition = lookaheadCondition == null ? descriptiveLookaheadCondition :
-							binaryExpr(lookaheadCondition, negativeLookahead ? BinaryOp.Or : BinaryOp.And, descriptiveLookaheadCondition);
-				}
-
-				return lookaheadCondition;
-			}
-		}
-		return binaryExpr(matchCall(firstTerminalsOf(expansion), literalExpr(0)), BinaryOp.NotEqual, FAILED_LOOKAHEAD);
-	}
-
-	private int incrementCount(String symbol) {
-		Integer count = perSymbolLookaheadMethodCount.get(symbol);
-		int newCount = (count == null ? 0 : count) + 1;
-		perSymbolLookaheadMethodCount.put(symbol, newCount);
-		return newCount;
-	}
-
-	private Expr buildLookaheadWithAmountCondition(String symbol, GExpansion expansion, int amount, NodeList<FormalParameter> params, NodeList<Expr> args) {
-		String matchMethodName = "match" + symbol + "_lookahead" + incrementCount(symbol);
-		NodeList<Stmt> stmts = buildLookaheadWithAmountCondition(Collections.singletonList(expansion.location()), 0, amount, params, args);
-		stmts = stmts.append(returnStmt().withExpr(FAILED_LOOKAHEAD));
-		createMatchMethod(symbol, matchMethodName, expansion, stmts, emptyList());
-		return binaryExpr(matchMethodCall(matchMethodName, literalExpr(0), emptyList()), BinaryOp.NotEqual, FAILED_LOOKAHEAD);
-	}
-
-	private NodeList<Stmt> buildLookaheadWithAmountCondition(List<GLocation> location, int lookahead, int amount, NodeList<FormalParameter> params, NodeList<Expr> args) {
-		NodeList<Stmt> stmts = emptyList();
-		if (amount == 0) {
-			stmts = stmts.append(returnStmt().withExpr(LOOKAHEAD));
-		} else {
-			GContinuations c = new GContinuations(location, productions, lookahead > 0);
-			c.next();
-
-			Map<String, List<GLocation>> terminals = c.perTerminalLocations();
-			if (terminals.isEmpty()) {
-				stmts = stmts.append(returnStmt().withExpr(LOOKAHEAD));
-			} else {
-				for (Map.Entry<String, List<GLocation>> entry : terminals.entrySet()) {
-					String terminal = entry.getKey();
-					List<GLocation> following = entry.getValue();
-
-					stmts = stmts.append(ifStmt(
-							binaryExpr(matchCall(terminal, literalExpr(lookahead)), BinaryOp.NotEqual, FAILED_LOOKAHEAD),
-							blockStmt().withStmts(buildLookaheadWithAmountCondition(following, lookahead + 1, amount - 1, params, args))
-					));
-				}
-			}
-		}
-		return stmts;
-	}
-
-	private Expr createMatchMethodAndCallFor(String symbol, Expr outerLookahead, NodeList<Expr> args) {
-		if (!symbolToMatchNames.contains(symbol)) {
-			symbolToMatchNames.add(symbol);
-			GProduction production = productions.get(symbol);
-			GExpansion symbolExpansion = production.expansion;
-			return createMatchMethodAndCallFor(symbol, matchMethodName(symbol), symbolExpansion, outerLookahead, production.hintParams, args, MEMOIZE_MATCHES && (MEMOIZE_ALL_MATCHES || production.memoizeMatches));
-		} else return matchMethodCall(matchMethodName(symbol), outerLookahead, args);
-	}
-
-	int memoizationIndex = 0;
-
-	private Expr createMatchMethodAndCallFor(String symbol, String namePrefix, GExpansion expansion, Expr outerLookahead, NodeList<FormalParameter> params, NodeList<Expr> args, boolean memoize) {
-		switch (expansion.kind) {
-			case LookAhead:
-				Expr semanticLookahead = expansion.semanticLookahead;
-				if (semanticLookahead != null) {
-					if (semanticLookahead.equals(methodInvocationExpr(name("isLambda")))) {
-						semanticLookahead = methodInvocationExpr(name("isLambda")).withArgs(listOf(outerLookahead));
-					} else if (semanticLookahead.equals(methodInvocationExpr(name("isCast")))) {
-						semanticLookahead = methodInvocationExpr(name("isCast")).withArgs(listOf(outerLookahead));
-					}
-					return conditionalExpr(semanticLookahead, outerLookahead, FAILED_LOOKAHEAD);
-				}
-				return null;
-			case Sequence: {
-				int index = memoize ? memoizationIndex++ : -1;
-
-				NodeList<Stmt> stmts = emptyList();
-				int count = 0;
-				for (GExpansion child : expansion.children) {
-					Expr childCall = createMatchMethodAndCallFor(symbol, namePrefix + "_" + ++count, child, LOOKAHEAD, params, params.map(p -> p.id().get().name()), false);
-					if (childCall == null) continue;
-					stmts = stmts.append(expressionStmt(assignExpr(LOOKAHEAD, AssignOp.Normal, childCall)));
-					stmts = stmts.append(ifStmt(binaryExpr(LOOKAHEAD, BinaryOp.Equal, FAILED_LOOKAHEAD),
-							memoize ? stmt("return memoizeMatch(initialLookahead, " + index + ", -1);").build() :
-									stmt("return -1;").build()
-					));
-				}
-
-				if (memoize) {
-					stmts = stmts.prependAll(listOf(
-							stmt("int initialLookahead = lookahead;").build(),
-							stmt("int memoizedMatch = memoizedMatch(initialLookahead, " + index + ");").build(),
-							stmt("if (memoizedMatch > -2) return memoizedMatch;").build()
-					));
-				}
-
-				stmts = stmts.append(
-						memoize ? stmt("return memoizeMatch(initialLookahead, " + index + ", lookahead);").build() :
-								stmt("return lookahead;").build()
-				);
-
-				createMatchMethod(symbol, namePrefix, expansion, stmts, params);
-
-				return matchMethodCall(namePrefix, outerLookahead, args);
-			}
-			case Choice: {
-				NodeList<Stmt> stmts = emptyList();
-				stmts = stmts.append(expressionStmt(variableDeclarationExpr(
-						localVariableDecl(primitiveType(Primitive.Int))
-								.withVariables(listOf(variableDeclarator(variableDeclaratorId(LOOKAHEAD_NEW))))
-				)));
-				int count = 0;
-				for (GExpansion child : expansion.children) {
-					Expr childCall = createMatchMethodAndCallFor(symbol, namePrefix + "_" + ++count, child, LOOKAHEAD, params, params.map(p -> p.id().get().name()), false);
-					if (childCall == null) continue;
-					stmts = stmts.append(expressionStmt(assignExpr(LOOKAHEAD_NEW, AssignOp.Normal, childCall)));
-					stmts = stmts.append(ifStmt(binaryExpr(LOOKAHEAD_NEW, BinaryOp.NotEqual, FAILED_LOOKAHEAD), returnStmt().withExpr(LOOKAHEAD_NEW)));
-				}
-				stmts = stmts.append(returnStmt().withExpr(FAILED_LOOKAHEAD));
-				createMatchMethod(symbol, namePrefix, expansion, stmts, params);
-
-				return matchMethodCall(namePrefix, outerLookahead, args);
-			}
-			case ZeroOrOne: {
-				NodeList<Stmt> stmts = emptyList();
-				stmts = stmts.append(expressionStmt(variableDeclarationExpr(
-						localVariableDecl(primitiveType(Primitive.Int))
-								.withVariables(listOf(variableDeclarator(variableDeclaratorId(LOOKAHEAD_NEW))))
-				)));
-
-				Expr childCall = createMatchMethodAndCallFor(symbol, namePrefix + "_" + 1, GExpansion.sequence(expansion.children), LOOKAHEAD, params, params.map(p -> p.id().get().name()), false);
-				stmts = stmts.append(expressionStmt(assignExpr(LOOKAHEAD_NEW, AssignOp.Normal, childCall)));
-				stmts = stmts.append(ifStmt(binaryExpr(LOOKAHEAD_NEW, BinaryOp.NotEqual, FAILED_LOOKAHEAD), returnStmt().withExpr(LOOKAHEAD_NEW)));
-
-				stmts = stmts.append(returnStmt().withExpr(LOOKAHEAD));
-				createMatchMethod(symbol, namePrefix, expansion, stmts, params);
-
-				return matchMethodCall(namePrefix, outerLookahead, args);
-			}
-			case ZeroOrMore: {
-				NodeList<Stmt> stmts = emptyList();
-				stmts = stmts.append(expressionStmt(variableDeclarationExpr(
-						localVariableDecl(primitiveType(Primitive.Int))
-								.withVariables(listOf(variableDeclarator(variableDeclaratorId(LOOKAHEAD_NEW))))
-				)));
-
-				Expr childCall = createMatchMethodAndCallFor(symbol, namePrefix + "_" + 1, GExpansion.sequence(expansion.children), LOOKAHEAD, params, params.map(p -> p.id().get().name()), false);
-				stmts = stmts.append(expressionStmt(assignExpr(LOOKAHEAD_NEW, AssignOp.Normal, childCall)));
-				stmts = stmts.append(whileStmt(
-						binaryExpr(LOOKAHEAD_NEW, BinaryOp.NotEqual, FAILED_LOOKAHEAD),
-						blockStmt().withStmts(listOf(
-								expressionStmt(assignExpr(LOOKAHEAD, AssignOp.Normal, LOOKAHEAD_NEW)),
-								expressionStmt(assignExpr(LOOKAHEAD_NEW, AssignOp.Normal, childCall))
-						))
-				));
-				stmts = stmts.append(returnStmt().withExpr(LOOKAHEAD));
-				createMatchMethod(symbol, namePrefix, expansion, stmts, params);
-
-				return matchMethodCall(namePrefix, outerLookahead, args);
-			}
-			case OneOrMore: {
-				NodeList<Stmt> stmts = emptyList();
-				stmts = stmts.append(expressionStmt(variableDeclarationExpr(
-						localVariableDecl(primitiveType(Primitive.Int))
-								.withVariables(listOf(variableDeclarator(variableDeclaratorId(LOOKAHEAD_NEW))))
-				)));
-
-				Expr childCall = createMatchMethodAndCallFor(symbol, namePrefix + "_" + 1, GExpansion.sequence(expansion.children), LOOKAHEAD, params, params.map(p -> p.id().get().name()), false);
-				stmts = stmts.append(expressionStmt(assignExpr(LOOKAHEAD_NEW, AssignOp.Normal, childCall)));
-				stmts = stmts.append(ifStmt(binaryExpr(LOOKAHEAD_NEW, BinaryOp.Equal, FAILED_LOOKAHEAD), returnStmt().withExpr(FAILED_LOOKAHEAD)));
-				stmts = stmts.append(whileStmt(
-						binaryExpr(LOOKAHEAD_NEW, BinaryOp.NotEqual, FAILED_LOOKAHEAD),
-						blockStmt().withStmts(listOf(
-								expressionStmt(assignExpr(LOOKAHEAD, AssignOp.Normal, LOOKAHEAD_NEW)),
-								expressionStmt(assignExpr(LOOKAHEAD_NEW, AssignOp.Normal, childCall))
-						))
-				));
-				stmts = stmts.append(returnStmt().withExpr(LOOKAHEAD));
-				createMatchMethod(symbol, namePrefix, expansion, stmts, params);
-
-				return matchMethodCall(namePrefix, outerLookahead, args);
-			}
-			case NonTerminal: {
-				return createMatchMethodAndCallFor(expansion.symbol, outerLookahead, expansion.hints);
-			}
-			case Terminal: {
-				return matchCall(expansion.symbol, LOOKAHEAD);
-			}
-			case Action: {
-				return null;
-			}
-			default:
-		}
-		return null;
-	}
-
-	private GExpansion traverseUniqueChildSequences(GExpansion expansion) {
-		main:
-		while (expansion.kind == GExpansion.Kind.Sequence) {
-			GExpansion child = null;
-			List<GExpansion> children = expansion.children;
-			for (int i = 0; i < children.size(); i++) {
-				GExpansion otherChild = children.get(i);
-				if ((otherChild.kind != GExpansion.Kind.LookAhead || otherChild.semanticLookahead == null) &&
-						otherChild.kind != GExpansion.Kind.Action) {
-					if (child == null) child = otherChild;
-					else break main;
-				}
-			}
-			expansion = child;
-		}
-		return expansion;
-	}
-
-	private void createMatchMethod(String symbol, String namePrefix, GExpansion expansion, NodeList<Stmt> stmts, NodeList<FormalParameter> params) {
-		List<MethodDecl> methods = perSymbolMatchMethods.get(symbol);
-		if (methods == null) {
-			methods = new ArrayList<>();
-			perSymbolMatchMethods.put(symbol, methods);
-		}
-		methods.add(matchMethod(namePrefix, stmts, expansion, params));
-	}
-
-	private String matchMethodName(String symbol) {
-		return "match" + upperCaseFirst(symbol);
-	}
-
-	private MethodDecl matchMethod(String methodName, NodeList<Stmt> stmts, GExpansion expansion, NodeList<FormalParameter> params) {
-		return methodDecl(primitiveType(Primitive.Int), name(methodName))
-				.withModifiers(listOf(Modifier.Private))
-				.withParams(
-						listOf(formalParameter(primitiveType(Primitive.Int)).withId(variableDeclaratorId(LOOKAHEAD)))
-								.appendAll(params)
-				)
-				.withBody(blockStmt().withStmts(stmts))
-				.appendLeadingComment(expansion.toString(e -> e.kind != GExpansion.Kind.Action), true);
-	}
-
-	private MethodInvocationExpr matchMethodCall(String methodName, Expr lookahead, NodeList<Expr> args) {
-		return methodInvocationExpr(name(methodName)).withArgs(listOf(lookahead).appendAll(args));
-	}
-
-	private MethodInvocationExpr matchCall(List<String> tokens, Expr lookahead) {
-		return methodInvocationExpr(MATCH).withArgs(listOf(prefixedConstants(tokens)).prepend(lookahead));
-	}
-
-	private MethodInvocationExpr matchCall(String token, Expr lookahead) {
-		return methodInvocationExpr(MATCH).withArgs(listOf(lookahead, prefixedConstant(token)));
+		return methodInvocationExpr(name("predict")).withArgs(listOf(constant));
 	}
 
 	private List<Expr> prefixedConstants(List<String> tokens) {

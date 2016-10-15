@@ -167,7 +167,7 @@ public class GExpansion {
 			case OneOrMore:
 				List<GExpansion> rewroteChildren =
 						children.stream().map(e -> e.rewrite(f)).collect(Collectors.toList());
-				return f.apply(new GExpansion(kind, rewroteChildren, null, null, hints, null, null, amount, null, false));
+				return f.apply(new GExpansion(kind, rewroteChildren, name, symbol, hints, arguments, action, amount, semanticLookahead, negativeLookahead));
 			case NonTerminal:
 			case Terminal:
 			case Action:

@@ -74,8 +74,9 @@ public class Grammar2 {
 					emptyList(),
 					emptyList(),
 					emptyList(),
-					choice(
-							terminal("EOF"),
+//					choice(
+//							terminal("EOF"),
+					sequence(
 							terminal("EOF")
 					)
 			),

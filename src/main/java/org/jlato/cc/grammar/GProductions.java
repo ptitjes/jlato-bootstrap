@@ -31,17 +31,14 @@ public class GProductions {
 		return productionsByName.get(symbol);
 	}
 
-	public void rewrite(Function<GProduction, GProduction> f) {
+	public GProductions rewrite(Function<GProduction, GProduction> f) {
 		List<GProduction> rewrote = new ArrayList<>();
-		Map<String, GProduction> rewroteByName = new HashMap<>();
 
 		for (GProduction production : productions) {
 			GProduction r = f.apply(production);
 			rewrote.add(r);
-			rewroteByName.put(r.symbol, r);
 		}
-		productions = rewrote;
-		productionsByName = rewroteByName;
+		return new GProductions(productions);
 	}
 
 	public void recomputeReferences() {
