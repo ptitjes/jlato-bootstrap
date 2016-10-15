@@ -9,6 +9,7 @@ import org.jlato.tree.NodeList;
 import org.jlato.tree.Trees;
 import org.jlato.tree.decl.*;
 import org.jlato.tree.expr.*;
+import org.jlato.tree.stmt.ExpressionStmt;
 import org.jlato.tree.stmt.Stmt;
 import org.jlato.tree.stmt.SwitchCase;
 import org.jlato.tree.type.Type;
@@ -280,6 +281,19 @@ public class ParserPattern2 extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				);
 				break;
 			}
+			case NonTerminal: {
+				String ntConstantName = camelToConstant(lowerCaseFirst(expansion.symbol));
+				members = members.append(fieldDecl(qType("NonTerminal"))
+						.withModifiers(listOf(Modifier.Static, Modifier.Final))
+						.withVariables(listOf(
+								variableDeclarator(variableDeclaratorId(name(namePrefix))).withInit(
+										methodInvocationExpr(name("nonTerminal"))
+												.withArgs(listOf(literalExpr(namePrefix), name(ntConstantName)))
+								)
+						))
+				);
+				break;
+			}
 			default:
 		}
 		return members;
@@ -348,10 +362,11 @@ public class ParserPattern2 extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				childrenExprs = childrenExprs.append(name(namePrefix));
 				break;
 			case NonTerminal: {
-				String name = camelToConstant(lowerCaseFirst(expansion.symbol));
-				childrenExprs = childrenExprs.append(methodInvocationExpr(name("nonTerminal"))
-						.withArgs(listOf(literalExpr(namePrefix), name(name)))
-				);
+				childrenExprs = childrenExprs.append(name(namePrefix));
+//				String name = camelToConstant(lowerCaseFirst(expansion.symbol));
+//				childrenExprs = childrenExprs.append(methodInvocationExpr(name("nonTerminal"))
+//						.withArgs(listOf(literalExpr(namePrefix), name(name)))
+//				);
 				break;
 			}
 			case Terminal: {
@@ -367,15 +382,19 @@ public class ParserPattern2 extends TypePattern.OfClass<TreeClassDescriptor[]> {
 	}
 
 	private NodeList<Stmt> grammarDefStmts(GProduction production, NodeList<Stmt> stmts) {
-		String productionConstantName = camelToConstant(lowerCaseFirst(production.symbol));
+		String symbol = production.symbol;
+		String productionConstantName = camelToConstant(lowerCaseFirst(symbol));
 		stmts = stmts.append(
 				expressionStmt(
-						methodInvocationExpr(name("addProduction"))
-								.withArgs(listOf(name(productionConstantName), name(production.symbol)))
+						methodInvocationExpr(name("addProduction")).withArgs(listOf(
+								name(productionConstantName),
+								name(symbol),
+								literalExpr(symbol.endsWith("Entry") && !symbol.equals("SwitchEntry"))
+						))
 				)
 		);
 
-		stmts = grammarDefStmts(production.symbol, production.expansion, stmts);
+		stmts = grammarDefStmts(symbol, production.expansion, stmts);
 		return stmts;
 	}
 
@@ -476,10 +495,12 @@ public class ParserPattern2 extends TypePattern.OfClass<TreeClassDescriptor[]> {
 					cases = cases.append(switchCase().withLabel(label).withStmts(caseStmts));
 				}
 
-				cases = cases.append(switchCase().withStmts(listOf(throwStmt(
-						methodInvocationExpr(name("produceParseException"))
-								.withArgs(listOf(firstTerminalsOf(expansion).stream().map(this::prefixedConstant).collect(Collectors.toList())))
-				))));
+				if (!optional) {
+					cases = cases.append(switchCase().withStmts(listOf(throwStmt(
+							methodInvocationExpr(name("produceParseException"))
+									.withArgs(listOf(firstTerminalsOf(expansion).stream().map(this::prefixedConstant).collect(Collectors.toList())))
+					))));
+				}
 
 				stmts = stmts.append(switchStmt(selector).withCases(cases));
 
@@ -488,19 +509,23 @@ public class ParserPattern2 extends TypePattern.OfClass<TreeClassDescriptor[]> {
 			case NonTerminal: {
 				Expr call = methodInvocationExpr(name("parse" + upperCaseFirst(expansion.symbol)))
 						.withArgs(expansion.hints.appendAll(expansion.arguments));
-				stmts = stmts.append(expressionStmt(
-						expansion.name == null ? call :
-								assignExpr(name(expansion.name), AssignOp.Normal, call)
-				));
+				ExpressionStmt callStmt = expressionStmt(
+						expansion.name == null ? call : assignExpr(name(expansion.name), AssignOp.Normal, call)
+				);
+
+				stmts = stmts.append(pushCallStack(namePrefix));
+				stmts = stmts.append(callStmt);
+				stmts = stmts.append(popCallStack());
 				break;
 			}
 			case Terminal: {
 				Expr argument = prefixedConstant(expansion.symbol);
 				Expr call = methodInvocationExpr(name("parse")).withArgs(listOf(argument));
-				stmts = stmts.append(expressionStmt(
-						expansion.name == null ? call :
-								assignExpr(name(expansion.name), AssignOp.Normal, call)
-				));
+				ExpressionStmt callStmt = expressionStmt(
+						expansion.name == null ? call : assignExpr(name(expansion.name), AssignOp.Normal, call)
+				);
+
+				stmts = stmts.append(callStmt);
 				break;
 			}
 			case Action: {
@@ -529,6 +554,16 @@ public class ParserPattern2 extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		Expr constant = fieldAccessExpr(name(name)).withScope(name("JavaGrammar"));
 
 		return methodInvocationExpr(name("predict")).withArgs(listOf(constant));
+	}
+
+	private Stmt pushCallStack(String name) {
+		Expr constant = fieldAccessExpr(name(name)).withScope(name("JavaGrammar"));
+
+		return expressionStmt(methodInvocationExpr(name("pushCallStack")).withArgs(listOf(constant)));
+	}
+
+	private Stmt popCallStack() {
+		return expressionStmt(methodInvocationExpr(name("popCallStack")));
 	}
 
 	private List<Expr> prefixedConstants(List<String> tokens) {

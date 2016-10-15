@@ -14,6 +14,386 @@ import static org.jlato.cc.grammar.GProduction.*;
 public class Grammar2 {
 
 	public static GProductions productions = new GProductions(
+
+			// Entry productions
+
+			production("CompilationUnitEntry", type("BUTree<SCompilationUnit>").build(),
+					emptyList(),
+					emptyList(),
+					listOf(
+							stmt("BUTree<SCompilationUnit> ret;").build()
+					),
+					sequence(
+							action(listOf(
+									stmt("entryPoint = JavaGrammar.COMPILATION_UNIT_ENTRY;").build()
+							)),
+							nonTerminal("ret", "CompilationUnit"),
+							action(listOf(
+									stmt("return ret;").build()
+							))
+					)
+			),
+			production("PackageDeclEntry", type("BUTree<SPackageDecl>").build(),
+					emptyList(),
+					emptyList(),
+					listOf(
+							stmt("BUTree<SPackageDecl> ret;").build()
+					),
+					sequence(
+							action(listOf(
+									stmt("entryPoint = JavaGrammar.PACKAGE_DECL_ENTRY;").build()
+							)),
+							nonTerminal("ret", "PackageDecl"),
+							nonTerminal("Epilog"),
+							action(listOf(
+									stmt("return dressWithPrologAndEpilog(ret);").build()
+							))
+					)
+			),
+			production("ImportDeclEntry", type("BUTree<SImportDecl>").build(),
+					emptyList(),
+					emptyList(),
+					listOf(
+							stmt("BUTree<SImportDecl> ret;").build()
+					),
+					sequence(
+							action(listOf(
+									stmt("entryPoint = JavaGrammar.IMPORT_DECL_ENTRY;").build()
+							)),
+							nonTerminal("ret", "ImportDecl"),
+							nonTerminal("Epilog"),
+							action(listOf(
+									stmt("return dressWithPrologAndEpilog(ret);").build()
+							))
+					)
+			),
+			production("TypeDeclEntry", type("BUTree<? extends STypeDecl>").build(),
+					emptyList(),
+					emptyList(),
+					listOf(
+							stmt("BUTree<? extends STypeDecl> ret;").build()
+					),
+					sequence(
+							action(listOf(
+									stmt("entryPoint = JavaGrammar.TYPE_DECL_ENTRY;").build()
+							)),
+							nonTerminal("ret", "TypeDecl"),
+							nonTerminal("Epilog"),
+							action(listOf(
+									stmt("return dressWithPrologAndEpilog(ret);").build()
+							))
+					)
+			),
+			production("MemberDeclEntry", type("BUTree<? extends SMemberDecl>").build(),
+					listOf(param("TypeKind typeKind").build()),
+					emptyList(),
+					listOf(stmt("BUTree<? extends SMemberDecl> ret;").build()),
+					sequence(
+							action(listOf(
+									stmt("entryPoint = JavaGrammar.MEMBER_DECL_ENTRY;").build()
+							)),
+							nonTerminal("ret", "ClassOrInterfaceBodyDecl", listOf(expr("typeKind").build())),
+							nonTerminal("Epilog"),
+							action(listOf(
+									stmt("return dressWithPrologAndEpilog(ret);").build()
+							))
+					)
+			),
+			production("AnnotationMemberDeclEntry", type("BUTree<? extends SMemberDecl>").build(),
+					emptyList(),
+					emptyList(),
+					listOf(
+							stmt("BUTree<? extends SMemberDecl> ret;").build()
+					),
+					sequence(
+							action(listOf(
+									stmt("entryPoint = JavaGrammar.ANNOTATION_MEMBER_DECL_ENTRY;").build()
+							)),
+							// TODO Rename AnnotationMemberDecl
+							nonTerminal("ret", "AnnotationTypeBodyDecl"),
+							nonTerminal("Epilog"),
+							action(listOf(
+									stmt("return dressWithPrologAndEpilog(ret);").build()
+							))
+					)
+			),
+
+			production("ModifiersEntry", type("BUTree<SNodeList>").build(),
+					emptyList(),
+					emptyList(),
+					listOf(
+							stmt("BUTree<SNodeList> ret;").build()
+					),
+					sequence(
+							action(listOf(
+									stmt("entryPoint = JavaGrammar.MODIFIERS_ENTRY;").build()
+							)),
+							nonTerminal("ret", "Modifiers"),
+							nonTerminal("Epilog"),
+							action(listOf(
+									stmt("return ret;").build()
+							))
+					)
+			),
+			production("AnnotationsEntry", type("BUTree<SNodeList>").build(),
+					emptyList(),
+					emptyList(),
+					listOf(
+							stmt("BUTree<SNodeList> ret;").build()
+					),
+					sequence(
+							action(listOf(
+									stmt("entryPoint = JavaGrammar.ANNOTATIONS_ENTRY;").build()
+							)),
+							nonTerminal("ret", "Annotations"),
+							nonTerminal("Epilog"),
+							action(listOf(
+									stmt("return ret;").build()
+							))
+					)
+			),
+
+			production("MethodDeclEntry", type("BUTree<SMethodDecl>").build(),
+					emptyList(),
+					emptyList(),
+					listOf(
+							stmt("BUTree<SNodeList> modifiers;").build(),
+							stmt("BUTree<SMethodDecl> ret;").build()
+					),
+					sequence(
+							action(listOf(
+									stmt("entryPoint = JavaGrammar.METHOD_DECL_ENTRY;").build()
+							)),
+							action(listOf(
+									stmt("run();").build()
+							)),
+							nonTerminal("modifiers", "Modifiers"),
+							nonTerminal("ret", "MethodDecl", listOf(expr("modifiers").build())),
+							nonTerminal("Epilog"),
+							action(listOf(
+									stmt("return dressWithPrologAndEpilog(ret);").build()
+							))
+					)
+			),
+			production("FieldDeclEntry", type("BUTree<SFieldDecl>").build(),
+					emptyList(),
+					emptyList(),
+					listOf(
+							stmt("BUTree<SNodeList> modifiers;").build(),
+							stmt("BUTree<SFieldDecl> ret;").build()
+					),
+					sequence(
+							action(listOf(
+									stmt("entryPoint = JavaGrammar.FIELD_DECL_ENTRY;").build()
+							)),
+							action(listOf(
+									stmt("run();").build()
+							)),
+							nonTerminal("modifiers", "Modifiers"),
+							nonTerminal("ret", "FieldDecl", listOf(expr("modifiers").build())),
+							nonTerminal("Epilog"),
+							action(listOf(
+									stmt("return dressWithPrologAndEpilog(ret);").build()
+							))
+					)
+			),
+			production("AnnotationElementDeclEntry", type("BUTree<SAnnotationMemberDecl>").build(),
+					emptyList(),
+					emptyList(),
+					listOf(
+							stmt("BUTree<SNodeList> modifiers;").build(),
+							stmt("BUTree<SAnnotationMemberDecl> ret;").build()
+					),
+					sequence(
+							action(listOf(
+									stmt("entryPoint = JavaGrammar.ANNOTATION_ELEMENT_DECL_ENTRY;").build()
+							)),
+							action(listOf(
+									stmt("run();").build()
+							)),
+							nonTerminal("modifiers", "Modifiers"),
+							// TODO Rename AnnotationElementDecl
+							nonTerminal("ret", "AnnotationTypeMemberDecl", listOf(expr("modifiers").build())),
+							nonTerminal("Epilog"),
+							action(listOf(
+									stmt("return dressWithPrologAndEpilog(ret);").build()
+							))
+					)
+			),
+
+			production("EnumConstantDeclEntry", type("BUTree<SEnumConstantDecl>").build(),
+					emptyList(),
+					emptyList(),
+					listOf(
+							stmt("BUTree<SEnumConstantDecl> ret;").build()
+					),
+					sequence(
+							action(listOf(
+									stmt("entryPoint = JavaGrammar.ENUM_CONSTANT_DECL_ENTRY;").build()
+							)),
+							nonTerminal("ret", "EnumConstantDecl"),
+							nonTerminal("Epilog"),
+							action(listOf(
+									stmt("return dressWithPrologAndEpilog(ret);").build()
+							))
+					)
+			),
+			production("FormalParameterEntry", type("BUTree<SFormalParameter>").build(),
+					emptyList(),
+					emptyList(),
+					listOf(
+							stmt("BUTree<SFormalParameter> ret;").build()
+					),
+					sequence(
+							action(listOf(
+									stmt("entryPoint = JavaGrammar.FORMAL_PARAMETER_ENTRY;").build()
+							)),
+							nonTerminal("ret", "FormalParameter"),
+							nonTerminal("Epilog"),
+							action(listOf(
+									stmt("return dressWithPrologAndEpilog(ret);").build()
+							))
+					)
+			),
+			production("TypeParameterEntry", type("BUTree<STypeParameter>").build(),
+					emptyList(),
+					emptyList(),
+					listOf(
+							stmt("BUTree<STypeParameter> ret;").build()
+					),
+					sequence(
+							action(listOf(
+									stmt("entryPoint = JavaGrammar.TYPE_PARAMETER_ENTRY;").build()
+							)),
+							nonTerminal("ret", "TypeParameter"),
+							nonTerminal("Epilog"),
+							action(listOf(
+									stmt("return dressWithPrologAndEpilog(ret);").build()
+							))
+					)
+			),
+			production("StatementsEntry", type("BUTree<SNodeList>").build(),
+					emptyList(),
+					emptyList(),
+					listOf(
+							stmt("BUTree<SNodeList> ret;").build()
+					),
+					sequence(
+							action(listOf(
+									stmt("entryPoint = JavaGrammar.STATEMENTS_ENTRY;").build()
+							)),
+							nonTerminal("ret", "Statements", listOf(expr("false").build())),
+							nonTerminal("Epilog"),
+							action(listOf(
+									stmt("return ret;").build()
+							))
+					)
+			),
+			production("BlockStatementEntry", type("BUTree<? extends SStmt>").build(),
+					emptyList(),
+					emptyList(),
+					listOf(
+							stmt("BUTree<? extends SStmt> ret;").build()
+					),
+					sequence(
+							action(listOf(
+									stmt("entryPoint = JavaGrammar.BLOCK_STATEMENT_ENTRY;").build()
+							)),
+							nonTerminal("ret", "BlockStatement"),
+							nonTerminal("Epilog"),
+							action(listOf(
+									stmt("return dressWithPrologAndEpilog(ret);").build()
+							))
+					)
+			),
+			production("ExpressionEntry", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					emptyList(),
+					listOf(
+							stmt("BUTree<? extends SExpr> ret;").build()
+					),
+					sequence(
+							action(listOf(
+									stmt("entryPoint = JavaGrammar.EXPRESSION_ENTRY;").build()
+							)),
+							nonTerminal("ret", "Expression"),
+							nonTerminal("Epilog"),
+							action(listOf(
+									stmt("return dressWithPrologAndEpilog(ret);").build()
+							))
+					)
+			),
+
+
+			production("TypeEntry", type("BUTree<? extends SType>").build(),
+					emptyList(),
+					emptyList(),
+					listOf(
+							stmt("BUTree<SNodeList> annotations;").build(),
+							stmt("BUTree<? extends SType> ret;").build()
+					),
+					sequence(
+							action(listOf(
+									stmt("entryPoint = JavaGrammar.TYPE_ENTRY;").build()
+							)),
+							action(listOf(
+									stmt("run();").build()
+							)),
+							nonTerminal("annotations", "Annotations"),
+							nonTerminal("ret", "Type", listOf(expr("annotations").build())),
+							nonTerminal("Epilog"),
+							action(listOf(
+									stmt("return dressWithPrologAndEpilog(ret);").build()
+							))
+					)
+			),
+
+			production("QualifiedNameEntry", type("BUTree<SQualifiedName>").build(),
+					emptyList(),
+					emptyList(),
+					listOf(
+							stmt("BUTree<SQualifiedName> ret;").build()
+					),
+					sequence(
+							action(listOf(
+									stmt("entryPoint = JavaGrammar.QUALIFIED_NAME_ENTRY;").build()
+							)),
+							nonTerminal("ret", "QualifiedName"),
+							nonTerminal("Epilog"),
+							action(listOf(
+									stmt("return dressWithPrologAndEpilog(ret);").build()
+							))
+					)
+			),
+			production("NameEntry", type("BUTree<SName>").build(),
+					emptyList(),
+					emptyList(),
+					listOf(
+							stmt("BUTree<SName> ret;").build()
+					),
+					sequence(
+							action(listOf(
+									stmt("entryPoint = JavaGrammar.NAME_ENTRY;").build()
+							)),
+							nonTerminal("ret", "Name"),
+							nonTerminal("Epilog"),
+							action(listOf(
+									stmt("return dressWithPrologAndEpilog(ret);").build()
+							))
+					)
+			),
+
+			production("Epilog", null,
+					emptyList(),
+					emptyList(),
+					emptyList(),
+					sequence(
+							terminal("EOF")
+					)
+			),
+
+			// Main productions
+
 			production("NodeListVar", type("BUTree<SNodeList>").build(),
 					emptyList(),
 					emptyList(),
@@ -68,16 +448,6 @@ public class Grammar2 {
 							action(listOf(
 									stmt("return dressWithPrologAndEpilog(compilationUnit);").build()
 							))
-					)
-			),
-			production("Epilog", null,
-					emptyList(),
-					emptyList(),
-					emptyList(),
-//					choice(
-//							terminal("EOF"),
-					sequence(
-							terminal("EOF")
 					)
 			),
 			production("PackageDecl", type("BUTree<SPackageDecl>").build(),
@@ -2008,76 +2378,6 @@ public class Grammar2 {
 					),
 					sequence(
 							choice(
-									// TODO Handle LambdaExpressions in a LambdaExpressions production here
-									sequence(
-											lookAhead(
-													nonTerminal("Name"),
-													terminal("ARROW")
-											),
-											action(listOf(
-													stmt("run();").build()
-											)),
-											nonTerminal("ret", "Name"),
-											terminal("ARROW"),
-											nonTerminal("ret", "LambdaBody", null, listOf(
-													expr("singletonList(makeFormalParameter((BUTree<SName>) ret))").build(),
-													expr("false").build()
-											))
-									),
-									sequence(
-											lookAhead(
-													terminal("LPAREN"),
-													terminal("RPAREN"),
-													terminal("ARROW")
-											),
-											action(listOf(
-													stmt("run();").build()
-											)),
-											terminal("LPAREN"),
-											terminal("RPAREN"),
-											terminal("ARROW"),
-											nonTerminal("ret", "LambdaBody", null, listOf(
-													expr("emptyList()").build(),
-													expr("true").build()
-											))
-									),
-									sequence(
-											lookAhead(
-													terminal("LPAREN"),
-													nonTerminal("Name"),
-													terminal("RPAREN"),
-													terminal("ARROW")
-											),
-											action(listOf(
-													stmt("run();").build()
-											)),
-											terminal("LPAREN"),
-											nonTerminal("ret", "Name"),
-											terminal("RPAREN"),
-											terminal("ARROW"),
-											nonTerminal("ret", "LambdaBody", null, listOf(
-													expr("singletonList(makeFormalParameter((BUTree<SName>) ret))").build(),
-													expr("true").build()
-											))
-									),
-									sequence(
-											lookAhead(
-													terminal("LPAREN"),
-													nonTerminal("Name"),
-													terminal("COMMA")
-											),
-											action(listOf(
-													stmt("run();").build()
-											)),
-											terminal("LPAREN"),
-											nonTerminal("params", "InferredFormalParameterList"),
-											terminal("RPAREN"),
-											terminal("ARROW"),
-											nonTerminal("ret", "LambdaBody", null, listOf(
-													expr("params").build(),
-													expr("true").build()
-											))
-									),
 									sequence(
 											nonTerminal("ret", "ConditionalExpression"),
 											zeroOrOne(
@@ -2091,6 +2391,63 @@ public class Grammar2 {
 															stmt("ret = dress(SAssignExpr.make(ret, op, value));").build()
 													))
 											)
+									)
+							),
+							action(listOf(
+									stmt("return ret;").build()
+							))
+					)
+			),
+			production("LambdaExpression", type("BUTree<SLambdaExpr>").build(),
+					emptyList(),
+					emptyList(),
+					listOf(
+							stmt("BUTree<SLambdaExpr> ret;").build(),
+							stmt("BUTree<SName> name;").build(),
+							stmt("BUTree<SNodeList> params;").build()
+					),
+					sequence(
+							action(listOf(
+									stmt("run();").build()
+							)),
+							choice(
+									sequence(
+											nonTerminal("name", "Name"),
+											terminal("ARROW"),
+											nonTerminal("ret", "LambdaBody", null, listOf(
+													expr("singletonList(makeFormalParameter(name))").build(),
+													expr("false").build()
+													)
+											)
+									),
+									sequence(
+											terminal("LPAREN"),
+											terminal("RPAREN"),
+											terminal("ARROW"),
+											nonTerminal("ret", "LambdaBody", null, listOf(
+													expr("emptyList()").build(),
+													expr("true").build()
+											))
+									),
+									sequence(
+											terminal("LPAREN"),
+											nonTerminal("params", "InferredFormalParameterList"),
+											terminal("RPAREN"),
+											terminal("ARROW"),
+											nonTerminal("ret", "LambdaBody", null, listOf(
+													expr("params").build(),
+													expr("true").build()
+											))
+									),
+									sequence(
+											terminal("LPAREN"),
+											nonTerminal("params", "FormalParameterList"),
+											terminal("RPAREN"),
+											terminal("ARROW"),
+											nonTerminal("ret", "LambdaBody", null, listOf(
+													expr("params").build(),
+													expr("true").build()
+											))
 									)
 							),
 							action(listOf(
@@ -2855,7 +3212,6 @@ public class Grammar2 {
 																	expr("type").build()
 															)),
 															terminal("RPAREN"),
-															// TODO Handle LambdaExpressions here
 															nonTerminal("ret", "UnaryExpressionNotPlusMinus"),
 															action(listOf(
 																	stmt("ret = dress(SCastExpr.make(type, ret));").build()
@@ -2884,7 +3240,6 @@ public class Grammar2 {
 													expr("type").build()
 											)),
 											terminal("RPAREN"),
-											// TODO Handle LambdaExpressions here
 											nonTerminal("ret", "UnaryExpressionNotPlusMinus"),
 											action(listOf(
 													stmt("ret = dress(SCastExpr.make(type, ret));").build()
@@ -3017,15 +3372,21 @@ public class Grammar2 {
 							stmt("BUTree<? extends SExpr> ret;").build()
 					),
 					sequence(
-							nonTerminal("ret", "PrimaryPrefix"),
-							zeroOrMore(
-//									lookAhead(2),
-									action(listOf(
-											stmt("lateRun();").build()
-									)),
-									nonTerminal("ret", "PrimarySuffix", null, listOf(
-											expr("ret").build()
-									))
+							choice(
+									sequence(
+											nonTerminal("ret", "LambdaExpression")
+									),
+									sequence(
+											nonTerminal("ret", "PrimaryPrefix"),
+											zeroOrMore(
+													action(listOf(
+															stmt("lateRun();").build()
+													)),
+													nonTerminal("ret", "PrimarySuffix", null, listOf(
+															expr("ret").build()
+													))
+											)
+									)
 							),
 							action(listOf(
 									stmt("return ret;").build()
@@ -3170,81 +3531,18 @@ public class Grammar2 {
 											))
 									),
 									sequence(
-											nonTerminal("ret", "Name"),
-											zeroOrOne(
-													action(listOf(
-															stmt("lateRun();").build()
-													)),
-													// TODO Do not handle LambdaExpressions here
-													terminal("ARROW"),
-													nonTerminal("ret", "LambdaBody", null, listOf(
-															expr("singletonList(makeFormalParameter((BUTree<SName>) ret))").build(),
-															expr("false").build()
-													))
-											)
+											nonTerminal("ret", "Name")
 									),
 									sequence(
 											action(listOf(
 													stmt("run();").build()
 											)),
-											// TODO Do not handle LambdaExpressions here but just parenthesized expression
 											terminal("LPAREN"),
-											choice(
-													sequence(
-															terminal("RPAREN"),
-															terminal("ARROW"),
-															nonTerminal("ret", "LambdaBody", null, listOf(
-																	expr("emptyList()").build(),
-																	expr("true").build()
-															))
-													),
-													sequence(
-															lookAhead(
-																	nonTerminal("Name"),
-																	terminal("RPAREN"),
-																	terminal("ARROW")
-															),
-															nonTerminal("ret", "Name"),
-															terminal("RPAREN"),
-															terminal("ARROW"),
-															nonTerminal("ret", "LambdaBody", null, listOf(
-																	expr("singletonList(makeFormalParameter((BUTree<SName>) ret))").build(),
-																	expr("true").build()
-															))
-													),
-													sequence(
-															lookAhead(
-																	nonTerminal("Name"),
-																	terminal("COMMA")
-															),
-															nonTerminal("params", "InferredFormalParameterList"),
-															terminal("RPAREN"),
-															terminal("ARROW"),
-															nonTerminal("ret", "LambdaBody", null, listOf(
-																	expr("params").build(),
-																	expr("true").build()
-															))
-													),
-													sequence(
-															lookAhead(
-																	expr("isLambda()").build()
-															),
-															nonTerminal("params", "FormalParameterList"),
-															terminal("RPAREN"),
-															terminal("ARROW"),
-															nonTerminal("ret", "LambdaBody", null, listOf(
-																	expr("params").build(),
-																	expr("true").build()
-															))
-													),
-													sequence(
-															nonTerminal("ret", "Expression"),
-															terminal("RPAREN"),
-															action(listOf(
-																	stmt("ret = dress(SParenthesizedExpr.make(ret));").build()
-															))
-													)
-											)
+											nonTerminal("ret", "Expression"),
+											terminal("RPAREN"),
+											action(listOf(
+													stmt("ret = dress(SParenthesizedExpr.make(ret));").build()
+											))
 									)
 							),
 							action(listOf(
