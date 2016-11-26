@@ -38,7 +38,7 @@ public class GProductions {
 			GProduction r = f.apply(production);
 			rewrote.add(r);
 		}
-		return new GProductions(productions);
+		return new GProductions(rewrote);
 	}
 
 	public void recomputeReferences() {

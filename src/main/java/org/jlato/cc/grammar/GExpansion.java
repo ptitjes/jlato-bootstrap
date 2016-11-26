@@ -10,6 +10,7 @@ import org.jlato.tree.stmt.Stmt;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -166,7 +167,7 @@ public class GExpansion {
 			case ZeroOrMore:
 			case OneOrMore:
 				List<GExpansion> rewroteChildren =
-						children.stream().map(e -> e.rewrite(f)).collect(Collectors.toList());
+						children.stream().map(e -> e.rewrite(f)).filter(Objects::nonNull).collect(Collectors.toList());
 				return f.apply(new GExpansion(kind, rewroteChildren, name, symbol, hints, arguments, action, amount, semanticLookahead, negativeLookahead));
 			case NonTerminal:
 			case Terminal:
