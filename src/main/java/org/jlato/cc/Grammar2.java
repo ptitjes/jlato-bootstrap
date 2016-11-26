@@ -3919,7 +3919,7 @@ public class Grammar2 {
 									nonTerminal("ret", "AssertStatement"),
 									nonTerminal("ret", "Block"),
 									nonTerminal("ret", "EmptyStatement"),
-									nonTerminal("ret", "StatementExpression"),
+									nonTerminal("ret", "ExpressionStatement"),
 									nonTerminal("ret", "SwitchStatement"),
 									nonTerminal("ret", "IfStatement"),
 									nonTerminal("ret", "WhileStatement"),
@@ -4096,7 +4096,7 @@ public class Grammar2 {
 							))
 					)
 			),
-			production("StatementExpression", type("BUTree<SExpressionStmt>").build(),
+			production("ExpressionStatement", type("BUTree<SExpressionStmt>").build(),
 					emptyList(),
 					emptyList(),
 					listOf(
@@ -4108,6 +4108,22 @@ public class Grammar2 {
 							action(listOf(
 									stmt("run();").build()
 							)),
+							nonTerminal("expr", "StatementExpression"),
+							terminal("SEMICOLON"),
+							action(listOf(
+									stmt("return dress(SExpressionStmt.make(expr));").build()
+							))
+					)
+			),
+			production("StatementExpression", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					emptyList(),
+					listOf(
+							stmt("BUTree<? extends SExpr> expr;").build(),
+							stmt("AssignOp op;").build(),
+							stmt("BUTree<? extends SExpr> value;").build()
+					),
+					sequence(
 							choice(
 									nonTerminal("expr", "PrefixExpression"),
 									sequence(
@@ -4146,9 +4162,8 @@ public class Grammar2 {
 											)
 									)
 							),
-							terminal("SEMICOLON"),
 							action(listOf(
-									stmt("return dress(SExpressionStmt.make(expr));").build()
+									stmt("return expr;").build()
 							))
 					)
 			),
@@ -4349,14 +4364,14 @@ public class Grammar2 {
 													stmt("ret = append(ret, expr);").build()
 											))
 									),
-									nonTerminal("ret", "ExpressionList")
+									nonTerminal("ret", "StatementExpressionList")
 							),
 							action(listOf(
 									stmt("return ret;").build()
 							))
 					)
 			),
-			production("ExpressionList", type("BUTree<SNodeList>").build(),
+			production("StatementExpressionList", type("BUTree<SNodeList>").build(),
 					emptyList(),
 					emptyList(),
 					listOf(
@@ -4364,13 +4379,13 @@ public class Grammar2 {
 							stmt("BUTree<? extends SExpr> expr;").build()
 					),
 					sequence(
-							nonTerminal("expr", "Expression"),
+							nonTerminal("expr", "StatementExpression"),
 							action(listOf(
 									stmt("ret = append(ret, expr);").build()
 							)),
 							zeroOrMore(
 									terminal("COMMA"),
-									nonTerminal("expr", "Expression"),
+									nonTerminal("expr", "StatementExpression"),
 									action(listOf(
 											stmt("ret = append(ret, expr);").build()
 									))
@@ -4387,7 +4402,7 @@ public class Grammar2 {
 							stmt("BUTree<SNodeList> ret;").build()
 					),
 					sequence(
-							nonTerminal("ret", "ExpressionList"),
+							nonTerminal("ret", "StatementExpressionList"),
 							action(listOf(
 									stmt("return ret;").build()
 							))
