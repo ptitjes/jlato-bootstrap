@@ -1093,8 +1093,8 @@ public class Grammar2 {
 							stmt("BUTree<? extends SType> type;").build(),
 							stmt("BUTree<SName> name;").build(),
 							stmt("BUTree<SNodeList> dims;").build(),
-							stmt("BUTree<SNodeOption> defaultVal = none();").build(),
-							stmt("BUTree<? extends SExpr> val = null;").build()
+							stmt("BUTree<SNodeOption> defaultValue = none();").build(),
+							stmt("BUTree<? extends SExpr> value = null;").build()
 					),
 					sequence(
 							nonTerminal("type", "Type", null, listOf(
@@ -1106,14 +1106,14 @@ public class Grammar2 {
 							nonTerminal("dims", "ArrayDims"),
 							zeroOrOne(
 									terminal("DEFAULT"),
-									nonTerminal("val", "MemberValue"),
+									nonTerminal("value", "ElementValue"),
 									action(listOf(
-											stmt("defaultVal = optionOf(val);").build()
+											stmt("defaultValue = optionOf(value);").build()
 									))
 							),
 							terminal("SEMICOLON"),
 							action(listOf(
-									stmt("return dress(SAnnotationMemberDecl.make(modifiers, type, name, dims, defaultVal));").build()
+									stmt("return dress(SAnnotationMemberDecl.make(modifiers, type, name, dims, defaultValue));").build()
 							))
 					)
 			),
@@ -4481,6 +4481,9 @@ public class Grammar2 {
 							))
 					)
 			),
+
+			// ----- Annotations -----
+
 			production("Annotations", type("BUTree<SNodeList>").build(),
 					emptyList(),
 					emptyList(),
@@ -4509,8 +4512,8 @@ public class Grammar2 {
 					sequence(
 							choice(
 									nonTerminal("ret", "NormalAnnotation"),
-									nonTerminal("ret", "SingleMemberAnnotation"),
-									nonTerminal("ret", "MarkerAnnotation")
+									nonTerminal("ret", "MarkerAnnotation"),
+									nonTerminal("ret", "SingleElementAnnotation")
 							),
 							action(listOf(
 									stmt("return ret;").build()
@@ -4532,7 +4535,7 @@ public class Grammar2 {
 							nonTerminal("name", "QualifiedName"),
 							terminal("LPAREN"),
 							zeroOrOne(
-									nonTerminal("pairs", "MemberValuePairs")
+									nonTerminal("pairs", "ElementValuePairList")
 							),
 							terminal("RPAREN"),
 							action(listOf(
@@ -4557,12 +4560,12 @@ public class Grammar2 {
 							))
 					)
 			),
-			production("SingleMemberAnnotation", type("BUTree<SSingleMemberAnnotationExpr>").build(),
+			production("SingleElementAnnotation", type("BUTree<SSingleMemberAnnotationExpr>").build(),
 					emptyList(),
 					emptyList(),
 					listOf(
 							stmt("BUTree<SQualifiedName> name;").build(),
-							stmt("BUTree<? extends SExpr> memberVal;").build()
+							stmt("BUTree<? extends SExpr> value;").build()
 					),
 					sequence(
 							action(listOf(
@@ -4571,14 +4574,14 @@ public class Grammar2 {
 							terminal("AT"),
 							nonTerminal("name", "QualifiedName"),
 							terminal("LPAREN"),
-							nonTerminal("memberVal", "MemberValue"),
+							nonTerminal("value", "ElementValue"),
 							terminal("RPAREN"),
 							action(listOf(
-									stmt("return dress(SSingleMemberAnnotationExpr.make(name, memberVal));").build()
+									stmt("return dress(SSingleMemberAnnotationExpr.make(name, value));").build()
 							))
 					)
 			),
-			production("MemberValuePairs", type("BUTree<SNodeList>").build(),
+			production("ElementValuePairList", type("BUTree<SNodeList>").build(),
 					emptyList(),
 					emptyList(),
 					listOf(
@@ -4586,13 +4589,13 @@ public class Grammar2 {
 							stmt("BUTree<SMemberValuePair> pair;").build()
 					),
 					sequence(
-							nonTerminal("pair", "MemberValuePair"),
+							nonTerminal("pair", "ElementValuePair"),
 							action(listOf(
 									stmt("ret = append(ret, pair);").build()
 							)),
 							zeroOrMore(
 									terminal("COMMA"),
-									nonTerminal("pair", "MemberValuePair"),
+									nonTerminal("pair", "ElementValuePair"),
 									action(listOf(
 											stmt("ret = append(ret, pair);").build()
 									))
@@ -4602,7 +4605,7 @@ public class Grammar2 {
 							))
 					)
 			),
-			production("MemberValuePair", type("BUTree<SMemberValuePair>").build(),
+			production("ElementValuePair", type("BUTree<SMemberValuePair>").build(),
 					emptyList(),
 					emptyList(),
 					listOf(
@@ -4615,13 +4618,13 @@ public class Grammar2 {
 							)),
 							nonTerminal("name", "Name"),
 							terminal("ASSIGN"),
-							nonTerminal("value", "MemberValue"),
+							nonTerminal("value", "ElementValue"),
 							action(listOf(
 									stmt("return dress(SMemberValuePair.make(name, value));").build()
 							))
 					)
 			),
-			production("MemberValue", type("BUTree<? extends SExpr>").build(),
+			production("ElementValue", type("BUTree<? extends SExpr>").build(),
 					emptyList(),
 					emptyList(),
 					listOf(
@@ -4629,21 +4632,20 @@ public class Grammar2 {
 					),
 					sequence(
 							choice(
-									nonTerminal("ret", "Annotation"),
-									nonTerminal("ret", "MemberValueArrayInitializer"),
-									nonTerminal("ret", "ConditionalExpression")
+									nonTerminal("ret", "ConditionalExpression"),
+									nonTerminal("ret", "ElementValueArrayInitializer"),
+									nonTerminal("ret", "Annotation")
 							),
 							action(listOf(
 									stmt("return ret;").build()
 							))
 					)
 			),
-			production("MemberValueArrayInitializer", type("BUTree<? extends SExpr>").build(),
+			production("ElementValueArrayInitializer", type("BUTree<? extends SExpr>").build(),
 					emptyList(),
 					emptyList(),
 					listOf(
-							stmt("BUTree<SNodeList> ret = emptyList();").build(),
-							stmt("BUTree<? extends SExpr> member;").build(),
+							stmt("BUTree<SNodeList> values = null;").build(),
 							stmt("boolean trailingComma = false;").build()
 					),
 					sequence(
@@ -4652,17 +4654,7 @@ public class Grammar2 {
 							)),
 							terminal("LBRACE"),
 							zeroOrOne(
-									nonTerminal("member", "MemberValue"),
-									action(listOf(
-											stmt("ret = append(ret, member);").build()
-									)),
-									zeroOrMore(
-											terminal("COMMA"),
-											nonTerminal("member", "MemberValue"),
-											action(listOf(
-													stmt("ret = append(ret, member);").build()
-											))
-									)
+								nonTerminal("values", "ElementValueList")
 							),
 							zeroOrOne(
 									terminal("COMMA"),
@@ -4672,7 +4664,31 @@ public class Grammar2 {
 							),
 							terminal("RBRACE"),
 							action(listOf(
-									stmt("return dress(SArrayInitializerExpr.make(ret, trailingComma));").build()
+									stmt("return dress(SArrayInitializerExpr.make(ensureNotNull(values), trailingComma));").build()
+							))
+					)
+			),
+			production("ElementValueList", type("BUTree<SNodeList>").build(),
+					emptyList(),
+					emptyList(),
+					listOf(
+							stmt("BUTree<SNodeList> ret = emptyList();").build(),
+							stmt("BUTree<? extends SExpr> value;").build()
+					),
+					sequence(
+							nonTerminal("value", "ElementValue"),
+							action(listOf(
+									stmt("ret = append(ret, value);").build()
+							)),
+							zeroOrMore(
+									terminal("COMMA"),
+									nonTerminal("value", "ElementValue"),
+									action(listOf(
+											stmt("ret = append(ret, value);").build()
+									))
+							),
+							action(listOf(
+									stmt("return ret;").build()
 							))
 					)
 			)
