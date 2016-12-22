@@ -2274,33 +2274,108 @@ public class Grammar2 {
 					emptyList(),
 					emptyList(),
 					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build(),
-							stmt("AssignOp op;").build(),
-							stmt("BUTree<? extends SExpr> value;").build(),
-							stmt("BUTree<SNodeList> params;").build()
+							stmt("BUTree<? extends SExpr> ret;").build()
 					),
 					sequence(
 							choice(
-									sequence(
-											nonTerminal("ret", "ConditionalExpression"),
-											zeroOrOne(
-													action(listOf(
-															stmt("lateRun();").build()
-													)),
-													nonTerminal("op", "AssignmentOperator"),
-													nonTerminal("value", "Expression"),
-													action(listOf(
-															stmt("ret = dress(SAssignExpr.make(ret, op, value));").build()
-													))
-											)
-									)
+									nonTerminal("ret", "LambdaExpression"),
+									nonTerminal("ret", "AssignmentExpression")
 							),
 							action(listOf(
 									stmt("return ret;").build()
 							))
 					)
 			),
-			production("LambdaExpression", type("BUTree<SLambdaExpr>").build(),
+			production("AssignmentExpression", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					emptyList(),
+					listOf(
+							stmt("BUTree<? extends SExpr> ret;").build()
+					),
+					sequence(
+							choice(
+									nonTerminal("ret", "ConditionalExpression"),
+									nonTerminal("ret", "Assignment")
+							),
+							action(listOf(
+									stmt("return ret;").build()
+							))
+					)
+			),
+			production("Assignment", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					emptyList(),
+					listOf(
+							stmt("BUTree<? extends SExpr> lhs;").build(),
+							stmt("AssignOp op;").build(),
+							stmt("BUTree<? extends SExpr> expr;").build()
+					),
+					sequence(
+							action(listOf(
+									stmt("run();").build()
+							)),
+							nonTerminal("lhs", "LeftHandSide"),
+							nonTerminal("op", "AssignmentOperator"),
+							nonTerminal("expr", "Expression"),
+							action(listOf(
+									stmt("return dress(SAssignExpr.make(lhs, op, expr));").build()
+							))
+					)
+			),
+			production("LeftHandSide", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					emptyList(),
+					listOf(
+							stmt("BUTree<? extends SExpr> ret;").build()
+					),
+					sequence(
+							choice(
+									nonTerminal("ret", "PrimaryExpression")
+							),
+							action(listOf(
+									stmt("return ret;").build()
+							))
+					)
+			),
+			production("LambdaExpression", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					emptyList(),
+					listOf(
+							stmt("BUTree<SNodeList> annotations;").build(),
+							stmt("BUTree<? extends SType> type;").build(),
+							stmt("BUTree<? extends SExpr> ret;").build()
+					),
+					sequence(
+							choice(
+									sequence(
+											action(listOf(
+													stmt("run();").build()
+											)),
+											terminal("LPAREN"),
+											action(listOf(
+													stmt("run();").build()
+											)),
+											nonTerminal("annotations", "Annotations"),
+											nonTerminal("type", "ReferenceType", null, listOf(
+													expr("annotations").build()
+											)),
+											nonTerminal("type", "ReferenceCastTypeRest", null, listOf(
+													expr("type").build()
+											)),
+											terminal("RPAREN"),
+											nonTerminal("ret", "LambdaExpression"),
+											action(listOf(
+													stmt("ret = dress(SCastExpr.make(type, ret));").build()
+											))
+									),
+									nonTerminal("ret", "LambdaExpressionWithoutCast")
+							),
+							action(listOf(
+									stmt("return ret;").build()
+							))
+					)
+			),
+			production("LambdaExpressionWithoutCast", type("BUTree<SLambdaExpr>").build(),
 					emptyList(),
 					emptyList(),
 					listOf(
@@ -2319,8 +2394,7 @@ public class Grammar2 {
 											nonTerminal("ret", "LambdaBody", null, listOf(
 													expr("singletonList(makeFormalParameter(name))").build(),
 													expr("false").build()
-													)
-											)
+											))
 									),
 									sequence(
 											terminal("LPAREN"),
@@ -2528,7 +2602,10 @@ public class Grammar2 {
 									terminal("HOOK"),
 									nonTerminal("left", "Expression"),
 									terminal("COLON"),
-									nonTerminal("right", "ConditionalExpression"),
+									choice(
+											nonTerminal("right", "ConditionalExpression"),
+											nonTerminal("right", "LambdaExpression")
+									),
 									action(listOf(
 											stmt("ret = dress(SConditionalExpr.make(ret, left, right));").build()
 									))
@@ -3075,46 +3152,16 @@ public class Grammar2 {
 											nonTerminal("primitiveType", "PrimitiveType", null, listOf(
 													expr("annotations").build()
 											)),
-											choice(
-													sequence(
-															terminal("RPAREN"),
-															nonTerminal("ret", "UnaryExpression"),
-															action(listOf(
-																	stmt("ret = dress(SCastExpr.make(primitiveType, ret));").build()
-															))
-													),
-													sequence(
-															action(listOf(
-																	stmt("lateRun();").build()
-															)),
-															nonTerminal("arrayDims", "ArrayDimsMandatory"),
-															action(listOf(
-																	stmt("type = dress(SArrayType.make(primitiveType, arrayDims));").build()
-															)),
-															nonTerminal("type", "ReferenceCastTypeRest", null, listOf(
-																	expr("type").build()
-															)),
-															terminal("RPAREN"),
-															nonTerminal("ret", "UnaryExpressionNotPlusMinus"),
-															action(listOf(
-																	stmt("ret = dress(SCastExpr.make(type, ret));").build()
-															))
-													)
-											)
+											terminal("RPAREN"),
+											nonTerminal("ret", "UnaryExpression"),
+											action(listOf(
+													stmt("ret = dress(SCastExpr.make(primitiveType, ret));").build()
+											))
 									),
 									sequence(
-											nonTerminal("type", "QualifiedType", null, listOf(
+											nonTerminal("type", "ReferenceType", null, listOf(
 													expr("annotations").build()
 											)),
-											zeroOrOne(
-													action(listOf(
-															stmt("lateRun();").build()
-													)),
-													nonTerminal("arrayDims", "ArrayDimsMandatory"),
-													action(listOf(
-															stmt("type = dress(SArrayType.make(type, arrayDims));").build()
-													))
-											),
 											nonTerminal("type", "ReferenceCastTypeRest", null, listOf(
 													expr("type").build()
 											)),
@@ -3248,21 +3295,21 @@ public class Grammar2 {
 							stmt("BUTree<? extends SExpr> ret;").build()
 					),
 					sequence(
-							choice(
-									sequence(
-											nonTerminal("ret", "LambdaExpression")
-									),
-									sequence(
-											nonTerminal("ret", "PrimaryPrefix"),
-											zeroOrMore(
-													action(listOf(
-															stmt("lateRun();").build()
-													)),
-													nonTerminal("ret", "PrimarySuffix", null, listOf(
-															expr("ret").build()
-													))
-											)
+//							choice(
+//									sequence(
+//											nonTerminal("ret", "LambdaExpression")
+//									),
+							sequence(
+									nonTerminal("ret", "PrimaryPrefix"),
+									zeroOrMore(
+											action(listOf(
+													stmt("lateRun();").build()
+											)),
+											nonTerminal("ret", "PrimarySuffix", null, listOf(
+													expr("ret").build()
+											))
 									)
+//									)
 							),
 							action(listOf(
 									stmt("return ret;").build()
@@ -3914,51 +3961,13 @@ public class Grammar2 {
 					emptyList(),
 					emptyList(),
 					listOf(
-							stmt("BUTree<? extends SExpr> expr;").build(),
-							stmt("AssignOp op;").build(),
-							stmt("BUTree<? extends SExpr> value;").build()
+							stmt("BUTree<? extends SExpr> ret;").build()
 					),
 					sequence(
-							choice(
-									nonTerminal("expr", "PrefixExpression"),
-									sequence(
-											nonTerminal("expr", "PrimaryExpression"),
-											zeroOrOne(
-													choice(
-															sequence(
-																	action(listOf(
-																			stmt("lateRun();").build()
-																	)),
-																	terminal("INCR"),
-																	action(listOf(
-																			stmt("expr = dress(SUnaryExpr.make(UnaryOp.PostIncrement, expr));").build()
-																	))
-															),
-															sequence(
-																	action(listOf(
-																			stmt("lateRun();").build()
-																	)),
-																	terminal("DECR"),
-																	action(listOf(
-																			stmt("expr = dress(SUnaryExpr.make(UnaryOp.PostDecrement, expr));").build()
-																	))
-															),
-															sequence(
-																	action(listOf(
-																			stmt("lateRun();").build()
-																	)),
-																	nonTerminal("op", "AssignmentOperator"),
-																	nonTerminal("value", "Expression"),
-																	action(listOf(
-																			stmt("expr = dress(SAssignExpr.make(expr, op, value));").build()
-																	))
-															)
-													)
-											)
-									)
-							),
+							// TODO Add further checks to report invalid expression in a statement
+							nonTerminal("ret", "Expression"),
 							action(listOf(
-									stmt("return expr;").build()
+									stmt("return ret;").build()
 							))
 					)
 			),
@@ -4654,7 +4663,7 @@ public class Grammar2 {
 							)),
 							terminal("LBRACE"),
 							zeroOrOne(
-								nonTerminal("values", "ElementValueList")
+									nonTerminal("values", "ElementValueList")
 							),
 							zeroOrOne(
 									terminal("COMMA"),
