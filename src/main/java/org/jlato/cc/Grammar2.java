@@ -3295,21 +3295,21 @@ public class Grammar2 {
 							stmt("BUTree<? extends SExpr> ret;").build()
 					),
 					sequence(
-//							choice(
-//									sequence(
-//											nonTerminal("ret", "LambdaExpression")
-//									),
-							sequence(
-									nonTerminal("ret", "PrimaryPrefix"),
-									zeroOrMore(
-											action(listOf(
-													stmt("lateRun();").build()
-											)),
-											nonTerminal("ret", "PrimarySuffix", null, listOf(
-													expr("ret").build()
-											))
-									)
-//									)
+							choice(
+									sequence(
+											nonTerminal("ret", "PrimaryPrefix"),
+											zeroOrMore(
+													action(listOf(
+															stmt("lateRun();").build()
+													)),
+													nonTerminal("ret", "PrimarySuffix", null, listOf(
+															expr("ret").build()
+													))
+											)
+									),
+									nonTerminal("ret", "ArrayCreationExpr", null, listOf(
+											expr("null").build()
+									))
 							),
 							action(listOf(
 									stmt("return ret;").build()
@@ -3391,7 +3391,7 @@ public class Grammar2 {
 													)
 											)
 									),
-									nonTerminal("ret", "AllocationExpression", null, listOf(
+									nonTerminal("ret", "ClassCreationExpr", null, listOf(
 											expr("null").build()
 									)),
 									sequence(
@@ -3496,7 +3496,7 @@ public class Grammar2 {
 																	stmt("ret = dress(SThisExpr.make(optionOf(scope)));").build()
 															))
 													),
-													nonTerminal("ret", "AllocationExpression", null, listOf(
+													nonTerminal("ret", "ClassCreationExpr", null, listOf(
 															expr("scope").build()
 													)),
 													nonTerminal("ret", "MethodInvocation", null, listOf(
@@ -3626,7 +3626,46 @@ public class Grammar2 {
 							))
 					)
 			).memoizeMatches(),
-			production("AllocationExpression", type("BUTree<? extends SExpr>").build(),
+			production("ClassCreationExpr", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					listOf(
+							param("BUTree<? extends SExpr> scope").build()
+					),
+					listOf(
+							stmt("BUTree<? extends SExpr> ret;").build(),
+							stmt("BUTree<? extends SType> type;").build(),
+							stmt("BUTree<SNodeList> typeArgs = null;").build(),
+							stmt("BUTree<SNodeList> anonymousBody = null;").build(),
+							stmt("BUTree<SNodeList> args;").build(),
+							stmt("BUTree<SNodeList> annotations = null;").build()
+					),
+					sequence(
+							action(listOf(
+									stmt("if (scope == null) run();\n" + "").build()
+							)),
+							terminal("NEW"),
+							zeroOrOne(
+									nonTerminal("typeArgs", "TypeArguments")
+							),
+							action(listOf(
+									stmt("run();").build()
+							)),
+							nonTerminal("annotations", "Annotations"),
+							nonTerminal("type", "QualifiedType", null, listOf(
+									expr("annotations").build()
+							)),
+							nonTerminal("args", "Arguments"),
+							zeroOrOne(
+									nonTerminal("anonymousBody", "ClassOrInterfaceBody", null, listOf(
+											expr("TypeKind.Class").build()
+									))
+							),
+							action(listOf(
+									stmt("return dress(SObjectCreationExpr.make(optionOf(scope), ensureNotNull(typeArgs), (BUTree<SQualifiedType>) type, args, optionOf(anonymousBody)));").build()
+							))
+					)
+			),
+			production("ArrayCreationExpr", type("BUTree<? extends SExpr>").build(),
 					emptyList(),
 					listOf(
 							param("BUTree<? extends SExpr> scope").build()
@@ -3652,42 +3691,22 @@ public class Grammar2 {
 							)),
 							nonTerminal("annotations", "Annotations"),
 							choice(
-									sequence(
-											nonTerminal("type", "PrimitiveType", null, listOf(
-													expr("annotations").build()
-											)),
-											nonTerminal("ret", "ArrayCreationExpr", null, listOf(
-													expr("type").build()
-											))
-									),
-									sequence(
-											nonTerminal("type", "QualifiedType", null, listOf(
-													expr("annotations").build()
-											)),
-											choice(
-													nonTerminal("ret", "ArrayCreationExpr", null, listOf(
-															expr("type").build()
-													)),
-													sequence(
-															nonTerminal("args", "Arguments"),
-															zeroOrOne(
-																	nonTerminal("anonymousBody", "ClassOrInterfaceBody", null, listOf(
-																			expr("TypeKind.Class").build()
-																	))
-															),
-															action(listOf(
-																	stmt("ret = dress(SObjectCreationExpr.make(optionOf(scope), ensureNotNull(typeArgs), (BUTree<SQualifiedType>) type, args, optionOf(anonymousBody)));").build()
-															))
-													)
-											)
-									)
+									nonTerminal("type", "PrimitiveType", null, listOf(
+											expr("annotations").build()
+									)),
+									nonTerminal("type", "QualifiedType", null, listOf(
+											expr("annotations").build()
+									))
 							),
+							nonTerminal("ret", "ArrayCreationExprRest", null, listOf(
+									expr("type").build()
+							)),
 							action(listOf(
 									stmt("return ret;").build()
 							))
 					)
 			),
-			production("ArrayCreationExpr", type("BUTree<? extends SExpr>").build(),
+			production("ArrayCreationExprRest", type("BUTree<? extends SExpr>").build(),
 					emptyList(),
 					listOf(
 							param("BUTree<? extends SType> componentType").build()
