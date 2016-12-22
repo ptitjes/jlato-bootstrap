@@ -2290,47 +2290,22 @@ public class Grammar2 {
 					emptyList(),
 					emptyList(),
 					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build()
-					),
-					sequence(
-							choice(
-									nonTerminal("ret", "ConditionalExpression"),
-									nonTerminal("ret", "Assignment")
-							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
-					)
-			),
-			production("Assignment", type("BUTree<? extends SExpr>").build(),
-					emptyList(),
-					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> lhs;").build(),
+							stmt("BUTree<? extends SExpr> ret;").build(),
 							stmt("AssignOp op;").build(),
 							stmt("BUTree<? extends SExpr> expr;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
-							nonTerminal("lhs", "LeftHandSide"),
-							nonTerminal("op", "AssignmentOperator"),
-							nonTerminal("expr", "Expression"),
-							action(listOf(
-									stmt("return dress(SAssignExpr.make(lhs, op, expr));").build()
-							))
-					)
-			),
-			production("LeftHandSide", type("BUTree<? extends SExpr>").build(),
-					emptyList(),
-					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build()
-					),
-					sequence(
-							choice(
-									nonTerminal("ret", "PrimaryExpression")
+							// TODO Add checks to report invalid left hand side in assignment
+							nonTerminal("ret", "ConditionalExpression"),
+							zeroOrOne(
+									action(listOf(
+											stmt("lateRun();").build()
+									)),
+									nonTerminal("op", "AssignmentOperator"),
+									nonTerminal("expr", "Expression"),
+									action(listOf(
+											stmt("ret = dress(SAssignExpr.make(ret, op, expr));").build()
+									))
 							),
 							action(listOf(
 									stmt("return ret;").build()
