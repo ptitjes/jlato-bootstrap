@@ -62,7 +62,7 @@ public class GContinuations {
 				if (debug) System.out.println("\tFound terminal: " + expansion.symbol);
 				return Stream.of(location);
 			case Choice:
-				toFollow = location.allChildren().stream();
+				toFollow = location.allChildren().toSet().asSet().stream();
 				break;
 			case ZeroOrOne:
 			case ZeroOrMore:

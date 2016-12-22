@@ -1,7 +1,6 @@
 package org.jlato.cc.grammar;
 
-import java.util.HashSet;
-import java.util.Set;
+import com.github.andrewoma.dexx.collection.*;
 
 /**
  * @author Didier Villevalois
@@ -45,14 +44,14 @@ public class GLocation {
 		else return null;
 	}
 
-	public Set<GLocation> allChildren() {
-		Set<GLocation> all = new HashSet<>();
+	public List<GLocation> allChildren() {
+		Builder<GLocation, LinkedList<GLocation>> builder = LinkedLists.builder();
 		GLocation child = firstChild();
 		while (child != null) {
-			all.add(child);
+			builder.add(child);
 			child = child.nextSibling();
 		}
-		return all;
+		return builder.build();
 	}
 
 	@Override
