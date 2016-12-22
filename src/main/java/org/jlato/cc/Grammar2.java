@@ -1722,6 +1722,7 @@ public class Grammar2 {
 							))
 					)
 			),
+			// TODO Enable parsing of this anywhere in a block and add later checks to report when not used in a constructor
 			production("ExplicitConstructorInvocation", type("BUTree<SExplicitConstructorInvocationStmt>").build(),
 					emptyList(),
 					emptyList(),
@@ -3271,19 +3272,30 @@ public class Grammar2 {
 					),
 					sequence(
 							choice(
-									sequence(
-											nonTerminal("ret", "PrimaryPrefix"),
-											zeroOrMore(
-													action(listOf(
-															stmt("lateRun();").build()
-													)),
-													nonTerminal("ret", "PrimarySuffix", null, listOf(
-															expr("ret").build()
-													))
-											)
-									),
+									nonTerminal("ret", "PrimaryNoNewArray"),
 									nonTerminal("ret", "ArrayCreationExpr", null, listOf(
 											expr("null").build()
+									))
+							),
+							action(listOf(
+									stmt("return ret;").build()
+							))
+					)
+			),
+			production("PrimaryNoNewArray", type("BUTree<? extends SExpr>").build(),
+					emptyList(),
+					emptyList(),
+					listOf(
+							stmt("BUTree<? extends SExpr> ret;").build()
+					),
+					sequence(
+							nonTerminal("ret", "PrimaryPrefix"),
+							zeroOrMore(
+									action(listOf(
+											stmt("lateRun();").build()
+									)),
+									nonTerminal("ret", "PrimarySuffix", null, listOf(
+											expr("ret").build()
 									))
 							),
 							action(listOf(
@@ -3882,6 +3894,7 @@ public class Grammar2 {
 											action(listOf(
 													stmt("run();").build()
 											)),
+											// TODO Rename LocalVariableDeclStmt and remove use of ExpressionStmt ?
 											nonTerminal("expr", "VariableDeclExpression"),
 											terminal("SEMICOLON"),
 											action(listOf(
