@@ -2279,8 +2279,8 @@ public class Grammar2 {
 					),
 					sequence(
 							choice(
-									nonTerminal("ret", "LambdaExpression"),
-									nonTerminal("ret", "AssignmentExpression")
+									nonTerminal("ret", "AssignmentExpression"),
+									nonTerminal("ret", "LambdaExpression")
 							),
 							action(listOf(
 									stmt("return ret;").build()
