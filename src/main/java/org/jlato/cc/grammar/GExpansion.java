@@ -179,7 +179,7 @@ public class GExpansion {
 	}
 
 	public GLocation location() {
-		return new GLocation(this);
+		return new GLocation(null, this);
 	}
 
 	public MethodInvocationExpr toExpr() {

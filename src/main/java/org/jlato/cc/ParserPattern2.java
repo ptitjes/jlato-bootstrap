@@ -61,6 +61,7 @@ public class ParserPattern2 extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				importDecl(qualifiedName("org.jlato.tree.type.Primitive"))
 		));
 
+		productions.recomputeReferences();
 		List<GProduction> allProductions = productions.getAll();
 
 		NodeList<MemberDecl> members = Trees.emptyList();
@@ -456,7 +457,7 @@ public class ParserPattern2 extends TypePattern.OfClass<TreeClassDescriptor[]> {
 					stmts = stmts.appendAll(parseStatementsForChildren(symbol, namePrefix, location, hintParams, true));
 				} else {
 					stmts = stmts.append(ifStmt(
-							binaryExpr(predictChoice(namePrefix, hintParams, hintParams.map(p -> p.id().get().name())), BinaryOp.Equal, literalExpr(1)),
+							makeCondition(namePrefix, location, hintParams),
 							blockStmt().withStmts(parseStatementsForChildren(symbol, namePrefix, location, hintParams, false))
 					));
 				}
@@ -464,7 +465,7 @@ public class ParserPattern2 extends TypePattern.OfClass<TreeClassDescriptor[]> {
 			}
 			case ZeroOrMore: {
 				stmts = stmts.append(whileStmt(
-						binaryExpr(predictChoice(namePrefix, hintParams, hintParams.map(p -> p.id().get().name())), BinaryOp.Equal, literalExpr(1)),
+						makeCondition(namePrefix, location, hintParams),
 						blockStmt().withStmts(parseStatementsForChildren(symbol, namePrefix, location, hintParams, false))
 				));
 				break;
@@ -472,7 +473,7 @@ public class ParserPattern2 extends TypePattern.OfClass<TreeClassDescriptor[]> {
 			case OneOrMore: {
 				stmts = stmts.append(doStmt(
 						blockStmt().withStmts(parseStatementsForChildren(symbol, namePrefix, location, hintParams, false)),
-						binaryExpr(predictChoice(namePrefix, hintParams, hintParams.map(p -> p.id().get().name())), BinaryOp.Equal, literalExpr(1))
+						makeCondition(namePrefix, location, hintParams)
 				));
 				break;
 			}
@@ -495,7 +496,7 @@ public class ParserPattern2 extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				if (!optional) {
 					cases = cases.append(switchCase().withStmts(listOf(throwStmt(
 							methodInvocationExpr(name("produceParseException"))
-									.withArgs(listOf(firstTerminalsOf(location).stream().map(this::prefixedConstant).collect(Collectors.toList())))
+									.withArgs(listOf(prefixedAndOrderedConstants(firstTerminalsOf(location))))
 					))));
 				}
 
@@ -534,6 +535,31 @@ public class ParserPattern2 extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		return stmts;
 	}
 
+	private BinaryExpr makeCondition(String namePrefix, GLocation location, NodeList<FormalParameter> hintParams) {
+		List<String> ll1DecisionTerminals = computeLL1DecisionTerminals(location);
+		return ll1DecisionTerminals != null ?
+				binaryExpr(matchCall(ll1DecisionTerminals, literalExpr(0)), BinaryOp.NotEqual, literalExpr(-1)) :
+				makePredictionCondition(namePrefix, location, hintParams);
+	}
+
+	private BinaryExpr makePredictionCondition(String namePrefix, GLocation location, NodeList<FormalParameter> hintParams) {
+		return binaryExpr(predictChoice(namePrefix, hintParams, hintParams.map(p -> p.id().get().name())), BinaryOp.Equal, literalExpr(1));
+	}
+
+	private List<String> computeLL1DecisionTerminals(GLocation location) {
+		GLocation firstChild = location.firstChild();
+		GLocation nextSibling = location.nextSibling();
+
+		List<String> ll1DecisionTerminals = null;
+		if (firstChild != null && nextSibling != null) {
+			GContinuation inside = new GContinuation(firstChild).moveToNextTerminals2(productions);
+			GContinuation after = new GContinuation(nextSibling).moveToNextTerminals2(productions);
+			if (inside != null && after != null && !inside.intersects(after))
+				ll1DecisionTerminals = inside.asTerminals().toIndexedList().asList();
+		}
+		return ll1DecisionTerminals;
+	}
+
 	private NodeList<Stmt> parseStatementsForChildren(String symbol, String namePrefix, GLocation location, NodeList<FormalParameter> hintParams, boolean optional) {
 		int count = 1;
 		NodeList<Stmt> stmts = emptyList();
@@ -553,6 +579,10 @@ public class ParserPattern2 extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		return methodInvocationExpr(name("predict")).withArgs(listOf(constant));
 	}
 
+	private MethodInvocationExpr matchCall(List<String> tokens, Expr lookahead) {
+		return methodInvocationExpr(name("match")).withArgs(listOf(prefixedAndOrderedConstants(tokens)).prepend(lookahead));
+	}
+
 	private Stmt pushCallStack(String name) {
 		Expr constant = fieldAccessExpr(name(name)).withScope(name("JavaGrammar"));
 
@@ -563,9 +593,10 @@ public class ParserPattern2 extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		return expressionStmt(methodInvocationExpr(name("popCallStack")));
 	}
 
-	private List<Expr> prefixedConstants(List<String> tokens) {
+	private List<Expr> prefixedAndOrderedConstants(List<String> tokens) {
 		return tokens.stream()
 				.filter(t -> t != null)
+				.sorted()
 				.map(t -> prefixedConstant(t))
 				.collect(Collectors.toList());
 	}
