@@ -112,7 +112,7 @@ public class GContinuation {
 
 			// TODO Fix this really dirty trick !!
 			depth++;
-			if (depth > 400) return null;
+			if (depth > 10000) return null;
 		}
 		return continuation;
 	}

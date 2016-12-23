@@ -1,5 +1,6 @@
 package org.jlato.cc;
 
+import com.github.andrewoma.dexx.collection.*;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.util.ImportManager;
 import org.jlato.bootstrap.util.TypePattern;
@@ -15,6 +16,11 @@ import org.jlato.tree.stmt.SwitchCase;
 import org.jlato.tree.type.Type;
 
 import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import static org.jlato.pattern.Quotes.memberDecl;
@@ -464,7 +470,7 @@ public class ParserPattern2 extends TypePattern.OfClass<TreeClassDescriptor[]> {
 					stmts = stmts.appendAll(parseStatementsForChildren(symbol, namePrefix, location, hintParams, true));
 				} else {
 					stmts = stmts.append(ifStmt(
-							makeCondition(namePrefix, location, hintParams),
+							makeKleeneCondition(namePrefix, location, hintParams),
 							blockStmt().withStmts(parseStatementsForChildren(symbol, namePrefix, location, hintParams, false))
 					));
 				}
@@ -472,7 +478,7 @@ public class ParserPattern2 extends TypePattern.OfClass<TreeClassDescriptor[]> {
 			}
 			case ZeroOrMore: {
 				stmts = stmts.append(whileStmt(
-						makeCondition(namePrefix, location, hintParams),
+						makeKleeneCondition(namePrefix, location, hintParams),
 						blockStmt().withStmts(parseStatementsForChildren(symbol, namePrefix, location, hintParams, false))
 				));
 				break;
@@ -480,35 +486,67 @@ public class ParserPattern2 extends TypePattern.OfClass<TreeClassDescriptor[]> {
 			case OneOrMore: {
 				stmts = stmts.append(doStmt(
 						blockStmt().withStmts(parseStatementsForChildren(symbol, namePrefix, location, hintParams, false)),
-						makeCondition(namePrefix, location, hintParams)
+						makeKleeneCondition(namePrefix, location, hintParams)
 				));
 				break;
 			}
 			case Choice: {
-				Expr selector = predict(namePrefix, hintParams);
+				List<Set<String>> ll1DecisionTerminals = computeChoiceLL1DecisionTerminals(location);
+				if (ll1DecisionTerminals != null) {
+					Expr selector = getTokenKind(literalExpr(0));
 
-				NodeList<SwitchCase> cases = emptyList();
+					NodeList<SwitchCase> cases = emptyList();
 
-				int count = 1;
-				for (GLocation child : location.allChildren()) {
-					LiteralExpr<Integer> label = literalExpr(count);
-					String name = namePrefix + "_" + count++;
+					int count = 1;
+					for (GLocation child : location.allChildren()) {
+						List<Expr> terminals = prefixedAndOrderedConstants(ll1DecisionTerminals.get(count - 1));
 
-					NodeList<Stmt> caseStmts = parseStatementsFor(symbol, name, child, hintParams, optional);
-					if (caseStmts.last().kind() != Kind.ReturnStmt) caseStmts = caseStmts.append(breakStmt());
+						// Produce statements
+						String name = namePrefix + "_" + count++;
+						NodeList<Stmt> caseStmts = parseStatementsFor(symbol, name, child, hintParams, optional);
+						if (caseStmts.last().kind() != Kind.ReturnStmt) caseStmts = caseStmts.append(breakStmt());
 
-					cases = cases.append(switchCase().withLabel(label).withStmts(caseStmts));
+						// Produce labels
+						int i = 0;
+						for (; i < terminals.size() - 1; i++) {
+							cases = cases.append(switchCase().withLabel(terminals.get(i)));
+						}
+						cases = cases.append(switchCase().withLabel(terminals.get(i)).withStmts(caseStmts));
+					}
+
+					if (!optional) {
+						cases = cases.append(switchCase().withStmts(listOf(throwStmt(
+								methodInvocationExpr(name("produceParseException"))
+										.withArgs(listOf(prefixedAndOrderedConstants(firstTerminalsOf(location))))
+						))));
+					}
+
+					stmts = stmts.append(switchStmt(selector).withCases(cases));
+				} else {
+					Expr selector = predict(namePrefix, hintParams);
+
+					NodeList<SwitchCase> cases = emptyList();
+
+					int count = 1;
+					for (GLocation child : location.allChildren()) {
+						LiteralExpr<Integer> label = literalExpr(count);
+						String name = namePrefix + "_" + count++;
+
+						NodeList<Stmt> caseStmts = parseStatementsFor(symbol, name, child, hintParams, optional);
+						if (caseStmts.last().kind() != Kind.ReturnStmt) caseStmts = caseStmts.append(breakStmt());
+
+						cases = cases.append(switchCase().withLabel(label).withStmts(caseStmts));
+					}
+
+					if (!optional) {
+						cases = cases.append(switchCase().withStmts(listOf(throwStmt(
+								methodInvocationExpr(name("produceParseException"))
+										.withArgs(listOf(prefixedAndOrderedConstants(firstTerminalsOf(location))))
+						))));
+					}
+
+					stmts = stmts.append(switchStmt(selector).withCases(cases));
 				}
-
-				if (!optional) {
-					cases = cases.append(switchCase().withStmts(listOf(throwStmt(
-							methodInvocationExpr(name("produceParseException"))
-									.withArgs(listOf(prefixedAndOrderedConstants(firstTerminalsOf(location))))
-					))));
-				}
-
-				stmts = stmts.append(switchStmt(selector).withCases(cases));
-
 				break;
 			}
 			case NonTerminal: {
@@ -554,14 +592,36 @@ public class ParserPattern2 extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		return stmts;
 	}
 
-	private BinaryExpr makeCondition(String namePrefix, GLocation location, NodeList<FormalParameter> hintParams) {
-		List<String> ll1DecisionTerminals = computeLL1DecisionTerminals(location);
+	private List<Set<String>> computeChoiceLL1DecisionTerminals(GLocation location) {
+		List<GLocation> children = location.allChildren().asList();
+
+		List<Set<String>> terminalSets = new ArrayList<>(children.size());
+		for (GLocation child : children) {
+			GContinuation continuation = new GContinuation(child).moveToNextTerminals2(productions);
+			if (continuation == null) return null;
+			terminalSets.add(continuation.asTerminals().asSet());
+		}
+
+		// Verify that the terminals don't intersect pairwise
+		for (int i = 0; i < terminalSets.size(); i++) {
+			Set<String> terminalSet1 = terminalSets.get(i);
+			for (int j = i + 1; j < terminalSets.size(); j++) {
+				Set<String> terminalSet2 = terminalSets.get(j);
+				if (terminalSet1.stream().anyMatch(terminalSet2::contains)) return null;
+			}
+		}
+
+		return terminalSets;
+	}
+
+	private BinaryExpr makeKleeneCondition(String namePrefix, GLocation location, NodeList<FormalParameter> hintParams) {
+		List<String> ll1DecisionTerminals = computeKleeneLL1DecisionTerminals(location);
 		return ll1DecisionTerminals != null ?
 				binaryExpr(match(ll1DecisionTerminals, literalExpr(0)), BinaryOp.NotEqual, literalExpr(-1)) :
 				binaryExpr(predict(namePrefix, hintParams), BinaryOp.Equal, literalExpr(1));
 	}
 
-	private List<String> computeLL1DecisionTerminals(GLocation location) {
+	private List<String> computeKleeneLL1DecisionTerminals(GLocation location) {
 		GLocation firstChild = location.firstChild();
 		GLocation nextSibling = location.nextSibling();
 
@@ -582,6 +642,10 @@ public class ParserPattern2 extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		return methodInvocationExpr(name("predict")).withArgs(listOf(constant));
 	}
 
+	private Expr getTokenKind(Expr lookahead) {
+		return fieldAccessExpr(name("kind")).withScope(methodInvocationExpr(name("getToken")).withArgs(listOf(lookahead)));
+	}
+
 	private MethodInvocationExpr match(List<String> tokens, Expr lookahead) {
 		return methodInvocationExpr(name("match")).withArgs(listOf(prefixedAndOrderedConstants(tokens)).prepend(lookahead));
 	}
@@ -596,7 +660,7 @@ public class ParserPattern2 extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		return expressionStmt(methodInvocationExpr(name("popCallStack")));
 	}
 
-	private List<Expr> prefixedAndOrderedConstants(List<String> tokens) {
+	private List<Expr> prefixedAndOrderedConstants(Collection<String> tokens) {
 		return tokens.stream()
 				.filter(t -> t != null)
 				.sorted()
