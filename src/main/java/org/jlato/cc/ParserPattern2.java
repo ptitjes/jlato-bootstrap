@@ -38,7 +38,10 @@ public class ParserPattern2 extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		return "public class " + implementationName + " extends ParserNewBase2 { ..$_ }";
 	}
 
-	private Map<String, Integer> perSymbolLookaheadMethodCount = new HashMap<>();
+	@Override
+	protected String makeDoc(ClassDecl decl, TreeClassDescriptor[] arg) {
+		return "Internal implementation of the Java parser as a recursive descent parser using ALL(*) predictions.";
+	}
 
 	@Override
 	protected ClassDecl contributeBody(ClassDecl decl, ImportManager importManager, TreeClassDescriptor[] arg) {
@@ -75,6 +78,10 @@ public class ParserPattern2 extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		}
 
 		return decl.withMembers(members);
+	}
+
+	private boolean excluded(GProduction production) {
+		return false;
 	}
 
 	/* ALL(*) Grammar declaration */
@@ -478,7 +485,7 @@ public class ParserPattern2 extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				break;
 			}
 			case Choice: {
-				Expr selector = predictChoice(namePrefix, hintParams, hintParams.map(p -> p.id().get().name()));
+				Expr selector = predict(namePrefix, hintParams);
 
 				NodeList<SwitchCase> cases = emptyList();
 
@@ -535,15 +542,23 @@ public class ParserPattern2 extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		return stmts;
 	}
 
+	private NodeList<Stmt> parseStatementsForChildren(String symbol, String namePrefix, GLocation location, NodeList<FormalParameter> hintParams, boolean optional) {
+		int count = 1;
+		NodeList<Stmt> stmts = emptyList();
+		for (GLocation child : location.allChildren()) {
+			boolean lookaheadOrAction = lookaheadOrAction(child.current);
+			String name = namePrefix + (lookaheadOrAction ? "" : "_" + count++);
+
+			stmts = stmts.appendAll(parseStatementsFor(symbol, name, child, hintParams, optional));
+		}
+		return stmts;
+	}
+
 	private BinaryExpr makeCondition(String namePrefix, GLocation location, NodeList<FormalParameter> hintParams) {
 		List<String> ll1DecisionTerminals = computeLL1DecisionTerminals(location);
 		return ll1DecisionTerminals != null ?
-				binaryExpr(matchCall(ll1DecisionTerminals, literalExpr(0)), BinaryOp.NotEqual, literalExpr(-1)) :
-				makePredictionCondition(namePrefix, location, hintParams);
-	}
-
-	private BinaryExpr makePredictionCondition(String namePrefix, GLocation location, NodeList<FormalParameter> hintParams) {
-		return binaryExpr(predictChoice(namePrefix, hintParams, hintParams.map(p -> p.id().get().name())), BinaryOp.Equal, literalExpr(1));
+				binaryExpr(match(ll1DecisionTerminals, literalExpr(0)), BinaryOp.NotEqual, literalExpr(-1)) :
+				binaryExpr(predict(namePrefix, hintParams), BinaryOp.Equal, literalExpr(1));
 	}
 
 	private List<String> computeLL1DecisionTerminals(GLocation location) {
@@ -560,26 +575,14 @@ public class ParserPattern2 extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		return ll1DecisionTerminals;
 	}
 
-	private NodeList<Stmt> parseStatementsForChildren(String symbol, String namePrefix, GLocation location, NodeList<FormalParameter> hintParams, boolean optional) {
-		int count = 1;
-		NodeList<Stmt> stmts = emptyList();
-		for (GLocation child : location.allChildren()) {
-			boolean lookaheadOrAction = lookaheadOrAction(child.current);
-			String name = namePrefix + (lookaheadOrAction ? "" : "_" + count++);
-
-			stmts = stmts.appendAll(parseStatementsFor(symbol, name, child, hintParams, optional));
-		}
-		return stmts;
-	}
-
-	private Expr predictChoice(String namePrefix, NodeList<FormalParameter> params, NodeList<Expr> args) {
+	private Expr predict(String namePrefix, NodeList<FormalParameter> hintParams) {
 		String name = camelToConstant(lowerCaseFirst(namePrefix));
 		Expr constant = fieldAccessExpr(name(name)).withScope(name("JavaGrammar"));
 
 		return methodInvocationExpr(name("predict")).withArgs(listOf(constant));
 	}
 
-	private MethodInvocationExpr matchCall(List<String> tokens, Expr lookahead) {
+	private MethodInvocationExpr match(List<String> tokens, Expr lookahead) {
 		return methodInvocationExpr(name("match")).withArgs(listOf(prefixedAndOrderedConstants(tokens)).prepend(lookahead));
 	}
 
@@ -609,14 +612,5 @@ public class ParserPattern2 extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		GContinuations c = new GContinuations(location, productions, false);
 		c.next();
 		return c.terminals();
-	}
-
-	protected boolean excluded(GProduction production) {
-		return false;
-	}
-
-	@Override
-	protected String makeDoc(ClassDecl decl, TreeClassDescriptor[] arg) {
-		return "Internal implementation of the Java parser as a recursive descent parser.";
 	}
 }
