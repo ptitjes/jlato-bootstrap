@@ -45,7 +45,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 
 	@Override
 	protected String makeQuote(TreeClassDescriptor[] arg) {
-		return "public class " + implementationName + " extends ParserNewBase { ..$_ }";
+		return "class " + implementationName + " extends ParserNewBase { ..$_ }";
 	}
 
 	@Override
@@ -129,7 +129,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		);
 
 		return classDecl(name("JavaGrammar")).withExtendsClause(qType("Grammar"))
-				.withModifiers(listOf(Modifier.Static))
+				.withModifiers(listOf(Modifier.Private, Modifier.Static))
 				.withMembers(members);
 	}
 
@@ -139,7 +139,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		String name = camelToConstant(lowerCaseFirst(production.symbol));
 		if (!members.containsKey(name)) {
 			members.put(name, fieldDecl(qType("int"))
-					.withModifiers(listOf(Modifier.Public, Modifier.Static, Modifier.Final))
+					.withModifiers(listOf(Modifier.Static, Modifier.Final))
 					.withVariables(listOf(
 							variableDeclarator(variableDeclaratorId(name(name)))
 									.withInit(literalExpr(constantCount++))
@@ -159,7 +159,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				String name = camelToConstant(lowerCaseFirst(namePrefix));
 				if (!members.containsKey(name)) {
 					members.put(name, fieldDecl(qType("int"))
-							.withModifiers(listOf(Modifier.Public, Modifier.Static, Modifier.Final))
+							.withModifiers(listOf(Modifier.Static, Modifier.Final))
 							.withVariables(listOf(
 									variableDeclarator(variableDeclaratorId(name(name)))
 											.withInit(literalExpr(constantCount++))
@@ -181,7 +181,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				String name = camelToConstant(lowerCaseFirst(expansion.symbol));
 				if (!members.containsKey(name)) {
 					members.put(name, fieldDecl(qType("int"))
-							.withModifiers(listOf(Modifier.Public, Modifier.Static, Modifier.Final))
+							.withModifiers(listOf(Modifier.Static, Modifier.Final))
 							.withVariables(listOf(
 									variableDeclarator(variableDeclaratorId(name(name)))
 											.withInit(literalExpr(constantCount++))
