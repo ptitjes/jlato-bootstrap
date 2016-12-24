@@ -65,7 +65,7 @@ public class ExtractFromJJ {
 						importDecl(qualifiedName("org.jlato.tree.Trees.listOf")).setStatic(true)
 				))
 				.withTypes(listOf(
-						classDecl(name("Grammar"))
+						classDecl(name("GrammarOld"))
 								.withModifiers(listOf(Modifier.Public))
 								.withMembers(listOf(
 										fieldDecl(qualifiedType(name("GProductions")))
@@ -77,7 +77,7 @@ public class ExtractFromJJ {
 								))
 				));
 
-		PrintWriter writer = new PrintWriter(new FileWriter("src/main/java/org/jlato/cc/Grammar.java"));
+		PrintWriter writer = new PrintWriter(new FileWriter("src/main/java/org/jlato/cc/GrammarOld.java"));
 		Printer.printTo(cu, writer, true);
 		writer.close();
 	}

@@ -1,10 +1,8 @@
 package org.jlato.cc;
 
 import org.javacc.parser.ParseException;
-import org.jlato.bootstrap.descriptors.AllDescriptors;
-import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
-import org.jlato.bootstrap.util.CompilationUnitPattern;
 import org.jlato.cc.grammar.*;
+import org.jlato.cc.old.GrammarOld;
 
 import java.io.IOException;
 import java.util.List;
@@ -20,7 +18,7 @@ public class TestContinuations {
 	}
 
 	private void generate() throws IOException, ParseException, org.jlato.parser.ParseException {
-		GProductions productions = Grammar.productions;
+		GProductions productions = GrammarOld.productions;
 
 		GProduction production = productions.get("ConstructorDecl");
 		GExpansion expansion = production.expansion;
@@ -60,7 +58,7 @@ public class TestContinuations {
 	}
 
 	private GContinuations run(GLocation location, boolean fromTerminals) {
-		GContinuations c = new GContinuations(location, Grammar.productions, fromTerminals);
+		GContinuations c = new GContinuations(location, GrammarOld.productions, fromTerminals);
 		c.next();
 		return c;
 	}

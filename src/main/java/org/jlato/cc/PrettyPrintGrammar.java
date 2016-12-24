@@ -17,7 +17,7 @@ public class PrettyPrintGrammar {
 	}
 
 	public void prettyPrint() throws IOException, ParseException {
-		prettyPrint(filter(Grammar2.productions));
+		prettyPrint(filter(Grammar.productions));
 	}
 
 	private GProductions filter(GProductions productions) {

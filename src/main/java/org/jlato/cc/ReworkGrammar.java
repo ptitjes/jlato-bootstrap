@@ -1,18 +1,14 @@
 package org.jlato.cc;
 
 import org.javacc.parser.ParseException;
-import org.jlato.cc.grammar.GExpansion;
-import org.jlato.cc.grammar.GProduction;
 import org.jlato.cc.grammar.GProductions;
-import org.jlato.cc.grammar.ProductionsExtractor;
+import org.jlato.cc.old.GrammarOld;
 import org.jlato.parser.Parser;
-import org.jlato.parser.ParserConfiguration;
 import org.jlato.printer.Printer;
 import org.jlato.tree.decl.CompilationUnit;
 import org.jlato.tree.decl.Modifier;
 import org.jlato.tree.expr.ObjectCreationExpr;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -33,7 +29,7 @@ public class ReworkGrammar {
 	}
 
 	private void generate() throws IOException, ParseException {
-		GProductions productions = Grammar.productions;
+		GProductions productions = GrammarOld.productions;
 
 		writeGrammar(productions);
 	}
@@ -61,7 +57,7 @@ public class ReworkGrammar {
 						importDecl(qualifiedName("org.jlato.cc.grammar.GProduction")).setOnDemand(true).setStatic(true)
 				))
 				.withTypes(listOf(
-						classDecl(name("Grammar"))
+						classDecl(name("GrammarOld"))
 								.withModifiers(listOf(Modifier.Public))
 								.withMembers(listOf(
 										fieldDecl(qualifiedType(name("GProductions")))
@@ -73,7 +69,7 @@ public class ReworkGrammar {
 								))
 				));
 
-		PrintWriter writer = new PrintWriter(new FileWriter("src/main/java/org/jlato/cc/Grammar.java"));
+		PrintWriter writer = new PrintWriter(new FileWriter("src/main/java/org/jlato/cc/GrammarOld.java"));
 		Printer.printTo(cu, writer, true);
 		writer.close();
 	}

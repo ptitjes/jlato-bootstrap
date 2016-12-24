@@ -4,7 +4,6 @@ import org.jlato.bootstrap.descriptors.AllDescriptors;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.util.CompilationUnitPattern;
 import org.jlato.bootstrap.util.TypePattern;
-import org.jlato.cc.grammar.GProductions;
 import org.jlato.parser.ParseException;
 import org.jlato.printer.FormattingSettings;
 import org.jlato.tree.decl.ClassDecl;
@@ -25,7 +24,6 @@ public class GenParser {
 		String rootDirectory = pathToJLaTo + "src/main/java";
 
 		generateParser(new ParserPattern(Grammar.productions, "ParserImplementation"), "ParserImplementation", rootDirectory);
-		generateParser(new ParserPattern2(Grammar2.productions, "ParserImplementation2"), "ParserImplementation2", rootDirectory);
 	}
 
 	private void generateParser(TypePattern<TreeClassDescriptor[], ClassDecl> pattern, String implementationName, String rootDirectory) throws org.jlato.parser.ParseException, IOException {
