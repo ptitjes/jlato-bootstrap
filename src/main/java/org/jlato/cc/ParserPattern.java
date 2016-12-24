@@ -96,9 +96,13 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 
 	/* ALL(*) Grammar declaration */
 
+	private int constantCount = 0;
+	private int stateCount = 0;
+
 	private MemberDecl grammarClass(ImportManager importManager, List<GProduction> allProductions) {
 		importManager.addImports(listOf(
 				importDecl(qualifiedName("org.jlato.internal.parser.all.Grammar")),
+				importDecl(qualifiedName("org.jlato.internal.parser.all.GrammarProduction")).setOnDemand(true).setStatic(true),
 				importDecl(qualifiedName("org.jlato.internal.parser.TokenType"))
 		));
 
@@ -113,6 +117,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		}
 
 		for (GProduction production : allProductions) {
+			stateCount += 2;
 			members = grammarElements(production.symbol, production.expansion, members);
 		}
 
@@ -128,12 +133,16 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 						.withBody(blockStmt().withStmts(stmts))
 		);
 
+		ConstructorDecl constructor = constructorDecl(name("JavaGrammar")).withBody(blockStmt().withStmts(listOf(
+				explicitConstructorInvocationStmt().withArgs(listOf(
+						literalExpr(stateCount), literalExpr(constantCount)
+				))
+		)));
+
 		return classDecl(name("JavaGrammar")).withExtendsClause(qType("Grammar"))
 				.withModifiers(listOf(Modifier.Private, Modifier.Static))
-				.withMembers(members);
+				.withMembers(members.prepend(constructor));
 	}
-
-	static int constantCount = 1;
 
 	private void grammarConstants(GProduction production, Map<String, MemberDecl> members) {
 		String name = camelToConstant(lowerCaseFirst(production.symbol));
@@ -200,7 +209,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				int count = 1;
 				NodeList<Expr> childrenExprs = emptyList();
 				for (GExpansion child : expansion.children) {
-					if (lookaheadOrAction(child)) continue;
+					stateCount++;
 
 					String name = namePrefix + '_' + count++;
 					childrenExprs = grammarElementExpression(child, name, childrenExprs);
@@ -223,11 +232,13 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				NodeList<Expr> childrenExprs = emptyList();
 				for (GExpansion child : expansion.children) {
 					if (lookaheadOrAction(child)) continue;
+					stateCount++;
 
 					String name = namePrefix + '_' + count++;
 					childrenExprs = grammarElementExpression(child, name, childrenExprs);
 					members = grammarElements(name, child, members);
 				}
+				stateCount--;
 
 				if (!namePrefix.contains("_")) {
 					members = members.append(fieldDecl(qType("Sequence"))
@@ -243,6 +254,8 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				break;
 			}
 			case ZeroOrOne: {
+				stateCount++;
+
 				NodeList<Expr> childrenExprs = emptyList();
 				GExpansion child = makeSequence(expansion);
 				String name = namePrefix + (child.kind != GExpansion.Kind.Sequence && child != expansion ? "_1" : "");
@@ -262,6 +275,8 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				break;
 			}
 			case ZeroOrMore: {
+				stateCount++;
+
 				NodeList<Expr> childrenExprs = emptyList();
 				GExpansion child = makeSequence(expansion);
 				String name = namePrefix + (child.kind != GExpansion.Kind.Sequence && child != expansion ? "_1" : "");
@@ -281,6 +296,8 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				break;
 			}
 			case OneOrMore: {
+				stateCount++;
+
 				NodeList<Expr> childrenExprs = emptyList();
 				GExpansion child = makeSequence(expansion);
 				String name = namePrefix + (child.kind != GExpansion.Kind.Sequence && child != expansion ? "_1" : "");
