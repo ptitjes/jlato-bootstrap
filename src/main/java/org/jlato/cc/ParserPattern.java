@@ -45,7 +45,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 
 	@Override
 	protected String makeQuote(TreeClassDescriptor[] arg) {
-		return "class " + implementationName + " extends ParserNewBase { ..$_ }";
+		return "class " + implementationName + " extends ParserBaseALL { ..$_ }";
 	}
 
 	@Override
@@ -444,19 +444,20 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 	/* Parse methods */
 
 	private MethodDecl parseMethod(ImportManager importManager, GProduction production) {
+		String symbol = production.symbol;
 		Type type = production.returnType;
 
 		NodeList<Stmt> stmts = emptyList();
 		stmts = stmts.appendAll(production.declarations);
 		stmts = stmts.append(tokenVarDeclaration());
-		stmts = stmts.appendAll(parseStatementsFor(production.symbol, production.symbol, production.location(), production.hintParams, false));
+		stmts = stmts.appendAll(parseStatementsFor(symbol, symbol, production.location(), production.hintParams, false));
 
 		// Add push/pop callStack calls
-		String ntName = camelToConstant(lowerCaseFirst(production.symbol));
+		String ntName = camelToConstant(lowerCaseFirst(symbol));
 		Expr constant = fieldAccessExpr(name(ntName)).withScope(name("JavaGrammar"));
 
-		return methodDecl(type, name("parse" + upperCaseFirst(production.symbol)))
-				.withModifiers(listOf(Modifier.Protected))
+		return methodDecl(type, name("parse" + upperCaseFirst(symbol)))
+				.withModifiers(listOf(symbol.endsWith("Entry") ? Modifier.Public : Modifier.Protected))
 				.withParams(production.hintParams.appendAll(production.dataParams))
 				.withThrowsClause(listOf(qualifiedType(name("ParseException"))))
 				.withBody(blockStmt().withStmts(stmts))
@@ -568,7 +569,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 			}
 			case Terminal: {
 				Expr argument = prefixedConstant(expansion.symbol);
-				Expr call = methodInvocationExpr(name("parse")).withArgs(listOf(argument));
+				Expr call = methodInvocationExpr(name("consume")).withArgs(listOf(argument));
 				ExpressionStmt callStmt = expressionStmt(
 						expansion.name == null ? call : assignExpr(name(expansion.name), AssignOp.Normal, call)
 				);
