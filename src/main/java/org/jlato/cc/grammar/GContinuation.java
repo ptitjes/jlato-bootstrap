@@ -86,8 +86,6 @@ public class GContinuation {
 				return Sets.of(location.traverseRef(productions));
 			case Action:
 				return Sets.of(nextOrParentsNext(location));
-			case LookAhead:
-				return Sets.of(nextOrParentsNext(location));
 			default:
 				throw new IllegalArgumentException();
 		}
@@ -136,7 +134,6 @@ public class GContinuation {
 			case NonTerminal:
 				return Sets.of(location.traverseRef(productions));
 			case Action:
-			case LookAhead:
 				return nextSiblingOrParentsNextSiblings(location, productions);
 			default:
 				throw new IllegalArgumentException();

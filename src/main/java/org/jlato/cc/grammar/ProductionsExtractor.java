@@ -160,10 +160,7 @@ public class ProductionsExtractor {
 	}
 
 	private GExpansion emitExpansionLookahead(Lookahead e) {
-		if (!e.isExplicit()) return null;
-		if (e.getAmount() == 0) return GExpansion.lookAhead(tokensToExpression(e.getActionTokens()));
-		if (e.getAmount() != Integer.MAX_VALUE) return GExpansion.lookAhead(e.getAmount());
-		return GExpansion.lookAhead(Collections.singletonList(emitExpansionTree(e.getLaExpansion())));
+		return null;
 	}
 
 	private GExpansion emitExpansionNonTerminal(NonTerminal nt) {

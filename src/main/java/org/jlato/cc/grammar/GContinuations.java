@@ -82,9 +82,6 @@ public class GContinuations {
 			case Action:
 				toFollow = Stream.of(nextOrParentsNext(location));
 				break;
-			case LookAhead:
-				toFollow = Stream.of(nextOrParentsNext(location));
-				break;
 			default:
 				throw new IllegalArgumentException();
 		}

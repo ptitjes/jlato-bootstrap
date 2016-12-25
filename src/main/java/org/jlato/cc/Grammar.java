@@ -282,7 +282,7 @@ public class Grammar {
 							action(listOf(
 									stmt("entryPoint = JavaGrammar.STATEMENTS_ENTRY;").build()
 							)),
-							nonTerminal("ret", "Statements", listOf(expr("false").build())),
+							nonTerminal("ret", "Statements"),
 							nonTerminal("Epilog"),
 							action(listOf(
 									stmt("return ret;").build()
@@ -830,12 +830,7 @@ public class Grammar {
 					sequence(
 							terminal("EXTENDS"),
 							choice(
-									sequence(
-											lookAhead(
-													expr("quotesMode").build()
-											),
-											nonTerminal("ret", "NodeListVar")
-									),
+									nonTerminal("ret", "NodeListVar"),
 									sequence(
 											nonTerminal("cit", "AnnotatedQualifiedType"),
 											action(listOf(
@@ -869,12 +864,7 @@ public class Grammar {
 					sequence(
 							terminal("IMPLEMENTS"),
 							choice(
-									sequence(
-											lookAhead(
-													expr("quotesMode").build()
-											),
-											nonTerminal("ret", "NodeListVar")
-									),
+									nonTerminal("ret", "NodeListVar"),
 									sequence(
 											nonTerminal("cit", "AnnotatedQualifiedType"),
 											action(listOf(
@@ -923,12 +913,7 @@ public class Grammar {
 							terminal("LBRACE"),
 							zeroOrOne(
 									choice(
-											sequence(
-													lookAhead(
-															expr("quotesMode").build()
-													),
-													nonTerminal("constants", "NodeListVar")
-											),
+											nonTerminal("constants", "NodeListVar"),
 											sequence(
 													nonTerminal("entry", "EnumConstantDecl"),
 													action(listOf(
@@ -1020,12 +1005,7 @@ public class Grammar {
 							terminal("LBRACE"),
 							zeroOrOne(
 									choice(
-											sequence(
-													lookAhead(
-															expr("quotesMode").build()
-													),
-													nonTerminal("ret", "NodeListVar")
-											),
+											nonTerminal("ret", "NodeListVar"),
 											oneOrMore(
 													nonTerminal("member", "AnnotationTypeBodyDecl"),
 													action(listOf(
@@ -1127,12 +1107,7 @@ public class Grammar {
 					sequence(
 							terminal("LT"),
 							choice(
-									sequence(
-											lookAhead(
-													expr("quotesMode").build()
-											),
-											nonTerminal("ret", "NodeListVar")
-									),
+									nonTerminal("ret", "NodeListVar"),
 									sequence(
 											nonTerminal("tp", "TypeParameter"),
 											action(listOf(
@@ -1186,12 +1161,7 @@ public class Grammar {
 					sequence(
 							terminal("EXTENDS"),
 							choice(
-									sequence(
-											lookAhead(
-													expr("quotesMode").build()
-											),
-											nonTerminal("ret", "NodeListVar")
-									),
+									nonTerminal("ret", "NodeListVar"),
 									sequence(
 											nonTerminal("cit", "AnnotatedQualifiedType"),
 											action(listOf(
@@ -1243,12 +1213,7 @@ public class Grammar {
 					sequence(
 							zeroOrOne(
 									choice(
-											sequence(
-													lookAhead(
-															expr("quotesMode").build()
-													),
-													nonTerminal("ret", "NodeListVar")
-											),
+											nonTerminal("ret", "NodeListVar"),
 											oneOrMore(
 													nonTerminal("member", "ClassOrInterfaceBodyDecl", null, listOf(
 															expr("typeKind").build()
@@ -1586,12 +1551,7 @@ public class Grammar {
 					),
 					sequence(
 							choice(
-									sequence(
-											lookAhead(
-													expr("quotesMode").build()
-											),
-											nonTerminal("ret", "NodeListVar")
-									),
+									nonTerminal("ret", "NodeListVar"),
 									// TODO Handle a receiver parameter as first parameter
 									sequence(
 											nonTerminal("par", "FormalParameter"),
@@ -1710,9 +1670,7 @@ public class Grammar {
 									stmt("run();").build()
 							)),
 							terminal("LBRACE"),
-							nonTerminal("stmts", "Statements", listOf(
-									expr("true").build()
-							)),
+							nonTerminal("stmts", "Statements"),
 							terminal("RBRACE"),
 							action(listOf(
 									stmt("block = dress(SBlockStmt.make(stmts));").build()
@@ -1767,9 +1725,7 @@ public class Grammar {
 					)
 			).memoizeMatches(),
 			production("Statements", type("BUTree<SNodeList>").build(),
-					listOf(
-							param("boolean inConstructor").build()
-					),
+					emptyList(),
 					emptyList(),
 					listOf(
 							stmt("BUTree<SNodeList> ret = null;").build(),
@@ -1778,14 +1734,9 @@ public class Grammar {
 					sequence(
 							zeroOrOne(
 									choice(
-											sequence(
-													nonTerminal("ret", "NodeListVar")
-											),
+											nonTerminal("ret", "NodeListVar"),
 											sequence(
 													zeroOrOne(
-															lookAhead(
-																	expr("inConstructor").build()
-															),
 															nonTerminal("stmt", "ExplicitConstructorInvocation"),
 															action(listOf(
 																	stmt("ret = append(ret, stmt);").build()
@@ -1999,9 +1950,6 @@ public class Grammar {
 					),
 					choice(
 							sequence(
-									lookAhead(
-											expr("quotesMode").build()
-									),
 									nonTerminal("ret", "NodeListVar"),
 									action(listOf(
 											stmt("return ret;").build()
@@ -2250,12 +2198,7 @@ public class Grammar {
 					),
 					sequence(
 							choice(
-									sequence(
-											lookAhead(
-													expr("quotesMode").build()
-											),
-											nonTerminal("name", "NodeVar")
-									),
+									nonTerminal("name", "NodeVar"),
 									sequence(
 											action(listOf(
 													stmt("run();").build()
@@ -2852,7 +2795,6 @@ public class Grammar {
 													))
 											),
 											sequence(
-													lookAhead(3),
 													nonTerminal("RUNSIGNEDSHIFT"),
 													action(listOf(
 															stmt("op = BinaryOp.RightUnsignedShift;").build()
@@ -3412,9 +3354,7 @@ public class Grammar {
 													expr("null").build()
 											))
 									),
-									sequence(
-											nonTerminal("ret", "Name")
-									),
+									nonTerminal("ret", "Name"),
 									sequence(
 											action(listOf(
 													stmt("run();").build()
@@ -3556,10 +3496,7 @@ public class Grammar {
 							terminal("LPAREN"),
 							zeroOrOne(
 									choice(
-											sequence(
-													lookAhead(expr("quotesMode").build()),
-													nonTerminal("ret", "NodeListVar")
-											),
+											nonTerminal("ret", "NodeListVar"),
 											sequence(
 													nonTerminal("expr", "Expression"),
 													action(listOf(
@@ -3855,9 +3792,7 @@ public class Grammar {
 									stmt("run();").build()
 							)),
 							terminal("LBRACE"),
-							nonTerminal("stmts", "Statements", listOf(
-									expr("false").build()
-							)),
+							nonTerminal("stmts", "Statements"),
 							terminal("RBRACE"),
 							action(listOf(
 									stmt("return dress(SBlockStmt.make(ensureNotNull(stmts)));").build()
@@ -4026,9 +3961,7 @@ public class Grammar {
 									terminal("DEFAULT")
 							),
 							terminal("COLON"),
-							nonTerminal("stmts", "Statements", listOf(
-									expr("false").build()
-							)),
+							nonTerminal("stmts", "Statements"),
 							action(listOf(
 									stmt("return dress(SSwitchCase.make(optionOf(label), ensureNotNull(stmts)));").build()
 							))

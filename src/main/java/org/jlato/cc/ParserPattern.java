@@ -4,7 +4,6 @@ import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.util.ImportManager;
 import org.jlato.bootstrap.util.TypePattern;
 import org.jlato.cc.grammar.*;
-import org.jlato.internal.td.expr.TDLiteralExpr;
 import org.jlato.tree.Kind;
 import org.jlato.tree.NodeList;
 import org.jlato.tree.NodeOption;
@@ -179,7 +178,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 			case Sequence: {
 				int count = 1;
 				for (GExpansion child : expansion.children) {
-					if (lookaheadOrAction(child)) continue;
+					if (isAction(child)) continue;
 
 					String name = namePrefix + '_' + count++;
 					grammarConstants(name, child, members);
@@ -231,7 +230,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				int count = 1;
 				NodeList<Expr> childrenExprs = emptyList();
 				for (GExpansion child : expansion.children) {
-					if (lookaheadOrAction(child)) continue;
+					if (isAction(child)) continue;
 					stateCount++;
 
 					String name = namePrefix + '_' + count++;
@@ -334,15 +333,14 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		return members;
 	}
 
-	private boolean lookaheadOrAction(GExpansion expansion) {
-		return expansion.kind == GExpansion.Kind.LookAhead || expansion.kind == GExpansion.Kind.Action;
+	private boolean isAction(GExpansion expansion) {
+		return expansion.kind == GExpansion.Kind.Action;
 	}
 
 	private GExpansion makeSequence(GExpansion expansion) {
 		GExpansion uniqueChild = null;
 		for (GExpansion child : expansion.children) {
 			switch (child.kind) {
-				case LookAhead:
 				case Action:
 					break;
 				default:
@@ -351,22 +349,6 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 			}
 		}
 		return uniqueChild;
-	}
-
-	private List<GExpansion> filterLookaheadAndAction(List<GExpansion> children) {
-		if (children == null) return null;
-
-		List<GExpansion> filtered = new ArrayList<>();
-		for (GExpansion child : children) {
-			switch (child.kind) {
-				case LookAhead:
-				case Action:
-					break;
-				default:
-					filtered.add(child);
-			}
-		}
-		return filtered;
 	}
 
 	private NodeList<Expr> grammarElementExpression(GExpansion expansion, String namePrefix, NodeList<Expr> childrenExprs) {
@@ -378,7 +360,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				break;
 			case Sequence: {
 				for (GExpansion child : expansion.children) {
-					if (lookaheadOrAction(child)) continue;
+					if (isAction(child)) continue;
 
 					String name = namePrefix + '_' + count++;
 					localChildrenExprs = grammarElementExpression(child, name, localChildrenExprs);
@@ -446,7 +428,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 			case Sequence: {
 				int count = 1;
 				for (GExpansion child : expansion.children) {
-					if (lookaheadOrAction(child)) continue;
+					if (isAction(child)) continue;
 
 					String name = namePrefix + '_' + count++;
 					stmts = grammarDefStmts(name, child, stmts);
@@ -698,7 +680,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		int count = 1;
 		NodeList<Stmt> stmts = emptyList();
 		for (GLocation child : location.allChildren()) {
-			boolean lookaheadOrAction = lookaheadOrAction(child.current);
+			boolean lookaheadOrAction = isAction(child.current);
 			String name = namePrefix + (lookaheadOrAction ? "" : "_" + count++);
 
 			stmts = stmts.appendAll(parseStatementsFor(symbol, name, child, hintParams, optional));

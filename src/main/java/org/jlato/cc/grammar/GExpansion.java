@@ -29,102 +29,77 @@ public class GExpansion {
 		ZeroOrOne,
 		ZeroOrMore,
 		OneOrMore,
-		LookAhead,
 		NonTerminal,
 		Terminal,
 		Action,
 	}
 
 	public static GExpansion choice(List<GExpansion> children) {
-		return new GExpansion(Kind.Choice, children, null, null, null, null, null, -1, null, false);
+		return new GExpansion(Kind.Choice, children, null, null, null, null, null);
 	}
 
 	public static GExpansion choice(GExpansion... children) {
-		return new GExpansion(Kind.Choice, Arrays.asList(children), null, null, null, null, null, -1, null, false);
+		return new GExpansion(Kind.Choice, Arrays.asList(children), null, null, null, null, null);
 	}
 
 	public static GExpansion sequence(List<GExpansion> children) {
-		return new GExpansion(Kind.Sequence, children, null, null, null, null, null, -1, null, false);
+		return new GExpansion(Kind.Sequence, children, null, null, null, null, null);
 	}
 
 	public static GExpansion sequence(GExpansion... children) {
-		return new GExpansion(Kind.Sequence, Arrays.asList(children), null, null, null, null, null, -1, null, false);
+		return new GExpansion(Kind.Sequence, Arrays.asList(children), null, null, null, null, null);
 	}
 
 	public static GExpansion zeroOrOne(List<GExpansion> children) {
-		return new GExpansion(Kind.ZeroOrOne, children, null, null, null, null, null, -1, null, false);
+		return new GExpansion(Kind.ZeroOrOne, children, null, null, null, null, null);
 	}
 
 	public static GExpansion zeroOrOne(GExpansion... children) {
-		return new GExpansion(Kind.ZeroOrOne, Arrays.asList(children), null, null, null, null, null, -1, null, false);
+		return new GExpansion(Kind.ZeroOrOne, Arrays.asList(children), null, null, null, null, null);
 	}
 
 	public static GExpansion zeroOrMore(List<GExpansion> children) {
-		return new GExpansion(Kind.ZeroOrMore, children, null, null, null, null, null, -1, null, false);
+		return new GExpansion(Kind.ZeroOrMore, children, null, null, null, null, null);
 	}
 
 	public static GExpansion zeroOrMore(GExpansion... children) {
-		return new GExpansion(Kind.ZeroOrMore, Arrays.asList(children), null, null, null, null, null, -1, null, false);
+		return new GExpansion(Kind.ZeroOrMore, Arrays.asList(children), null, null, null, null, null);
 	}
 
 	public static GExpansion oneOrMore(List<GExpansion> children) {
-		return new GExpansion(Kind.OneOrMore, children, null, null, null, null, null, -1, null, false);
+		return new GExpansion(Kind.OneOrMore, children, null, null, null, null, null);
 	}
 
 	public static GExpansion oneOrMore(GExpansion... children) {
-		return new GExpansion(Kind.OneOrMore, Arrays.asList(children), null, null, null, null, null, -1, null, false);
-	}
-
-	public static GExpansion lookAhead(List<GExpansion> children) {
-		return new GExpansion(Kind.LookAhead, children, null, null, null, null, null, -1, null, false);
-	}
-
-	public static GExpansion lookAhead(GExpansion... children) {
-		return new GExpansion(Kind.LookAhead, Arrays.asList(children), null, null, null, null, null, -1, null, false);
-	}
-
-	public static GExpansion lookAhead(Expr semanticLookahead) {
-		return new GExpansion(Kind.LookAhead, null, null, null, null, null, null, -1, semanticLookahead, false);
-	}
-
-	public static GExpansion lookAhead(Expr semanticLookahead, GExpansion... children) {
-		return new GExpansion(Kind.LookAhead, Arrays.asList(children), null, null, null, null, null, -1, semanticLookahead, false);
-	}
-
-	public static GExpansion lookAhead(int amount) {
-		return new GExpansion(Kind.LookAhead, null, null, null, null, null, null, amount, null, false);
+		return new GExpansion(Kind.OneOrMore, Arrays.asList(children), null, null, null, null, null);
 	}
 
 	public static GExpansion nonTerminal(String symbol) {
-		return new GExpansion(Kind.NonTerminal, null, null, symbol, null, null, null, -1, null, false);
-	}
-
-	public static GExpansion nonTerminal(String symbol, NodeList<Expr> hints) {
-		return new GExpansion(Kind.NonTerminal, null, null, symbol, hints, null, null, -1, null, false);
+		return new GExpansion(Kind.NonTerminal, null, null, symbol, null, null, null);
 	}
 
 	public static GExpansion nonTerminal(String name, String symbol) {
-		return new GExpansion(Kind.NonTerminal, null, name, symbol, null, null, null, -1, null, false);
+		return new GExpansion(Kind.NonTerminal, null, name, symbol, null, null, null);
 	}
 
 	public static GExpansion nonTerminal(String name, String symbol, NodeList<Expr> hints) {
-		return new GExpansion(Kind.NonTerminal, null, name, symbol, hints, null, null, -1, null, false);
+		return new GExpansion(Kind.NonTerminal, null, name, symbol, hints, null, null);
 	}
 
 	public static GExpansion nonTerminal(String name, String symbol, NodeList<Expr> hints, NodeList<Expr> arguments) {
-		return new GExpansion(Kind.NonTerminal, null, name, symbol, hints, arguments, null, -1, null, false);
+		return new GExpansion(Kind.NonTerminal, null, name, symbol, hints, arguments, null);
 	}
 
 	public static GExpansion terminal(String symbol) {
-		return new GExpansion(Kind.Terminal, null, null, symbol, null, null, null, -1, null, false);
+		return new GExpansion(Kind.Terminal, null, null, symbol, null, null, null);
 	}
 
 	public static GExpansion terminal(String name, String symbol) {
-		return new GExpansion(Kind.Terminal, null, name, symbol, null, null, null, -1, null, false);
+		return new GExpansion(Kind.Terminal, null, name, symbol, null, null, null);
 	}
 
 	public static GExpansion action(NodeList<Stmt> action) {
-		return new GExpansion(Kind.Action, null, null, null, null, null, action, -1, null, false);
+		return new GExpansion(Kind.Action, null, null, null, null, null, action);
 	}
 
 	public final Kind kind;
@@ -134,11 +109,8 @@ public class GExpansion {
 	public final NodeList<Expr> hints;
 	public final NodeList<Expr> arguments;
 	public final NodeList<Stmt> action;
-	public final int amount;
-	public final Expr semanticLookahead;
-	public final boolean negativeLookahead;
 
-	public GExpansion(Kind kind, List<GExpansion> children, String name, String symbol, NodeList<Expr> hints, NodeList<Expr> arguments, NodeList<Stmt> action, int amount, Expr semanticLookahead, boolean negativeLookahead) {
+	public GExpansion(Kind kind, List<GExpansion> children, String name, String symbol, NodeList<Expr> hints, NodeList<Expr> arguments, NodeList<Stmt> action) {
 		this.kind = kind;
 		this.children = children;
 		this.name = name;
@@ -146,21 +118,10 @@ public class GExpansion {
 		this.hints = hints == null ? emptyList() : hints;
 		this.arguments = arguments == null ? emptyList() : arguments;
 		this.action = action;
-		this.amount = amount;
-		this.semanticLookahead = semanticLookahead;
-		this.negativeLookahead = negativeLookahead;
-	}
-
-	public GExpansion setNegative() {
-		return new GExpansion(kind, children, name, symbol, hints, arguments, action, amount, semanticLookahead, true);
 	}
 
 	public GExpansion rewrite(Function<GExpansion, GExpansion> f) {
 		switch (kind) {
-			case LookAhead:
-				if (semanticLookahead != null || amount != -1) {
-					return f.apply(this);
-				}
 			case Choice:
 			case Sequence:
 			case ZeroOrOne:
@@ -168,7 +129,7 @@ public class GExpansion {
 			case OneOrMore:
 				List<GExpansion> rewroteChildren =
 						children.stream().map(e -> e.rewrite(f)).filter(Objects::nonNull).collect(Collectors.toList());
-				return f.apply(new GExpansion(kind, rewroteChildren, name, symbol, hints, arguments, action, amount, semanticLookahead, negativeLookahead));
+				return f.apply(new GExpansion(kind, rewroteChildren, name, symbol, hints, arguments, action));
 			case NonTerminal:
 			case Terminal:
 			case Action:
@@ -178,21 +139,8 @@ public class GExpansion {
 		return null;
 	}
 
-	public GLocation location() {
-		return new GLocation(null, this);
-	}
-
 	public MethodInvocationExpr toExpr() {
 		switch (kind) {
-			case LookAhead:
-				if (semanticLookahead != null) {
-					return factoryCall(listOf(
-							reify("expr", semanticLookahead).prependLeadingNewLine().appendTrailingNewLine()
-					));
-				}
-				if (amount != -1) {
-					return factoryCall(listOf(literalExpr(amount)));
-				}
 			case Choice:
 			case Sequence:
 			case ZeroOrOne:
@@ -249,33 +197,15 @@ public class GExpansion {
 		return builder.toString();
 	}
 
-	public String toString(Predicate<GExpansion> filter) {
-		StringBuilder builder = new StringBuilder();
-		this.print(builder, 0, filter);
-		return builder.toString();
-	}
-
 	private void print(StringBuilder builder, int indent, Predicate<GExpansion> filter) {
 		if (!filter.test(this)) return;
 
 		builder.append("\n");
 		Utils.printIndent(builder, indent);
 		String kindString = kind.toString();
-		if (negativeLookahead) kindString = "negative" + kindString;
 		builder.append(Utils.lowerCaseFirst(kindString)).append("(");
 
 		switch (kind) {
-			case LookAhead:
-				if (semanticLookahead != null) {
-					builder.append("{ ");
-					builder.append(Printer.printToString(semanticLookahead, true).trim());
-					builder.append(" }");
-					break;
-				}
-				if (amount != -1) {
-					builder.append(amount);
-					break;
-				}
 			case Choice:
 			case Sequence:
 			case ZeroOrOne:

@@ -23,7 +23,6 @@ public class PrettyPrintGrammar {
 	private GProductions filter(GProductions productions) {
 		return productions.rewrite(p -> p.rewrite(e -> {
 			switch (e.kind) {
-				case LookAhead:
 				case Action:
 					return null;
 			}

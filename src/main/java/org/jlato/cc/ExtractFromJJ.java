@@ -88,17 +88,13 @@ public class ExtractFromJJ {
 				case Choice:
 				case Sequence:
 					if (e.children.size() == 1) return e.children.get(0);
-				case LookAhead:
-					if (e.semanticLookahead != null || e.amount != -1) {
-						return e;
-					}
 				case ZeroOrOne:
 				case ZeroOrMore:
 				case OneOrMore:
 					if (e.children.size() == 1) {
 						GExpansion child = e.children.get(0);
 						if (child.kind == GExpansion.Kind.Sequence)
-							return new GExpansion(e.kind, child.children, null, null, null, null, null, -1, null, false);
+							return new GExpansion(e.kind, child.children, null, null, null, null, null);
 					}
 				default:
 			}
