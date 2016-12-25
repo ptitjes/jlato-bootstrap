@@ -32,17 +32,17 @@ public class GContinuation {
 		return exists(l -> continuation.asTerminals().contains(l.current.symbol));
 	}
 
-	public GContinuation moveToNextTerminals2(GProductions productions) {
+	public GContinuation moveToNextTerminals(GProductions productions) {
 		Set<GLocation> visited = new HashSet<>();
 		Set<GLocation> locations = new HashSet<>();
 		for (GLocation location : this.locations) {
-			moveToNextTerminals2(location, locations, visited, productions);
+			moveToNextTerminals(location, locations, visited, productions);
 		}
 		this.locations = locations;
 		return this;
 	}
 
-	private void moveToNextTerminals2(GLocation location, Set<GLocation> locations, Set<GLocation> visited, GProductions productions) {
+	private void moveToNextTerminals(GLocation location, Set<GLocation> locations, Set<GLocation> visited, GProductions productions) {
 		if (visited.contains(location)) return;
 		else visited.add(location);
 
@@ -53,20 +53,20 @@ public class GContinuation {
 				break;
 			case Choice:
 				for (GLocation child : location.allChildren().asList()) {
-					moveToNextTerminals2(child, locations, visited, productions);
+					moveToNextTerminals(child, locations, visited, productions);
 				}
 				break;
 			case ZeroOrOne:
 			case ZeroOrMore:
 				nextSiblingOrParentsNextSiblings(location, locations, visited, productions);
-				moveToNextTerminals2(location.firstChild(), locations, visited, productions);
+				moveToNextTerminals(location.firstChild(), locations, visited, productions);
 				break;
 			case OneOrMore:
 			case Sequence:
-				moveToNextTerminals2(location.firstChild(), locations, visited, productions);
+				moveToNextTerminals(location.firstChild(), locations, visited, productions);
 				break;
 			case NonTerminal:
-				moveToNextTerminals2(location.traverseRef(productions), locations, visited, productions);
+				moveToNextTerminals(location.traverseRef(productions), locations, visited, productions);
 				break;
 			case Action:
 				nextSiblingOrParentsNextSiblings(location, locations, visited, productions);
@@ -79,7 +79,7 @@ public class GContinuation {
 	private void nextSiblingOrParentsNextSiblings(GLocation location, Set<GLocation> locations, Set<GLocation> visited, GProductions productions) {
 		GLocation nextSibling = location.nextSibling();
 		if (nextSibling != null) {
-			moveToNextTerminals2(nextSibling, locations, visited, productions);
+			moveToNextTerminals(nextSibling, locations, visited, productions);
 		} else {
 			Set<GLocation> nonChoiceParents = nonChoiceParents(location, productions);
 			for (GLocation nonChoiceParent : nonChoiceParents) {

@@ -693,7 +693,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 
 		List<Set<String>> terminalSets = new ArrayList<>(children.size());
 		for (GLocation child : children) {
-			GContinuation continuation = new GContinuation(child).moveToNextTerminals2(productions);
+			GContinuation continuation = new GContinuation(child).moveToNextTerminals(productions);
 			if (continuation == null) return null;
 			terminalSets.add(continuation.asTerminals());
 		}
@@ -723,8 +723,8 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 
 		List<String> ll1DecisionTerminals = null;
 		if (firstChild != null && nextSibling != null) {
-			GContinuation inside = new GContinuation(firstChild).moveToNextTerminals2(productions);
-			GContinuation after = new GContinuation(nextSibling).moveToNextTerminals2(productions);
+			GContinuation inside = new GContinuation(firstChild).moveToNextTerminals(productions);
+			GContinuation after = new GContinuation(nextSibling).moveToNextTerminals(productions);
 			if (inside != null && after != null && !inside.intersects(after))
 				ll1DecisionTerminals = new ArrayList<>(inside.asTerminals());
 		}
@@ -769,10 +769,10 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		return fieldAccessExpr(name(token)).withScope(name("TokenType"));
 	}
 
-	private List<String> firstTerminalsOf(GLocation location) {
-		GContinuations c = new GContinuations(location, productions, false);
-		c.next();
-		return c.terminals();
+	private Set<String> firstTerminalsOf(GLocation location) {
+		GContinuation c = new GContinuation(location);
+		c.moveToNextTerminals(productions);
+		return c.asTerminals();
 	}
 
 	private Comparator<Expr> terminalComparator = new Comparator<Expr>() {

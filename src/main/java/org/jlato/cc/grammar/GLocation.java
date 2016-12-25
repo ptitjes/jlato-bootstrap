@@ -66,14 +66,14 @@ public class GLocation {
 
 		GLocation other = (GLocation) o;
 
-		return (index > -1 && other.index > -1 && index == other.index) &&
-				(parent != null ? parent.equals(other.parent) : other.parent == null) &&
+		return (index == other.index) &&
+				(parent != null ? index == -1 || parent.equals(other.parent) : other.parent == null) &&
 				(production != null ? production.symbol.equals(other.production.symbol) : other.production == null);
 	}
 
 	@Override
 	public int hashCode() {
-		int result = parent != null && parent.index != -1 ? parent.hashCode() : 0;
+		int result = index != -1 && parent != null ? parent.hashCode() : 0;
 		result = 31 * result + (production != null ? production.symbol.hashCode() : 0);
 		result = 31 * result + index;
 		return result;
