@@ -15,8 +15,8 @@ public class GLocation {
 	public final int index;
 	public final GExpansion current;
 
-	public GLocation(GProduction production, GExpansion root) {
-		this(production, null, -1, root);
+	public GLocation(GProduction production, GLocation parent, GExpansion root) {
+		this(production, parent, -1, root);
 	}
 
 	public GLocation(GProduction production, GLocation parent, int index, GExpansion current) {
@@ -28,8 +28,7 @@ public class GLocation {
 
 	public GLocation traverseRef(GProductions productions) {
 		if (current.kind != GExpansion.Kind.NonTerminal) throw new IllegalStateException();
-		GProduction referedProduction = productions.get(current.symbol);
-		return new GLocation(referedProduction, parent, index, referedProduction.expansion);
+		return productions.get(current.symbol).location(this);
 	}
 
 	public GLocation traverse(GExpansionPath path) {
@@ -38,6 +37,7 @@ public class GLocation {
 	}
 
 	public GLocation nextSibling() {
+		if (parent != null && index == -1) return parent.nextSibling();
 		if (parent != null && index + 1 < parent.current.children.size())
 			return new GLocation(production, parent, index + 1, parent.current.children.get(index + 1));
 		else return null;
@@ -66,14 +66,14 @@ public class GLocation {
 
 		GLocation other = (GLocation) o;
 
-		return (index == other.index) &&
+		return (index > -1 && other.index > -1 && index == other.index) &&
 				(parent != null ? parent.equals(other.parent) : other.parent == null) &&
 				(production != null ? production.symbol.equals(other.production.symbol) : other.production == null);
 	}
 
 	@Override
 	public int hashCode() {
-		int result = parent != null ? parent.hashCode() : 0;
+		int result = parent != null && parent.index != -1 ? parent.hashCode() : 0;
 		result = 31 * result + (production != null ? production.symbol.hashCode() : 0);
 		result = 31 * result + index;
 		return result;
@@ -81,6 +81,6 @@ public class GLocation {
 
 	@Override
 	public String toString() {
-		return parent == null ? "<" + production.symbol + ">" : parent + "." + index;
+		return (parent != null ? parent + "." : "") + (index == -1 ? "<" + production.symbol + ">" : index);
 	}
 }

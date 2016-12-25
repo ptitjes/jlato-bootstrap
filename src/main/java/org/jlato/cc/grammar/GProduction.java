@@ -60,7 +60,11 @@ public class GProduction {
 	}
 
 	public GLocation location() {
-		return new GLocation(this, expansion);
+		return new GLocation(this, null, expansion);
+	}
+
+	public GLocation location(GLocation parent) {
+		return new GLocation(this, parent, expansion);
 	}
 
 	public MethodInvocationExpr toExpr() {

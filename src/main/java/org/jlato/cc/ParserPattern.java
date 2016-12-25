@@ -695,7 +695,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		for (GLocation child : children) {
 			GContinuation continuation = new GContinuation(child).moveToNextTerminals2(productions);
 			if (continuation == null) return null;
-			terminalSets.add(continuation.asTerminals().asSet());
+			terminalSets.add(continuation.asTerminals());
 		}
 
 		// Verify that the terminals don't intersect pairwise
@@ -726,7 +726,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 			GContinuation inside = new GContinuation(firstChild).moveToNextTerminals2(productions);
 			GContinuation after = new GContinuation(nextSibling).moveToNextTerminals2(productions);
 			if (inside != null && after != null && !inside.intersects(after))
-				ll1DecisionTerminals = inside.asTerminals().toIndexedList().asList();
+				ll1DecisionTerminals = new ArrayList<>(inside.asTerminals());
 		}
 		return ll1DecisionTerminals;
 	}
