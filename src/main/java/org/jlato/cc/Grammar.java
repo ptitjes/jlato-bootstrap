@@ -24,13 +24,9 @@ public class Grammar {
 							stmt("BUTree<SCompilationUnit> ret;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("entryPoint = JavaGrammar.COMPILATION_UNIT_ENTRY;").build()
-							)),
+							action("entryPoint = JavaGrammar.COMPILATION_UNIT_ENTRY;"),
 							nonTerminal("ret", "CompilationUnit"),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("PackageDeclEntry", type("BUTree<SPackageDecl>").build(),
@@ -40,14 +36,10 @@ public class Grammar {
 							stmt("BUTree<SPackageDecl> ret;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("entryPoint = JavaGrammar.PACKAGE_DECL_ENTRY;").build()
-							)),
+							action("entryPoint = JavaGrammar.PACKAGE_DECL_ENTRY;"),
 							nonTerminal("ret", "PackageDecl"),
 							nonTerminal("Epilog"),
-							action(listOf(
-									stmt("return dressWithPrologAndEpilog(ret);").build()
-							))
+							action("return dressWithPrologAndEpilog(ret);")
 					)
 			),
 			production("ImportDeclEntry", type("BUTree<SImportDecl>").build(),
@@ -57,14 +49,10 @@ public class Grammar {
 							stmt("BUTree<SImportDecl> ret;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("entryPoint = JavaGrammar.IMPORT_DECL_ENTRY;").build()
-							)),
+							action("entryPoint = JavaGrammar.IMPORT_DECL_ENTRY;"),
 							nonTerminal("ret", "ImportDecl"),
 							nonTerminal("Epilog"),
-							action(listOf(
-									stmt("return dressWithPrologAndEpilog(ret);").build()
-							))
+							action("return dressWithPrologAndEpilog(ret);")
 					)
 			),
 			production("TypeDeclEntry", type("BUTree<? extends STypeDecl>").build(),
@@ -74,14 +62,10 @@ public class Grammar {
 							stmt("BUTree<? extends STypeDecl> ret;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("entryPoint = JavaGrammar.TYPE_DECL_ENTRY;").build()
-							)),
+							action("entryPoint = JavaGrammar.TYPE_DECL_ENTRY;"),
 							nonTerminal("ret", "TypeDecl"),
 							nonTerminal("Epilog"),
-							action(listOf(
-									stmt("return dressWithPrologAndEpilog(ret);").build()
-							))
+							action("return dressWithPrologAndEpilog(ret);")
 					)
 			),
 			production("MemberDeclEntry", type("BUTree<? extends SMemberDecl>").build(),
@@ -89,14 +73,10 @@ public class Grammar {
 					emptyList(),
 					listOf(stmt("BUTree<? extends SMemberDecl> ret;").build()),
 					sequence(
-							action(listOf(
-									stmt("entryPoint = JavaGrammar.MEMBER_DECL_ENTRY;").build()
-							)),
+							action("entryPoint = JavaGrammar.MEMBER_DECL_ENTRY;"),
 							nonTerminal("ret", "ClassOrInterfaceBodyDecl", listOf(expr("typeKind").build())),
 							nonTerminal("Epilog"),
-							action(listOf(
-									stmt("return dressWithPrologAndEpilog(ret);").build()
-							))
+							action("return dressWithPrologAndEpilog(ret);")
 					)
 			),
 			production("AnnotationMemberDeclEntry", type("BUTree<? extends SMemberDecl>").build(),
@@ -106,15 +86,11 @@ public class Grammar {
 							stmt("BUTree<? extends SMemberDecl> ret;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("entryPoint = JavaGrammar.ANNOTATION_MEMBER_DECL_ENTRY;").build()
-							)),
+							action("entryPoint = JavaGrammar.ANNOTATION_MEMBER_DECL_ENTRY;"),
 							// TODO Rename AnnotationMemberDecl
 							nonTerminal("ret", "AnnotationTypeBodyDecl"),
 							nonTerminal("Epilog"),
-							action(listOf(
-									stmt("return dressWithPrologAndEpilog(ret);").build()
-							))
+							action("return dressWithPrologAndEpilog(ret);")
 					)
 			),
 
@@ -125,14 +101,10 @@ public class Grammar {
 							stmt("BUTree<SNodeList> ret;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("entryPoint = JavaGrammar.MODIFIERS_ENTRY;").build()
-							)),
+							action("entryPoint = JavaGrammar.MODIFIERS_ENTRY;"),
 							nonTerminal("ret", "Modifiers"),
 							nonTerminal("Epilog"),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("AnnotationsEntry", type("BUTree<SNodeList>").build(),
@@ -142,14 +114,10 @@ public class Grammar {
 							stmt("BUTree<SNodeList> ret;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("entryPoint = JavaGrammar.ANNOTATIONS_ENTRY;").build()
-							)),
+							action("entryPoint = JavaGrammar.ANNOTATIONS_ENTRY;"),
 							nonTerminal("ret", "Annotations"),
 							nonTerminal("Epilog"),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 
@@ -161,18 +129,12 @@ public class Grammar {
 							stmt("BUTree<SMethodDecl> ret;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("entryPoint = JavaGrammar.METHOD_DECL_ENTRY;").build()
-							)),
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("entryPoint = JavaGrammar.METHOD_DECL_ENTRY;"),
+							action("run();"),
 							nonTerminal("modifiers", "Modifiers"),
 							nonTerminal("ret", "MethodDecl", listOf(expr("modifiers").build())),
 							nonTerminal("Epilog"),
-							action(listOf(
-									stmt("return dressWithPrologAndEpilog(ret);").build()
-							))
+							action("return dressWithPrologAndEpilog(ret);")
 					)
 			),
 			production("FieldDeclEntry", type("BUTree<SFieldDecl>").build(),
@@ -183,18 +145,12 @@ public class Grammar {
 							stmt("BUTree<SFieldDecl> ret;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("entryPoint = JavaGrammar.FIELD_DECL_ENTRY;").build()
-							)),
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("entryPoint = JavaGrammar.FIELD_DECL_ENTRY;"),
+							action("run();"),
 							nonTerminal("modifiers", "Modifiers"),
 							nonTerminal("ret", "FieldDecl", listOf(expr("modifiers").build())),
 							nonTerminal("Epilog"),
-							action(listOf(
-									stmt("return dressWithPrologAndEpilog(ret);").build()
-							))
+							action("return dressWithPrologAndEpilog(ret);")
 					)
 			),
 			production("AnnotationElementDeclEntry", type("BUTree<SAnnotationMemberDecl>").build(),
@@ -205,19 +161,13 @@ public class Grammar {
 							stmt("BUTree<SAnnotationMemberDecl> ret;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("entryPoint = JavaGrammar.ANNOTATION_ELEMENT_DECL_ENTRY;").build()
-							)),
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("entryPoint = JavaGrammar.ANNOTATION_ELEMENT_DECL_ENTRY;"),
+							action("run();"),
 							nonTerminal("modifiers", "Modifiers"),
 							// TODO Rename AnnotationElementDecl
 							nonTerminal("ret", "AnnotationTypeMemberDecl", listOf(expr("modifiers").build())),
 							nonTerminal("Epilog"),
-							action(listOf(
-									stmt("return dressWithPrologAndEpilog(ret);").build()
-							))
+							action("return dressWithPrologAndEpilog(ret);")
 					)
 			),
 
@@ -228,14 +178,10 @@ public class Grammar {
 							stmt("BUTree<SEnumConstantDecl> ret;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("entryPoint = JavaGrammar.ENUM_CONSTANT_DECL_ENTRY;").build()
-							)),
+							action("entryPoint = JavaGrammar.ENUM_CONSTANT_DECL_ENTRY;"),
 							nonTerminal("ret", "EnumConstantDecl"),
 							nonTerminal("Epilog"),
-							action(listOf(
-									stmt("return dressWithPrologAndEpilog(ret);").build()
-							))
+							action("return dressWithPrologAndEpilog(ret);")
 					)
 			),
 			production("FormalParameterEntry", type("BUTree<SFormalParameter>").build(),
@@ -245,14 +191,10 @@ public class Grammar {
 							stmt("BUTree<SFormalParameter> ret;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("entryPoint = JavaGrammar.FORMAL_PARAMETER_ENTRY;").build()
-							)),
+							action("entryPoint = JavaGrammar.FORMAL_PARAMETER_ENTRY;"),
 							nonTerminal("ret", "FormalParameter"),
 							nonTerminal("Epilog"),
-							action(listOf(
-									stmt("return dressWithPrologAndEpilog(ret);").build()
-							))
+							action("return dressWithPrologAndEpilog(ret);")
 					)
 			),
 			production("TypeParameterEntry", type("BUTree<STypeParameter>").build(),
@@ -262,14 +204,10 @@ public class Grammar {
 							stmt("BUTree<STypeParameter> ret;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("entryPoint = JavaGrammar.TYPE_PARAMETER_ENTRY;").build()
-							)),
+							action("entryPoint = JavaGrammar.TYPE_PARAMETER_ENTRY;"),
 							nonTerminal("ret", "TypeParameter"),
 							nonTerminal("Epilog"),
-							action(listOf(
-									stmt("return dressWithPrologAndEpilog(ret);").build()
-							))
+							action("return dressWithPrologAndEpilog(ret);")
 					)
 			),
 			production("StatementsEntry", type("BUTree<SNodeList>").build(),
@@ -279,14 +217,10 @@ public class Grammar {
 							stmt("BUTree<SNodeList> ret;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("entryPoint = JavaGrammar.STATEMENTS_ENTRY;").build()
-							)),
+							action("entryPoint = JavaGrammar.STATEMENTS_ENTRY;"),
 							nonTerminal("ret", "Statements"),
 							nonTerminal("Epilog"),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("BlockStatementEntry", type("BUTree<? extends SStmt>").build(),
@@ -296,14 +230,10 @@ public class Grammar {
 							stmt("BUTree<? extends SStmt> ret;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("entryPoint = JavaGrammar.BLOCK_STATEMENT_ENTRY;").build()
-							)),
+							action("entryPoint = JavaGrammar.BLOCK_STATEMENT_ENTRY;"),
 							nonTerminal("ret", "BlockStatement"),
 							nonTerminal("Epilog"),
-							action(listOf(
-									stmt("return dressWithPrologAndEpilog(ret);").build()
-							))
+							action("return dressWithPrologAndEpilog(ret);")
 					)
 			),
 			production("ExpressionEntry", type("BUTree<? extends SExpr>").build(),
@@ -313,14 +243,10 @@ public class Grammar {
 							stmt("BUTree<? extends SExpr> ret;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("entryPoint = JavaGrammar.EXPRESSION_ENTRY;").build()
-							)),
+							action("entryPoint = JavaGrammar.EXPRESSION_ENTRY;"),
 							nonTerminal("ret", "Expression"),
 							nonTerminal("Epilog"),
-							action(listOf(
-									stmt("return dressWithPrologAndEpilog(ret);").build()
-							))
+							action("return dressWithPrologAndEpilog(ret);")
 					)
 			),
 
@@ -333,18 +259,12 @@ public class Grammar {
 							stmt("BUTree<? extends SType> ret;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("entryPoint = JavaGrammar.TYPE_ENTRY;").build()
-							)),
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("entryPoint = JavaGrammar.TYPE_ENTRY;"),
+							action("run();"),
 							nonTerminal("annotations", "Annotations"),
 							nonTerminal("ret", "Type", listOf(expr("annotations").build())),
 							nonTerminal("Epilog"),
-							action(listOf(
-									stmt("return dressWithPrologAndEpilog(ret);").build()
-							))
+							action("return dressWithPrologAndEpilog(ret);")
 					)
 			),
 
@@ -355,14 +275,10 @@ public class Grammar {
 							stmt("BUTree<SQualifiedName> ret;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("entryPoint = JavaGrammar.QUALIFIED_NAME_ENTRY;").build()
-							)),
+							action("entryPoint = JavaGrammar.QUALIFIED_NAME_ENTRY;"),
 							nonTerminal("ret", "QualifiedName"),
 							nonTerminal("Epilog"),
-							action(listOf(
-									stmt("return dressWithPrologAndEpilog(ret);").build()
-							))
+							action("return dressWithPrologAndEpilog(ret);")
 					)
 			),
 			production("NameEntry", type("BUTree<SName>").build(),
@@ -372,14 +288,10 @@ public class Grammar {
 							stmt("BUTree<SName> ret;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("entryPoint = JavaGrammar.NAME_ENTRY;").build()
-							)),
+							action("entryPoint = JavaGrammar.NAME_ENTRY;"),
 							nonTerminal("ret", "Name"),
 							nonTerminal("Epilog"),
-							action(listOf(
-									stmt("return dressWithPrologAndEpilog(ret);").build()
-							))
+							action("return dressWithPrologAndEpilog(ret);")
 					)
 			),
 
@@ -402,9 +314,7 @@ public class Grammar {
 					),
 					sequence(
 							terminal("id", "NODE_LIST_VARIABLE"),
-							action(listOf(
-									stmt("return makeVar(id);").build()
-							))
+							action("return makeVar(id);")
 					)
 			),
 			production("NodeVar", type("BUTree<SName>").build(),
@@ -415,9 +325,7 @@ public class Grammar {
 					),
 					sequence(
 							terminal("id", "NODE_VARIABLE"),
-							action(listOf(
-									stmt("return makeVar(id);").build()
-							))
+							action("return makeVar(id);")
 					)
 			),
 			production("CompilationUnit", type("BUTree<SCompilationUnit>").build(),
@@ -430,21 +338,15 @@ public class Grammar {
 							stmt("BUTree<SCompilationUnit> compilationUnit;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							zeroOrOne(
 									nonTerminal("packageDecl", "PackageDecl")
 							),
 							nonTerminal("imports", "ImportDecls"),
 							nonTerminal("types", "TypeDecls"),
-							action(listOf(
-									stmt("compilationUnit = dress(SCompilationUnit.make(packageDecl, imports, types));").build()
-							)),
+							action("compilationUnit = dress(SCompilationUnit.make(packageDecl, imports, types));"),
 							nonTerminal("Epilog"),
-							action(listOf(
-									stmt("return dressWithPrologAndEpilog(compilationUnit);").build()
-							))
+							action("return dressWithPrologAndEpilog(compilationUnit);")
 					)
 			),
 			production("PackageDecl", type("BUTree<SPackageDecl>").build(),
@@ -455,16 +357,12 @@ public class Grammar {
 							stmt("BUTree<SQualifiedName> name;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							nonTerminal("annotations", "Annotations"),
 							terminal("PACKAGE"),
 							nonTerminal("name", "QualifiedName"),
 							terminal("SEMICOLON"),
-							action(listOf(
-									stmt("return dress(SPackageDecl.make(annotations, name));").build()
-							))
+							action("return dress(SPackageDecl.make(annotations, name));")
 					)
 			),
 			production("ImportDecls", type("BUTree<SNodeList>").build(),
@@ -477,13 +375,9 @@ public class Grammar {
 					sequence(
 							zeroOrMore(
 									nonTerminal("importDecl", "ImportDecl"),
-									action(listOf(
-											stmt("imports = append(imports, importDecl);").build()
-									))
+									action("imports = append(imports, importDecl);")
 							),
-							action(listOf(
-									stmt("return imports;").build()
-							))
+							action("return imports;")
 					)
 			),
 			production("ImportDecl", type("BUTree<SImportDecl>").build(),
@@ -495,28 +389,20 @@ public class Grammar {
 							stmt("boolean isAsterisk = false;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							terminal("IMPORT"),
 							zeroOrOne(
 									terminal("STATIC"),
-									action(listOf(
-											stmt("isStatic = true;").build()
-									))
+									action("isStatic = true;")
 							),
 							nonTerminal("name", "QualifiedName"),
 							zeroOrOne(
 									terminal("DOT"),
 									terminal("STAR"),
-									action(listOf(
-											stmt("isAsterisk = true;").build()
-									))
+									action("isAsterisk = true;")
 							),
 							terminal("SEMICOLON"),
-							action(listOf(
-									stmt("return dress(SImportDecl.make(name, isStatic, isAsterisk));").build()
-							))
+							action("return dress(SImportDecl.make(name, isStatic, isAsterisk));")
 					)
 			),
 			production("TypeDecls", type("BUTree<SNodeList>").build(),
@@ -529,13 +415,9 @@ public class Grammar {
 					sequence(
 							zeroOrMore(
 									nonTerminal("typeDecl", "TypeDecl"),
-									action(listOf(
-											stmt("types = append(types, typeDecl);").build()
-									))
+									action("types = append(types, typeDecl);")
 							),
-							action(listOf(
-									stmt("return types;").build()
-							))
+							action("return types;")
 					)
 			),
 			production("Modifiers", type("BUTree<SNodeList>").build(),
@@ -550,87 +432,59 @@ public class Grammar {
 									choice(
 											sequence(
 													terminal("PUBLIC"),
-													action(listOf(
-															stmt("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Public));").build()
-													))
+													action("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Public));")
 											),
 											sequence(
 													terminal("PROTECTED"),
-													action(listOf(
-															stmt("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Protected));").build()
-													))
+													action("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Protected));")
 											),
 											sequence(
 													terminal("PRIVATE"),
-													action(listOf(
-															stmt("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Private));").build()
-													))
+													action("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Private));")
 											),
 											sequence(
 													terminal("ABSTRACT"),
-													action(listOf(
-															stmt("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Abstract));").build()
-													))
+													action("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Abstract));")
 											),
 											sequence(
 													terminal("DEFAULT"),
-													action(listOf(
-															stmt("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Default));").build()
-													))
+													action("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Default));")
 											),
 											sequence(
 													terminal("STATIC"),
-													action(listOf(
-															stmt("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Static));").build()
-													))
+													action("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Static));")
 											),
 											sequence(
 													terminal("FINAL"),
-													action(listOf(
-															stmt("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Final));").build()
-													))
+													action("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Final));")
 											),
 											sequence(
 													terminal("TRANSIENT"),
-													action(listOf(
-															stmt("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Transient));").build()
-													))
+													action("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Transient));")
 											),
 											sequence(
 													terminal("VOLATILE"),
-													action(listOf(
-															stmt("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Volatile));").build()
-													))
+													action("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Volatile));")
 											),
 											sequence(
 													terminal("SYNCHRONIZED"),
-													action(listOf(
-															stmt("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Synchronized));").build()
-													))
+													action("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Synchronized));")
 											),
 											sequence(
 													terminal("NATIVE"),
-													action(listOf(
-															stmt("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Native));").build()
-													))
+													action("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Native));")
 											),
 											sequence(
 													terminal("STRICTFP"),
-													action(listOf(
-															stmt("modifiers = append(modifiers, SModifier.make(ModifierKeyword.StrictFP));").build()
-													))
+													action("modifiers = append(modifiers, SModifier.make(ModifierKeyword.StrictFP));")
 											),
 											sequence(
 													nonTerminal("ann", "Annotation"),
-													action(listOf(
-															stmt("modifiers = append(modifiers, ann);").build()
-													))
+													action("modifiers = append(modifiers, ann);")
 											)
 									)
 							),
-							action(listOf(
-									stmt("return modifiers;").build()
-							))
+							action("return modifiers;")
 					)
 			),
 			production("ModifiersNoDefault", type("BUTree<SNodeList>").build(),
@@ -645,81 +499,55 @@ public class Grammar {
 									choice(
 											sequence(
 													terminal("PUBLIC"),
-													action(listOf(
-															stmt("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Public));").build()
-													))
+													action("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Public));")
 											),
 											sequence(
 													terminal("PROTECTED"),
-													action(listOf(
-															stmt("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Protected));").build()
-													))
+													action("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Protected));")
 											),
 											sequence(
 													terminal("PRIVATE"),
-													action(listOf(
-															stmt("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Private));").build()
-													))
+													action("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Private));")
 											),
 											sequence(
 													terminal("ABSTRACT"),
-													action(listOf(
-															stmt("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Abstract));").build()
-													))
+													action("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Abstract));")
 											),
 											sequence(
 													terminal("STATIC"),
-													action(listOf(
-															stmt("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Static));").build()
-													))
+													action("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Static));")
 											),
 											sequence(
 													terminal("FINAL"),
-													action(listOf(
-															stmt("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Final));").build()
-													))
+													action("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Final));")
 											),
 											sequence(
 													terminal("TRANSIENT"),
-													action(listOf(
-															stmt("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Transient));").build()
-													))
+													action("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Transient));")
 											),
 											sequence(
 													terminal("VOLATILE"),
-													action(listOf(
-															stmt("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Volatile));").build()
-													))
+													action("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Volatile));")
 											),
 											sequence(
 													terminal("SYNCHRONIZED"),
-													action(listOf(
-															stmt("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Synchronized));").build()
-													))
+													action("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Synchronized));")
 											),
 											sequence(
 													terminal("NATIVE"),
-													action(listOf(
-															stmt("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Native));").build()
-													))
+													action("modifiers = append(modifiers, SModifier.make(ModifierKeyword.Native));")
 											),
 											sequence(
 													terminal("STRICTFP"),
-													action(listOf(
-															stmt("modifiers = append(modifiers, SModifier.make(ModifierKeyword.StrictFP));").build()
-													))
+													action("modifiers = append(modifiers, SModifier.make(ModifierKeyword.StrictFP));")
 											),
 											sequence(
 													nonTerminal("ann", "Annotation"),
-													action(listOf(
-															stmt("modifiers = append(modifiers, ann);").build()
-													))
+													action("modifiers = append(modifiers, ann);")
 											)
 									)
 							),
-							action(listOf(
-									stmt("return modifiers;").build()
-							))
+							action("return modifiers;")
 					)
 			),
 			production("TypeDecl", type("BUTree<? extends STypeDecl>").build(),
@@ -730,15 +558,11 @@ public class Grammar {
 							stmt("BUTree<? extends STypeDecl> ret;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							choice(
 									sequence(
 											terminal("SEMICOLON"),
-											action(listOf(
-													stmt("ret = dress(SEmptyTypeDecl.make());").build()
-											))
+											action("ret = dress(SEmptyTypeDecl.make());")
 									),
 									sequence(
 											nonTerminal("modifiers", "Modifiers"),
@@ -755,9 +579,7 @@ public class Grammar {
 											)
 									)
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("ClassOrInterfaceDecl", type("BUTree<? extends STypeDecl>").build(),
@@ -779,9 +601,7 @@ public class Grammar {
 							choice(
 									sequence(
 											terminal("CLASS"),
-											action(listOf(
-													stmt("typeKind = TypeKind.Class;").build()
-											)),
+											action("typeKind = TypeKind.Class;"),
 											nonTerminal("name", "Name"),
 											zeroOrOne(
 													nonTerminal("typeParams", "TypeParameters")
@@ -799,9 +619,7 @@ public class Grammar {
 									),
 									sequence(
 											terminal("INTERFACE"),
-											action(listOf(
-													stmt("typeKind = TypeKind.Interface;").build()
-											)),
+											action("typeKind = TypeKind.Interface;"),
 											nonTerminal("name", "Name"),
 											zeroOrOne(
 													nonTerminal("typeParams", "TypeParameters")
@@ -814,9 +632,7 @@ public class Grammar {
 							nonTerminal("members", "ClassOrInterfaceBody", null, listOf(
 									expr("typeKind").build()
 							)),
-							action(listOf(
-									stmt("if (typeKind == TypeKind.Interface)\n" + "\treturn dress(SInterfaceDecl.make(modifiers, name, ensureNotNull(typeParams), ensureNotNull(extendsClause), members)).withProblem(problem.value);\n" + "else {\n" + "\treturn dress(SClassDecl.make(modifiers, name, ensureNotNull(typeParams), optionOf(superClassType), ensureNotNull(implementsClause), members));\n" + "}").build()
-							))
+							action("if (typeKind == TypeKind.Interface)\n\treturn dress(SInterfaceDecl.make(modifiers, name, ensureNotNull(typeParams), ensureNotNull(extendsClause), members)).withProblem(problem.value);\nelse {\n\treturn dress(SClassDecl.make(modifiers, name, ensureNotNull(typeParams), optionOf(superClassType), ensureNotNull(implementsClause), members));\n}")
 					)
 			),
 			production("ExtendsList", type("BUTree<SNodeList>").build(),
@@ -833,21 +649,15 @@ public class Grammar {
 									nonTerminal("ret", "NodeListVar"),
 									sequence(
 											nonTerminal("cit", "AnnotatedQualifiedType"),
-											action(listOf(
-													stmt("ret = append(ret, cit);").build()
-											)),
+											action("ret = append(ret, cit);"),
 											zeroOrMore(
 													terminal("COMMA"),
 													nonTerminal("cit", "AnnotatedQualifiedType"),
-													action(listOf(
-															stmt("ret = append(ret, cit);").build()
-													))
+													action("ret = append(ret, cit);")
 											)
 									)
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("ImplementsList", type("BUTree<SNodeList>").build(),
@@ -867,24 +677,16 @@ public class Grammar {
 									nonTerminal("ret", "NodeListVar"),
 									sequence(
 											nonTerminal("cit", "AnnotatedQualifiedType"),
-											action(listOf(
-													stmt("ret = append(ret, cit);").build()
-											)),
+											action("ret = append(ret, cit);"),
 											zeroOrMore(
 													terminal("COMMA"),
 													nonTerminal("cit", "AnnotatedQualifiedType"),
-													action(listOf(
-															stmt("ret = append(ret, cit);").build()
-													))
+													action("ret = append(ret, cit);")
 											),
-											action(listOf(
-													stmt("if (typeKind == TypeKind.Interface) problem.value = new BUProblem(Severity.ERROR, \"An interface cannot implement other interfaces\");\n" + "").build()
-											))
+											action("if (typeKind == TypeKind.Interface) problem.value = new BUProblem(Severity.ERROR, \"An interface cannot implement other interfaces\");")
 									)
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("EnumDecl", type("BUTree<? extends STypeDecl>").build(),
@@ -916,24 +718,18 @@ public class Grammar {
 											nonTerminal("constants", "NodeListVar"),
 											sequence(
 													nonTerminal("entry", "EnumConstantDecl"),
-													action(listOf(
-															stmt("constants = append(constants, entry);").build()
-													)),
+													action("constants = append(constants, entry);"),
 													zeroOrMore(
 															terminal("COMMA"),
 															nonTerminal("entry", "EnumConstantDecl"),
-															action(listOf(
-																	stmt("constants = append(constants, entry);").build()
-															))
+															action("constants = append(constants, entry);")
 													)
 											)
 									)
 							),
 							zeroOrOne(
 									terminal("COMMA"),
-									action(listOf(
-											stmt("trailingComma = true;").build()
-									))
+									action("trailingComma = true;")
 							),
 							zeroOrOne(
 									terminal("SEMICOLON"),
@@ -942,9 +738,7 @@ public class Grammar {
 									))
 							),
 							terminal("RBRACE"),
-							action(listOf(
-									stmt("return dress(SEnumDecl.make(modifiers, name, implementsClause, constants, trailingComma, ensureNotNull(members))).withProblem(problem.value);").build()
-							))
+							action("return dress(SEnumDecl.make(modifiers, name, implementsClause, constants, trailingComma, ensureNotNull(members))).withProblem(problem.value);")
 					)
 			),
 			production("EnumConstantDecl", type("BUTree<SEnumConstantDecl>").build(),
@@ -957,9 +751,7 @@ public class Grammar {
 							stmt("BUTree<SNodeList> classBody = null;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							nonTerminal("modifiers", "Modifiers"),
 							nonTerminal("name", "Name"),
 							zeroOrOne(
@@ -970,9 +762,7 @@ public class Grammar {
 											expr("TypeKind.Class").build()
 									))
 							),
-							action(listOf(
-									stmt("return dress(SEnumConstantDecl.make(modifiers, name, optionOf(args), optionOf(classBody)));").build()
-							))
+							action("return dress(SEnumConstantDecl.make(modifiers, name, optionOf(args), optionOf(classBody)));")
 					)
 			),
 			production("AnnotationTypeDecl", type("BUTree<SAnnotationDecl>").build(),
@@ -989,9 +779,7 @@ public class Grammar {
 							terminal("INTERFACE"),
 							nonTerminal("name", "Name"),
 							nonTerminal("members", "AnnotationTypeBody"),
-							action(listOf(
-									stmt("return dress(SAnnotationDecl.make(modifiers, name, members));").build()
-							))
+							action("return dress(SAnnotationDecl.make(modifiers, name, members));")
 					)
 			),
 			production("AnnotationTypeBody", type("BUTree<SNodeList>").build(),
@@ -1008,16 +796,12 @@ public class Grammar {
 											nonTerminal("ret", "NodeListVar"),
 											oneOrMore(
 													nonTerminal("member", "AnnotationTypeBodyDecl"),
-													action(listOf(
-															stmt("ret = append(ret, member);").build()
-													))
+													action("ret = append(ret, member);")
 											)
 									)
 							),
 							terminal("RBRACE"),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("AnnotationTypeBodyDecl", type("BUTree<? extends SMemberDecl>").build(),
@@ -1028,15 +812,11 @@ public class Grammar {
 							stmt("BUTree<? extends SMemberDecl> ret;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							choice(
 									sequence(
 											terminal("SEMICOLON"),
-											action(listOf(
-													stmt("ret = dress(SEmptyTypeDecl.make());").build()
-											))
+											action("ret = dress(SEmptyTypeDecl.make());")
 									),
 									sequence(
 											nonTerminal("modifiers", "Modifiers"),
@@ -1059,9 +839,7 @@ public class Grammar {
 											)
 									)
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("AnnotationTypeMemberDecl", type("BUTree<SAnnotationMemberDecl>").build(),
@@ -1087,14 +865,10 @@ public class Grammar {
 							zeroOrOne(
 									terminal("DEFAULT"),
 									nonTerminal("value", "ElementValue"),
-									action(listOf(
-											stmt("defaultValue = optionOf(value);").build()
-									))
+									action("defaultValue = optionOf(value);")
 							),
 							terminal("SEMICOLON"),
-							action(listOf(
-									stmt("return dress(SAnnotationMemberDecl.make(modifiers, type, name, dims, defaultValue));").build()
-							))
+							action("return dress(SAnnotationMemberDecl.make(modifiers, type, name, dims, defaultValue));")
 					)
 			),
 			production("TypeParameters", type("BUTree<SNodeList>").build(),
@@ -1110,22 +884,16 @@ public class Grammar {
 									nonTerminal("ret", "NodeListVar"),
 									sequence(
 											nonTerminal("tp", "TypeParameter"),
-											action(listOf(
-													stmt("ret = append(ret, tp);").build()
-											)),
+											action("ret = append(ret, tp);"),
 											zeroOrMore(
 													terminal("COMMA"),
 													nonTerminal("tp", "TypeParameter"),
-													action(listOf(
-															stmt("ret = append(ret, tp);").build()
-													))
+													action("ret = append(ret, tp);")
 											)
 									)
 							),
 							terminal("GT"),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("TypeParameter", type("BUTree<STypeParameter>").build(),
@@ -1137,17 +905,13 @@ public class Grammar {
 							stmt("BUTree<SNodeList> typeBounds = null;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							nonTerminal("annotations", "Annotations"),
 							nonTerminal("name", "Name"),
 							zeroOrOne(
 									nonTerminal("typeBounds", "TypeBounds")
 							),
-							action(listOf(
-									stmt("return dress(STypeParameter.make(annotations, name, ensureNotNull(typeBounds)));").build()
-							))
+							action("return dress(STypeParameter.make(annotations, name, ensureNotNull(typeBounds)));")
 					)
 			),
 			production("TypeBounds", type("BUTree<SNodeList>").build(),
@@ -1164,21 +928,15 @@ public class Grammar {
 									nonTerminal("ret", "NodeListVar"),
 									sequence(
 											nonTerminal("cit", "AnnotatedQualifiedType"),
-											action(listOf(
-													stmt("ret = append(ret, cit);").build()
-											)),
+											action("ret = append(ret, cit);"),
 											zeroOrMore(
 													terminal("BIT_AND"),
 													nonTerminal("cit", "AnnotatedQualifiedType"),
-													action(listOf(
-															stmt("ret = append(ret, cit);").build()
-													))
+													action("ret = append(ret, cit);")
 											)
 									)
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("ClassOrInterfaceBody", type("BUTree<SNodeList>").build(),
@@ -1196,9 +954,7 @@ public class Grammar {
 									expr("typeKind").build()
 							)),
 							terminal("RBRACE"),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("ClassOrInterfaceBodyDecls", type("BUTree<SNodeList>").build(),
@@ -1218,15 +974,11 @@ public class Grammar {
 													nonTerminal("member", "ClassOrInterfaceBodyDecl", null, listOf(
 															expr("typeKind").build()
 													)),
-													action(listOf(
-															stmt("ret = append(ret, member);").build()
-													))
+													action("ret = append(ret, member);")
 											)
 									)
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("ClassOrInterfaceBodyDecl", type("BUTree<? extends SMemberDecl>").build(),
@@ -1240,29 +992,21 @@ public class Grammar {
 							stmt("BUProblem problem = null;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							choice(
 									sequence(
 											terminal("SEMICOLON"),
-											action(listOf(
-													stmt("ret = dress(SEmptyMemberDecl.make());").build()
-											))
+											action("ret = dress(SEmptyMemberDecl.make());")
 									),
 									sequence(
 											nonTerminal("modifiers", "Modifiers"),
-											action(listOf(
-													stmt("if (modifiers != null && contains(modifiers, SModifier.make(ModifierKeyword.Default)) && typeKind != TypeKind.Interface) problem = new BUProblem(Severity.ERROR, \"Only interfaces can have default members\");\n" + "").build()
-											)),
+											action("if (modifiers != null && contains(modifiers, SModifier.make(ModifierKeyword.Default)) && typeKind != TypeKind.Interface) problem = new BUProblem(Severity.ERROR, \"Only interfaces can have default members\");"),
 											choice(
 													sequence(
 															nonTerminal("ret", "InitializerDecl", null, listOf(
 																	expr("modifiers").build()
 															)),
-															action(listOf(
-																	stmt("if (typeKind == TypeKind.Interface) ret = ret.withProblem(new BUProblem(Severity.ERROR, \"An interface cannot have initializers\"));\n" + "").build()
-															))
+															action("if (typeKind == TypeKind.Interface) ret = ret.withProblem(new BUProblem(Severity.ERROR, \"An interface cannot have initializers\"));")
 													),
 													nonTerminal("ret", "ClassOrInterfaceDecl", null, listOf(
 															expr("modifiers").build()
@@ -1277,9 +1021,7 @@ public class Grammar {
 															nonTerminal("ret", "ConstructorDecl", null, listOf(
 																	expr("modifiers").build()
 															)),
-															action(listOf(
-																	stmt("if (typeKind == TypeKind.Interface) ret = ret.withProblem(new BUProblem(Severity.ERROR, \"An interface cannot have constructors\"));\n" + "").build()
-															))
+															action("if (typeKind == TypeKind.Interface) ret = ret.withProblem(new BUProblem(Severity.ERROR, \"An interface cannot have constructors\"));")
 													),
 													sequence(
 															nonTerminal("ret", "FieldDecl", null, listOf(
@@ -1292,9 +1034,7 @@ public class Grammar {
 											)
 									)
 							),
-							action(listOf(
-									stmt("return ret.withProblem(problem);").build()
-							))
+							action("return ret.withProblem(problem);")
 					)
 			),
 			production("FieldDecl", type("BUTree<SFieldDecl>").build(),
@@ -1313,9 +1053,7 @@ public class Grammar {
 							)),
 							nonTerminal("variables", "VariableDeclarators"),
 							terminal("SEMICOLON"),
-							action(listOf(
-									stmt("return dress(SFieldDecl.make(modifiers, type, variables));").build()
-							))
+							action("return dress(SFieldDecl.make(modifiers, type, variables));")
 					)
 			),
 			production("VariableDecl", type("BUTree<SLocalVariableDecl>").build(),
@@ -1332,9 +1070,7 @@ public class Grammar {
 									expr("null").build()
 							)),
 							nonTerminal("variables", "VariableDeclarators"),
-							action(listOf(
-									stmt("return dress(SLocalVariableDecl.make(modifiers, type, variables));").build()
-							))
+							action("return dress(SLocalVariableDecl.make(modifiers, type, variables));")
 					)
 			),
 			production("VariableDeclarators", type("BUTree<SNodeList>").build(),
@@ -1346,19 +1082,13 @@ public class Grammar {
 					),
 					sequence(
 							nonTerminal("val", "VariableDeclarator"),
-							action(listOf(
-									stmt("variables = append(variables, val);").build()
-							)),
+							action("variables = append(variables, val);"),
 							zeroOrMore(
 									terminal("COMMA"),
 									nonTerminal("val", "VariableDeclarator"),
-									action(listOf(
-											stmt("variables = append(variables, val);").build()
-									))
+									action("variables = append(variables, val);")
 							),
-							action(listOf(
-									stmt("return variables;").build()
-							))
+							action("return variables;")
 					)
 			),
 			production("VariableDeclarator", type("BUTree<SVariableDeclarator>").build(),
@@ -1370,20 +1100,14 @@ public class Grammar {
 							stmt("BUTree<? extends SExpr> initExpr = null;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							nonTerminal("id", "VariableDeclaratorId"),
 							zeroOrOne(
 									terminal("ASSIGN"),
 									nonTerminal("initExpr", "VariableInitializer"),
-									action(listOf(
-											stmt("init = optionOf(initExpr);").build()
-									))
+									action("init = optionOf(initExpr);")
 							),
-							action(listOf(
-									stmt("return dress(SVariableDeclarator.make(id, init));").build()
-							))
+							action("return dress(SVariableDeclarator.make(id, init));")
 					)
 			),
 			production("VariableDeclaratorId", type("BUTree<SVariableDeclaratorId>").build(),
@@ -1394,14 +1118,10 @@ public class Grammar {
 							stmt("BUTree<SNodeList> arrayDims;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							nonTerminal("name", "Name"),
 							nonTerminal("arrayDims", "ArrayDims"),
-							action(listOf(
-									stmt("return dress(SVariableDeclaratorId.make(name, arrayDims));").build()
-							))
+							action("return dress(SVariableDeclaratorId.make(name, arrayDims));")
 					)
 			),
 			production("ArrayDims", type("BUTree<SNodeList>").build(),
@@ -1413,19 +1133,13 @@ public class Grammar {
 					),
 					sequence(
 							zeroOrMore(
-									action(listOf(
-											stmt("run();").build()
-									)),
+									action("run();"),
 									nonTerminal("annotations", "Annotations"),
 									terminal("LBRACKET"),
 									terminal("RBRACKET"),
-									action(listOf(
-											stmt("arrayDims = append(arrayDims, dress(SArrayDim.make(annotations)));").build()
-									))
+									action("arrayDims = append(arrayDims, dress(SArrayDim.make(annotations)));")
 							),
-							action(listOf(
-									stmt("return arrayDims;").build()
-							))
+							action("return arrayDims;")
 					)
 			),
 			production("VariableInitializer", type("BUTree<? extends SExpr>").build(),
@@ -1439,9 +1153,7 @@ public class Grammar {
 									nonTerminal("ret", "ArrayInitializer"),
 									nonTerminal("ret", "Expression")
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("ArrayInitializer", type("BUTree<SArrayInitializerExpr>").build(),
@@ -1453,33 +1165,23 @@ public class Grammar {
 							stmt("boolean trailingComma = false;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							terminal("LBRACE"),
 							zeroOrOne(
 									nonTerminal("val", "VariableInitializer"),
-									action(listOf(
-											stmt("values = append(values, val);").build()
-									)),
+									action("values = append(values, val);"),
 									zeroOrMore(
 											terminal("COMMA"),
 											nonTerminal("val", "VariableInitializer"),
-											action(listOf(
-													stmt("values = append(values, val);").build()
-											))
+											action("values = append(values, val);")
 									)
 							),
 							zeroOrOne(
 									terminal("COMMA"),
-									action(listOf(
-											stmt("trailingComma = true;").build()
-									))
+									action("trailingComma = true;")
 							),
 							terminal("RBRACE"),
-							action(listOf(
-									stmt("return dress(SArrayInitializerExpr.make(values, trailingComma));").build()
-							))
+							action("return dress(SArrayInitializerExpr.make(values, trailingComma));")
 					)
 			),
 			production("MethodDecl", type("BUTree<SMethodDecl>").build(),
@@ -1514,14 +1216,10 @@ public class Grammar {
 									nonTerminal("block", "Block"),
 									sequence(
 											terminal("SEMICOLON"),
-											action(listOf(
-													stmt("if (modifiers != null && contains(modifiers, SModifier.make(ModifierKeyword.Default))) problem = new BUProblem(Severity.ERROR, \"Default methods must have a body\");\n" + "").build()
-											))
+											action("if (modifiers != null && contains(modifiers, SModifier.make(ModifierKeyword.Default))) problem = new BUProblem(Severity.ERROR, \"Default methods must have a body\");")
 									)
 							),
-							action(listOf(
-									stmt("return dress(SMethodDecl.make(modifiers, ensureNotNull(typeParameters), ensureNotNull(additionalAnnotations), type, name, parameters, arrayDims, ensureNotNull(throwsClause), optionOf(block))).withProblem(problem);").build()
-							))
+							action("return dress(SMethodDecl.make(modifiers, ensureNotNull(typeParameters), ensureNotNull(additionalAnnotations), type, name, parameters, arrayDims, ensureNotNull(throwsClause), optionOf(block))).withProblem(problem);")
 					)
 			),
 			production("FormalParameters", type("BUTree<SNodeList>").build(),
@@ -1537,9 +1235,7 @@ public class Grammar {
 									nonTerminal("ret", "FormalParameterList")
 							),
 							terminal("RPAREN"),
-							action(listOf(
-									stmt("return ensureNotNull(ret);").build()
-							))
+							action("return ensureNotNull(ret);")
 					)
 			),
 			production("FormalParameterList", type("BUTree<SNodeList>").build(),
@@ -1555,21 +1251,15 @@ public class Grammar {
 									// TODO Handle a receiver parameter as first parameter
 									sequence(
 											nonTerminal("par", "FormalParameter"),
-											action(listOf(
-													stmt("ret = append(ret, par);").build()
-											)),
+											action("ret = append(ret, par);"),
 											zeroOrMore(
 													terminal("COMMA"),
 													nonTerminal("par", "FormalParameter"),
-													action(listOf(
-															stmt("ret = append(ret, par);").build()
-													))
+													action("ret = append(ret, par);")
 											)
 									)
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("FormalParameter", type("BUTree<SFormalParameter>").build(),
@@ -1585,9 +1275,7 @@ public class Grammar {
 							stmt("BUTree<SName> receiverTypeName = null;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							nonTerminal("modifiers", "Modifiers"),
 							nonTerminal("type", "Type", null, listOf(
 									expr("null").build()
@@ -1595,9 +1283,7 @@ public class Grammar {
 							zeroOrOne(
 									nonTerminal("ellipsisAnnotations", "Annotations"),
 									terminal("ELLIPSIS"),
-									action(listOf(
-											stmt("isVarArg = true;").build()
-									))
+									action("isVarArg = true;")
 							),
 							choice(
 									sequence(
@@ -1606,15 +1292,11 @@ public class Grammar {
 													terminal("DOT")
 											),
 											terminal("THIS"),
-											action(listOf(
-													stmt("isReceiver = true;").build()
-											))
+											action("isReceiver = true;")
 									),
 									nonTerminal("id", "VariableDeclaratorId")
 							),
-							action(listOf(
-									stmt("return dress(SFormalParameter.make(modifiers, type, isVarArg, ensureNotNull(ellipsisAnnotations), optionOf(id), isReceiver, optionOf(receiverTypeName)));").build()
-							))
+							action("return dress(SFormalParameter.make(modifiers, type, isVarArg, ensureNotNull(ellipsisAnnotations), optionOf(id), isReceiver, optionOf(receiverTypeName)));")
 					)
 			),
 			production("ThrowsClause", type("BUTree<SNodeList>").build(),
@@ -1627,19 +1309,13 @@ public class Grammar {
 					sequence(
 							terminal("THROWS"),
 							nonTerminal("cit", "AnnotatedQualifiedType"),
-							action(listOf(
-									stmt("ret = append(ret, cit);").build()
-							)),
+							action("ret = append(ret, cit);"),
 							zeroOrMore(
 									terminal("COMMA"),
 									nonTerminal("cit", "AnnotatedQualifiedType"),
-									action(listOf(
-											stmt("ret = append(ret, cit);").build()
-									))
+									action("ret = append(ret, cit);")
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("ConstructorDecl", type("BUTree<SConstructorDecl>").build(),
@@ -1666,18 +1342,12 @@ public class Grammar {
 							zeroOrOne(
 									nonTerminal("throwsClause", "ThrowsClause")
 							),
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							terminal("LBRACE"),
 							nonTerminal("stmts", "Statements"),
 							terminal("RBRACE"),
-							action(listOf(
-									stmt("block = dress(SBlockStmt.make(stmts));").build()
-							)),
-							action(listOf(
-									stmt("return dress(SConstructorDecl.make(modifiers, ensureNotNull(typeParameters), name, parameters, ensureNotNull(throwsClause), block));").build()
-							))
+							action("block = dress(SBlockStmt.make(stmts));"),
+							action("return dress(SConstructorDecl.make(modifiers, ensureNotNull(typeParameters), name, parameters, ensureNotNull(throwsClause), block));")
 					)
 			),
 			// TODO Enable parsing of this anywhere in a block and add later checks to report when not used in a constructor
@@ -1691,18 +1361,14 @@ public class Grammar {
 							stmt("BUTree<SNodeList> typeArgs = null;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							choice(
 									sequence(
 											zeroOrOne(
 													nonTerminal("typeArgs", "TypeArguments")
 											),
 											terminal("THIS"),
-											action(listOf(
-													stmt("isThis = true;").build()
-											)),
+											action("isThis = true;"),
 											nonTerminal("args", "Arguments"),
 											terminal("SEMICOLON")
 									),
@@ -1719,9 +1385,7 @@ public class Grammar {
 											terminal("SEMICOLON")
 									)
 							),
-							action(listOf(
-									stmt("return dress(SExplicitConstructorInvocationStmt.make(ensureNotNull(typeArgs), isThis, optionOf(expr), args));").build()
-							))
+							action("return dress(SExplicitConstructorInvocationStmt.make(ensureNotNull(typeArgs), isThis, optionOf(expr), args));")
 					)
 			),
 			production("Statements", type("BUTree<SNodeList>").build(),
@@ -1738,22 +1402,16 @@ public class Grammar {
 											sequence(
 													zeroOrOne(
 															nonTerminal("stmt", "ExplicitConstructorInvocation"),
-															action(listOf(
-																	stmt("ret = append(ret, stmt);").build()
-															))
+															action("ret = append(ret, stmt);")
 													),
 													zeroOrMore(
 															nonTerminal("stmt", "BlockStatement"),
-															action(listOf(
-																	stmt("ret = append(ret, stmt);").build()
-															))
+															action("ret = append(ret, stmt);")
 													)
 											)
 									)
 							),
-							action(listOf(
-									stmt("return ensureNotNull(ret);").build()
-							))
+							action("return ensureNotNull(ret);")
 					)
 			),
 			production("InitializerDecl", type("BUTree<SInitializerDecl>").build(),
@@ -1766,9 +1424,7 @@ public class Grammar {
 					),
 					sequence(
 							nonTerminal("block", "Block"),
-							action(listOf(
-									stmt("return dress(SInitializerDecl.make(modifiers, block));").build()
-							))
+							action("return dress(SInitializerDecl.make(modifiers, block));")
 					)
 			),
 			production("Type", type("BUTree<? extends SType>").build(),
@@ -1788,13 +1444,9 @@ public class Grammar {
 													expr("annotations").build()
 											)),
 											zeroOrOne(
-													action(listOf(
-															stmt("lateRun();").build()
-													)),
+													action("lateRun();"),
 													nonTerminal("arrayDims", "ArrayDimsMandatory"),
-													action(listOf(
-															stmt("type = dress(SArrayType.make(primitiveType, arrayDims));").build()
-													))
+													action("type = dress(SArrayType.make(primitiveType, arrayDims));")
 											)
 									),
 									sequence(
@@ -1802,19 +1454,13 @@ public class Grammar {
 													expr("annotations").build()
 											)),
 											zeroOrOne(
-													action(listOf(
-															stmt("lateRun();").build()
-													)),
+													action("lateRun();"),
 													nonTerminal("arrayDims", "ArrayDimsMandatory"),
-													action(listOf(
-															stmt("type = dress(SArrayType.make(type, arrayDims));").build()
-													))
+													action("type = dress(SArrayType.make(type, arrayDims));")
 											)
 									)
 							),
-							action(listOf(
-									stmt("return type == null ? primitiveType : type;").build()
-							))
+							action("return type == null ? primitiveType : type;")
 					)
 			),
 			production("ReferenceType", type("BUTree<? extends SReferenceType>").build(),
@@ -1833,32 +1479,22 @@ public class Grammar {
 											nonTerminal("primitiveType", "PrimitiveType", null, listOf(
 													expr("annotations").build()
 											)),
-											action(listOf(
-													stmt("lateRun();").build()
-											)),
+											action("lateRun();"),
 											nonTerminal("arrayDims", "ArrayDimsMandatory"),
-											action(listOf(
-													stmt("type = dress(SArrayType.make(primitiveType, arrayDims));").build()
-											))
+											action("type = dress(SArrayType.make(primitiveType, arrayDims));")
 									),
 									sequence(
 											nonTerminal("type", "QualifiedType", null, listOf(
 													expr("annotations").build()
 											)),
 											zeroOrOne(
-													action(listOf(
-															stmt("lateRun();").build()
-													)),
+													action("lateRun();"),
 													nonTerminal("arrayDims", "ArrayDimsMandatory"),
-													action(listOf(
-															stmt("type = dress(SArrayType.make(type, arrayDims));").build()
-													))
+													action("type = dress(SArrayType.make(type, arrayDims));")
 											)
 									)
 							),
-							action(listOf(
-									stmt("return type;").build()
-							))
+							action("return type;")
 					)
 			),
 			production("QualifiedType", type("BUTree<SQualifiedType>").build(),
@@ -1873,36 +1509,24 @@ public class Grammar {
 							stmt("BUTree<SNodeList> typeArgs = null;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("if (annotations == null) {\n" + "\trun();\n" + "\tannotations = emptyList();\n" + "}").build()
-							)),
+							action("if (annotations == null) {\n\trun();\n\tannotations = emptyList();\n}"),
 							nonTerminal("name", "Name"),
 							zeroOrOne(
 									nonTerminal("typeArgs", "TypeArgumentsOrDiamond")
 							),
-							action(listOf(
-									stmt("ret = dress(SQualifiedType.make(annotations, scope, name, optionOf(typeArgs)));").build()
-							)),
+							action("ret = dress(SQualifiedType.make(annotations, scope, name, optionOf(typeArgs)));"),
 							zeroOrMore(
-									action(listOf(
-											stmt("lateRun();").build()
-									)),
+									action("lateRun();"),
 									terminal("DOT"),
-									action(listOf(
-											stmt("scope = optionOf(ret);").build()
-									)),
+									action("scope = optionOf(ret);"),
 									nonTerminal("annotations", "Annotations"),
 									nonTerminal("name", "Name"),
 									zeroOrOne(
 											nonTerminal("typeArgs", "TypeArgumentsOrDiamond")
 									),
-									action(listOf(
-											stmt("ret = dress(SQualifiedType.make(annotations, scope, name, optionOf(typeArgs)));").build()
-									))
+									action("ret = dress(SQualifiedType.make(annotations, scope, name, optionOf(typeArgs)));")
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("TypeArguments", type("BUTree<SNodeList>").build(),
@@ -1918,9 +1542,7 @@ public class Grammar {
 									nonTerminal("ret", "TypeArgumentList")
 							),
 							terminal("GT"),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("TypeArgumentsOrDiamond", type("BUTree<SNodeList>").build(),
@@ -1936,9 +1558,7 @@ public class Grammar {
 									nonTerminal("ret", "TypeArgumentList")
 							),
 							terminal("GT"),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("TypeArgumentList", type("BUTree<SNodeList>").build(),
@@ -1951,25 +1571,17 @@ public class Grammar {
 					choice(
 							sequence(
 									nonTerminal("ret", "NodeListVar"),
-									action(listOf(
-											stmt("return ret;").build()
-									))
+									action("return ret;")
 							),
 							sequence(
 									nonTerminal("type", "TypeArgument"),
-									action(listOf(
-											stmt("ret = append(ret, type);").build()
-									)),
+									action("ret = append(ret, type);"),
 									zeroOrMore(
 											terminal("COMMA"),
 											nonTerminal("type", "TypeArgument"),
-											action(listOf(
-													stmt("ret = append(ret, type);").build()
-											))
+											action("ret = append(ret, type);")
 									),
-									action(listOf(
-											stmt("return ret;").build()
-									))
+									action("return ret;")
 							)
 					)
 			),
@@ -1981,9 +1593,7 @@ public class Grammar {
 							stmt("BUTree<SNodeList> annotations = null;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							nonTerminal("annotations", "Annotations"),
 							choice(
 									nonTerminal("ret", "ReferenceType", null, listOf(
@@ -1993,9 +1603,7 @@ public class Grammar {
 											expr("annotations").build()
 									))
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("Wildcard", type("BUTree<SWildcardType>").build(),
@@ -2009,17 +1617,13 @@ public class Grammar {
 							stmt("BUTree<SNodeList> boundAnnotations = null;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("if (annotations == null) {\n" + "\trun();\n" + "\tannotations = emptyList();\n" + "}").build()
-							)),
+							action("if (annotations == null) {\n\trun();\n\tannotations = emptyList();\n}"),
 							terminal("HOOK"),
 							zeroOrOne(
 									choice(
 											sequence(
 													terminal("EXTENDS"),
-													action(listOf(
-															stmt("run();").build()
-													)),
+													action("run();"),
 													nonTerminal("boundAnnotations", "Annotations"),
 													nonTerminal("ext", "ReferenceType", null, listOf(
 															expr("boundAnnotations").build()
@@ -2027,9 +1631,7 @@ public class Grammar {
 											),
 											sequence(
 													terminal("SUPER"),
-													action(listOf(
-															stmt("run();").build()
-													)),
+													action("run();"),
 													nonTerminal("boundAnnotations", "Annotations"),
 													nonTerminal("sup", "ReferenceType", null, listOf(
 															expr("boundAnnotations").build()
@@ -2037,9 +1639,7 @@ public class Grammar {
 											)
 									)
 							),
-							action(listOf(
-									stmt("return dress(SWildcardType.make(annotations, optionOf(ext), optionOf(sup)));").build()
-							))
+							action("return dress(SWildcardType.make(annotations, optionOf(ext), optionOf(sup)));")
 					)
 			),
 			production("PrimitiveType", type("BUTree<SPrimitiveType>").build(),
@@ -2051,62 +1651,42 @@ public class Grammar {
 							stmt("Primitive primitive;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("if (annotations == null) {\n" + "\trun();\n" + "\tannotations = emptyList();\n" + "}").build()
-							)),
+							action("if (annotations == null) {\n\trun();\n\tannotations = emptyList();\n}"),
 							choice(
 									sequence(
 											terminal("BOOLEAN"),
-											action(listOf(
-													stmt("primitive = Primitive.Boolean;").build()
-											))
+											action("primitive = Primitive.Boolean;")
 									),
 									sequence(
 											terminal("CHAR"),
-											action(listOf(
-													stmt("primitive = Primitive.Char;").build()
-											))
+											action("primitive = Primitive.Char;")
 									),
 									sequence(
 											terminal("BYTE"),
-											action(listOf(
-													stmt("primitive = Primitive.Byte;").build()
-											))
+											action("primitive = Primitive.Byte;")
 									),
 									sequence(
 											terminal("SHORT"),
-											action(listOf(
-													stmt("primitive = Primitive.Short;").build()
-											))
+											action("primitive = Primitive.Short;")
 									),
 									sequence(
 											terminal("INT"),
-											action(listOf(
-													stmt("primitive = Primitive.Int;").build()
-											))
+											action("primitive = Primitive.Int;")
 									),
 									sequence(
 											terminal("LONG"),
-											action(listOf(
-													stmt("primitive = Primitive.Long;").build()
-											))
+											action("primitive = Primitive.Long;")
 									),
 									sequence(
 											terminal("FLOAT"),
-											action(listOf(
-													stmt("primitive = Primitive.Float;").build()
-											))
+											action("primitive = Primitive.Float;")
 									),
 									sequence(
 											terminal("DOUBLE"),
-											action(listOf(
-													stmt("primitive = Primitive.Double;").build()
-											))
+											action("primitive = Primitive.Double;")
 									)
 							),
-							action(listOf(
-									stmt("return dress(SPrimitiveType.make(annotations, primitive));").build()
-							))
+							action("return dress(SPrimitiveType.make(annotations, primitive));")
 					)
 			),
 			production("ResultType", type("BUTree<? extends SType>").build(),
@@ -2118,21 +1698,15 @@ public class Grammar {
 					sequence(
 							choice(
 									sequence(
-											action(listOf(
-													stmt("run();").build()
-											)),
+											action("run();"),
 											terminal("VOID"),
-											action(listOf(
-													stmt("ret = dress(SVoidType.make());").build()
-											))
+											action("ret = dress(SVoidType.make());")
 									),
 									nonTerminal("ret", "Type", null, listOf(
 											expr("null").build()
 									))
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("AnnotatedQualifiedType", type("BUTree<SQualifiedType>").build(),
@@ -2143,16 +1717,12 @@ public class Grammar {
 							stmt("BUTree<SQualifiedType> ret;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							nonTerminal("annotations", "Annotations"),
 							nonTerminal("ret", "QualifiedType", null, listOf(
 									expr("annotations").build()
 							)),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("QualifiedName", type("BUTree<SQualifiedName>").build(),
@@ -2164,29 +1734,17 @@ public class Grammar {
 							stmt("BUTree<SName> name;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							nonTerminal("name", "Name"),
-							action(listOf(
-									stmt("ret = dress(SQualifiedName.make(qualifier, name));").build()
-							)),
+							action("ret = dress(SQualifiedName.make(qualifier, name));"),
 							zeroOrMore(
-									action(listOf(
-											stmt("lateRun();").build()
-									)),
+									action("lateRun();"),
 									terminal("DOT"),
-									action(listOf(
-											stmt("qualifier = optionOf(ret);").build()
-									)),
+									action("qualifier = optionOf(ret);"),
 									nonTerminal("name", "Name"),
-									action(listOf(
-											stmt("ret = dress(SQualifiedName.make(qualifier, name));").build()
-									))
+									action("ret = dress(SQualifiedName.make(qualifier, name));")
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("Name", type("BUTree<SName>").build(),
@@ -2200,18 +1758,12 @@ public class Grammar {
 							choice(
 									nonTerminal("name", "NodeVar"),
 									sequence(
-											action(listOf(
-													stmt("run();").build()
-											)),
+											action("run();"),
 											terminal("id", "IDENTIFIER"),
-											action(listOf(
-													stmt("name = dress(SName.make(id.image));").build()
-											))
+											action("name = dress(SName.make(id.image));")
 									)
 							),
-							action(listOf(
-									stmt("return name;").build()
-							))
+							action("return name;")
 					)
 			),
 			production("Expression", type("BUTree<? extends SExpr>").build(),
@@ -2225,9 +1777,7 @@ public class Grammar {
 									nonTerminal("ret", "AssignmentExpression"),
 									nonTerminal("ret", "LambdaExpression")
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("AssignmentExpression", type("BUTree<? extends SExpr>").build(),
@@ -2242,18 +1792,12 @@ public class Grammar {
 							// TODO Add checks to report invalid left hand side in assignment
 							nonTerminal("ret", "ConditionalExpression"),
 							zeroOrOne(
-									action(listOf(
-											stmt("lateRun();").build()
-									)),
+									action("lateRun();"),
 									nonTerminal("op", "AssignmentOperator"),
 									nonTerminal("expr", "Expression"),
-									action(listOf(
-											stmt("ret = dress(SAssignExpr.make(ret, op, expr));").build()
-									))
+									action("ret = dress(SAssignExpr.make(ret, op, expr));")
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("LambdaExpression", type("BUTree<? extends SExpr>").build(),
@@ -2267,13 +1811,9 @@ public class Grammar {
 					sequence(
 							choice(
 									sequence(
-											action(listOf(
-													stmt("run();").build()
-											)),
+											action("run();"),
 											terminal("LPAREN"),
-											action(listOf(
-													stmt("run();").build()
-											)),
+											action("run();"),
 											nonTerminal("annotations", "Annotations"),
 											nonTerminal("type", "ReferenceType", null, listOf(
 													expr("annotations").build()
@@ -2283,15 +1823,11 @@ public class Grammar {
 											)),
 											terminal("RPAREN"),
 											nonTerminal("ret", "LambdaExpression"),
-											action(listOf(
-													stmt("ret = dress(SCastExpr.make(type, ret));").build()
-											))
+											action("ret = dress(SCastExpr.make(type, ret));")
 									),
 									nonTerminal("ret", "LambdaExpressionWithoutCast")
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("LambdaExpressionWithoutCast", type("BUTree<SLambdaExpr>").build(),
@@ -2303,9 +1839,7 @@ public class Grammar {
 							stmt("BUTree<SNodeList> params;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							choice(
 									sequence(
 											nonTerminal("name", "Name"),
@@ -2345,9 +1879,7 @@ public class Grammar {
 											))
 									)
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("LambdaBody", type("BUTree<SLambdaExpr>").build(),
@@ -2365,20 +1897,14 @@ public class Grammar {
 							choice(
 									sequence(
 											nonTerminal("expr", "Expression"),
-											action(listOf(
-													stmt("ret = dress(SLambdaExpr.make(parameters, parenthesis, left(expr)));").build()
-											))
+											action("ret = dress(SLambdaExpr.make(parameters, parenthesis, left(expr)));")
 									),
 									sequence(
 											nonTerminal("block", "Block"),
-											action(listOf(
-													stmt("ret = dress(SLambdaExpr.make(parameters, parenthesis, right(block)));").build()
-											))
+											action("ret = dress(SLambdaExpr.make(parameters, parenthesis, right(block)));")
 									)
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("InferredFormalParameterList", type("BUTree<SNodeList>").build(),
@@ -2390,19 +1916,13 @@ public class Grammar {
 					),
 					sequence(
 							nonTerminal("param", "InferredFormalParameter"),
-							action(listOf(
-									stmt("ret = append(ret, param);").build()
-							)),
+							action("ret = append(ret, param);"),
 							zeroOrMore(
 									terminal("COMMA"),
 									nonTerminal("param", "InferredFormalParameter"),
-									action(listOf(
-											stmt("ret = append(ret, param);").build()
-									))
+									action("ret = append(ret, param);")
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("InferredFormalParameter", type("BUTree<SFormalParameter>").build(),
@@ -2413,9 +1933,7 @@ public class Grammar {
 					),
 					sequence(
 							nonTerminal("name", "Name"),
-							action(listOf(
-									stmt("return makeFormalParameter(name);").build()
-							))
+							action("return makeFormalParameter(name);")
 					)
 			),
 			production("AssignmentOperator", type("AssignOp").build(),
@@ -2428,80 +1946,54 @@ public class Grammar {
 							choice(
 									sequence(
 											terminal("ASSIGN"),
-											action(listOf(
-													stmt("ret = AssignOp.Normal;").build()
-											))
+											action("ret = AssignOp.Normal;")
 									),
 									sequence(
 											terminal("STARASSIGN"),
-											action(listOf(
-													stmt("ret = AssignOp.Times;").build()
-											))
+											action("ret = AssignOp.Times;")
 									),
 									sequence(
 											terminal("SLASHASSIGN"),
-											action(listOf(
-													stmt("ret = AssignOp.Divide;").build()
-											))
+											action("ret = AssignOp.Divide;")
 									),
 									sequence(
 											terminal("REMASSIGN"),
-											action(listOf(
-													stmt("ret = AssignOp.Remainder;").build()
-											))
+											action("ret = AssignOp.Remainder;")
 									),
 									sequence(
 											terminal("PLUSASSIGN"),
-											action(listOf(
-													stmt("ret = AssignOp.Plus;").build()
-											))
+											action("ret = AssignOp.Plus;")
 									),
 									sequence(
 											terminal("MINUSASSIGN"),
-											action(listOf(
-													stmt("ret = AssignOp.Minus;").build()
-											))
+											action("ret = AssignOp.Minus;")
 									),
 									sequence(
 											terminal("LSHIFTASSIGN"),
-											action(listOf(
-													stmt("ret = AssignOp.LeftShift;").build()
-											))
+											action("ret = AssignOp.LeftShift;")
 									),
 									sequence(
 											terminal("RSIGNEDSHIFTASSIGN"),
-											action(listOf(
-													stmt("ret = AssignOp.RightSignedShift;").build()
-											))
+											action("ret = AssignOp.RightSignedShift;")
 									),
 									sequence(
 											terminal("RUNSIGNEDSHIFTASSIGN"),
-											action(listOf(
-													stmt("ret = AssignOp.RightUnsignedShift;").build()
-											))
+											action("ret = AssignOp.RightUnsignedShift;")
 									),
 									sequence(
 											terminal("ANDASSIGN"),
-											action(listOf(
-													stmt("ret = AssignOp.And;").build()
-											))
+											action("ret = AssignOp.And;")
 									),
 									sequence(
 											terminal("XORASSIGN"),
-											action(listOf(
-													stmt("ret = AssignOp.XOr;").build()
-											))
+											action("ret = AssignOp.XOr;")
 									),
 									sequence(
 											terminal("ORASSIGN"),
-											action(listOf(
-													stmt("ret = AssignOp.Or;").build()
-											))
+											action("ret = AssignOp.Or;")
 									)
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("ConditionalExpression", type("BUTree<? extends SExpr>").build(),
@@ -2515,9 +2007,7 @@ public class Grammar {
 					sequence(
 							nonTerminal("ret", "ConditionalOrExpression"),
 							zeroOrOne(
-									action(listOf(
-											stmt("lateRun();").build()
-									)),
+									action("lateRun();"),
 									terminal("HOOK"),
 									nonTerminal("left", "Expression"),
 									terminal("COLON"),
@@ -2525,13 +2015,9 @@ public class Grammar {
 											nonTerminal("right", "ConditionalExpression"),
 											nonTerminal("right", "LambdaExpression")
 									),
-									action(listOf(
-											stmt("ret = dress(SConditionalExpr.make(ret, left, right));").build()
-									))
+									action("ret = dress(SConditionalExpr.make(ret, left, right));")
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("ConditionalOrExpression", type("BUTree<? extends SExpr>").build(),
@@ -2544,18 +2030,12 @@ public class Grammar {
 					sequence(
 							nonTerminal("ret", "ConditionalAndExpression"),
 							zeroOrMore(
-									action(listOf(
-											stmt("lateRun();").build()
-									)),
+									action("lateRun();"),
 									terminal("SC_OR"),
 									nonTerminal("right", "ConditionalAndExpression"),
-									action(listOf(
-											stmt("ret = dress(SBinaryExpr.make(ret, BinaryOp.Or, right));").build()
-									))
+									action("ret = dress(SBinaryExpr.make(ret, BinaryOp.Or, right));")
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("ConditionalAndExpression", type("BUTree<? extends SExpr>").build(),
@@ -2568,18 +2048,12 @@ public class Grammar {
 					sequence(
 							nonTerminal("ret", "InclusiveOrExpression"),
 							zeroOrMore(
-									action(listOf(
-											stmt("lateRun();").build()
-									)),
+									action("lateRun();"),
 									terminal("SC_AND"),
 									nonTerminal("right", "InclusiveOrExpression"),
-									action(listOf(
-											stmt("ret = dress(SBinaryExpr.make(ret, BinaryOp.And, right));").build()
-									))
+									action("ret = dress(SBinaryExpr.make(ret, BinaryOp.And, right));")
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("InclusiveOrExpression", type("BUTree<? extends SExpr>").build(),
@@ -2592,18 +2066,12 @@ public class Grammar {
 					sequence(
 							nonTerminal("ret", "ExclusiveOrExpression"),
 							zeroOrMore(
-									action(listOf(
-											stmt("lateRun();").build()
-									)),
+									action("lateRun();"),
 									terminal("BIT_OR"),
 									nonTerminal("right", "ExclusiveOrExpression"),
-									action(listOf(
-											stmt("ret = dress(SBinaryExpr.make(ret, BinaryOp.BinOr, right));").build()
-									))
+									action("ret = dress(SBinaryExpr.make(ret, BinaryOp.BinOr, right));")
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("ExclusiveOrExpression", type("BUTree<? extends SExpr>").build(),
@@ -2616,18 +2084,12 @@ public class Grammar {
 					sequence(
 							nonTerminal("ret", "AndExpression"),
 							zeroOrMore(
-									action(listOf(
-											stmt("lateRun();").build()
-									)),
+									action("lateRun();"),
 									terminal("XOR"),
 									nonTerminal("right", "AndExpression"),
-									action(listOf(
-											stmt("ret = dress(SBinaryExpr.make(ret, BinaryOp.XOr, right));").build()
-									))
+									action("ret = dress(SBinaryExpr.make(ret, BinaryOp.XOr, right));")
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("AndExpression", type("BUTree<? extends SExpr>").build(),
@@ -2640,18 +2102,12 @@ public class Grammar {
 					sequence(
 							nonTerminal("ret", "EqualityExpression"),
 							zeroOrMore(
-									action(listOf(
-											stmt("lateRun();").build()
-									)),
+									action("lateRun();"),
 									terminal("BIT_AND"),
 									nonTerminal("right", "EqualityExpression"),
-									action(listOf(
-											stmt("ret = dress(SBinaryExpr.make(ret, BinaryOp.BinAnd, right));").build()
-									))
+									action("ret = dress(SBinaryExpr.make(ret, BinaryOp.BinAnd, right));")
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("EqualityExpression", type("BUTree<? extends SExpr>").build(),
@@ -2665,31 +2121,21 @@ public class Grammar {
 					sequence(
 							nonTerminal("ret", "InstanceOfExpression"),
 							zeroOrMore(
-									action(listOf(
-											stmt("lateRun();").build()
-									)),
+									action("lateRun();"),
 									choice(
 											sequence(
 													terminal("EQ"),
-													action(listOf(
-															stmt("op = BinaryOp.Equal;").build()
-													))
+													action("op = BinaryOp.Equal;")
 											),
 											sequence(
 													terminal("NE"),
-													action(listOf(
-															stmt("op = BinaryOp.NotEqual;").build()
-													))
+													action("op = BinaryOp.NotEqual;")
 											)
 									),
 									nonTerminal("right", "InstanceOfExpression"),
-									action(listOf(
-											stmt("ret = dress(SBinaryExpr.make(ret, op, right));").build()
-									))
+									action("ret = dress(SBinaryExpr.make(ret, op, right));")
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("InstanceOfExpression", type("BUTree<? extends SExpr>").build(),
@@ -2703,24 +2149,16 @@ public class Grammar {
 					sequence(
 							nonTerminal("ret", "RelationalExpression"),
 							zeroOrOne(
-									action(listOf(
-											stmt("lateRun();").build()
-									)),
+									action("lateRun();"),
 									terminal("INSTANCEOF"),
-									action(listOf(
-											stmt("run();").build()
-									)),
+									action("run();"),
 									nonTerminal("annotations", "Annotations"),
 									nonTerminal("type", "Type", null, listOf(
 											expr("annotations").build()
 									)),
-									action(listOf(
-											stmt("ret = dress(SInstanceOfExpr.make(ret, type));").build()
-									))
+									action("ret = dress(SInstanceOfExpr.make(ret, type));")
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("RelationalExpression", type("BUTree<? extends SExpr>").build(),
@@ -2734,43 +2172,29 @@ public class Grammar {
 					sequence(
 							nonTerminal("ret", "ShiftExpression"),
 							zeroOrMore(
-									action(listOf(
-											stmt("lateRun();").build()
-									)),
+									action("lateRun();"),
 									choice(
 											sequence(
 													terminal("LT"),
-													action(listOf(
-															stmt("op = BinaryOp.Less;").build()
-													))
+													action("op = BinaryOp.Less;")
 											),
 											sequence(
 													terminal("GT"),
-													action(listOf(
-															stmt("op = BinaryOp.Greater;").build()
-													))
+													action("op = BinaryOp.Greater;")
 											),
 											sequence(
 													terminal("LE"),
-													action(listOf(
-															stmt("op = BinaryOp.LessOrEqual;").build()
-													))
+													action("op = BinaryOp.LessOrEqual;")
 											),
 											sequence(
 													terminal("GE"),
-													action(listOf(
-															stmt("op = BinaryOp.GreaterOrEqual;").build()
-													))
+													action("op = BinaryOp.GreaterOrEqual;")
 											)
 									),
 									nonTerminal("right", "ShiftExpression"),
-									action(listOf(
-											stmt("ret = dress(SBinaryExpr.make(ret, op, right));").build()
-									))
+									action("ret = dress(SBinaryExpr.make(ret, op, right));")
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("ShiftExpression", type("BUTree<? extends SExpr>").build(),
@@ -2784,37 +2208,25 @@ public class Grammar {
 					sequence(
 							nonTerminal("ret", "AdditiveExpression"),
 							zeroOrMore(
-									action(listOf(
-											stmt("lateRun();").build()
-									)),
+									action("lateRun();"),
 									choice(
 											sequence(
 													terminal("LSHIFT"),
-													action(listOf(
-															stmt("op = BinaryOp.LeftShift;").build()
-													))
+													action("op = BinaryOp.LeftShift;")
 											),
 											sequence(
 													nonTerminal("RUNSIGNEDSHIFT"),
-													action(listOf(
-															stmt("op = BinaryOp.RightUnsignedShift;").build()
-													))
+													action("op = BinaryOp.RightUnsignedShift;")
 											),
 											sequence(
 													nonTerminal("RSIGNEDSHIFT"),
-													action(listOf(
-															stmt("op = BinaryOp.RightSignedShift;").build()
-													))
+													action("op = BinaryOp.RightSignedShift;")
 											)
 									),
 									nonTerminal("right", "AdditiveExpression"),
-									action(listOf(
-											stmt("ret = dress(SBinaryExpr.make(ret, op, right));").build()
-									))
+									action("ret = dress(SBinaryExpr.make(ret, op, right));")
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("AdditiveExpression", type("BUTree<? extends SExpr>").build(),
@@ -2828,31 +2240,21 @@ public class Grammar {
 					sequence(
 							nonTerminal("ret", "MultiplicativeExpression"),
 							zeroOrMore(
-									action(listOf(
-											stmt("lateRun();").build()
-									)),
+									action("lateRun();"),
 									choice(
 											sequence(
 													terminal("PLUS"),
-													action(listOf(
-															stmt("op = BinaryOp.Plus;").build()
-													))
+													action("op = BinaryOp.Plus;")
 											),
 											sequence(
 													terminal("MINUS"),
-													action(listOf(
-															stmt("op = BinaryOp.Minus;").build()
-													))
+													action("op = BinaryOp.Minus;")
 											)
 									),
 									nonTerminal("right", "MultiplicativeExpression"),
-									action(listOf(
-											stmt("ret = dress(SBinaryExpr.make(ret, op, right));").build()
-									))
+									action("ret = dress(SBinaryExpr.make(ret, op, right));")
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("MultiplicativeExpression", type("BUTree<? extends SExpr>").build(),
@@ -2866,37 +2268,25 @@ public class Grammar {
 					sequence(
 							nonTerminal("ret", "UnaryExpression"),
 							zeroOrMore(
-									action(listOf(
-											stmt("lateRun();").build()
-									)),
+									action("lateRun();"),
 									choice(
 											sequence(
 													terminal("STAR"),
-													action(listOf(
-															stmt("op = BinaryOp.Times;").build()
-													))
+													action("op = BinaryOp.Times;")
 											),
 											sequence(
 													terminal("SLASH"),
-													action(listOf(
-															stmt("op = BinaryOp.Divide;").build()
-													))
+													action("op = BinaryOp.Divide;")
 											),
 											sequence(
 													terminal("REM"),
-													action(listOf(
-															stmt("op = BinaryOp.Remainder;").build()
-													))
+													action("op = BinaryOp.Remainder;")
 											)
 									),
 									nonTerminal("right", "UnaryExpression"),
-									action(listOf(
-											stmt("ret = dress(SBinaryExpr.make(ret, op, right));").build()
-									))
+									action("ret = dress(SBinaryExpr.make(ret, op, right));")
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("UnaryExpression", type("BUTree<? extends SExpr>").build(),
@@ -2910,33 +2300,23 @@ public class Grammar {
 							choice(
 									nonTerminal("ret", "PrefixExpression"),
 									sequence(
-											action(listOf(
-													stmt("run();").build()
-											)),
+											action("run();"),
 											choice(
 													sequence(
 															terminal("PLUS"),
-															action(listOf(
-																	stmt("op = UnaryOp.Positive;").build()
-															))
+															action("op = UnaryOp.Positive;")
 													),
 													sequence(
 															terminal("MINUS"),
-															action(listOf(
-																	stmt("op = UnaryOp.Negative;").build()
-															))
+															action("op = UnaryOp.Negative;")
 													)
 											),
 											nonTerminal("ret", "UnaryExpression"),
-											action(listOf(
-													stmt("ret = dress(SUnaryExpr.make(op, ret));").build()
-											))
+											action("ret = dress(SUnaryExpr.make(op, ret));")
 									),
 									nonTerminal("ret", "UnaryExpressionNotPlusMinus")
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("PrefixExpression", type("BUTree<? extends SExpr>").build(),
@@ -2947,27 +2327,19 @@ public class Grammar {
 							stmt("BUTree<? extends SExpr> ret;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							choice(
 									sequence(
 											terminal("INCR"),
-											action(listOf(
-													stmt("op = UnaryOp.PreIncrement;").build()
-											))
+											action("op = UnaryOp.PreIncrement;")
 									),
 									sequence(
 											terminal("DECR"),
-											action(listOf(
-													stmt("op = UnaryOp.PreDecrement;").build()
-											))
+											action("op = UnaryOp.PreDecrement;")
 									)
 							),
 							nonTerminal("ret", "UnaryExpression"),
-							action(listOf(
-									stmt("return dress(SUnaryExpr.make(op, ret));").build()
-							))
+							action("return dress(SUnaryExpr.make(op, ret));")
 					)
 			),
 			production("UnaryExpressionNotPlusMinus", type("BUTree<? extends SExpr>").build(),
@@ -2980,34 +2352,24 @@ public class Grammar {
 					sequence(
 							choice(
 									sequence(
-											action(listOf(
-													stmt("run();").build()
-											)),
+											action("run();"),
 											choice(
 													sequence(
 															terminal("TILDE"),
-															action(listOf(
-																	stmt("op = UnaryOp.Inverse;").build()
-															))
+															action("op = UnaryOp.Inverse;")
 													),
 													sequence(
 															terminal("BANG"),
-															action(listOf(
-																	stmt("op = UnaryOp.Not;").build()
-															))
+															action("op = UnaryOp.Not;")
 													)
 											),
 											nonTerminal("ret", "UnaryExpression"),
-											action(listOf(
-													stmt("ret = dress(SUnaryExpr.make(op, ret));").build()
-											))
+											action("ret = dress(SUnaryExpr.make(op, ret));")
 									),
 									nonTerminal("ret", "CastExpression"),
 									nonTerminal("ret", "PostfixExpression")
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("PostfixExpression", type("BUTree<? extends SExpr>").build(),
@@ -3020,30 +2382,20 @@ public class Grammar {
 					sequence(
 							nonTerminal("ret", "PrimaryExpression"),
 							zeroOrOne(
-									action(listOf(
-											stmt("lateRun();").build()
-									)),
+									action("lateRun();"),
 									choice(
 											sequence(
 													terminal("INCR"),
-													action(listOf(
-															stmt("op = UnaryOp.PostIncrement;").build()
-													))
+													action("op = UnaryOp.PostIncrement;")
 											),
 											sequence(
 													terminal("DECR"),
-													action(listOf(
-															stmt("op = UnaryOp.PostDecrement;").build()
-													))
+													action("op = UnaryOp.PostDecrement;")
 											)
 									),
-									action(listOf(
-											stmt("ret = dress(SUnaryExpr.make(op, ret));").build()
-									))
+									action("ret = dress(SUnaryExpr.make(op, ret));")
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("CastExpression", type("BUTree<? extends SExpr>").build(),
@@ -3057,13 +2409,9 @@ public class Grammar {
 							stmt("BUTree<? extends SExpr> ret;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							terminal("LPAREN"),
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							nonTerminal("annotations", "Annotations"),
 							choice(
 									sequence(
@@ -3072,9 +2420,7 @@ public class Grammar {
 											)),
 											terminal("RPAREN"),
 											nonTerminal("ret", "UnaryExpression"),
-											action(listOf(
-													stmt("ret = dress(SCastExpr.make(primitiveType, ret));").build()
-											))
+											action("ret = dress(SCastExpr.make(primitiveType, ret));")
 									),
 									sequence(
 											nonTerminal("type", "ReferenceType", null, listOf(
@@ -3085,14 +2431,10 @@ public class Grammar {
 											)),
 											terminal("RPAREN"),
 											nonTerminal("ret", "UnaryExpressionNotPlusMinus"),
-											action(listOf(
-													stmt("ret = dress(SCastExpr.make(type, ret));").build()
-											))
+											action("ret = dress(SCastExpr.make(type, ret));")
 									)
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("ReferenceCastTypeRest", type("BUTree<? extends SType>").build(),
@@ -3106,32 +2448,20 @@ public class Grammar {
 					),
 					sequence(
 							zeroOrOne(
-									action(listOf(
-											stmt("types = append(types, type);").build()
-									)),
-									action(listOf(
-											stmt("lateRun();").build()
-									)),
+									action("types = append(types, type);"),
+									action("lateRun();"),
 									oneOrMore(
 											terminal("BIT_AND"),
-											action(listOf(
-													stmt("run();").build()
-											)),
+											action("run();"),
 											nonTerminal("annotations", "Annotations"),
 											nonTerminal("type", "ReferenceType", null, listOf(
 													expr("annotations").build()
 											)),
-											action(listOf(
-													stmt("types = append(types, type);").build()
-											))
+											action("types = append(types, type);")
 									),
-									action(listOf(
-											stmt("type = dress(SIntersectionType.make(types));").build()
-									))
+									action("type = dress(SIntersectionType.make(types));")
 							),
-							action(listOf(
-									stmt("return type;").build()
-							))
+							action("return type;")
 					)
 			),
 			production("Literal", type("BUTree<? extends SExpr>").build(),
@@ -3142,68 +2472,46 @@ public class Grammar {
 							stmt("BUTree<? extends SExpr> ret;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							choice(
 									sequence(
 											terminal("literal", "INTEGER_LITERAL"),
-											action(listOf(
-													stmt("ret = SLiteralExpr.make(Integer.class, literal.image);").build()
-											))
+											action("ret = SLiteralExpr.make(Integer.class, literal.image);")
 									),
 									sequence(
 											terminal("literal", "LONG_LITERAL"),
-											action(listOf(
-													stmt("ret = SLiteralExpr.make(Long.class, literal.image);").build()
-											))
+											action("ret = SLiteralExpr.make(Long.class, literal.image);")
 									),
 									sequence(
 											terminal("literal", "FLOAT_LITERAL"),
-											action(listOf(
-													stmt("ret = SLiteralExpr.make(Float.class, literal.image);").build()
-											))
+											action("ret = SLiteralExpr.make(Float.class, literal.image);")
 									),
 									sequence(
 											terminal("literal", "DOUBLE_LITERAL"),
-											action(listOf(
-													stmt("ret = SLiteralExpr.make(Double.class, literal.image);").build()
-											))
+											action("ret = SLiteralExpr.make(Double.class, literal.image);")
 									),
 									sequence(
 											terminal("literal", "CHARACTER_LITERAL"),
-											action(listOf(
-													stmt("ret = SLiteralExpr.make(Character.class, literal.image);").build()
-											))
+											action("ret = SLiteralExpr.make(Character.class, literal.image);")
 									),
 									sequence(
 											terminal("literal", "STRING_LITERAL"),
-											action(listOf(
-													stmt("ret = SLiteralExpr.make(String.class, literal.image);").build()
-											))
+											action("ret = SLiteralExpr.make(String.class, literal.image);")
 									),
 									sequence(
 											terminal("literal", "TRUE"),
-											action(listOf(
-													stmt("ret = SLiteralExpr.make(Boolean.class, literal.image);").build()
-											))
+											action("ret = SLiteralExpr.make(Boolean.class, literal.image);")
 									),
 									sequence(
 											terminal("literal", "FALSE"),
-											action(listOf(
-													stmt("ret = SLiteralExpr.make(Boolean.class, literal.image);").build()
-											))
+											action("ret = SLiteralExpr.make(Boolean.class, literal.image);")
 									),
 									sequence(
 											terminal("literal", "NULL"),
-											action(listOf(
-													stmt("ret = SLiteralExpr.make(Void.class, literal.image);").build()
-											))
+											action("ret = SLiteralExpr.make(Void.class, literal.image);")
 									)
 							),
-							action(listOf(
-									stmt("return dress(ret);").build()
-							))
+							action("return dress(ret);")
 					)
 			),
 			production("PrimaryExpression", type("BUTree<? extends SExpr>").build(),
@@ -3219,9 +2527,7 @@ public class Grammar {
 											expr("null").build()
 									))
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("PrimaryNoNewArray", type("BUTree<? extends SExpr>").build(),
@@ -3233,16 +2539,12 @@ public class Grammar {
 					sequence(
 							nonTerminal("ret", "PrimaryPrefix"),
 							zeroOrMore(
-									action(listOf(
-											stmt("lateRun();").build()
-									)),
+									action("lateRun();"),
 									nonTerminal("ret", "PrimarySuffix", null, listOf(
 											expr("ret").build()
 									))
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("PrimaryExpressionWithoutSuperSuffix", type("BUTree<? extends SExpr>").build(),
@@ -3254,16 +2556,12 @@ public class Grammar {
 					sequence(
 							nonTerminal("ret", "PrimaryPrefix"),
 							zeroOrMore(
-									action(listOf(
-											stmt("lateRun();").build()
-									)),
+									action("lateRun();"),
 									nonTerminal("ret", "PrimarySuffixWithoutSuper", null, listOf(
 											expr("ret").build()
 									))
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("PrimaryPrefix", type("BUTree<? extends SExpr>").build(),
@@ -3279,27 +2577,17 @@ public class Grammar {
 							choice(
 									nonTerminal("ret", "Literal"),
 									sequence(
-											action(listOf(
-													stmt("run();").build()
-											)),
+											action("run();"),
 											terminal("THIS"),
-											action(listOf(
-													stmt("ret = dress(SThisExpr.make(none()));").build()
-											))
+											action("ret = dress(SThisExpr.make(none()));")
 									),
 									sequence(
-											action(listOf(
-													stmt("run();").build()
-											)),
+											action("run();"),
 											terminal("SUPER"),
-											action(listOf(
-													stmt("ret = dress(SSuperExpr.make(none()));").build()
-											)),
+											action("ret = dress(SSuperExpr.make(none()));"),
 											choice(
 													sequence(
-															action(listOf(
-																	stmt("lateRun();").build()
-															)),
+															action("lateRun();"),
 															terminal("DOT"),
 															choice(
 																	nonTerminal("ret", "MethodInvocation", null, listOf(
@@ -3311,9 +2599,7 @@ public class Grammar {
 															)
 													),
 													sequence(
-															action(listOf(
-																	stmt("lateRun();").build()
-															)),
+															action("lateRun();"),
 															nonTerminal("ret", "MethodReferenceSuffix", null, listOf(
 																	expr("ret").build()
 															))
@@ -3324,52 +2610,36 @@ public class Grammar {
 											expr("null").build()
 									)),
 									sequence(
-											action(listOf(
-													stmt("run();").build()
-											)),
+											action("run();"),
 											nonTerminal("type", "ResultType"),
 											terminal("DOT"),
 											terminal("CLASS"),
-											action(listOf(
-													stmt("ret = dress(SClassExpr.make(type));").build()
-											))
+											action("ret = dress(SClassExpr.make(type));")
 									),
 									sequence(
-											action(listOf(
-													stmt("run();").build()
-											)),
+											action("run();"),
 											nonTerminal("type", "ResultType"),
-											action(listOf(
-													stmt("ret = STypeExpr.make(type);").build()
-											)),
+											action("ret = STypeExpr.make(type);"),
 											nonTerminal("ret", "MethodReferenceSuffix", null, listOf(
 													expr("ret").build()
 											))
 									),
 									sequence(
-											action(listOf(
-													stmt("run();").build()
-											)),
+											action("run();"),
 											nonTerminal("ret", "MethodInvocation", null, listOf(
 													expr("null").build()
 											))
 									),
 									nonTerminal("ret", "Name"),
 									sequence(
-											action(listOf(
-													stmt("run();").build()
-											)),
+											action("run();"),
 											terminal("LPAREN"),
 											nonTerminal("ret", "Expression"),
 											terminal("RPAREN"),
-											action(listOf(
-													stmt("ret = dress(SParenthesizedExpr.make(ret));").build()
-											))
+											action("ret = dress(SParenthesizedExpr.make(ret));")
 									)
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("PrimarySuffix", type("BUTree<? extends SExpr>").build(),
@@ -3390,17 +2660,13 @@ public class Grammar {
 									sequence(
 											terminal("DOT"),
 											terminal("SUPER"),
-											action(listOf(
-													stmt("ret = dress(SSuperExpr.make(optionOf(scope)));").build()
-											))
+											action("ret = dress(SSuperExpr.make(optionOf(scope)));")
 									),
 									nonTerminal("ret", "MethodReferenceSuffix", null, listOf(
 											expr("scope").build()
 									))
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("PrimarySuffixWithoutSuper", type("BUTree<? extends SExpr>").build(),
@@ -3419,9 +2685,7 @@ public class Grammar {
 											choice(
 													sequence(
 															terminal("THIS"),
-															action(listOf(
-																	stmt("ret = dress(SThisExpr.make(optionOf(scope)));").build()
-															))
+															action("ret = dress(SThisExpr.make(optionOf(scope)));")
 													),
 													nonTerminal("ret", "ClassCreationExpr", null, listOf(
 															expr("scope").build()
@@ -3438,14 +2702,10 @@ public class Grammar {
 											terminal("LBRACKET"),
 											nonTerminal("ret", "Expression"),
 											terminal("RBRACKET"),
-											action(listOf(
-													stmt("ret = dress(SArrayAccessExpr.make(scope, ret));").build()
-											))
+											action("ret = dress(SArrayAccessExpr.make(scope, ret));")
 									)
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("FieldAccess", type("BUTree<? extends SExpr>").build(),
@@ -3458,9 +2718,7 @@ public class Grammar {
 					),
 					sequence(
 							nonTerminal("name", "Name"),
-							action(listOf(
-									stmt("return dress(SFieldAccessExpr.make(optionOf(scope), name));").build()
-							))
+							action("return dress(SFieldAccessExpr.make(optionOf(scope), name));")
 					)
 			),
 			production("MethodInvocation", type("BUTree<? extends SExpr>").build(),
@@ -3480,9 +2738,7 @@ public class Grammar {
 							),
 							nonTerminal("name", "Name"),
 							nonTerminal("args", "Arguments"),
-							action(listOf(
-									stmt("return dress(SMethodInvocationExpr.make(optionOf(scope), ensureNotNull(typeArgs), name, args));").build()
-							))
+							action("return dress(SMethodInvocationExpr.make(optionOf(scope), ensureNotNull(typeArgs), name, args));")
 					)
 			),
 			production("Arguments", type("BUTree<SNodeList>").build(),
@@ -3499,23 +2755,17 @@ public class Grammar {
 											nonTerminal("ret", "NodeListVar"),
 											sequence(
 													nonTerminal("expr", "Expression"),
-													action(listOf(
-															stmt("ret = append(ret, expr);").build()
-													)),
+													action("ret = append(ret, expr);"),
 													zeroOrMore(
 															terminal("COMMA"),
 															nonTerminal("expr", "Expression"),
-															action(listOf(
-																	stmt("ret = append(ret, expr);").build()
-															))
+															action("ret = append(ret, expr);")
 													)
 											)
 									)
 							),
 							terminal("RPAREN"),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("MethodReferenceSuffix", type("BUTree<? extends SExpr>").build(),
@@ -3537,17 +2787,11 @@ public class Grammar {
 									nonTerminal("name", "Name"),
 									sequence(
 											terminal("NEW"),
-											action(listOf(
-													stmt("name = SName.make(\"new\");").build()
-											))
+											action("name = SName.make(\"new\");")
 									)
 							),
-							action(listOf(
-									stmt("ret = dress(SMethodReferenceExpr.make(scope, ensureNotNull(typeArgs), name));").build()
-							)),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("ret = dress(SMethodReferenceExpr.make(scope, ensureNotNull(typeArgs), name));"),
+							action("return ret;")
 					)
 			),
 			production("ClassCreationExpr", type("BUTree<? extends SExpr>").build(),
@@ -3564,16 +2808,12 @@ public class Grammar {
 							stmt("BUTree<SNodeList> annotations = null;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("if (scope == null) run();\n" + "").build()
-							)),
+							action("if (scope == null) run();"),
 							terminal("NEW"),
 							zeroOrOne(
 									nonTerminal("typeArgs", "TypeArguments")
 							),
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							nonTerminal("annotations", "Annotations"),
 							nonTerminal("type", "QualifiedType", null, listOf(
 									expr("annotations").build()
@@ -3584,9 +2824,7 @@ public class Grammar {
 											expr("TypeKind.Class").build()
 									))
 							),
-							action(listOf(
-									stmt("return dress(SObjectCreationExpr.make(optionOf(scope), ensureNotNull(typeArgs), (BUTree<SQualifiedType>) type, args, optionOf(anonymousBody)));").build()
-							))
+							action("return dress(SObjectCreationExpr.make(optionOf(scope), ensureNotNull(typeArgs), (BUTree<SQualifiedType>) type, args, optionOf(anonymousBody)));")
 					)
 			),
 			production("ArrayCreationExpr", type("BUTree<? extends SExpr>").build(),
@@ -3603,16 +2841,12 @@ public class Grammar {
 							stmt("BUTree<SNodeList> annotations = null;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("if (scope == null) run();\n" + "").build()
-							)),
+							action("if (scope == null) run();"),
 							terminal("NEW"),
 							zeroOrOne(
 									nonTerminal("typeArgs", "TypeArguments")
 							),
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							nonTerminal("annotations", "Annotations"),
 							choice(
 									nonTerminal("type", "PrimitiveType", null, listOf(
@@ -3625,9 +2859,7 @@ public class Grammar {
 							nonTerminal("ret", "ArrayCreationExprRest", null, listOf(
 									expr("type").build()
 							)),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("ArrayCreationExprRest", type("BUTree<? extends SExpr>").build(),
@@ -3646,16 +2878,12 @@ public class Grammar {
 							sequence(
 									nonTerminal("arrayDimExprs", "ArrayDimExprsMandatory"),
 									nonTerminal("arrayDims", "ArrayDims"),
-									action(listOf(
-											stmt("return dress(SArrayCreationExpr.make(componentType, arrayDimExprs, arrayDims, none()));").build()
-									))
+									action("return dress(SArrayCreationExpr.make(componentType, arrayDimExprs, arrayDims, none()));")
 							),
 							sequence(
 									nonTerminal("arrayDims", "ArrayDimsMandatory"),
 									nonTerminal("initializer", "ArrayInitializer"),
-									action(listOf(
-											stmt("return dress(SArrayCreationExpr.make(componentType, arrayDimExprs, arrayDims, optionOf(initializer)));").build()
-									))
+									action("return dress(SArrayCreationExpr.make(componentType, arrayDimExprs, arrayDims, optionOf(initializer)));")
 							)
 					)
 			),
@@ -3669,20 +2897,14 @@ public class Grammar {
 					),
 					sequence(
 							oneOrMore(
-									action(listOf(
-											stmt("run();").build()
-									)),
+									action("run();"),
 									nonTerminal("annotations", "Annotations"),
 									terminal("LBRACKET"),
 									nonTerminal("expr", "Expression"),
 									terminal("RBRACKET"),
-									action(listOf(
-											stmt("arrayDimExprs = append(arrayDimExprs, dress(SArrayDimExpr.make(annotations, expr)));").build()
-									))
+									action("arrayDimExprs = append(arrayDimExprs, dress(SArrayDimExpr.make(annotations, expr)));")
 							),
-							action(listOf(
-									stmt("return arrayDimExprs;").build()
-							))
+							action("return arrayDimExprs;")
 					)
 			),
 			production("ArrayDimsMandatory", type("BUTree<SNodeList>").build(),
@@ -3694,19 +2916,13 @@ public class Grammar {
 					),
 					sequence(
 							oneOrMore(
-									action(listOf(
-											stmt("run();").build()
-									)),
+									action("run();"),
 									nonTerminal("annotations", "Annotations"),
 									terminal("LBRACKET"),
 									terminal("RBRACKET"),
-									action(listOf(
-											stmt("arrayDims = append(arrayDims, dress(SArrayDim.make(annotations)));").build()
-									))
+									action("arrayDims = append(arrayDims, dress(SArrayDim.make(annotations)));")
 							),
-							action(listOf(
-									stmt("return arrayDims;").build()
-							))
+							action("return arrayDims;")
 					)
 			),
 			production("Statement", type("BUTree<? extends SStmt>").build(),
@@ -3734,9 +2950,7 @@ public class Grammar {
 									nonTerminal("ret", "SynchronizedStatement"),
 									nonTerminal("ret", "TryStatement")
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("AssertStatement", type("BUTree<SAssertStmt>").build(),
@@ -3747,9 +2961,7 @@ public class Grammar {
 							stmt("BUTree<? extends SExpr> msg = null;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							terminal("ASSERT"),
 							nonTerminal("check", "Expression"),
 							zeroOrOne(
@@ -3757,9 +2969,7 @@ public class Grammar {
 									nonTerminal("msg", "Expression")
 							),
 							terminal("SEMICOLON"),
-							action(listOf(
-									stmt("return dress(SAssertStmt.make(check, optionOf(msg)));").build()
-							))
+							action("return dress(SAssertStmt.make(check, optionOf(msg)));")
 					)
 			),
 			production("LabeledStatement", type("BUTree<SLabeledStmt>").build(),
@@ -3770,15 +2980,11 @@ public class Grammar {
 							stmt("BUTree<? extends SStmt> stmt;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							nonTerminal("label", "Name"),
 							terminal("COLON"),
 							nonTerminal("stmt", "Statement"),
-							action(listOf(
-									stmt("return dress(SLabeledStmt.make(label, stmt));").build()
-							))
+							action("return dress(SLabeledStmt.make(label, stmt));")
 					)
 			),
 			production("Block", type("BUTree<SBlockStmt>").build(),
@@ -3788,15 +2994,11 @@ public class Grammar {
 							stmt("BUTree<SNodeList> stmts;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							terminal("LBRACE"),
 							nonTerminal("stmts", "Statements"),
 							terminal("RBRACE"),
-							action(listOf(
-									stmt("return dress(SBlockStmt.make(ensureNotNull(stmts)));").build()
-							))
+							action("return dress(SBlockStmt.make(ensureNotNull(stmts)));")
 					)
 			),
 			production("BlockStatement", type("BUTree<? extends SStmt>").build(),
@@ -3811,36 +3013,24 @@ public class Grammar {
 					sequence(
 							choice(
 									sequence(
-											action(listOf(
-													stmt("run();").build()
-											)),
-											action(listOf(
-													stmt("run();").build()
-											)),
+											action("run();"),
+											action("run();"),
 											nonTerminal("modifiers", "ModifiersNoDefault"),
 											nonTerminal("typeDecl", "ClassOrInterfaceDecl", null, listOf(
 													expr("modifiers").build()
 											)),
-											action(listOf(
-													stmt("ret = dress(STypeDeclarationStmt.make(typeDecl));").build()
-											))
+											action("ret = dress(STypeDeclarationStmt.make(typeDecl));")
 									),
 									sequence(
-											action(listOf(
-													stmt("run();").build()
-											)),
+											action("run();"),
 											// TODO Rename LocalVariableDeclStmt and remove use of ExpressionStmt ?
 											nonTerminal("expr", "VariableDeclExpression"),
 											terminal("SEMICOLON"),
-											action(listOf(
-													stmt("ret = dress(SExpressionStmt.make(expr));").build()
-											))
+											action("ret = dress(SExpressionStmt.make(expr));")
 									),
 									nonTerminal("ret", "Statement")
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("VariableDeclExpression", type("BUTree<SVariableDeclarationExpr>").build(),
@@ -3851,19 +3041,13 @@ public class Grammar {
 							stmt("BUTree<SLocalVariableDecl> variableDecl;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
+							action("run();"),
 							nonTerminal("modifiers", "ModifiersNoDefault"),
 							nonTerminal("variableDecl", "VariableDecl", null, listOf(
 									expr("modifiers").build()
 							)),
-							action(listOf(
-									stmt("return dress(SVariableDeclarationExpr.make(variableDecl));").build()
-							))
+							action("return dress(SVariableDeclarationExpr.make(variableDecl));")
 					)
 			),
 			production("EmptyStatement", type("BUTree<SEmptyStmt>").build(),
@@ -3871,13 +3055,9 @@ public class Grammar {
 					emptyList(),
 					emptyList(),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							terminal("SEMICOLON"),
-							action(listOf(
-									stmt("return dress(SEmptyStmt.make());").build()
-							))
+							action("return dress(SEmptyStmt.make());")
 					)
 			),
 			production("ExpressionStatement", type("BUTree<SExpressionStmt>").build(),
@@ -3889,14 +3069,10 @@ public class Grammar {
 							stmt("BUTree<? extends SExpr> value;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							nonTerminal("expr", "StatementExpression"),
 							terminal("SEMICOLON"),
-							action(listOf(
-									stmt("return dress(SExpressionStmt.make(expr));").build()
-							))
+							action("return dress(SExpressionStmt.make(expr));")
 					)
 			),
 			production("StatementExpression", type("BUTree<? extends SExpr>").build(),
@@ -3908,9 +3084,7 @@ public class Grammar {
 					sequence(
 							// TODO Add further checks to report invalid expression in a statement
 							nonTerminal("ret", "Expression"),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("SwitchStatement", type("BUTree<SSwitchStmt>").build(),
@@ -3922,9 +3096,7 @@ public class Grammar {
 							stmt("BUTree<SNodeList> entries = emptyList();").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							terminal("SWITCH"),
 							terminal("LPAREN"),
 							nonTerminal("selector", "Expression"),
@@ -3932,14 +3104,10 @@ public class Grammar {
 							terminal("LBRACE"),
 							zeroOrMore(
 									nonTerminal("entry", "SwitchEntry"),
-									action(listOf(
-											stmt("entries = append(entries, entry);").build()
-									))
+									action("entries = append(entries, entry);")
 							),
 							terminal("RBRACE"),
-							action(listOf(
-									stmt("return dress(SSwitchStmt.make(selector, entries));").build()
-							))
+							action("return dress(SSwitchStmt.make(selector, entries));")
 					)
 			),
 			production("SwitchEntry", type("BUTree<SSwitchCase>").build(),
@@ -3950,9 +3118,7 @@ public class Grammar {
 							stmt("BUTree<SNodeList> stmts;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							choice(
 									sequence(
 											terminal("CASE"),
@@ -3962,9 +3128,7 @@ public class Grammar {
 							),
 							terminal("COLON"),
 							nonTerminal("stmts", "Statements"),
-							action(listOf(
-									stmt("return dress(SSwitchCase.make(optionOf(label), ensureNotNull(stmts)));").build()
-							))
+							action("return dress(SSwitchCase.make(optionOf(label), ensureNotNull(stmts)));")
 					)
 			),
 			production("IfStatement", type("BUTree<SIfStmt>").build(),
@@ -3976,9 +3140,7 @@ public class Grammar {
 							stmt("BUTree<? extends SStmt> elseStmt = null;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							terminal("IF"),
 							terminal("LPAREN"),
 							nonTerminal("condition", "Expression"),
@@ -3988,9 +3150,7 @@ public class Grammar {
 									terminal("ELSE"),
 									nonTerminal("elseStmt", "Statement")
 							),
-							action(listOf(
-									stmt("return dress(SIfStmt.make(condition, thenStmt, optionOf(elseStmt)));").build()
-							))
+							action("return dress(SIfStmt.make(condition, thenStmt, optionOf(elseStmt)));")
 					)
 			),
 			production("WhileStatement", type("BUTree<SWhileStmt>").build(),
@@ -4001,17 +3161,13 @@ public class Grammar {
 							stmt("BUTree<? extends SStmt> body;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							terminal("WHILE"),
 							terminal("LPAREN"),
 							nonTerminal("condition", "Expression"),
 							terminal("RPAREN"),
 							nonTerminal("body", "Statement"),
-							action(listOf(
-									stmt("return dress(SWhileStmt.make(condition, body));").build()
-							))
+							action("return dress(SWhileStmt.make(condition, body));")
 					)
 			),
 			production("DoStatement", type("BUTree<SDoStmt>").build(),
@@ -4022,9 +3178,7 @@ public class Grammar {
 							stmt("BUTree<? extends SStmt> body;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							terminal("DO"),
 							nonTerminal("body", "Statement"),
 							terminal("WHILE"),
@@ -4032,9 +3186,7 @@ public class Grammar {
 							nonTerminal("condition", "Expression"),
 							terminal("RPAREN"),
 							terminal("SEMICOLON"),
-							action(listOf(
-									stmt("return dress(SDoStmt.make(body, condition));").build()
-							))
+							action("return dress(SDoStmt.make(body, condition));")
 					)
 			),
 			production("ForStatement", type("BUTree<? extends SStmt>").build(),
@@ -4048,9 +3200,7 @@ public class Grammar {
 							stmt("BUTree<? extends SStmt> body;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							terminal("FOR"),
 							terminal("LPAREN"),
 							choice(
@@ -4075,9 +3225,7 @@ public class Grammar {
 							),
 							terminal("RPAREN"),
 							nonTerminal("body", "Statement"),
-							action(listOf(
-									stmt("if (varExpr != null)\n" + "\treturn dress(SForeachStmt.make(varExpr, expr, body));\n" + "else\n" + "\treturn dress(SForStmt.make(init, expr, update, body));\n" + "").build()
-							))
+							action("if (varExpr != null)\n\treturn dress(SForeachStmt.make(varExpr, expr, body));\nelse\n\treturn dress(SForStmt.make(init, expr, update, body));")
 					)
 			),
 			production("ForInit", type("BUTree<SNodeList>").build(),
@@ -4091,16 +3239,11 @@ public class Grammar {
 							choice(
 									sequence(
 											nonTerminal("expr", "VariableDeclExpression"),
-											action(listOf(
-													stmt("ret = emptyList();").build(),
-													stmt("ret = append(ret, expr);").build()
-											))
+											action("ret = append(emptyList(), expr);")
 									),
 									nonTerminal("ret", "StatementExpressionList")
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("StatementExpressionList", type("BUTree<SNodeList>").build(),
@@ -4112,19 +3255,13 @@ public class Grammar {
 					),
 					sequence(
 							nonTerminal("expr", "StatementExpression"),
-							action(listOf(
-									stmt("ret = append(ret, expr);").build()
-							)),
+							action("ret = append(ret, expr);"),
 							zeroOrMore(
 									terminal("COMMA"),
 									nonTerminal("expr", "StatementExpression"),
-									action(listOf(
-											stmt("ret = append(ret, expr);").build()
-									))
+									action("ret = append(ret, expr);")
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("ForUpdate", type("BUTree<SNodeList>").build(),
@@ -4135,9 +3272,7 @@ public class Grammar {
 					),
 					sequence(
 							nonTerminal("ret", "StatementExpressionList"),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("BreakStatement", type("BUTree<SBreakStmt>").build(),
@@ -4147,17 +3282,13 @@ public class Grammar {
 							stmt("BUTree<SName> id = null;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							terminal("BREAK"),
 							zeroOrOne(
 									nonTerminal("id", "Name")
 							),
 							terminal("SEMICOLON"),
-							action(listOf(
-									stmt("return dress(SBreakStmt.make(optionOf(id)));").build()
-							))
+							action("return dress(SBreakStmt.make(optionOf(id)));")
 					)
 			),
 			production("ContinueStatement", type("BUTree<SContinueStmt>").build(),
@@ -4167,17 +3298,13 @@ public class Grammar {
 							stmt("BUTree<SName> id = null;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							terminal("CONTINUE"),
 							zeroOrOne(
 									nonTerminal("id", "Name")
 							),
 							terminal("SEMICOLON"),
-							action(listOf(
-									stmt("return dress(SContinueStmt.make(optionOf(id)));").build()
-							))
+							action("return dress(SContinueStmt.make(optionOf(id)));")
 					)
 			),
 			production("ReturnStatement", type("BUTree<SReturnStmt>").build(),
@@ -4187,17 +3314,13 @@ public class Grammar {
 							stmt("BUTree<? extends SExpr> expr = null;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							terminal("RETURN"),
 							zeroOrOne(
 									nonTerminal("expr", "Expression")
 							),
 							terminal("SEMICOLON"),
-							action(listOf(
-									stmt("return dress(SReturnStmt.make(optionOf(expr)));").build()
-							))
+							action("return dress(SReturnStmt.make(optionOf(expr)));")
 					)
 			),
 			production("ThrowStatement", type("BUTree<SThrowStmt>").build(),
@@ -4207,15 +3330,11 @@ public class Grammar {
 							stmt("BUTree<? extends SExpr> expr;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							terminal("THROW"),
 							nonTerminal("expr", "Expression"),
 							terminal("SEMICOLON"),
-							action(listOf(
-									stmt("return dress(SThrowStmt.make(expr));").build()
-							))
+							action("return dress(SThrowStmt.make(expr));")
 					)
 			),
 			production("SynchronizedStatement", type("BUTree<SSynchronizedStmt>").build(),
@@ -4226,17 +3345,13 @@ public class Grammar {
 							stmt("BUTree<SBlockStmt> block;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							terminal("SYNCHRONIZED"),
 							terminal("LPAREN"),
 							nonTerminal("expr", "Expression"),
 							terminal("RPAREN"),
 							nonTerminal("block", "Block"),
-							action(listOf(
-									stmt("return dress(SSynchronizedStmt.make(expr, block));").build()
-							))
+							action("return dress(SSynchronizedStmt.make(expr, block));")
 					)
 			),
 			production("TryStatement", type("BUTree<STryStmt>").build(),
@@ -4250,9 +3365,7 @@ public class Grammar {
 							stmt("BUTree<SNodeList> catchClauses = null;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							terminal("TRY"),
 							choice(
 									sequence(
@@ -4285,9 +3398,7 @@ public class Grammar {
 											)
 									)
 							),
-							action(listOf(
-									stmt("return dress(STryStmt.make(ensureNotNull(resources), trailingSemiColon.value, tryBlock, ensureNotNull(catchClauses), optionOf(finallyBlock)));").build()
-							))
+							action("return dress(STryStmt.make(ensureNotNull(resources), trailingSemiColon.value, tryBlock, ensureNotNull(catchClauses), optionOf(finallyBlock)));")
 					)
 			),
 			production("CatchClauses", type("BUTree<SNodeList>").build(),
@@ -4300,13 +3411,9 @@ public class Grammar {
 					sequence(
 							oneOrMore(
 									nonTerminal("catchClause", "CatchClause"),
-									action(listOf(
-											stmt("catchClauses = append(catchClauses, catchClause);").build()
-									))
+									action("catchClauses = append(catchClauses, catchClause);")
 							),
-							action(listOf(
-									stmt("return catchClauses;").build()
-							))
+							action("return catchClauses;")
 					)
 			),
 			production("CatchClause", type("BUTree<SCatchClause>").build(),
@@ -4317,17 +3424,13 @@ public class Grammar {
 							stmt("BUTree<SBlockStmt> catchBlock;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							terminal("CATCH"),
 							terminal("LPAREN"),
 							nonTerminal("param", "CatchFormalParameter"),
 							terminal("RPAREN"),
 							nonTerminal("catchBlock", "Block"),
-							action(listOf(
-									stmt("return dress(SCatchClause.make(param, catchBlock));").build()
-							))
+							action("return dress(SCatchClause.make(param, catchBlock));")
 					)
 			),
 			production("CatchFormalParameter", type("BUTree<SFormalParameter>").build(),
@@ -4340,35 +3443,23 @@ public class Grammar {
 							stmt("BUTree<SVariableDeclaratorId> exceptId;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							nonTerminal("modifiers", "Modifiers"),
 							nonTerminal("exceptType", "QualifiedType", null, listOf(
 									expr("null").build()
 							)),
-							action(listOf(
-									stmt("exceptTypes = append(exceptTypes, exceptType);").build()
-							)),
+							action("exceptTypes = append(exceptTypes, exceptType);"),
 							zeroOrOne(
-									action(listOf(
-											stmt("lateRun();").build()
-									)),
+									action("lateRun();"),
 									oneOrMore(
 											terminal("BIT_OR"),
 											nonTerminal("exceptType", "AnnotatedQualifiedType"),
-											action(listOf(
-													stmt("exceptTypes = append(exceptTypes, exceptType);").build()
-											))
+											action("exceptTypes = append(exceptTypes, exceptType);")
 									),
-									action(listOf(
-											stmt("exceptType = dress(SUnionType.make(exceptTypes));").build()
-									))
+									action("exceptType = dress(SUnionType.make(exceptTypes));")
 							),
 							nonTerminal("exceptId", "VariableDeclaratorId"),
-							action(listOf(
-									stmt("return dress(SFormalParameter.make(modifiers, exceptType, false, emptyList(), optionOf(exceptId), false, none()));").build()
-							))
+							action("return dress(SFormalParameter.make(modifiers, exceptType, false, emptyList(), optionOf(exceptId), false, none()));")
 					)
 			),
 			production("ResourceSpecification", type("BUTree<SNodeList>").build(),
@@ -4383,26 +3474,18 @@ public class Grammar {
 					sequence(
 							terminal("LPAREN"),
 							nonTerminal("var", "VariableDeclExpression"),
-							action(listOf(
-									stmt("vars = append(vars, var);").build()
-							)),
+							action("vars = append(vars, var);"),
 							zeroOrMore(
 									terminal("SEMICOLON"),
 									nonTerminal("var", "VariableDeclExpression"),
-									action(listOf(
-											stmt("vars = append(vars, var);").build()
-									))
+									action("vars = append(vars, var);")
 							),
 							zeroOrOne(
 									terminal("SEMICOLON"),
-									action(listOf(
-											stmt("trailingSemiColon.value = true;").build()
-									))
+									action("trailingSemiColon.value = true;")
 							),
 							terminal("RPAREN"),
-							action(listOf(
-									stmt("return vars;").build()
-							))
+							action("return vars;")
 					)
 			),
 			production("RUNSIGNEDSHIFT", null,
@@ -4413,9 +3496,7 @@ public class Grammar {
 							terminal("GT"),
 							terminal("GT"),
 							terminal("GT"),
-							action(listOf(
-									stmt("popNewWhitespaces(2);").build()
-							))
+							action("popNewWhitespaces(2);")
 					)
 			),
 			production("RSIGNEDSHIFT", null,
@@ -4425,9 +3506,7 @@ public class Grammar {
 					sequence(
 							terminal("GT"),
 							terminal("GT"),
-							action(listOf(
-									stmt("popNewWhitespaces(1);").build()
-							))
+							action("popNewWhitespaces(1);")
 					)
 			),
 
@@ -4443,13 +3522,9 @@ public class Grammar {
 					sequence(
 							zeroOrMore(
 									nonTerminal("annotation", "Annotation"),
-									action(listOf(
-											stmt("annotations = append(annotations, annotation);").build()
-									))
+									action("annotations = append(annotations, annotation);")
 							),
-							action(listOf(
-									stmt("return annotations;").build()
-							))
+							action("return annotations;")
 					)
 			),
 			production("Annotation", type("BUTree<? extends SAnnotationExpr>").build(),
@@ -4464,9 +3539,7 @@ public class Grammar {
 									nonTerminal("ret", "MarkerAnnotation"),
 									nonTerminal("ret", "SingleElementAnnotation")
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("NormalAnnotation", type("BUTree<SNormalAnnotationExpr>").build(),
@@ -4477,9 +3550,7 @@ public class Grammar {
 							stmt("BUTree<SNodeList> pairs = null;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							terminal("AT"),
 							nonTerminal("name", "QualifiedName"),
 							terminal("LPAREN"),
@@ -4487,9 +3558,7 @@ public class Grammar {
 									nonTerminal("pairs", "ElementValuePairList")
 							),
 							terminal("RPAREN"),
-							action(listOf(
-									stmt("return dress(SNormalAnnotationExpr.make(name, ensureNotNull(pairs)));").build()
-							))
+							action("return dress(SNormalAnnotationExpr.make(name, ensureNotNull(pairs)));")
 					)
 			),
 			production("MarkerAnnotation", type("BUTree<SMarkerAnnotationExpr>").build(),
@@ -4499,14 +3568,10 @@ public class Grammar {
 							stmt("BUTree<SQualifiedName> name;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							terminal("AT"),
 							nonTerminal("name", "QualifiedName"),
-							action(listOf(
-									stmt("return dress(SMarkerAnnotationExpr.make(name));").build()
-							))
+							action("return dress(SMarkerAnnotationExpr.make(name));")
 					)
 			),
 			production("SingleElementAnnotation", type("BUTree<SSingleMemberAnnotationExpr>").build(),
@@ -4517,17 +3582,13 @@ public class Grammar {
 							stmt("BUTree<? extends SExpr> value;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							terminal("AT"),
 							nonTerminal("name", "QualifiedName"),
 							terminal("LPAREN"),
 							nonTerminal("value", "ElementValue"),
 							terminal("RPAREN"),
-							action(listOf(
-									stmt("return dress(SSingleMemberAnnotationExpr.make(name, value));").build()
-							))
+							action("return dress(SSingleMemberAnnotationExpr.make(name, value));")
 					)
 			),
 			production("ElementValuePairList", type("BUTree<SNodeList>").build(),
@@ -4539,19 +3600,13 @@ public class Grammar {
 					),
 					sequence(
 							nonTerminal("pair", "ElementValuePair"),
-							action(listOf(
-									stmt("ret = append(ret, pair);").build()
-							)),
+							action("ret = append(ret, pair);"),
 							zeroOrMore(
 									terminal("COMMA"),
 									nonTerminal("pair", "ElementValuePair"),
-									action(listOf(
-											stmt("ret = append(ret, pair);").build()
-									))
+									action("ret = append(ret, pair);")
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("ElementValuePair", type("BUTree<SMemberValuePair>").build(),
@@ -4562,15 +3617,11 @@ public class Grammar {
 							stmt("BUTree<? extends SExpr> value;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							nonTerminal("name", "Name"),
 							terminal("ASSIGN"),
 							nonTerminal("value", "ElementValue"),
-							action(listOf(
-									stmt("return dress(SMemberValuePair.make(name, value));").build()
-							))
+							action("return dress(SMemberValuePair.make(name, value));")
 					)
 			),
 			production("ElementValue", type("BUTree<? extends SExpr>").build(),
@@ -4585,9 +3636,7 @@ public class Grammar {
 									nonTerminal("ret", "ElementValueArrayInitializer"),
 									nonTerminal("ret", "Annotation")
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			),
 			production("ElementValueArrayInitializer", type("BUTree<? extends SExpr>").build(),
@@ -4598,23 +3647,17 @@ public class Grammar {
 							stmt("boolean trailingComma = false;").build()
 					),
 					sequence(
-							action(listOf(
-									stmt("run();").build()
-							)),
+							action("run();"),
 							terminal("LBRACE"),
 							zeroOrOne(
 									nonTerminal("values", "ElementValueList")
 							),
 							zeroOrOne(
 									terminal("COMMA"),
-									action(listOf(
-											stmt("trailingComma = true;").build()
-									))
+									action("trailingComma = true;")
 							),
 							terminal("RBRACE"),
-							action(listOf(
-									stmt("return dress(SArrayInitializerExpr.make(ensureNotNull(values), trailingComma));").build()
-							))
+							action("return dress(SArrayInitializerExpr.make(ensureNotNull(values), trailingComma));")
 					)
 			),
 			production("ElementValueList", type("BUTree<SNodeList>").build(),
@@ -4626,19 +3669,13 @@ public class Grammar {
 					),
 					sequence(
 							nonTerminal("value", "ElementValue"),
-							action(listOf(
-									stmt("ret = append(ret, value);").build()
-							)),
+							action("ret = append(ret, value);"),
 							zeroOrMore(
 									terminal("COMMA"),
 									nonTerminal("value", "ElementValue"),
-									action(listOf(
-											stmt("ret = append(ret, value);").build()
-									))
+									action("ret = append(ret, value);")
 							),
-							action(listOf(
-									stmt("return ret;").build()
-							))
+							action("return ret;")
 					)
 			)
 	);

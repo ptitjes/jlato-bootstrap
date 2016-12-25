@@ -1,6 +1,7 @@
 package org.jlato.cc.grammar;
 
 import org.jlato.bootstrap.Utils;
+import org.jlato.pattern.Quotes;
 import org.jlato.printer.Printer;
 import org.jlato.tree.NodeList;
 import org.jlato.tree.expr.Expr;
@@ -102,6 +103,10 @@ public class GExpansion {
 		return new GExpansion(Kind.Action, null, null, null, null, null, action);
 	}
 
+	public static GExpansion action(String action) {
+		return new GExpansion(Kind.Action, null, null, null, null, null, listOf(Quotes.stmt(action).build()));
+	}
+
 	public final Kind kind;
 	public final List<GExpansion> children;
 	public final String name;
@@ -176,9 +181,8 @@ public class GExpansion {
 				return factoryCall(factoryArgs);
 			}
 			case Action:
-				return factoryCall(listOf(
-						reifyList("stmt", action)
-				));
+				if (action.size() > 1) return factoryCall(listOf(reifyList("stmt", action)));
+				else return factoryCall(listOf(literalExpr(Printer.printToString(action.first(), true))));
 			default:
 				throw new IllegalArgumentException();
 		}
