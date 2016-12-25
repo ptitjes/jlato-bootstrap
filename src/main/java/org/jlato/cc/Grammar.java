@@ -1,6 +1,12 @@
 package org.jlato.cc;
 
 import org.jlato.cc.grammar.GProductions;
+import org.jlato.pattern.Quotes;
+import org.jlato.tree.NodeList;
+import org.jlato.tree.Tree;
+import org.jlato.tree.decl.FormalParameter;
+import org.jlato.tree.expr.Expr;
+import org.jlato.tree.stmt.Stmt;
 
 import static org.jlato.pattern.Quotes.expr;
 import static org.jlato.pattern.Quotes.param;
@@ -10,6 +16,7 @@ import static org.jlato.tree.Trees.emptyList;
 import static org.jlato.tree.Trees.listOf;
 import static org.jlato.cc.grammar.GExpansion.*;
 import static org.jlato.cc.grammar.GProduction.*;
+import static org.jlato.tree.Trees.voidType;
 
 public class Grammar {
 
@@ -17,24 +24,20 @@ public class Grammar {
 
 			// Entry productions
 
-			production("CompilationUnitEntry", type("BUTree<SCompilationUnit>").build(),
+			production("CompilationUnitEntry", "BUTree<SCompilationUnit>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SCompilationUnit> ret;").build()
-					),
+					stmts("BUTree<SCompilationUnit> ret;"),
 					sequence(
 							action("entryPoint = JavaGrammar.COMPILATION_UNIT_ENTRY;"),
 							nonTerminal("ret", "CompilationUnit"),
 							action("return ret;")
 					)
 			),
-			production("PackageDeclEntry", type("BUTree<SPackageDecl>").build(),
+			production("PackageDeclEntry", "BUTree<SPackageDecl>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SPackageDecl> ret;").build()
-					),
+					stmts("BUTree<SPackageDecl> ret;"),
 					sequence(
 							action("entryPoint = JavaGrammar.PACKAGE_DECL_ENTRY;"),
 							nonTerminal("ret", "PackageDecl"),
@@ -42,12 +45,10 @@ public class Grammar {
 							action("return dressWithPrologAndEpilog(ret);")
 					)
 			),
-			production("ImportDeclEntry", type("BUTree<SImportDecl>").build(),
+			production("ImportDeclEntry", "BUTree<SImportDecl>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SImportDecl> ret;").build()
-					),
+					stmts("BUTree<SImportDecl> ret;"),
 					sequence(
 							action("entryPoint = JavaGrammar.IMPORT_DECL_ENTRY;"),
 							nonTerminal("ret", "ImportDecl"),
@@ -55,12 +56,10 @@ public class Grammar {
 							action("return dressWithPrologAndEpilog(ret);")
 					)
 			),
-			production("TypeDeclEntry", type("BUTree<? extends STypeDecl>").build(),
+			production("TypeDeclEntry", "BUTree<? extends STypeDecl>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends STypeDecl> ret;").build()
-					),
+					stmts("BUTree<? extends STypeDecl> ret;"),
 					sequence(
 							action("entryPoint = JavaGrammar.TYPE_DECL_ENTRY;"),
 							nonTerminal("ret", "TypeDecl"),
@@ -68,23 +67,21 @@ public class Grammar {
 							action("return dressWithPrologAndEpilog(ret);")
 					)
 			),
-			production("MemberDeclEntry", type("BUTree<? extends SMemberDecl>").build(),
-					listOf(param("TypeKind typeKind").build()),
+			production("MemberDeclEntry", "BUTree<? extends SMemberDecl>",
+					params("TypeKind typeKind"),
 					emptyList(),
-					listOf(stmt("BUTree<? extends SMemberDecl> ret;").build()),
+					stmts("BUTree<? extends SMemberDecl> ret;"),
 					sequence(
 							action("entryPoint = JavaGrammar.MEMBER_DECL_ENTRY;"),
-							nonTerminal("ret", "ClassOrInterfaceBodyDecl", listOf(expr("typeKind").build())),
+							nonTerminal("ret", "ClassOrInterfaceBodyDecl", exprs("typeKind")),
 							nonTerminal("Epilog"),
 							action("return dressWithPrologAndEpilog(ret);")
 					)
 			),
-			production("AnnotationMemberDeclEntry", type("BUTree<? extends SMemberDecl>").build(),
+			production("AnnotationMemberDeclEntry", "BUTree<? extends SMemberDecl>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SMemberDecl> ret;").build()
-					),
+					stmts("BUTree<? extends SMemberDecl> ret;"),
 					sequence(
 							action("entryPoint = JavaGrammar.ANNOTATION_MEMBER_DECL_ENTRY;"),
 							// TODO Rename AnnotationMemberDecl
@@ -94,12 +91,10 @@ public class Grammar {
 					)
 			),
 
-			production("ModifiersEntry", type("BUTree<SNodeList>").build(),
+			production("ModifiersEntry", "BUTree<SNodeList>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> ret;").build()
-					),
+					stmts("BUTree<SNodeList> ret;"),
 					sequence(
 							action("entryPoint = JavaGrammar.MODIFIERS_ENTRY;"),
 							nonTerminal("ret", "Modifiers"),
@@ -107,12 +102,10 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("AnnotationsEntry", type("BUTree<SNodeList>").build(),
+			production("AnnotationsEntry", "BUTree<SNodeList>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> ret;").build()
-					),
+					stmts("BUTree<SNodeList> ret;"),
 					sequence(
 							action("entryPoint = JavaGrammar.ANNOTATIONS_ENTRY;"),
 							nonTerminal("ret", "Annotations"),
@@ -121,62 +114,60 @@ public class Grammar {
 					)
 			),
 
-			production("MethodDeclEntry", type("BUTree<SMethodDecl>").build(),
+			production("MethodDeclEntry", "BUTree<SMethodDecl>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> modifiers;").build(),
-							stmt("BUTree<SMethodDecl> ret;").build()
+					stmts(
+							"BUTree<SNodeList> modifiers;",
+							"BUTree<SMethodDecl> ret;"
 					),
 					sequence(
 							action("entryPoint = JavaGrammar.METHOD_DECL_ENTRY;"),
 							action("run();"),
 							nonTerminal("modifiers", "Modifiers"),
-							nonTerminal("ret", "MethodDecl", listOf(expr("modifiers").build())),
+							nonTerminal("ret", "MethodDecl", exprs("modifiers")),
 							nonTerminal("Epilog"),
 							action("return dressWithPrologAndEpilog(ret);")
 					)
 			),
-			production("FieldDeclEntry", type("BUTree<SFieldDecl>").build(),
+			production("FieldDeclEntry", "BUTree<SFieldDecl>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> modifiers;").build(),
-							stmt("BUTree<SFieldDecl> ret;").build()
+					stmts(
+							"BUTree<SNodeList> modifiers;",
+							"BUTree<SFieldDecl> ret;"
 					),
 					sequence(
 							action("entryPoint = JavaGrammar.FIELD_DECL_ENTRY;"),
 							action("run();"),
 							nonTerminal("modifiers", "Modifiers"),
-							nonTerminal("ret", "FieldDecl", listOf(expr("modifiers").build())),
+							nonTerminal("ret", "FieldDecl", exprs("modifiers")),
 							nonTerminal("Epilog"),
 							action("return dressWithPrologAndEpilog(ret);")
 					)
 			),
-			production("AnnotationElementDeclEntry", type("BUTree<SAnnotationMemberDecl>").build(),
+			production("AnnotationElementDeclEntry", "BUTree<SAnnotationMemberDecl>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> modifiers;").build(),
-							stmt("BUTree<SAnnotationMemberDecl> ret;").build()
+					stmts(
+							"BUTree<SNodeList> modifiers;",
+							"BUTree<SAnnotationMemberDecl> ret;"
 					),
 					sequence(
 							action("entryPoint = JavaGrammar.ANNOTATION_ELEMENT_DECL_ENTRY;"),
 							action("run();"),
 							nonTerminal("modifiers", "Modifiers"),
 							// TODO Rename AnnotationElementDecl
-							nonTerminal("ret", "AnnotationTypeMemberDecl", listOf(expr("modifiers").build())),
+							nonTerminal("ret", "AnnotationTypeMemberDecl", exprs("modifiers")),
 							nonTerminal("Epilog"),
 							action("return dressWithPrologAndEpilog(ret);")
 					)
 			),
 
-			production("EnumConstantDeclEntry", type("BUTree<SEnumConstantDecl>").build(),
+			production("EnumConstantDeclEntry", "BUTree<SEnumConstantDecl>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SEnumConstantDecl> ret;").build()
-					),
+					stmts("BUTree<SEnumConstantDecl> ret;"),
 					sequence(
 							action("entryPoint = JavaGrammar.ENUM_CONSTANT_DECL_ENTRY;"),
 							nonTerminal("ret", "EnumConstantDecl"),
@@ -184,12 +175,10 @@ public class Grammar {
 							action("return dressWithPrologAndEpilog(ret);")
 					)
 			),
-			production("FormalParameterEntry", type("BUTree<SFormalParameter>").build(),
+			production("FormalParameterEntry", "BUTree<SFormalParameter>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SFormalParameter> ret;").build()
-					),
+					stmts("BUTree<SFormalParameter> ret;"),
 					sequence(
 							action("entryPoint = JavaGrammar.FORMAL_PARAMETER_ENTRY;"),
 							nonTerminal("ret", "FormalParameter"),
@@ -197,12 +186,10 @@ public class Grammar {
 							action("return dressWithPrologAndEpilog(ret);")
 					)
 			),
-			production("TypeParameterEntry", type("BUTree<STypeParameter>").build(),
+			production("TypeParameterEntry", "BUTree<STypeParameter>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<STypeParameter> ret;").build()
-					),
+					stmts("BUTree<STypeParameter> ret;"),
 					sequence(
 							action("entryPoint = JavaGrammar.TYPE_PARAMETER_ENTRY;"),
 							nonTerminal("ret", "TypeParameter"),
@@ -210,12 +197,10 @@ public class Grammar {
 							action("return dressWithPrologAndEpilog(ret);")
 					)
 			),
-			production("StatementsEntry", type("BUTree<SNodeList>").build(),
+			production("StatementsEntry", "BUTree<SNodeList>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> ret;").build()
-					),
+					stmts("BUTree<SNodeList> ret;"),
 					sequence(
 							action("entryPoint = JavaGrammar.STATEMENTS_ENTRY;"),
 							nonTerminal("ret", "Statements"),
@@ -223,12 +208,10 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("BlockStatementEntry", type("BUTree<? extends SStmt>").build(),
+			production("BlockStatementEntry", "BUTree<? extends SStmt>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SStmt> ret;").build()
-					),
+					stmts("BUTree<? extends SStmt> ret;"),
 					sequence(
 							action("entryPoint = JavaGrammar.BLOCK_STATEMENT_ENTRY;"),
 							nonTerminal("ret", "BlockStatement"),
@@ -236,12 +219,10 @@ public class Grammar {
 							action("return dressWithPrologAndEpilog(ret);")
 					)
 			),
-			production("ExpressionEntry", type("BUTree<? extends SExpr>").build(),
+			production("ExpressionEntry", "BUTree<? extends SExpr>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build()
-					),
+					stmts("BUTree<? extends SExpr> ret;"),
 					sequence(
 							action("entryPoint = JavaGrammar.EXPRESSION_ENTRY;"),
 							nonTerminal("ret", "Expression"),
@@ -251,29 +232,27 @@ public class Grammar {
 			),
 
 
-			production("TypeEntry", type("BUTree<? extends SType>").build(),
+			production("TypeEntry", "BUTree<? extends SType>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> annotations;").build(),
-							stmt("BUTree<? extends SType> ret;").build()
+					stmts(
+							"BUTree<SNodeList> annotations;",
+							"BUTree<? extends SType> ret;"
 					),
 					sequence(
 							action("entryPoint = JavaGrammar.TYPE_ENTRY;"),
 							action("run();"),
 							nonTerminal("annotations", "Annotations"),
-							nonTerminal("ret", "Type", listOf(expr("annotations").build())),
+							nonTerminal("ret", "Type", exprs("annotations")),
 							nonTerminal("Epilog"),
 							action("return dressWithPrologAndEpilog(ret);")
 					)
 			),
 
-			production("QualifiedNameEntry", type("BUTree<SQualifiedName>").build(),
+			production("QualifiedNameEntry", "BUTree<SQualifiedName>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SQualifiedName> ret;").build()
-					),
+					stmts("BUTree<SQualifiedName> ret;"),
 					sequence(
 							action("entryPoint = JavaGrammar.QUALIFIED_NAME_ENTRY;"),
 							nonTerminal("ret", "QualifiedName"),
@@ -281,12 +260,10 @@ public class Grammar {
 							action("return dressWithPrologAndEpilog(ret);")
 					)
 			),
-			production("NameEntry", type("BUTree<SName>").build(),
+			production("NameEntry", "BUTree<SName>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SName> ret;").build()
-					),
+					stmts("BUTree<SName> ret;"),
 					sequence(
 							action("entryPoint = JavaGrammar.NAME_ENTRY;"),
 							nonTerminal("ret", "Name"),
@@ -295,7 +272,7 @@ public class Grammar {
 					)
 			),
 
-			production("Epilog", null,
+			production("Epilog", voidType(),
 					emptyList(),
 					emptyList(),
 					emptyList(),
@@ -306,36 +283,32 @@ public class Grammar {
 
 			// Main productions
 
-			production("NodeListVar", type("BUTree<SNodeList>").build(),
+			production("NodeListVar", "BUTree<SNodeList>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("Token id;").build()
-					),
+					stmts("Token id;"),
 					sequence(
 							terminal("id", "NODE_LIST_VARIABLE"),
 							action("return makeVar(id);")
 					)
 			),
-			production("NodeVar", type("BUTree<SName>").build(),
+			production("NodeVar", "BUTree<SName>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("Token id;").build()
-					),
+					stmts("Token id;"),
 					sequence(
 							terminal("id", "NODE_VARIABLE"),
 							action("return makeVar(id);")
 					)
 			),
-			production("CompilationUnit", type("BUTree<SCompilationUnit>").build(),
+			production("CompilationUnit", "BUTree<SCompilationUnit>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SPackageDecl> packageDecl = null;").build(),
-							stmt("BUTree<SNodeList> imports;").build(),
-							stmt("BUTree<SNodeList> types;").build(),
-							stmt("BUTree<SCompilationUnit> compilationUnit;").build()
+					stmts(
+							"BUTree<SPackageDecl> packageDecl = null;",
+							"BUTree<SNodeList> imports;",
+							"BUTree<SNodeList> types;",
+							"BUTree<SCompilationUnit> compilationUnit;"
 					),
 					sequence(
 							action("run();"),
@@ -349,12 +322,12 @@ public class Grammar {
 							action("return dressWithPrologAndEpilog(compilationUnit);")
 					)
 			),
-			production("PackageDecl", type("BUTree<SPackageDecl>").build(),
+			production("PackageDecl", "BUTree<SPackageDecl>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> annotations = null;").build(),
-							stmt("BUTree<SQualifiedName> name;").build()
+					stmts(
+							"BUTree<SNodeList> annotations = null;",
+							"BUTree<SQualifiedName> name;"
 					),
 					sequence(
 							action("run();"),
@@ -365,12 +338,12 @@ public class Grammar {
 							action("return dress(SPackageDecl.make(annotations, name));")
 					)
 			),
-			production("ImportDecls", type("BUTree<SNodeList>").build(),
+			production("ImportDecls", "BUTree<SNodeList>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> imports = emptyList();").build(),
-							stmt("BUTree<SImportDecl> importDecl = null;").build()
+					stmts(
+							"BUTree<SNodeList> imports = emptyList();",
+							"BUTree<SImportDecl> importDecl = null;"
 					),
 					sequence(
 							zeroOrMore(
@@ -380,13 +353,13 @@ public class Grammar {
 							action("return imports;")
 					)
 			),
-			production("ImportDecl", type("BUTree<SImportDecl>").build(),
+			production("ImportDecl", "BUTree<SImportDecl>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SQualifiedName> name;").build(),
-							stmt("boolean isStatic = false;").build(),
-							stmt("boolean isAsterisk = false;").build()
+					stmts(
+							"BUTree<SQualifiedName> name;",
+							"boolean isStatic = false;",
+							"boolean isAsterisk = false;"
 					),
 					sequence(
 							action("run();"),
@@ -405,12 +378,12 @@ public class Grammar {
 							action("return dress(SImportDecl.make(name, isStatic, isAsterisk));")
 					)
 			),
-			production("TypeDecls", type("BUTree<SNodeList>").build(),
+			production("TypeDecls", "BUTree<SNodeList>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> types = emptyList();").build(),
-							stmt("BUTree<? extends STypeDecl> typeDecl = null;").build()
+					stmts(
+							"BUTree<SNodeList> types = emptyList();",
+							"BUTree<? extends STypeDecl> typeDecl = null;"
 					),
 					sequence(
 							zeroOrMore(
@@ -420,12 +393,12 @@ public class Grammar {
 							action("return types;")
 					)
 			),
-			production("Modifiers", type("BUTree<SNodeList>").build(),
+			production("Modifiers", "BUTree<SNodeList>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> modifiers = emptyList();").build(),
-							stmt("BUTree<? extends SAnnotationExpr> ann;").build()
+					stmts(
+							"BUTree<SNodeList> modifiers = emptyList();",
+							"BUTree<? extends SAnnotationExpr> ann;"
 					),
 					sequence(
 							zeroOrMore(
@@ -487,12 +460,12 @@ public class Grammar {
 							action("return modifiers;")
 					)
 			),
-			production("ModifiersNoDefault", type("BUTree<SNodeList>").build(),
+			production("ModifiersNoDefault", "BUTree<SNodeList>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> modifiers = emptyList();").build(),
-							stmt("BUTree<? extends SAnnotationExpr> ann;").build()
+					stmts(
+							"BUTree<SNodeList> modifiers = emptyList();",
+							"BUTree<? extends SAnnotationExpr> ann;"
 					),
 					sequence(
 							zeroOrMore(
@@ -550,12 +523,12 @@ public class Grammar {
 							action("return modifiers;")
 					)
 			),
-			production("TypeDecl", type("BUTree<? extends STypeDecl>").build(),
+			production("TypeDecl", "BUTree<? extends STypeDecl>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> modifiers;").build(),
-							stmt("BUTree<? extends STypeDecl> ret;").build()
+					stmts(
+							"BUTree<SNodeList> modifiers;",
+							"BUTree<? extends STypeDecl> ret;"
 					),
 					sequence(
 							action("run();"),
@@ -567,35 +540,27 @@ public class Grammar {
 									sequence(
 											nonTerminal("modifiers", "Modifiers"),
 											choice(
-													nonTerminal("ret", "ClassOrInterfaceDecl", null, listOf(
-															expr("modifiers").build()
-													)),
-													nonTerminal("ret", "EnumDecl", null, listOf(
-															expr("modifiers").build()
-													)),
-													nonTerminal("ret", "AnnotationTypeDecl", null, listOf(
-															expr("modifiers").build()
-													))
+													nonTerminal("ret", "ClassOrInterfaceDecl", null, exprs("modifiers")),
+													nonTerminal("ret", "EnumDecl", null, exprs("modifiers")),
+													nonTerminal("ret", "AnnotationTypeDecl", null, exprs("modifiers"))
 											)
 									)
 							),
 							action("return ret;")
 					)
 			),
-			production("ClassOrInterfaceDecl", type("BUTree<? extends STypeDecl>").build(),
+			production("ClassOrInterfaceDecl", "BUTree<? extends STypeDecl>",
 					emptyList(),
-					listOf(
-							param("BUTree<SNodeList> modifiers").build()
-					),
-					listOf(
-							stmt("TypeKind typeKind;").build(),
-							stmt("BUTree<SName> name;").build(),
-							stmt("BUTree<SNodeList> typeParams = null;").build(),
-							stmt("BUTree<SQualifiedType> superClassType = null;").build(),
-							stmt("BUTree<SNodeList> extendsClause = null;").build(),
-							stmt("BUTree<SNodeList> implementsClause = null;").build(),
-							stmt("BUTree<SNodeList> members;").build(),
-							stmt("ByRef<BUProblem> problem = new ByRef<BUProblem>(null);").build()
+					params("BUTree<SNodeList> modifiers"),
+					stmts(
+							"TypeKind typeKind;",
+							"BUTree<SName> name;",
+							"BUTree<SNodeList> typeParams = null;",
+							"BUTree<SQualifiedType> superClassType = null;",
+							"BUTree<SNodeList> extendsClause = null;",
+							"BUTree<SNodeList> implementsClause = null;",
+							"BUTree<SNodeList> members;",
+							"ByRef<BUProblem> problem = new ByRef<BUProblem>(null);"
 					),
 					sequence(
 							choice(
@@ -611,9 +576,9 @@ public class Grammar {
 													nonTerminal("superClassType", "AnnotatedQualifiedType")
 											),
 											zeroOrOne(
-													nonTerminal("implementsClause", "ImplementsList", null, listOf(
-															expr("typeKind").build(),
-															expr("problem").build()
+													nonTerminal("implementsClause", "ImplementsList", null, exprs(
+															"typeKind",
+															"problem"
 													))
 											)
 									),
@@ -629,19 +594,17 @@ public class Grammar {
 											)
 									)
 							),
-							nonTerminal("members", "ClassOrInterfaceBody", null, listOf(
-									expr("typeKind").build()
-							)),
+							nonTerminal("members", "ClassOrInterfaceBody", null, exprs("typeKind")),
 							action("if (typeKind == TypeKind.Interface)\n\treturn dress(SInterfaceDecl.make(modifiers, name, ensureNotNull(typeParams), ensureNotNull(extendsClause), members)).withProblem(problem.value);\nelse {\n\treturn dress(SClassDecl.make(modifiers, name, ensureNotNull(typeParams), optionOf(superClassType), ensureNotNull(implementsClause), members));\n}")
 					)
 			),
-			production("ExtendsList", type("BUTree<SNodeList>").build(),
+			production("ExtendsList", "BUTree<SNodeList>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> ret = emptyList();").build(),
-							stmt("BUTree<SQualifiedType> cit;").build(),
-							stmt("BUTree<SNodeList> annotations = null;").build()
+					stmts(
+							"BUTree<SNodeList> ret = emptyList();",
+							"BUTree<SQualifiedType> cit;",
+							"BUTree<SNodeList> annotations = null;"
 					),
 					sequence(
 							terminal("EXTENDS"),
@@ -660,16 +623,16 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("ImplementsList", type("BUTree<SNodeList>").build(),
+			production("ImplementsList", "BUTree<SNodeList>",
 					emptyList(),
-					listOf(
-							param("TypeKind typeKind").build(),
-							param("ByRef<BUProblem> problem").build()
+					params(
+							"TypeKind typeKind",
+							"ByRef<BUProblem> problem"
 					),
-					listOf(
-							stmt("BUTree<SNodeList> ret = emptyList();").build(),
-							stmt("BUTree<SQualifiedType> cit;").build(),
-							stmt("BUTree<SNodeList> annotations = null;").build()
+					stmts(
+							"BUTree<SNodeList> ret = emptyList();",
+							"BUTree<SQualifiedType> cit;",
+							"BUTree<SNodeList> annotations = null;"
 					),
 					sequence(
 							terminal("IMPLEMENTS"),
@@ -689,27 +652,25 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("EnumDecl", type("BUTree<? extends STypeDecl>").build(),
+			production("EnumDecl", "BUTree<? extends STypeDecl>",
 					emptyList(),
-					listOf(
-							param("BUTree<SNodeList> modifiers").build()
-					),
-					listOf(
-							stmt("BUTree<SName> name;").build(),
-							stmt("BUTree<SNodeList> implementsClause = emptyList();").build(),
-							stmt("BUTree<SEnumConstantDecl> entry;").build(),
-							stmt("BUTree<SNodeList> constants = emptyList();").build(),
-							stmt("boolean trailingComma = false;").build(),
-							stmt("BUTree<SNodeList> members = null;").build(),
-							stmt("ByRef<BUProblem> problem = new ByRef<BUProblem>(null);").build()
+					params("BUTree<SNodeList> modifiers"),
+					stmts(
+							"BUTree<SName> name;",
+							"BUTree<SNodeList> implementsClause = emptyList();",
+							"BUTree<SEnumConstantDecl> entry;",
+							"BUTree<SNodeList> constants = emptyList();",
+							"boolean trailingComma = false;",
+							"BUTree<SNodeList> members = null;",
+							"ByRef<BUProblem> problem = new ByRef<BUProblem>(null);"
 					),
 					sequence(
 							terminal("ENUM"),
 							nonTerminal("name", "Name"),
 							zeroOrOne(
-									nonTerminal("implementsClause", "ImplementsList", null, listOf(
-											expr("TypeKind.Enum").build(),
-											expr("problem").build()
+									nonTerminal("implementsClause", "ImplementsList", null, exprs(
+											"TypeKind.Enum",
+											"problem"
 									))
 							),
 							terminal("LBRACE"),
@@ -733,22 +694,20 @@ public class Grammar {
 							),
 							zeroOrOne(
 									terminal("SEMICOLON"),
-									nonTerminal("members", "ClassOrInterfaceBodyDecls", null, listOf(
-											expr("TypeKind.Enum").build()
-									))
+									nonTerminal("members", "ClassOrInterfaceBodyDecls", null, exprs("TypeKind.Enum"))
 							),
 							terminal("RBRACE"),
 							action("return dress(SEnumDecl.make(modifiers, name, implementsClause, constants, trailingComma, ensureNotNull(members))).withProblem(problem.value);")
 					)
 			),
-			production("EnumConstantDecl", type("BUTree<SEnumConstantDecl>").build(),
+			production("EnumConstantDecl", "BUTree<SEnumConstantDecl>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> modifiers = null;").build(),
-							stmt("BUTree<SName> name;").build(),
-							stmt("BUTree<SNodeList> args = null;").build(),
-							stmt("BUTree<SNodeList> classBody = null;").build()
+					stmts(
+							"BUTree<SNodeList> modifiers = null;",
+							"BUTree<SName> name;",
+							"BUTree<SNodeList> args = null;",
+							"BUTree<SNodeList> classBody = null;"
 					),
 					sequence(
 							action("run();"),
@@ -758,21 +717,17 @@ public class Grammar {
 									nonTerminal("args", "Arguments")
 							),
 							zeroOrOne(
-									nonTerminal("classBody", "ClassOrInterfaceBody", null, listOf(
-											expr("TypeKind.Class").build()
-									))
+									nonTerminal("classBody", "ClassOrInterfaceBody", null, exprs("TypeKind.Class"))
 							),
 							action("return dress(SEnumConstantDecl.make(modifiers, name, optionOf(args), optionOf(classBody)));")
 					)
 			),
-			production("AnnotationTypeDecl", type("BUTree<SAnnotationDecl>").build(),
+			production("AnnotationTypeDecl", "BUTree<SAnnotationDecl>",
 					emptyList(),
-					listOf(
-							param("BUTree<SNodeList> modifiers").build()
-					),
-					listOf(
-							stmt("BUTree<SName> name;").build(),
-							stmt("BUTree<SNodeList> members;").build()
+					params("BUTree<SNodeList> modifiers"),
+					stmts(
+							"BUTree<SName> name;",
+							"BUTree<SNodeList> members;"
 					),
 					sequence(
 							terminal("AT"),
@@ -782,12 +737,12 @@ public class Grammar {
 							action("return dress(SAnnotationDecl.make(modifiers, name, members));")
 					)
 			),
-			production("AnnotationTypeBody", type("BUTree<SNodeList>").build(),
+			production("AnnotationTypeBody", "BUTree<SNodeList>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> ret = emptyList();").build(),
-							stmt("BUTree<? extends SMemberDecl> member;").build()
+					stmts(
+							"BUTree<SNodeList> ret = emptyList();",
+							"BUTree<? extends SMemberDecl> member;"
 					),
 					sequence(
 							terminal("LBRACE"),
@@ -804,12 +759,12 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("AnnotationTypeBodyDecl", type("BUTree<? extends SMemberDecl>").build(),
+			production("AnnotationTypeBodyDecl", "BUTree<? extends SMemberDecl>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> modifiers;").build(),
-							stmt("BUTree<? extends SMemberDecl> ret;").build()
+					stmts(
+							"BUTree<SNodeList> modifiers;",
+							"BUTree<? extends SMemberDecl> ret;"
 					),
 					sequence(
 							action("run();"),
@@ -821,43 +776,29 @@ public class Grammar {
 									sequence(
 											nonTerminal("modifiers", "Modifiers"),
 											choice(
-													nonTerminal("ret", "AnnotationTypeMemberDecl", null, listOf(
-															expr("modifiers").build()
-													)),
-													nonTerminal("ret", "ClassOrInterfaceDecl", null, listOf(
-															expr("modifiers").build()
-													)),
-													nonTerminal("ret", "EnumDecl", null, listOf(
-															expr("modifiers").build()
-													)),
-													nonTerminal("ret", "AnnotationTypeDecl", null, listOf(
-															expr("modifiers").build()
-													)),
-													nonTerminal("ret", "FieldDecl", null, listOf(
-															expr("modifiers").build()
-													))
+													nonTerminal("ret", "AnnotationTypeMemberDecl", null, exprs("modifiers")),
+													nonTerminal("ret", "ClassOrInterfaceDecl", null, exprs("modifiers")),
+													nonTerminal("ret", "EnumDecl", null, exprs("modifiers")),
+													nonTerminal("ret", "AnnotationTypeDecl", null, exprs("modifiers")),
+													nonTerminal("ret", "FieldDecl", null, exprs("modifiers"))
 											)
 									)
 							),
 							action("return ret;")
 					)
 			),
-			production("AnnotationTypeMemberDecl", type("BUTree<SAnnotationMemberDecl>").build(),
+			production("AnnotationTypeMemberDecl", "BUTree<SAnnotationMemberDecl>",
 					emptyList(),
-					listOf(
-							param("BUTree<SNodeList> modifiers").build()
-					),
-					listOf(
-							stmt("BUTree<? extends SType> type;").build(),
-							stmt("BUTree<SName> name;").build(),
-							stmt("BUTree<SNodeList> dims;").build(),
-							stmt("BUTree<SNodeOption> defaultValue = none();").build(),
-							stmt("BUTree<? extends SExpr> value = null;").build()
+					params("BUTree<SNodeList> modifiers"),
+					stmts(
+							"BUTree<? extends SType> type;",
+							"BUTree<SName> name;",
+							"BUTree<SNodeList> dims;",
+							"BUTree<SNodeOption> defaultValue = none();",
+							"BUTree<? extends SExpr> value = null;"
 					),
 					sequence(
-							nonTerminal("type", "Type", null, listOf(
-									expr("null").build()
-							)),
+							nonTerminal("type", "Type", null, exprs("null")),
 							nonTerminal("name", "Name"),
 							terminal("LPAREN"),
 							terminal("RPAREN"),
@@ -871,12 +812,12 @@ public class Grammar {
 							action("return dress(SAnnotationMemberDecl.make(modifiers, type, name, dims, defaultValue));")
 					)
 			),
-			production("TypeParameters", type("BUTree<SNodeList>").build(),
+			production("TypeParameters", "BUTree<SNodeList>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> ret = emptyList();").build(),
-							stmt("BUTree<STypeParameter> tp;").build()
+					stmts(
+							"BUTree<SNodeList> ret = emptyList();",
+							"BUTree<STypeParameter> tp;"
 					),
 					sequence(
 							terminal("LT"),
@@ -896,13 +837,13 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("TypeParameter", type("BUTree<STypeParameter>").build(),
+			production("TypeParameter", "BUTree<STypeParameter>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> annotations = null;").build(),
-							stmt("BUTree<SName> name;").build(),
-							stmt("BUTree<SNodeList> typeBounds = null;").build()
+					stmts(
+							"BUTree<SNodeList> annotations = null;",
+							"BUTree<SName> name;",
+							"BUTree<SNodeList> typeBounds = null;"
 					),
 					sequence(
 							action("run();"),
@@ -914,13 +855,13 @@ public class Grammar {
 							action("return dress(STypeParameter.make(annotations, name, ensureNotNull(typeBounds)));")
 					)
 			),
-			production("TypeBounds", type("BUTree<SNodeList>").build(),
+			production("TypeBounds", "BUTree<SNodeList>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> ret = emptyList();").build(),
-							stmt("BUTree<SQualifiedType> cit;").build(),
-							stmt("BUTree<SNodeList> annotations = null;").build()
+					stmts(
+							"BUTree<SNodeList> ret = emptyList();",
+							"BUTree<SQualifiedType> cit;",
+							"BUTree<SNodeList> annotations = null;"
 					),
 					sequence(
 							terminal("EXTENDS"),
@@ -939,41 +880,33 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("ClassOrInterfaceBody", type("BUTree<SNodeList>").build(),
+			production("ClassOrInterfaceBody", "BUTree<SNodeList>",
 					emptyList(),
-					listOf(
-							param("TypeKind typeKind").build()
-					),
-					listOf(
-							stmt("BUTree<SNodeList> ret = emptyList();").build(),
-							stmt("BUTree<? extends SMemberDecl> member;").build()
+					params("TypeKind typeKind"),
+					stmts(
+							"BUTree<SNodeList> ret = emptyList();",
+							"BUTree<? extends SMemberDecl> member;"
 					),
 					sequence(
 							terminal("LBRACE"),
-							nonTerminal("ret", "ClassOrInterfaceBodyDecls", null, listOf(
-									expr("typeKind").build()
-							)),
+							nonTerminal("ret", "ClassOrInterfaceBodyDecls", null, exprs("typeKind")),
 							terminal("RBRACE"),
 							action("return ret;")
 					)
 			),
-			production("ClassOrInterfaceBodyDecls", type("BUTree<SNodeList>").build(),
+			production("ClassOrInterfaceBodyDecls", "BUTree<SNodeList>",
 					emptyList(),
-					listOf(
-							param("TypeKind typeKind").build()
-					),
-					listOf(
-							stmt("BUTree<? extends SMemberDecl> member;").build(),
-							stmt("BUTree<SNodeList> ret = emptyList();").build()
+					params("TypeKind typeKind"),
+					stmts(
+							"BUTree<? extends SMemberDecl> member;",
+							"BUTree<SNodeList> ret = emptyList();"
 					),
 					sequence(
 							zeroOrOne(
 									choice(
 											nonTerminal("ret", "NodeListVar"),
 											oneOrMore(
-													nonTerminal("member", "ClassOrInterfaceBodyDecl", null, listOf(
-															expr("typeKind").build()
-													)),
+													nonTerminal("member", "ClassOrInterfaceBodyDecl", null, exprs("typeKind")),
 													action("ret = append(ret, member);")
 											)
 									)
@@ -981,15 +914,13 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("ClassOrInterfaceBodyDecl", type("BUTree<? extends SMemberDecl>").build(),
+			production("ClassOrInterfaceBodyDecl", "BUTree<? extends SMemberDecl>",
 					emptyList(),
-					listOf(
-							param("TypeKind typeKind").build()
-					),
-					listOf(
-							stmt("BUTree<SNodeList> modifiers;").build(),
-							stmt("BUTree<? extends SMemberDecl> ret;").build(),
-							stmt("BUProblem problem = null;").build()
+					params("TypeKind typeKind"),
+					stmts(
+							"BUTree<SNodeList> modifiers;",
+							"BUTree<? extends SMemberDecl> ret;",
+							"BUProblem problem = null;"
 					),
 					sequence(
 							action("run();"),
@@ -1003,82 +934,60 @@ public class Grammar {
 											action("if (modifiers != null && contains(modifiers, SModifier.make(ModifierKeyword.Default)) && typeKind != TypeKind.Interface) problem = new BUProblem(Severity.ERROR, \"Only interfaces can have default members\");"),
 											choice(
 													sequence(
-															nonTerminal("ret", "InitializerDecl", null, listOf(
-																	expr("modifiers").build()
-															)),
+															nonTerminal("ret", "InitializerDecl", null, exprs("modifiers")),
 															action("if (typeKind == TypeKind.Interface) ret = ret.withProblem(new BUProblem(Severity.ERROR, \"An interface cannot have initializers\"));")
 													),
-													nonTerminal("ret", "ClassOrInterfaceDecl", null, listOf(
-															expr("modifiers").build()
-													)),
-													nonTerminal("ret", "EnumDecl", null, listOf(
-															expr("modifiers").build()
-													)),
-													nonTerminal("ret", "AnnotationTypeDecl", null, listOf(
-															expr("modifiers").build()
-													)),
+													nonTerminal("ret", "ClassOrInterfaceDecl", null, exprs("modifiers")),
+													nonTerminal("ret", "EnumDecl", null, exprs("modifiers")),
+													nonTerminal("ret", "AnnotationTypeDecl", null, exprs("modifiers")),
 													sequence(
-															nonTerminal("ret", "ConstructorDecl", null, listOf(
-																	expr("modifiers").build()
-															)),
+															nonTerminal("ret", "ConstructorDecl", null, exprs("modifiers")),
 															action("if (typeKind == TypeKind.Interface) ret = ret.withProblem(new BUProblem(Severity.ERROR, \"An interface cannot have constructors\"));")
 													),
 													sequence(
-															nonTerminal("ret", "FieldDecl", null, listOf(
-																	expr("modifiers").build()
-															))
+															nonTerminal("ret", "FieldDecl", null, exprs("modifiers"))
 													),
-													nonTerminal("ret", "MethodDecl", null, listOf(
-															expr("modifiers").build()
-													))
+													nonTerminal("ret", "MethodDecl", null, exprs("modifiers"))
 											)
 									)
 							),
 							action("return ret.withProblem(problem);")
 					)
 			),
-			production("FieldDecl", type("BUTree<SFieldDecl>").build(),
+			production("FieldDecl", "BUTree<SFieldDecl>",
 					emptyList(),
-					listOf(
-							param("BUTree<SNodeList> modifiers").build()
-					),
-					listOf(
-							stmt("BUTree<? extends SType> type;").build(),
-							stmt("BUTree<SNodeList> variables = emptyList();").build(),
-							stmt("BUTree<SVariableDeclarator> val;").build()
+					params("BUTree<SNodeList> modifiers"),
+					stmts(
+							"BUTree<? extends SType> type;",
+							"BUTree<SNodeList> variables = emptyList();",
+							"BUTree<SVariableDeclarator> val;"
 					),
 					sequence(
-							nonTerminal("type", "Type", null, listOf(
-									expr("null").build()
-							)),
+							nonTerminal("type", "Type", null, exprs("null")),
 							nonTerminal("variables", "VariableDeclarators"),
 							terminal("SEMICOLON"),
 							action("return dress(SFieldDecl.make(modifiers, type, variables));")
 					)
 			),
-			production("VariableDecl", type("BUTree<SLocalVariableDecl>").build(),
+			production("VariableDecl", "BUTree<SLocalVariableDecl>",
 					emptyList(),
-					listOf(
-							param("BUTree<SNodeList> modifiers").build()
-					),
-					listOf(
-							stmt("BUTree<? extends SType> type;").build(),
-							stmt("BUTree<SNodeList> variables = emptyList();").build()
+					params("BUTree<SNodeList> modifiers"),
+					stmts(
+							"BUTree<? extends SType> type;",
+							"BUTree<SNodeList> variables = emptyList();"
 					),
 					sequence(
-							nonTerminal("type", "Type", null, listOf(
-									expr("null").build()
-							)),
+							nonTerminal("type", "Type", null, exprs("null")),
 							nonTerminal("variables", "VariableDeclarators"),
 							action("return dress(SLocalVariableDecl.make(modifiers, type, variables));")
 					)
 			),
-			production("VariableDeclarators", type("BUTree<SNodeList>").build(),
+			production("VariableDeclarators", "BUTree<SNodeList>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> variables = emptyList();").build(),
-							stmt("BUTree<SVariableDeclarator> val;").build()
+					stmts(
+							"BUTree<SNodeList> variables = emptyList();",
+							"BUTree<SVariableDeclarator> val;"
 					),
 					sequence(
 							nonTerminal("val", "VariableDeclarator"),
@@ -1091,13 +1000,13 @@ public class Grammar {
 							action("return variables;")
 					)
 			),
-			production("VariableDeclarator", type("BUTree<SVariableDeclarator>").build(),
+			production("VariableDeclarator", "BUTree<SVariableDeclarator>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SVariableDeclaratorId> id;").build(),
-							stmt("BUTree<SNodeOption> init = none();").build(),
-							stmt("BUTree<? extends SExpr> initExpr = null;").build()
+					stmts(
+							"BUTree<SVariableDeclaratorId> id;",
+							"BUTree<SNodeOption> init = none();",
+							"BUTree<? extends SExpr> initExpr = null;"
 					),
 					sequence(
 							action("run();"),
@@ -1110,12 +1019,12 @@ public class Grammar {
 							action("return dress(SVariableDeclarator.make(id, init));")
 					)
 			),
-			production("VariableDeclaratorId", type("BUTree<SVariableDeclaratorId>").build(),
+			production("VariableDeclaratorId", "BUTree<SVariableDeclaratorId>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SName> name;").build(),
-							stmt("BUTree<SNodeList> arrayDims;").build()
+					stmts(
+							"BUTree<SName> name;",
+							"BUTree<SNodeList> arrayDims;"
 					),
 					sequence(
 							action("run();"),
@@ -1124,12 +1033,12 @@ public class Grammar {
 							action("return dress(SVariableDeclaratorId.make(name, arrayDims));")
 					)
 			),
-			production("ArrayDims", type("BUTree<SNodeList>").build(),
+			production("ArrayDims", "BUTree<SNodeList>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> arrayDims = emptyList();").build(),
-							stmt("BUTree<SNodeList> annotations;").build()
+					stmts(
+							"BUTree<SNodeList> arrayDims = emptyList();",
+							"BUTree<SNodeList> annotations;"
 					),
 					sequence(
 							zeroOrMore(
@@ -1142,12 +1051,10 @@ public class Grammar {
 							action("return arrayDims;")
 					)
 			),
-			production("VariableInitializer", type("BUTree<? extends SExpr>").build(),
+			production("VariableInitializer", "BUTree<? extends SExpr>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build()
-					),
+					stmts("BUTree<? extends SExpr> ret;"),
 					sequence(
 							choice(
 									nonTerminal("ret", "ArrayInitializer"),
@@ -1156,13 +1063,13 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("ArrayInitializer", type("BUTree<SArrayInitializerExpr>").build(),
+			production("ArrayInitializer", "BUTree<SArrayInitializerExpr>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> values = emptyList();").build(),
-							stmt("BUTree<? extends SExpr> val;").build(),
-							stmt("boolean trailingComma = false;").build()
+					stmts(
+							"BUTree<SNodeList> values = emptyList();",
+							"BUTree<? extends SExpr> val;",
+							"boolean trailingComma = false;"
 					),
 					sequence(
 							action("run();"),
@@ -1184,21 +1091,19 @@ public class Grammar {
 							action("return dress(SArrayInitializerExpr.make(values, trailingComma));")
 					)
 			),
-			production("MethodDecl", type("BUTree<SMethodDecl>").build(),
+			production("MethodDecl", "BUTree<SMethodDecl>",
 					emptyList(),
-					listOf(
-							param("BUTree<SNodeList> modifiers").build()
-					),
-					listOf(
-							stmt("BUTree<SNodeList> typeParameters = null;").build(),
-							stmt("BUTree<SNodeList> additionalAnnotations = null;").build(),
-							stmt("BUTree<? extends SType> type;").build(),
-							stmt("BUTree<SName> name;").build(),
-							stmt("BUTree<SNodeList> parameters;").build(),
-							stmt("BUTree<SNodeList> arrayDims;").build(),
-							stmt("BUTree<SNodeList> throwsClause = null;").build(),
-							stmt("BUTree<SBlockStmt> block = null;").build(),
-							stmt("BUProblem problem = null;").build()
+					params("BUTree<SNodeList> modifiers"),
+					stmts(
+							"BUTree<SNodeList> typeParameters = null;",
+							"BUTree<SNodeList> additionalAnnotations = null;",
+							"BUTree<? extends SType> type;",
+							"BUTree<SName> name;",
+							"BUTree<SNodeList> parameters;",
+							"BUTree<SNodeList> arrayDims;",
+							"BUTree<SNodeList> throwsClause = null;",
+							"BUTree<SBlockStmt> block = null;",
+							"BUProblem problem = null;"
 					),
 					sequence(
 							zeroOrOne(
@@ -1222,12 +1127,12 @@ public class Grammar {
 							action("return dress(SMethodDecl.make(modifiers, ensureNotNull(typeParameters), ensureNotNull(additionalAnnotations), type, name, parameters, arrayDims, ensureNotNull(throwsClause), optionOf(block))).withProblem(problem);")
 					)
 			),
-			production("FormalParameters", type("BUTree<SNodeList>").build(),
+			production("FormalParameters", "BUTree<SNodeList>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> ret = null;").build(),
-							stmt("BUTree<SFormalParameter> par;").build()
+					stmts(
+							"BUTree<SNodeList> ret = null;",
+							"BUTree<SFormalParameter> par;"
 					),
 					sequence(
 							terminal("LPAREN"),
@@ -1238,12 +1143,12 @@ public class Grammar {
 							action("return ensureNotNull(ret);")
 					)
 			),
-			production("FormalParameterList", type("BUTree<SNodeList>").build(),
+			production("FormalParameterList", "BUTree<SNodeList>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> ret = null;").build(),
-							stmt("BUTree<SFormalParameter> par;").build()
+					stmts(
+							"BUTree<SNodeList> ret = null;",
+							"BUTree<SFormalParameter> par;"
 					),
 					sequence(
 							choice(
@@ -1262,24 +1167,22 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("FormalParameter", type("BUTree<SFormalParameter>").build(),
+			production("FormalParameter", "BUTree<SFormalParameter>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> modifiers;").build(),
-							stmt("BUTree<? extends SType> type;").build(),
-							stmt("BUTree<SNodeList> ellipsisAnnotations = null;").build(),
-							stmt("boolean isVarArg = false;").build(),
-							stmt("BUTree<SVariableDeclaratorId> id = null;").build(),
-							stmt("boolean isReceiver = false;").build(),
-							stmt("BUTree<SName> receiverTypeName = null;").build()
+					stmts(
+							"BUTree<SNodeList> modifiers;",
+							"BUTree<? extends SType> type;",
+							"BUTree<SNodeList> ellipsisAnnotations = null;",
+							"boolean isVarArg = false;",
+							"BUTree<SVariableDeclaratorId> id = null;",
+							"boolean isReceiver = false;",
+							"BUTree<SName> receiverTypeName = null;"
 					),
 					sequence(
 							action("run();"),
 							nonTerminal("modifiers", "Modifiers"),
-							nonTerminal("type", "Type", null, listOf(
-									expr("null").build()
-							)),
+							nonTerminal("type", "Type", null, exprs("null")),
 							zeroOrOne(
 									nonTerminal("ellipsisAnnotations", "Annotations"),
 									terminal("ELLIPSIS"),
@@ -1299,12 +1202,12 @@ public class Grammar {
 							action("return dress(SFormalParameter.make(modifiers, type, isVarArg, ensureNotNull(ellipsisAnnotations), optionOf(id), isReceiver, optionOf(receiverTypeName)));")
 					)
 			),
-			production("ThrowsClause", type("BUTree<SNodeList>").build(),
+			production("ThrowsClause", "BUTree<SNodeList>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> ret = emptyList();").build(),
-							stmt("BUTree<SQualifiedType> cit;").build()
+					stmts(
+							"BUTree<SNodeList> ret = emptyList();",
+							"BUTree<SQualifiedType> cit;"
 					),
 					sequence(
 							terminal("THROWS"),
@@ -1318,20 +1221,18 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("ConstructorDecl", type("BUTree<SConstructorDecl>").build(),
+			production("ConstructorDecl", "BUTree<SConstructorDecl>",
 					emptyList(),
-					listOf(
-							param("BUTree<SNodeList> modifiers").build()
-					),
-					listOf(
-							stmt("BUTree<SNodeList> typeParameters = null;").build(),
-							stmt("BUTree<SName> name;").build(),
-							stmt("BUTree<SNodeList> parameters;").build(),
-							stmt("BUTree<SNodeList> throwsClause = null;").build(),
-							stmt("BUTree<SExplicitConstructorInvocationStmt> exConsInv = null;").build(),
-							stmt("BUTree<SBlockStmt> block;").build(),
-							stmt("BUTree<SNodeList> stmts = emptyList();").build(),
-							stmt("BUTree<? extends SStmt> stmt;").build()
+					params("BUTree<SNodeList> modifiers"),
+					stmts(
+							"BUTree<SNodeList> typeParameters = null;",
+							"BUTree<SName> name;",
+							"BUTree<SNodeList> parameters;",
+							"BUTree<SNodeList> throwsClause = null;",
+							"BUTree<SExplicitConstructorInvocationStmt> exConsInv = null;",
+							"BUTree<SBlockStmt> block;",
+							"BUTree<SNodeList> stmts = emptyList();",
+							"BUTree<? extends SStmt> stmt;"
 					),
 					sequence(
 							zeroOrOne(
@@ -1351,14 +1252,14 @@ public class Grammar {
 					)
 			),
 			// TODO Enable parsing of this anywhere in a block and add later checks to report when not used in a constructor
-			production("ExplicitConstructorInvocation", type("BUTree<SExplicitConstructorInvocationStmt>").build(),
+			production("ExplicitConstructorInvocation", "BUTree<SExplicitConstructorInvocationStmt>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("boolean isThis = false;").build(),
-							stmt("BUTree<SNodeList> args;").build(),
-							stmt("BUTree<? extends SExpr> expr = null;").build(),
-							stmt("BUTree<SNodeList> typeArgs = null;").build()
+					stmts(
+							"boolean isThis = false;",
+							"BUTree<SNodeList> args;",
+							"BUTree<? extends SExpr> expr = null;",
+							"BUTree<SNodeList> typeArgs = null;"
 					),
 					sequence(
 							action("run();"),
@@ -1388,12 +1289,12 @@ public class Grammar {
 							action("return dress(SExplicitConstructorInvocationStmt.make(ensureNotNull(typeArgs), isThis, optionOf(expr), args));")
 					)
 			),
-			production("Statements", type("BUTree<SNodeList>").build(),
+			production("Statements", "BUTree<SNodeList>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> ret = null;").build(),
-							stmt("BUTree<? extends SStmt> stmt;").build()
+					stmts(
+							"BUTree<SNodeList> ret = null;",
+							"BUTree<? extends SStmt> stmt;"
 					),
 					sequence(
 							zeroOrOne(
@@ -1414,35 +1315,27 @@ public class Grammar {
 							action("return ensureNotNull(ret);")
 					)
 			),
-			production("InitializerDecl", type("BUTree<SInitializerDecl>").build(),
+			production("InitializerDecl", "BUTree<SInitializerDecl>",
 					emptyList(),
-					listOf(
-							param("BUTree<SNodeList> modifiers").build()
-					),
-					listOf(
-							stmt("BUTree<SBlockStmt> block;").build()
-					),
+					params("BUTree<SNodeList> modifiers"),
+					stmts("BUTree<SBlockStmt> block;"),
 					sequence(
 							nonTerminal("block", "Block"),
 							action("return dress(SInitializerDecl.make(modifiers, block));")
 					)
 			),
-			production("Type", type("BUTree<? extends SType>").build(),
+			production("Type", "BUTree<? extends SType>",
 					emptyList(),
-					listOf(
-							param("BUTree<SNodeList> annotations").build()
-					),
-					listOf(
-							stmt("BUTree<? extends SType> primitiveType = null;").build(),
-							stmt("BUTree<? extends SReferenceType> type = null;").build(),
-							stmt("BUTree<SNodeList> arrayDims;").build()
+					params("BUTree<SNodeList> annotations"),
+					stmts(
+							"BUTree<? extends SType> primitiveType = null;",
+							"BUTree<? extends SReferenceType> type = null;",
+							"BUTree<SNodeList> arrayDims;"
 					),
 					sequence(
 							choice(
 									sequence(
-											nonTerminal("primitiveType", "PrimitiveType", null, listOf(
-													expr("annotations").build()
-											)),
+											nonTerminal("primitiveType", "PrimitiveType", null, exprs("annotations")),
 											zeroOrOne(
 													action("lateRun();"),
 													nonTerminal("arrayDims", "ArrayDimsMandatory"),
@@ -1450,9 +1343,7 @@ public class Grammar {
 											)
 									),
 									sequence(
-											nonTerminal("type", "QualifiedType", null, listOf(
-													expr("annotations").build()
-											)),
+											nonTerminal("type", "QualifiedType", null, exprs("annotations")),
 											zeroOrOne(
 													action("lateRun();"),
 													nonTerminal("arrayDims", "ArrayDimsMandatory"),
@@ -1463,30 +1354,24 @@ public class Grammar {
 							action("return type == null ? primitiveType : type;")
 					)
 			),
-			production("ReferenceType", type("BUTree<? extends SReferenceType>").build(),
+			production("ReferenceType", "BUTree<? extends SReferenceType>",
 					emptyList(),
-					listOf(
-							param("BUTree<SNodeList> annotations").build()
-					),
-					listOf(
-							stmt("BUTree<? extends SType> primitiveType;").build(),
-							stmt("BUTree<? extends SReferenceType> type;").build(),
-							stmt("BUTree<SNodeList> arrayDims;").build()
+					params("BUTree<SNodeList> annotations"),
+					stmts(
+							"BUTree<? extends SType> primitiveType;",
+							"BUTree<? extends SReferenceType> type;",
+							"BUTree<SNodeList> arrayDims;"
 					),
 					sequence(
 							choice(
 									sequence(
-											nonTerminal("primitiveType", "PrimitiveType", null, listOf(
-													expr("annotations").build()
-											)),
+											nonTerminal("primitiveType", "PrimitiveType", null, exprs("annotations")),
 											action("lateRun();"),
 											nonTerminal("arrayDims", "ArrayDimsMandatory"),
 											action("type = dress(SArrayType.make(primitiveType, arrayDims));")
 									),
 									sequence(
-											nonTerminal("type", "QualifiedType", null, listOf(
-													expr("annotations").build()
-											)),
+											nonTerminal("type", "QualifiedType", null, exprs("annotations")),
 											zeroOrOne(
 													action("lateRun();"),
 													nonTerminal("arrayDims", "ArrayDimsMandatory"),
@@ -1497,16 +1382,14 @@ public class Grammar {
 							action("return type;")
 					)
 			),
-			production("QualifiedType", type("BUTree<SQualifiedType>").build(),
+			production("QualifiedType", "BUTree<SQualifiedType>",
 					emptyList(),
-					listOf(
-							param("BUTree<SNodeList> annotations").build()
-					),
-					listOf(
-							stmt("BUTree<SNodeOption> scope = none();").build(),
-							stmt("BUTree<SQualifiedType> ret;").build(),
-							stmt("BUTree<SName> name;").build(),
-							stmt("BUTree<SNodeList> typeArgs = null;").build()
+					params("BUTree<SNodeList> annotations"),
+					stmts(
+							"BUTree<SNodeOption> scope = none();",
+							"BUTree<SQualifiedType> ret;",
+							"BUTree<SName> name;",
+							"BUTree<SNodeList> typeArgs = null;"
 					),
 					sequence(
 							action("if (annotations == null) {\n\trun();\n\tannotations = emptyList();\n}"),
@@ -1529,12 +1412,12 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("TypeArguments", type("BUTree<SNodeList>").build(),
+			production("TypeArguments", "BUTree<SNodeList>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> ret = emptyList();").build(),
-							stmt("BUTree<? extends SType> type;").build()
+					stmts(
+							"BUTree<SNodeList> ret = emptyList();",
+							"BUTree<? extends SType> type;"
 					),
 					sequence(
 							terminal("LT"),
@@ -1545,12 +1428,12 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("TypeArgumentsOrDiamond", type("BUTree<SNodeList>").build(),
+			production("TypeArgumentsOrDiamond", "BUTree<SNodeList>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> ret = emptyList();").build(),
-							stmt("BUTree<? extends SType> type;").build()
+					stmts(
+							"BUTree<SNodeList> ret = emptyList();",
+							"BUTree<? extends SType> type;"
 					),
 					sequence(
 							terminal("LT"),
@@ -1561,12 +1444,12 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("TypeArgumentList", type("BUTree<SNodeList>").build(),
+			production("TypeArgumentList", "BUTree<SNodeList>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> ret = emptyList();").build(),
-							stmt("BUTree<? extends SType> type;").build()
+					stmts(
+							"BUTree<SNodeList> ret = emptyList();",
+							"BUTree<? extends SType> type;"
 					),
 					choice(
 							sequence(
@@ -1585,36 +1468,30 @@ public class Grammar {
 							)
 					)
 			),
-			production("TypeArgument", type("BUTree<? extends SType>").build(),
+			production("TypeArgument", "BUTree<? extends SType>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SType> ret;").build(),
-							stmt("BUTree<SNodeList> annotations = null;").build()
+					stmts(
+							"BUTree<? extends SType> ret;",
+							"BUTree<SNodeList> annotations = null;"
 					),
 					sequence(
 							action("run();"),
 							nonTerminal("annotations", "Annotations"),
 							choice(
-									nonTerminal("ret", "ReferenceType", null, listOf(
-											expr("annotations").build()
-									)),
-									nonTerminal("ret", "Wildcard", null, listOf(
-											expr("annotations").build()
-									))
+									nonTerminal("ret", "ReferenceType", null, exprs("annotations")),
+									nonTerminal("ret", "Wildcard", null, exprs("annotations"))
 							),
 							action("return ret;")
 					)
 			),
-			production("Wildcard", type("BUTree<SWildcardType>").build(),
+			production("Wildcard", "BUTree<SWildcardType>",
 					emptyList(),
-					listOf(
-							param("BUTree<SNodeList> annotations").build()
-					),
-					listOf(
-							stmt("BUTree<? extends SReferenceType> ext = null;").build(),
-							stmt("BUTree<? extends SReferenceType> sup = null;").build(),
-							stmt("BUTree<SNodeList> boundAnnotations = null;").build()
+					params("BUTree<SNodeList> annotations"),
+					stmts(
+							"BUTree<? extends SReferenceType> ext = null;",
+							"BUTree<? extends SReferenceType> sup = null;",
+							"BUTree<SNodeList> boundAnnotations = null;"
 					),
 					sequence(
 							action("if (annotations == null) {\n\trun();\n\tannotations = emptyList();\n}"),
@@ -1625,31 +1502,23 @@ public class Grammar {
 													terminal("EXTENDS"),
 													action("run();"),
 													nonTerminal("boundAnnotations", "Annotations"),
-													nonTerminal("ext", "ReferenceType", null, listOf(
-															expr("boundAnnotations").build()
-													))
+													nonTerminal("ext", "ReferenceType", null, exprs("boundAnnotations"))
 											),
 											sequence(
 													terminal("SUPER"),
 													action("run();"),
 													nonTerminal("boundAnnotations", "Annotations"),
-													nonTerminal("sup", "ReferenceType", null, listOf(
-															expr("boundAnnotations").build()
-													))
+													nonTerminal("sup", "ReferenceType", null, exprs("boundAnnotations"))
 											)
 									)
 							),
 							action("return dress(SWildcardType.make(annotations, optionOf(ext), optionOf(sup)));")
 					)
 			),
-			production("PrimitiveType", type("BUTree<SPrimitiveType>").build(),
+			production("PrimitiveType", "BUTree<SPrimitiveType>",
 					emptyList(),
-					listOf(
-							param("BUTree<SNodeList> annotations").build()
-					),
-					listOf(
-							stmt("Primitive primitive;").build()
-					),
+					params("BUTree<SNodeList> annotations"),
+					stmts("Primitive primitive;"),
 					sequence(
 							action("if (annotations == null) {\n\trun();\n\tannotations = emptyList();\n}"),
 							choice(
@@ -1689,12 +1558,10 @@ public class Grammar {
 							action("return dress(SPrimitiveType.make(annotations, primitive));")
 					)
 			),
-			production("ResultType", type("BUTree<? extends SType>").build(),
+			production("ResultType", "BUTree<? extends SType>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SType> ret;").build()
-					),
+					stmts("BUTree<? extends SType> ret;"),
 					sequence(
 							choice(
 									sequence(
@@ -1702,36 +1569,32 @@ public class Grammar {
 											terminal("VOID"),
 											action("ret = dress(SVoidType.make());")
 									),
-									nonTerminal("ret", "Type", null, listOf(
-											expr("null").build()
-									))
+									nonTerminal("ret", "Type", null, exprs("null"))
 							),
 							action("return ret;")
 					)
 			),
-			production("AnnotatedQualifiedType", type("BUTree<SQualifiedType>").build(),
+			production("AnnotatedQualifiedType", "BUTree<SQualifiedType>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> annotations;").build(),
-							stmt("BUTree<SQualifiedType> ret;").build()
+					stmts(
+							"BUTree<SNodeList> annotations;",
+							"BUTree<SQualifiedType> ret;"
 					),
 					sequence(
 							action("run();"),
 							nonTerminal("annotations", "Annotations"),
-							nonTerminal("ret", "QualifiedType", null, listOf(
-									expr("annotations").build()
-							)),
+							nonTerminal("ret", "QualifiedType", null, exprs("annotations")),
 							action("return ret;")
 					)
 			),
-			production("QualifiedName", type("BUTree<SQualifiedName>").build(),
+			production("QualifiedName", "BUTree<SQualifiedName>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeOption> qualifier = none();").build(),
-							stmt("BUTree<SQualifiedName> ret = null;").build(),
-							stmt("BUTree<SName> name;").build()
+					stmts(
+							"BUTree<SNodeOption> qualifier = none();",
+							"BUTree<SQualifiedName> ret = null;",
+							"BUTree<SName> name;"
 					),
 					sequence(
 							action("run();"),
@@ -1747,12 +1610,12 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("Name", type("BUTree<SName>").build(),
+			production("Name", "BUTree<SName>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("Token id;").build(),
-							stmt("BUTree<SName> name;").build()
+					stmts(
+							"Token id;",
+							"BUTree<SName> name;"
 					),
 					sequence(
 							choice(
@@ -1766,12 +1629,10 @@ public class Grammar {
 							action("return name;")
 					)
 			),
-			production("Expression", type("BUTree<? extends SExpr>").build(),
+			production("Expression", "BUTree<? extends SExpr>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build()
-					),
+					stmts("BUTree<? extends SExpr> ret;"),
 					sequence(
 							choice(
 									nonTerminal("ret", "AssignmentExpression"),
@@ -1780,13 +1641,13 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("AssignmentExpression", type("BUTree<? extends SExpr>").build(),
+			production("AssignmentExpression", "BUTree<? extends SExpr>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build(),
-							stmt("AssignOp op;").build(),
-							stmt("BUTree<? extends SExpr> expr;").build()
+					stmts(
+							"BUTree<? extends SExpr> ret;",
+							"AssignOp op;",
+							"BUTree<? extends SExpr> expr;"
 					),
 					sequence(
 							// TODO Add checks to report invalid left hand side in assignment
@@ -1800,13 +1661,13 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("LambdaExpression", type("BUTree<? extends SExpr>").build(),
+			production("LambdaExpression", "BUTree<? extends SExpr>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> annotations;").build(),
-							stmt("BUTree<? extends SType> type;").build(),
-							stmt("BUTree<? extends SExpr> ret;").build()
+					stmts(
+							"BUTree<SNodeList> annotations;",
+							"BUTree<? extends SType> type;",
+							"BUTree<? extends SExpr> ret;"
 					),
 					sequence(
 							choice(
@@ -1815,12 +1676,8 @@ public class Grammar {
 											terminal("LPAREN"),
 											action("run();"),
 											nonTerminal("annotations", "Annotations"),
-											nonTerminal("type", "ReferenceType", null, listOf(
-													expr("annotations").build()
-											)),
-											nonTerminal("type", "ReferenceCastTypeRest", null, listOf(
-													expr("type").build()
-											)),
+											nonTerminal("type", "ReferenceType", null, exprs("annotations")),
+											nonTerminal("type", "ReferenceCastTypeRest", null, exprs("type")),
 											terminal("RPAREN"),
 											nonTerminal("ret", "LambdaExpression"),
 											action("ret = dress(SCastExpr.make(type, ret));")
@@ -1830,13 +1687,13 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("LambdaExpressionWithoutCast", type("BUTree<SLambdaExpr>").build(),
+			production("LambdaExpressionWithoutCast", "BUTree<SLambdaExpr>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SLambdaExpr> ret;").build(),
-							stmt("BUTree<SName> name;").build(),
-							stmt("BUTree<SNodeList> params;").build()
+					stmts(
+							"BUTree<SLambdaExpr> ret;",
+							"BUTree<SName> name;",
+							"BUTree<SNodeList> params;"
 					),
 					sequence(
 							action("run();"),
@@ -1844,18 +1701,18 @@ public class Grammar {
 									sequence(
 											nonTerminal("name", "Name"),
 											terminal("ARROW"),
-											nonTerminal("ret", "LambdaBody", null, listOf(
-													expr("singletonList(makeFormalParameter(name))").build(),
-													expr("false").build()
+											nonTerminal("ret", "LambdaBody", null, exprs(
+													"singletonList(makeFormalParameter(name))",
+													"false"
 											))
 									),
 									sequence(
 											terminal("LPAREN"),
 											terminal("RPAREN"),
 											terminal("ARROW"),
-											nonTerminal("ret", "LambdaBody", null, listOf(
-													expr("emptyList()").build(),
-													expr("true").build()
+											nonTerminal("ret", "LambdaBody", null, exprs(
+													"emptyList()",
+													"true"
 											))
 									),
 									sequence(
@@ -1863,9 +1720,9 @@ public class Grammar {
 											nonTerminal("params", "InferredFormalParameterList"),
 											terminal("RPAREN"),
 											terminal("ARROW"),
-											nonTerminal("ret", "LambdaBody", null, listOf(
-													expr("params").build(),
-													expr("true").build()
+											nonTerminal("ret", "LambdaBody", null, exprs(
+													"params",
+													"true"
 											))
 									),
 									sequence(
@@ -1873,25 +1730,25 @@ public class Grammar {
 											nonTerminal("params", "FormalParameterList"),
 											terminal("RPAREN"),
 											terminal("ARROW"),
-											nonTerminal("ret", "LambdaBody", null, listOf(
-													expr("params").build(),
-													expr("true").build()
+											nonTerminal("ret", "LambdaBody", null, exprs(
+													"params",
+													"true"
 											))
 									)
 							),
 							action("return ret;")
 					)
 			),
-			production("LambdaBody", type("BUTree<SLambdaExpr>").build(),
+			production("LambdaBody", "BUTree<SLambdaExpr>",
 					emptyList(),
-					listOf(
-							param("BUTree<SNodeList> parameters").build(),
-							param("boolean parenthesis").build()
+					params(
+							"BUTree<SNodeList> parameters",
+							"boolean parenthesis"
 					),
-					listOf(
-							stmt("BUTree<SBlockStmt> block;").build(),
-							stmt("BUTree<? extends SExpr> expr;").build(),
-							stmt("BUTree<SLambdaExpr> ret;").build()
+					stmts(
+							"BUTree<SBlockStmt> block;",
+							"BUTree<? extends SExpr> expr;",
+							"BUTree<SLambdaExpr> ret;"
 					),
 					sequence(
 							choice(
@@ -1907,12 +1764,12 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("InferredFormalParameterList", type("BUTree<SNodeList>").build(),
+			production("InferredFormalParameterList", "BUTree<SNodeList>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> ret = emptyList();").build(),
-							stmt("BUTree<SFormalParameter> param;").build()
+					stmts(
+							"BUTree<SNodeList> ret = emptyList();",
+							"BUTree<SFormalParameter> param;"
 					),
 					sequence(
 							nonTerminal("param", "InferredFormalParameter"),
@@ -1925,23 +1782,19 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("InferredFormalParameter", type("BUTree<SFormalParameter>").build(),
+			production("InferredFormalParameter", "BUTree<SFormalParameter>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SName> name;").build()
-					),
+					stmts("BUTree<SName> name;"),
 					sequence(
 							nonTerminal("name", "Name"),
 							action("return makeFormalParameter(name);")
 					)
 			),
-			production("AssignmentOperator", type("AssignOp").build(),
+			production("AssignmentOperator", "AssignOp",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("AssignOp ret;").build()
-					),
+					stmts("AssignOp ret;"),
 					sequence(
 							choice(
 									sequence(
@@ -1996,13 +1849,13 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("ConditionalExpression", type("BUTree<? extends SExpr>").build(),
+			production("ConditionalExpression", "BUTree<? extends SExpr>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build(),
-							stmt("BUTree<? extends SExpr> left;").build(),
-							stmt("BUTree<? extends SExpr> right;").build()
+					stmts(
+							"BUTree<? extends SExpr> ret;",
+							"BUTree<? extends SExpr> left;",
+							"BUTree<? extends SExpr> right;"
 					),
 					sequence(
 							nonTerminal("ret", "ConditionalOrExpression"),
@@ -2020,12 +1873,12 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("ConditionalOrExpression", type("BUTree<? extends SExpr>").build(),
+			production("ConditionalOrExpression", "BUTree<? extends SExpr>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build(),
-							stmt("BUTree<? extends SExpr> right;").build()
+					stmts(
+							"BUTree<? extends SExpr> ret;",
+							"BUTree<? extends SExpr> right;"
 					),
 					sequence(
 							nonTerminal("ret", "ConditionalAndExpression"),
@@ -2038,12 +1891,12 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("ConditionalAndExpression", type("BUTree<? extends SExpr>").build(),
+			production("ConditionalAndExpression", "BUTree<? extends SExpr>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build(),
-							stmt("BUTree<? extends SExpr> right;").build()
+					stmts(
+							"BUTree<? extends SExpr> ret;",
+							"BUTree<? extends SExpr> right;"
 					),
 					sequence(
 							nonTerminal("ret", "InclusiveOrExpression"),
@@ -2056,12 +1909,12 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("InclusiveOrExpression", type("BUTree<? extends SExpr>").build(),
+			production("InclusiveOrExpression", "BUTree<? extends SExpr>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build(),
-							stmt("BUTree<? extends SExpr> right;").build()
+					stmts(
+							"BUTree<? extends SExpr> ret;",
+							"BUTree<? extends SExpr> right;"
 					),
 					sequence(
 							nonTerminal("ret", "ExclusiveOrExpression"),
@@ -2074,12 +1927,12 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("ExclusiveOrExpression", type("BUTree<? extends SExpr>").build(),
+			production("ExclusiveOrExpression", "BUTree<? extends SExpr>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build(),
-							stmt("BUTree<? extends SExpr> right;").build()
+					stmts(
+							"BUTree<? extends SExpr> ret;",
+							"BUTree<? extends SExpr> right;"
 					),
 					sequence(
 							nonTerminal("ret", "AndExpression"),
@@ -2092,12 +1945,12 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("AndExpression", type("BUTree<? extends SExpr>").build(),
+			production("AndExpression", "BUTree<? extends SExpr>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build(),
-							stmt("BUTree<? extends SExpr> right;").build()
+					stmts(
+							"BUTree<? extends SExpr> ret;",
+							"BUTree<? extends SExpr> right;"
 					),
 					sequence(
 							nonTerminal("ret", "EqualityExpression"),
@@ -2110,13 +1963,13 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("EqualityExpression", type("BUTree<? extends SExpr>").build(),
+			production("EqualityExpression", "BUTree<? extends SExpr>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build(),
-							stmt("BUTree<? extends SExpr> right;").build(),
-							stmt("BinaryOp op;").build()
+					stmts(
+							"BUTree<? extends SExpr> ret;",
+							"BUTree<? extends SExpr> right;",
+							"BinaryOp op;"
 					),
 					sequence(
 							nonTerminal("ret", "InstanceOfExpression"),
@@ -2138,13 +1991,13 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("InstanceOfExpression", type("BUTree<? extends SExpr>").build(),
+			production("InstanceOfExpression", "BUTree<? extends SExpr>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build(),
-							stmt("BUTree<SNodeList> annotations;").build(),
-							stmt("BUTree<? extends SType> type;").build()
+					stmts(
+							"BUTree<? extends SExpr> ret;",
+							"BUTree<SNodeList> annotations;",
+							"BUTree<? extends SType> type;"
 					),
 					sequence(
 							nonTerminal("ret", "RelationalExpression"),
@@ -2153,21 +2006,19 @@ public class Grammar {
 									terminal("INSTANCEOF"),
 									action("run();"),
 									nonTerminal("annotations", "Annotations"),
-									nonTerminal("type", "Type", null, listOf(
-											expr("annotations").build()
-									)),
+									nonTerminal("type", "Type", null, exprs("annotations")),
 									action("ret = dress(SInstanceOfExpr.make(ret, type));")
 							),
 							action("return ret;")
 					)
 			),
-			production("RelationalExpression", type("BUTree<? extends SExpr>").build(),
+			production("RelationalExpression", "BUTree<? extends SExpr>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build(),
-							stmt("BUTree<? extends SExpr> right;").build(),
-							stmt("BinaryOp op;").build()
+					stmts(
+							"BUTree<? extends SExpr> ret;",
+							"BUTree<? extends SExpr> right;",
+							"BinaryOp op;"
 					),
 					sequence(
 							nonTerminal("ret", "ShiftExpression"),
@@ -2197,13 +2048,13 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("ShiftExpression", type("BUTree<? extends SExpr>").build(),
+			production("ShiftExpression", "BUTree<? extends SExpr>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build(),
-							stmt("BUTree<? extends SExpr> right;").build(),
-							stmt("BinaryOp op;").build()
+					stmts(
+							"BUTree<? extends SExpr> ret;",
+							"BUTree<? extends SExpr> right;",
+							"BinaryOp op;"
 					),
 					sequence(
 							nonTerminal("ret", "AdditiveExpression"),
@@ -2215,11 +2066,16 @@ public class Grammar {
 													action("op = BinaryOp.LeftShift;")
 											),
 											sequence(
-													nonTerminal("RUNSIGNEDSHIFT"),
+													terminal("GT"),
+													terminal("GT"),
+													terminal("GT"),
+													action("popNewWhitespaces(2);"),
 													action("op = BinaryOp.RightUnsignedShift;")
 											),
 											sequence(
-													nonTerminal("RSIGNEDSHIFT"),
+													terminal("GT"),
+													terminal("GT"),
+													action("popNewWhitespaces(1);"),
 													action("op = BinaryOp.RightSignedShift;")
 											)
 									),
@@ -2229,13 +2085,13 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("AdditiveExpression", type("BUTree<? extends SExpr>").build(),
+			production("AdditiveExpression", "BUTree<? extends SExpr>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build(),
-							stmt("BUTree<? extends SExpr> right;").build(),
-							stmt("BinaryOp op;").build()
+					stmts(
+							"BUTree<? extends SExpr> ret;",
+							"BUTree<? extends SExpr> right;",
+							"BinaryOp op;"
 					),
 					sequence(
 							nonTerminal("ret", "MultiplicativeExpression"),
@@ -2257,13 +2113,13 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("MultiplicativeExpression", type("BUTree<? extends SExpr>").build(),
+			production("MultiplicativeExpression", "BUTree<? extends SExpr>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build(),
-							stmt("BUTree<? extends SExpr> right;").build(),
-							stmt("BinaryOp op;").build()
+					stmts(
+							"BUTree<? extends SExpr> ret;",
+							"BUTree<? extends SExpr> right;",
+							"BinaryOp op;"
 					),
 					sequence(
 							nonTerminal("ret", "UnaryExpression"),
@@ -2289,12 +2145,12 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("UnaryExpression", type("BUTree<? extends SExpr>").build(),
+			production("UnaryExpression", "BUTree<? extends SExpr>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build(),
-							stmt("UnaryOp op;").build()
+					stmts(
+							"BUTree<? extends SExpr> ret;",
+							"UnaryOp op;"
 					),
 					sequence(
 							choice(
@@ -2319,12 +2175,12 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("PrefixExpression", type("BUTree<? extends SExpr>").build(),
+			production("PrefixExpression", "BUTree<? extends SExpr>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("UnaryOp op;").build(),
-							stmt("BUTree<? extends SExpr> ret;").build()
+					stmts(
+							"UnaryOp op;",
+							"BUTree<? extends SExpr> ret;"
 					),
 					sequence(
 							action("run();"),
@@ -2342,12 +2198,12 @@ public class Grammar {
 							action("return dress(SUnaryExpr.make(op, ret));")
 					)
 			),
-			production("UnaryExpressionNotPlusMinus", type("BUTree<? extends SExpr>").build(),
+			production("UnaryExpressionNotPlusMinus", "BUTree<? extends SExpr>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build(),
-							stmt("UnaryOp op;").build()
+					stmts(
+							"BUTree<? extends SExpr> ret;",
+							"UnaryOp op;"
 					),
 					sequence(
 							choice(
@@ -2372,12 +2228,12 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("PostfixExpression", type("BUTree<? extends SExpr>").build(),
+			production("PostfixExpression", "BUTree<? extends SExpr>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build(),
-							stmt("UnaryOp op;").build()
+					stmts(
+							"BUTree<? extends SExpr> ret;",
+							"UnaryOp op;"
 					),
 					sequence(
 							nonTerminal("ret", "PrimaryExpression"),
@@ -2398,15 +2254,15 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("CastExpression", type("BUTree<? extends SExpr>").build(),
+			production("CastExpression", "BUTree<? extends SExpr>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> annotations = null;").build(),
-							stmt("BUTree<? extends SType> primitiveType;").build(),
-							stmt("BUTree<? extends SType> type;").build(),
-							stmt("BUTree<SNodeList> arrayDims;").build(),
-							stmt("BUTree<? extends SExpr> ret;").build()
+					stmts(
+							"BUTree<SNodeList> annotations = null;",
+							"BUTree<? extends SType> primitiveType;",
+							"BUTree<? extends SType> type;",
+							"BUTree<SNodeList> arrayDims;",
+							"BUTree<? extends SExpr> ret;"
 					),
 					sequence(
 							action("run();"),
@@ -2415,20 +2271,14 @@ public class Grammar {
 							nonTerminal("annotations", "Annotations"),
 							choice(
 									sequence(
-											nonTerminal("primitiveType", "PrimitiveType", null, listOf(
-													expr("annotations").build()
-											)),
+											nonTerminal("primitiveType", "PrimitiveType", null, exprs("annotations")),
 											terminal("RPAREN"),
 											nonTerminal("ret", "UnaryExpression"),
 											action("ret = dress(SCastExpr.make(primitiveType, ret));")
 									),
 									sequence(
-											nonTerminal("type", "ReferenceType", null, listOf(
-													expr("annotations").build()
-											)),
-											nonTerminal("type", "ReferenceCastTypeRest", null, listOf(
-													expr("type").build()
-											)),
+											nonTerminal("type", "ReferenceType", null, exprs("annotations")),
+											nonTerminal("type", "ReferenceCastTypeRest", null, exprs("type")),
 											terminal("RPAREN"),
 											nonTerminal("ret", "UnaryExpressionNotPlusMinus"),
 											action("ret = dress(SCastExpr.make(type, ret));")
@@ -2437,14 +2287,12 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("ReferenceCastTypeRest", type("BUTree<? extends SType>").build(),
+			production("ReferenceCastTypeRest", "BUTree<? extends SType>",
 					emptyList(),
-					listOf(
-							param("BUTree<? extends SType> type").build()
-					),
-					listOf(
-							stmt("BUTree<SNodeList> types = emptyList();").build(),
-							stmt("BUTree<SNodeList> annotations = null;").build()
+					params("BUTree<? extends SType> type"),
+					stmts(
+							"BUTree<SNodeList> types = emptyList();",
+							"BUTree<SNodeList> annotations = null;"
 					),
 					sequence(
 							zeroOrOne(
@@ -2454,9 +2302,7 @@ public class Grammar {
 											terminal("BIT_AND"),
 											action("run();"),
 											nonTerminal("annotations", "Annotations"),
-											nonTerminal("type", "ReferenceType", null, listOf(
-													expr("annotations").build()
-											)),
+											nonTerminal("type", "ReferenceType", null, exprs("annotations")),
 											action("types = append(types, type);")
 									),
 									action("type = dress(SIntersectionType.make(types));")
@@ -2464,12 +2310,12 @@ public class Grammar {
 							action("return type;")
 					)
 			),
-			production("Literal", type("BUTree<? extends SExpr>").build(),
+			production("Literal", "BUTree<? extends SExpr>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("Token literal;").build(),
-							stmt("BUTree<? extends SExpr> ret;").build()
+					stmts(
+							"Token literal;",
+							"BUTree<? extends SExpr> ret;"
 					),
 					sequence(
 							action("run();"),
@@ -2514,64 +2360,52 @@ public class Grammar {
 							action("return dress(ret);")
 					)
 			),
-			production("PrimaryExpression", type("BUTree<? extends SExpr>").build(),
+			production("PrimaryExpression", "BUTree<? extends SExpr>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build()
-					),
+					stmts("BUTree<? extends SExpr> ret;"),
 					sequence(
 							choice(
 									nonTerminal("ret", "PrimaryNoNewArray"),
-									nonTerminal("ret", "ArrayCreationExpr", null, listOf(
-											expr("null").build()
-									))
+									nonTerminal("ret", "ArrayCreationExpr", null, exprs("null"))
 							),
 							action("return ret;")
 					)
 			),
-			production("PrimaryNoNewArray", type("BUTree<? extends SExpr>").build(),
+			production("PrimaryNoNewArray", "BUTree<? extends SExpr>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build()
-					),
+					stmts("BUTree<? extends SExpr> ret;"),
 					sequence(
 							nonTerminal("ret", "PrimaryPrefix"),
 							zeroOrMore(
 									action("lateRun();"),
-									nonTerminal("ret", "PrimarySuffix", null, listOf(
-											expr("ret").build()
-									))
+									nonTerminal("ret", "PrimarySuffix", null, exprs("ret"))
 							),
 							action("return ret;")
 					)
 			),
-			production("PrimaryExpressionWithoutSuperSuffix", type("BUTree<? extends SExpr>").build(),
+			production("PrimaryExpressionWithoutSuperSuffix", "BUTree<? extends SExpr>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build()
-					),
+					stmts("BUTree<? extends SExpr> ret;"),
 					sequence(
 							nonTerminal("ret", "PrimaryPrefix"),
 							zeroOrMore(
 									action("lateRun();"),
-									nonTerminal("ret", "PrimarySuffixWithoutSuper", null, listOf(
-											expr("ret").build()
-									))
+									nonTerminal("ret", "PrimarySuffixWithoutSuper", null, exprs("ret"))
 							),
 							action("return ret;")
 					)
 			),
-			production("PrimaryPrefix", type("BUTree<? extends SExpr>").build(),
+			production("PrimaryPrefix", "BUTree<? extends SExpr>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> ret = null;").build(),
-							stmt("BUTree<SNodeList> typeArgs = null;").build(),
-							stmt("BUTree<SNodeList> params;").build(),
-							stmt("BUTree<? extends SType> type;").build()
+					stmts(
+							"BUTree<? extends SExpr> ret = null;",
+							"BUTree<SNodeList> typeArgs = null;",
+							"BUTree<SNodeList> params;",
+							"BUTree<? extends SType> type;"
 					),
 					sequence(
 							choice(
@@ -2590,25 +2424,17 @@ public class Grammar {
 															action("lateRun();"),
 															terminal("DOT"),
 															choice(
-																	nonTerminal("ret", "MethodInvocation", null, listOf(
-																			expr("ret").build()
-																	)),
-																	nonTerminal("ret", "FieldAccess", null, listOf(
-																			expr("ret").build()
-																	))
+																	nonTerminal("ret", "MethodInvocation", null, exprs("ret")),
+																	nonTerminal("ret", "FieldAccess", null, exprs("ret"))
 															)
 													),
 													sequence(
 															action("lateRun();"),
-															nonTerminal("ret", "MethodReferenceSuffix", null, listOf(
-																	expr("ret").build()
-															))
+															nonTerminal("ret", "MethodReferenceSuffix", null, exprs("ret"))
 													)
 											)
 									),
-									nonTerminal("ret", "ClassCreationExpr", null, listOf(
-											expr("null").build()
-									)),
+									nonTerminal("ret", "ClassCreationExpr", null, exprs("null")),
 									sequence(
 											action("run();"),
 											nonTerminal("type", "ResultType"),
@@ -2620,15 +2446,11 @@ public class Grammar {
 											action("run();"),
 											nonTerminal("type", "ResultType"),
 											action("ret = STypeExpr.make(type);"),
-											nonTerminal("ret", "MethodReferenceSuffix", null, listOf(
-													expr("ret").build()
-											))
+											nonTerminal("ret", "MethodReferenceSuffix", null, exprs("ret"))
 									),
 									sequence(
 											action("run();"),
-											nonTerminal("ret", "MethodInvocation", null, listOf(
-													expr("null").build()
-											))
+											nonTerminal("ret", "MethodInvocation", null, exprs("null"))
 									),
 									nonTerminal("ret", "Name"),
 									sequence(
@@ -2642,41 +2464,31 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("PrimarySuffix", type("BUTree<? extends SExpr>").build(),
+			production("PrimarySuffix", "BUTree<? extends SExpr>",
 					emptyList(),
-					listOf(
-							param("BUTree<? extends SExpr> scope").build()
-					),
-					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build()
-					),
+					params("BUTree<? extends SExpr> scope"),
+					stmts("BUTree<? extends SExpr> ret;"),
 					sequence(
 							choice(
 									sequence(
-											nonTerminal("ret", "PrimarySuffixWithoutSuper", null, listOf(
-													expr("scope").build()
-											))
+											nonTerminal("ret", "PrimarySuffixWithoutSuper", null, exprs("scope"))
 									),
 									sequence(
 											terminal("DOT"),
 											terminal("SUPER"),
 											action("ret = dress(SSuperExpr.make(optionOf(scope)));")
 									),
-									nonTerminal("ret", "MethodReferenceSuffix", null, listOf(
-											expr("scope").build()
-									))
+									nonTerminal("ret", "MethodReferenceSuffix", null, exprs("scope"))
 							),
 							action("return ret;")
 					)
 			),
-			production("PrimarySuffixWithoutSuper", type("BUTree<? extends SExpr>").build(),
+			production("PrimarySuffixWithoutSuper", "BUTree<? extends SExpr>",
 					emptyList(),
-					listOf(
-							param("BUTree<? extends SExpr> scope").build()
-					),
-					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build(),
-							stmt("BUTree<SName> name;").build()
+					params("BUTree<? extends SExpr> scope"),
+					stmts(
+							"BUTree<? extends SExpr> ret;",
+							"BUTree<SName> name;"
 					),
 					sequence(
 							choice(
@@ -2687,15 +2499,9 @@ public class Grammar {
 															terminal("THIS"),
 															action("ret = dress(SThisExpr.make(optionOf(scope)));")
 													),
-													nonTerminal("ret", "ClassCreationExpr", null, listOf(
-															expr("scope").build()
-													)),
-													nonTerminal("ret", "MethodInvocation", null, listOf(
-															expr("scope").build()
-													)),
-													nonTerminal("ret", "FieldAccess", null, listOf(
-															expr("scope").build()
-													))
+													nonTerminal("ret", "ClassCreationExpr", null, exprs("scope")),
+													nonTerminal("ret", "MethodInvocation", null, exprs("scope")),
+													nonTerminal("ret", "FieldAccess", null, exprs("scope"))
 											)
 									),
 									sequence(
@@ -2708,29 +2514,23 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("FieldAccess", type("BUTree<? extends SExpr>").build(),
+			production("FieldAccess", "BUTree<? extends SExpr>",
 					emptyList(),
-					listOf(
-							param("BUTree<? extends SExpr> scope").build()
-					),
-					listOf(
-							stmt("BUTree<SName> name;").build()
-					),
+					params("BUTree<? extends SExpr> scope"),
+					stmts("BUTree<SName> name;"),
 					sequence(
 							nonTerminal("name", "Name"),
 							action("return dress(SFieldAccessExpr.make(optionOf(scope), name));")
 					)
 			),
-			production("MethodInvocation", type("BUTree<? extends SExpr>").build(),
+			production("MethodInvocation", "BUTree<? extends SExpr>",
 					emptyList(),
-					listOf(
-							param("BUTree<? extends SExpr> scope").build()
-					),
-					listOf(
-							stmt("BUTree<SNodeList> typeArgs = null;").build(),
-							stmt("BUTree<SName> name;").build(),
-							stmt("BUTree<SNodeList> args = null;").build(),
-							stmt("BUTree<? extends SExpr> ret;").build()
+					params("BUTree<? extends SExpr> scope"),
+					stmts(
+							"BUTree<SNodeList> typeArgs = null;",
+							"BUTree<SName> name;",
+							"BUTree<SNodeList> args = null;",
+							"BUTree<? extends SExpr> ret;"
 					),
 					sequence(
 							zeroOrOne(
@@ -2741,12 +2541,12 @@ public class Grammar {
 							action("return dress(SMethodInvocationExpr.make(optionOf(scope), ensureNotNull(typeArgs), name, args));")
 					)
 			),
-			production("Arguments", type("BUTree<SNodeList>").build(),
+			production("Arguments", "BUTree<SNodeList>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> ret = emptyList();").build(),
-							stmt("BUTree<? extends SExpr> expr;").build()
+					stmts(
+							"BUTree<SNodeList> ret = emptyList();",
+							"BUTree<? extends SExpr> expr;"
 					),
 					sequence(
 							terminal("LPAREN"),
@@ -2768,15 +2568,13 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("MethodReferenceSuffix", type("BUTree<? extends SExpr>").build(),
+			production("MethodReferenceSuffix", "BUTree<? extends SExpr>",
 					emptyList(),
-					listOf(
-							param("BUTree<? extends SExpr> scope").build()
-					),
-					listOf(
-							stmt("BUTree<SNodeList> typeArgs = null;").build(),
-							stmt("BUTree<SName> name;").build(),
-							stmt("BUTree<? extends SExpr> ret;").build()
+					params("BUTree<? extends SExpr> scope"),
+					stmts(
+							"BUTree<SNodeList> typeArgs = null;",
+							"BUTree<SName> name;",
+							"BUTree<? extends SExpr> ret;"
 					),
 					sequence(
 							terminal("DOUBLECOLON"),
@@ -2794,18 +2592,16 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("ClassCreationExpr", type("BUTree<? extends SExpr>").build(),
+			production("ClassCreationExpr", "BUTree<? extends SExpr>",
 					emptyList(),
-					listOf(
-							param("BUTree<? extends SExpr> scope").build()
-					),
-					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build(),
-							stmt("BUTree<? extends SType> type;").build(),
-							stmt("BUTree<SNodeList> typeArgs = null;").build(),
-							stmt("BUTree<SNodeList> anonymousBody = null;").build(),
-							stmt("BUTree<SNodeList> args;").build(),
-							stmt("BUTree<SNodeList> annotations = null;").build()
+					params("BUTree<? extends SExpr> scope"),
+					stmts(
+							"BUTree<? extends SExpr> ret;",
+							"BUTree<? extends SType> type;",
+							"BUTree<SNodeList> typeArgs = null;",
+							"BUTree<SNodeList> anonymousBody = null;",
+							"BUTree<SNodeList> args;",
+							"BUTree<SNodeList> annotations = null;"
 					),
 					sequence(
 							action("if (scope == null) run();"),
@@ -2815,30 +2611,24 @@ public class Grammar {
 							),
 							action("run();"),
 							nonTerminal("annotations", "Annotations"),
-							nonTerminal("type", "QualifiedType", null, listOf(
-									expr("annotations").build()
-							)),
+							nonTerminal("type", "QualifiedType", null, exprs("annotations")),
 							nonTerminal("args", "Arguments"),
 							zeroOrOne(
-									nonTerminal("anonymousBody", "ClassOrInterfaceBody", null, listOf(
-											expr("TypeKind.Class").build()
-									))
+									nonTerminal("anonymousBody", "ClassOrInterfaceBody", null, exprs("TypeKind.Class"))
 							),
 							action("return dress(SObjectCreationExpr.make(optionOf(scope), ensureNotNull(typeArgs), (BUTree<SQualifiedType>) type, args, optionOf(anonymousBody)));")
 					)
 			),
-			production("ArrayCreationExpr", type("BUTree<? extends SExpr>").build(),
+			production("ArrayCreationExpr", "BUTree<? extends SExpr>",
 					emptyList(),
-					listOf(
-							param("BUTree<? extends SExpr> scope").build()
-					),
-					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build(),
-							stmt("BUTree<? extends SType> type;").build(),
-							stmt("BUTree<SNodeList> typeArgs = null;").build(),
-							stmt("BUTree<SNodeList> anonymousBody = null;").build(),
-							stmt("BUTree<SNodeList> args;").build(),
-							stmt("BUTree<SNodeList> annotations = null;").build()
+					params("BUTree<? extends SExpr> scope"),
+					stmts(
+							"BUTree<? extends SExpr> ret;",
+							"BUTree<? extends SType> type;",
+							"BUTree<SNodeList> typeArgs = null;",
+							"BUTree<SNodeList> anonymousBody = null;",
+							"BUTree<SNodeList> args;",
+							"BUTree<SNodeList> annotations = null;"
 					),
 					sequence(
 							action("if (scope == null) run();"),
@@ -2849,30 +2639,22 @@ public class Grammar {
 							action("run();"),
 							nonTerminal("annotations", "Annotations"),
 							choice(
-									nonTerminal("type", "PrimitiveType", null, listOf(
-											expr("annotations").build()
-									)),
-									nonTerminal("type", "QualifiedType", null, listOf(
-											expr("annotations").build()
-									))
+									nonTerminal("type", "PrimitiveType", null, exprs("annotations")),
+									nonTerminal("type", "QualifiedType", null, exprs("annotations"))
 							),
-							nonTerminal("ret", "ArrayCreationExprRest", null, listOf(
-									expr("type").build()
-							)),
+							nonTerminal("ret", "ArrayCreationExprRest", null, exprs("type")),
 							action("return ret;")
 					)
 			),
-			production("ArrayCreationExprRest", type("BUTree<? extends SExpr>").build(),
+			production("ArrayCreationExprRest", "BUTree<? extends SExpr>",
 					emptyList(),
-					listOf(
-							param("BUTree<? extends SType> componentType").build()
-					),
-					listOf(
-							stmt("BUTree<? extends SExpr> expr;").build(),
-							stmt("BUTree<SNodeList> arrayDimExprs = emptyList();").build(),
-							stmt("BUTree<SNodeList> arrayDims = emptyList();").build(),
-							stmt("BUTree<SNodeList> annotations = null;").build(),
-							stmt("BUTree<SArrayInitializerExpr> initializer;").build()
+					params("BUTree<? extends SType> componentType"),
+					stmts(
+							"BUTree<? extends SExpr> expr;",
+							"BUTree<SNodeList> arrayDimExprs = emptyList();",
+							"BUTree<SNodeList> arrayDims = emptyList();",
+							"BUTree<SNodeList> annotations = null;",
+							"BUTree<SArrayInitializerExpr> initializer;"
 					),
 					choice(
 							sequence(
@@ -2887,13 +2669,13 @@ public class Grammar {
 							)
 					)
 			),
-			production("ArrayDimExprsMandatory", type("BUTree<SNodeList>").build(),
+			production("ArrayDimExprsMandatory", "BUTree<SNodeList>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> arrayDimExprs = emptyList();").build(),
-							stmt("BUTree<SNodeList> annotations;").build(),
-							stmt("BUTree<? extends SExpr> expr;").build()
+					stmts(
+							"BUTree<SNodeList> arrayDimExprs = emptyList();",
+							"BUTree<SNodeList> annotations;",
+							"BUTree<? extends SExpr> expr;"
 					),
 					sequence(
 							oneOrMore(
@@ -2907,12 +2689,12 @@ public class Grammar {
 							action("return arrayDimExprs;")
 					)
 			),
-			production("ArrayDimsMandatory", type("BUTree<SNodeList>").build(),
+			production("ArrayDimsMandatory", "BUTree<SNodeList>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> arrayDims = emptyList();").build(),
-							stmt("BUTree<SNodeList> annotations;").build()
+					stmts(
+							"BUTree<SNodeList> arrayDims = emptyList();",
+							"BUTree<SNodeList> annotations;"
 					),
 					sequence(
 							oneOrMore(
@@ -2925,12 +2707,10 @@ public class Grammar {
 							action("return arrayDims;")
 					)
 			),
-			production("Statement", type("BUTree<? extends SStmt>").build(),
+			production("Statement", "BUTree<? extends SStmt>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SStmt> ret;").build()
-					),
+					stmts("BUTree<? extends SStmt> ret;"),
 					sequence(
 							choice(
 									nonTerminal("ret", "LabeledStatement"),
@@ -2953,12 +2733,12 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("AssertStatement", type("BUTree<SAssertStmt>").build(),
+			production("AssertStatement", "BUTree<SAssertStmt>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> check;").build(),
-							stmt("BUTree<? extends SExpr> msg = null;").build()
+					stmts(
+							"BUTree<? extends SExpr> check;",
+							"BUTree<? extends SExpr> msg = null;"
 					),
 					sequence(
 							action("run();"),
@@ -2972,12 +2752,12 @@ public class Grammar {
 							action("return dress(SAssertStmt.make(check, optionOf(msg)));")
 					)
 			),
-			production("LabeledStatement", type("BUTree<SLabeledStmt>").build(),
+			production("LabeledStatement", "BUTree<SLabeledStmt>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SName> label;").build(),
-							stmt("BUTree<? extends SStmt> stmt;").build()
+					stmts(
+							"BUTree<SName> label;",
+							"BUTree<? extends SStmt> stmt;"
 					),
 					sequence(
 							action("run();"),
@@ -2987,12 +2767,10 @@ public class Grammar {
 							action("return dress(SLabeledStmt.make(label, stmt));")
 					)
 			),
-			production("Block", type("BUTree<SBlockStmt>").build(),
+			production("Block", "BUTree<SBlockStmt>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> stmts;").build()
-					),
+					stmts("BUTree<SNodeList> stmts;"),
 					sequence(
 							action("run();"),
 							terminal("LBRACE"),
@@ -3001,14 +2779,14 @@ public class Grammar {
 							action("return dress(SBlockStmt.make(ensureNotNull(stmts)));")
 					)
 			),
-			production("BlockStatement", type("BUTree<? extends SStmt>").build(),
+			production("BlockStatement", "BUTree<? extends SStmt>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SStmt> ret;").build(),
-							stmt("BUTree<? extends SExpr> expr;").build(),
-							stmt("BUTree<? extends STypeDecl> typeDecl;").build(),
-							stmt("BUTree<SNodeList> modifiers;").build()
+					stmts(
+							"BUTree<? extends SStmt> ret;",
+							"BUTree<? extends SExpr> expr;",
+							"BUTree<? extends STypeDecl> typeDecl;",
+							"BUTree<SNodeList> modifiers;"
 					),
 					sequence(
 							choice(
@@ -3016,9 +2794,7 @@ public class Grammar {
 											action("run();"),
 											action("run();"),
 											nonTerminal("modifiers", "ModifiersNoDefault"),
-											nonTerminal("typeDecl", "ClassOrInterfaceDecl", null, listOf(
-													expr("modifiers").build()
-											)),
+											nonTerminal("typeDecl", "ClassOrInterfaceDecl", null, exprs("modifiers")),
 											action("ret = dress(STypeDeclarationStmt.make(typeDecl));")
 									),
 									sequence(
@@ -3033,24 +2809,22 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("VariableDeclExpression", type("BUTree<SVariableDeclarationExpr>").build(),
+			production("VariableDeclExpression", "BUTree<SVariableDeclarationExpr>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> modifiers;").build(),
-							stmt("BUTree<SLocalVariableDecl> variableDecl;").build()
+					stmts(
+							"BUTree<SNodeList> modifiers;",
+							"BUTree<SLocalVariableDecl> variableDecl;"
 					),
 					sequence(
 							action("run();"),
 							action("run();"),
 							nonTerminal("modifiers", "ModifiersNoDefault"),
-							nonTerminal("variableDecl", "VariableDecl", null, listOf(
-									expr("modifiers").build()
-							)),
+							nonTerminal("variableDecl", "VariableDecl", null, exprs("modifiers")),
 							action("return dress(SVariableDeclarationExpr.make(variableDecl));")
 					)
 			),
-			production("EmptyStatement", type("BUTree<SEmptyStmt>").build(),
+			production("EmptyStatement", "BUTree<SEmptyStmt>",
 					emptyList(),
 					emptyList(),
 					emptyList(),
@@ -3060,13 +2834,13 @@ public class Grammar {
 							action("return dress(SEmptyStmt.make());")
 					)
 			),
-			production("ExpressionStatement", type("BUTree<SExpressionStmt>").build(),
+			production("ExpressionStatement", "BUTree<SExpressionStmt>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> expr;").build(),
-							stmt("AssignOp op;").build(),
-							stmt("BUTree<? extends SExpr> value;").build()
+					stmts(
+							"BUTree<? extends SExpr> expr;",
+							"AssignOp op;",
+							"BUTree<? extends SExpr> value;"
 					),
 					sequence(
 							action("run();"),
@@ -3075,25 +2849,23 @@ public class Grammar {
 							action("return dress(SExpressionStmt.make(expr));")
 					)
 			),
-			production("StatementExpression", type("BUTree<? extends SExpr>").build(),
+			production("StatementExpression", "BUTree<? extends SExpr>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build()
-					),
+					stmts("BUTree<? extends SExpr> ret;"),
 					sequence(
 							// TODO Add further checks to report invalid expression in a statement
 							nonTerminal("ret", "Expression"),
 							action("return ret;")
 					)
 			),
-			production("SwitchStatement", type("BUTree<SSwitchStmt>").build(),
+			production("SwitchStatement", "BUTree<SSwitchStmt>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> selector;").build(),
-							stmt("BUTree<SSwitchCase> entry;").build(),
-							stmt("BUTree<SNodeList> entries = emptyList();").build()
+					stmts(
+							"BUTree<? extends SExpr> selector;",
+							"BUTree<SSwitchCase> entry;",
+							"BUTree<SNodeList> entries = emptyList();"
 					),
 					sequence(
 							action("run();"),
@@ -3110,12 +2882,12 @@ public class Grammar {
 							action("return dress(SSwitchStmt.make(selector, entries));")
 					)
 			),
-			production("SwitchEntry", type("BUTree<SSwitchCase>").build(),
+			production("SwitchEntry", "BUTree<SSwitchCase>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> label = null;").build(),
-							stmt("BUTree<SNodeList> stmts;").build()
+					stmts(
+							"BUTree<? extends SExpr> label = null;",
+							"BUTree<SNodeList> stmts;"
 					),
 					sequence(
 							action("run();"),
@@ -3131,13 +2903,13 @@ public class Grammar {
 							action("return dress(SSwitchCase.make(optionOf(label), ensureNotNull(stmts)));")
 					)
 			),
-			production("IfStatement", type("BUTree<SIfStmt>").build(),
+			production("IfStatement", "BUTree<SIfStmt>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> condition;").build(),
-							stmt("BUTree<? extends SStmt> thenStmt;").build(),
-							stmt("BUTree<? extends SStmt> elseStmt = null;").build()
+					stmts(
+							"BUTree<? extends SExpr> condition;",
+							"BUTree<? extends SStmt> thenStmt;",
+							"BUTree<? extends SStmt> elseStmt = null;"
 					),
 					sequence(
 							action("run();"),
@@ -3153,12 +2925,12 @@ public class Grammar {
 							action("return dress(SIfStmt.make(condition, thenStmt, optionOf(elseStmt)));")
 					)
 			),
-			production("WhileStatement", type("BUTree<SWhileStmt>").build(),
+			production("WhileStatement", "BUTree<SWhileStmt>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> condition;").build(),
-							stmt("BUTree<? extends SStmt> body;").build()
+					stmts(
+							"BUTree<? extends SExpr> condition;",
+							"BUTree<? extends SStmt> body;"
 					),
 					sequence(
 							action("run();"),
@@ -3170,12 +2942,12 @@ public class Grammar {
 							action("return dress(SWhileStmt.make(condition, body));")
 					)
 			),
-			production("DoStatement", type("BUTree<SDoStmt>").build(),
+			production("DoStatement", "BUTree<SDoStmt>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> condition;").build(),
-							stmt("BUTree<? extends SStmt> body;").build()
+					stmts(
+							"BUTree<? extends SExpr> condition;",
+							"BUTree<? extends SStmt> body;"
 					),
 					sequence(
 							action("run();"),
@@ -3189,15 +2961,15 @@ public class Grammar {
 							action("return dress(SDoStmt.make(body, condition));")
 					)
 			),
-			production("ForStatement", type("BUTree<? extends SStmt>").build(),
+			production("ForStatement", "BUTree<? extends SStmt>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SVariableDeclarationExpr> varExpr = null;").build(),
-							stmt("BUTree<? extends SExpr> expr = null;").build(),
-							stmt("BUTree<SNodeList> init = null;").build(),
-							stmt("BUTree<SNodeList> update = null;").build(),
-							stmt("BUTree<? extends SStmt> body;").build()
+					stmts(
+							"BUTree<SVariableDeclarationExpr> varExpr = null;",
+							"BUTree<? extends SExpr> expr = null;",
+							"BUTree<SNodeList> init = null;",
+							"BUTree<SNodeList> update = null;",
+							"BUTree<? extends SStmt> body;"
 					),
 					sequence(
 							action("run();"),
@@ -3228,12 +3000,12 @@ public class Grammar {
 							action("if (varExpr != null)\n\treturn dress(SForeachStmt.make(varExpr, expr, body));\nelse\n\treturn dress(SForStmt.make(init, expr, update, body));")
 					)
 			),
-			production("ForInit", type("BUTree<SNodeList>").build(),
+			production("ForInit", "BUTree<SNodeList>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> ret;").build(),
-							stmt("BUTree<? extends SExpr> expr;").build()
+					stmts(
+							"BUTree<SNodeList> ret;",
+							"BUTree<? extends SExpr> expr;"
 					),
 					sequence(
 							choice(
@@ -3246,12 +3018,12 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("StatementExpressionList", type("BUTree<SNodeList>").build(),
+			production("StatementExpressionList", "BUTree<SNodeList>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> ret = emptyList();").build(),
-							stmt("BUTree<? extends SExpr> expr;").build()
+					stmts(
+							"BUTree<SNodeList> ret = emptyList();",
+							"BUTree<? extends SExpr> expr;"
 					),
 					sequence(
 							nonTerminal("expr", "StatementExpression"),
@@ -3264,23 +3036,19 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("ForUpdate", type("BUTree<SNodeList>").build(),
+			production("ForUpdate", "BUTree<SNodeList>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> ret;").build()
-					),
+					stmts("BUTree<SNodeList> ret;"),
 					sequence(
 							nonTerminal("ret", "StatementExpressionList"),
 							action("return ret;")
 					)
 			),
-			production("BreakStatement", type("BUTree<SBreakStmt>").build(),
+			production("BreakStatement", "BUTree<SBreakStmt>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SName> id = null;").build()
-					),
+					stmts("BUTree<SName> id = null;"),
 					sequence(
 							action("run();"),
 							terminal("BREAK"),
@@ -3291,12 +3059,10 @@ public class Grammar {
 							action("return dress(SBreakStmt.make(optionOf(id)));")
 					)
 			),
-			production("ContinueStatement", type("BUTree<SContinueStmt>").build(),
+			production("ContinueStatement", "BUTree<SContinueStmt>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SName> id = null;").build()
-					),
+					stmts("BUTree<SName> id = null;"),
 					sequence(
 							action("run();"),
 							terminal("CONTINUE"),
@@ -3307,12 +3073,10 @@ public class Grammar {
 							action("return dress(SContinueStmt.make(optionOf(id)));")
 					)
 			),
-			production("ReturnStatement", type("BUTree<SReturnStmt>").build(),
+			production("ReturnStatement", "BUTree<SReturnStmt>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> expr = null;").build()
-					),
+					stmts("BUTree<? extends SExpr> expr = null;"),
 					sequence(
 							action("run();"),
 							terminal("RETURN"),
@@ -3323,12 +3087,10 @@ public class Grammar {
 							action("return dress(SReturnStmt.make(optionOf(expr)));")
 					)
 			),
-			production("ThrowStatement", type("BUTree<SThrowStmt>").build(),
+			production("ThrowStatement", "BUTree<SThrowStmt>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> expr;").build()
-					),
+					stmts("BUTree<? extends SExpr> expr;"),
 					sequence(
 							action("run();"),
 							terminal("THROW"),
@@ -3337,12 +3099,12 @@ public class Grammar {
 							action("return dress(SThrowStmt.make(expr));")
 					)
 			),
-			production("SynchronizedStatement", type("BUTree<SSynchronizedStmt>").build(),
+			production("SynchronizedStatement", "BUTree<SSynchronizedStmt>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> expr;").build(),
-							stmt("BUTree<SBlockStmt> block;").build()
+					stmts(
+							"BUTree<? extends SExpr> expr;",
+							"BUTree<SBlockStmt> block;"
 					),
 					sequence(
 							action("run();"),
@@ -3354,24 +3116,22 @@ public class Grammar {
 							action("return dress(SSynchronizedStmt.make(expr, block));")
 					)
 			),
-			production("TryStatement", type("BUTree<STryStmt>").build(),
+			production("TryStatement", "BUTree<STryStmt>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> resources = null;").build(),
-							stmt("ByRef<Boolean> trailingSemiColon = new ByRef<Boolean>(false);").build(),
-							stmt("BUTree<SBlockStmt> tryBlock;").build(),
-							stmt("BUTree<SBlockStmt> finallyBlock = null;").build(),
-							stmt("BUTree<SNodeList> catchClauses = null;").build()
+					stmts(
+							"BUTree<SNodeList> resources = null;",
+							"ByRef<Boolean> trailingSemiColon = new ByRef<Boolean>(false);",
+							"BUTree<SBlockStmt> tryBlock;",
+							"BUTree<SBlockStmt> finallyBlock = null;",
+							"BUTree<SNodeList> catchClauses = null;"
 					),
 					sequence(
 							action("run();"),
 							terminal("TRY"),
 							choice(
 									sequence(
-											nonTerminal("resources", "ResourceSpecification", null, listOf(
-													expr("trailingSemiColon").build()
-											)),
+											nonTerminal("resources", "ResourceSpecification", null, exprs("trailingSemiColon")),
 											nonTerminal("tryBlock", "Block"),
 											zeroOrOne(
 													nonTerminal("catchClauses", "CatchClauses")
@@ -3401,12 +3161,12 @@ public class Grammar {
 							action("return dress(STryStmt.make(ensureNotNull(resources), trailingSemiColon.value, tryBlock, ensureNotNull(catchClauses), optionOf(finallyBlock)));")
 					)
 			),
-			production("CatchClauses", type("BUTree<SNodeList>").build(),
+			production("CatchClauses", "BUTree<SNodeList>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> catchClauses = emptyList();").build(),
-							stmt("BUTree<SCatchClause> catchClause;").build()
+					stmts(
+							"BUTree<SNodeList> catchClauses = emptyList();",
+							"BUTree<SCatchClause> catchClause;"
 					),
 					sequence(
 							oneOrMore(
@@ -3416,12 +3176,12 @@ public class Grammar {
 							action("return catchClauses;")
 					)
 			),
-			production("CatchClause", type("BUTree<SCatchClause>").build(),
+			production("CatchClause", "BUTree<SCatchClause>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SFormalParameter> param;").build(),
-							stmt("BUTree<SBlockStmt> catchBlock;").build()
+					stmts(
+							"BUTree<SFormalParameter> param;",
+							"BUTree<SBlockStmt> catchBlock;"
 					),
 					sequence(
 							action("run();"),
@@ -3433,21 +3193,19 @@ public class Grammar {
 							action("return dress(SCatchClause.make(param, catchBlock));")
 					)
 			),
-			production("CatchFormalParameter", type("BUTree<SFormalParameter>").build(),
+			production("CatchFormalParameter", "BUTree<SFormalParameter>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> modifiers;").build(),
-							stmt("BUTree<? extends SType> exceptType;").build(),
-							stmt("BUTree<SNodeList> exceptTypes = emptyList();").build(),
-							stmt("BUTree<SVariableDeclaratorId> exceptId;").build()
+					stmts(
+							"BUTree<SNodeList> modifiers;",
+							"BUTree<? extends SType> exceptType;",
+							"BUTree<SNodeList> exceptTypes = emptyList();",
+							"BUTree<SVariableDeclaratorId> exceptId;"
 					),
 					sequence(
 							action("run();"),
 							nonTerminal("modifiers", "Modifiers"),
-							nonTerminal("exceptType", "QualifiedType", null, listOf(
-									expr("null").build()
-							)),
+							nonTerminal("exceptType", "QualifiedType", null, exprs("null")),
 							action("exceptTypes = append(exceptTypes, exceptType);"),
 							zeroOrOne(
 									action("lateRun();"),
@@ -3462,14 +3220,12 @@ public class Grammar {
 							action("return dress(SFormalParameter.make(modifiers, exceptType, false, emptyList(), optionOf(exceptId), false, none()));")
 					)
 			),
-			production("ResourceSpecification", type("BUTree<SNodeList>").build(),
+			production("ResourceSpecification", "BUTree<SNodeList>",
 					emptyList(),
-					listOf(
-							param("ByRef<Boolean> trailingSemiColon").build()
-					),
-					listOf(
-							stmt("BUTree<SNodeList> vars = emptyList();").build(),
-							stmt("BUTree<SVariableDeclarationExpr> var;").build()
+					params("ByRef<Boolean> trailingSemiColon"),
+					stmts(
+							"BUTree<SNodeList> vars = emptyList();",
+							"BUTree<SVariableDeclarationExpr> var;"
 					),
 					sequence(
 							terminal("LPAREN"),
@@ -3488,36 +3244,15 @@ public class Grammar {
 							action("return vars;")
 					)
 			),
-			production("RUNSIGNEDSHIFT", null,
-					emptyList(),
-					emptyList(),
-					emptyList(),
-					sequence(
-							terminal("GT"),
-							terminal("GT"),
-							terminal("GT"),
-							action("popNewWhitespaces(2);")
-					)
-			),
-			production("RSIGNEDSHIFT", null,
-					emptyList(),
-					emptyList(),
-					emptyList(),
-					sequence(
-							terminal("GT"),
-							terminal("GT"),
-							action("popNewWhitespaces(1);")
-					)
-			),
 
 			// ----- Annotations -----
 
-			production("Annotations", type("BUTree<SNodeList>").build(),
+			production("Annotations", "BUTree<SNodeList>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> annotations = emptyList();").build(),
-							stmt("BUTree<? extends SAnnotationExpr> annotation;").build()
+					stmts(
+							"BUTree<SNodeList> annotations = emptyList();",
+							"BUTree<? extends SAnnotationExpr> annotation;"
 					),
 					sequence(
 							zeroOrMore(
@@ -3527,12 +3262,10 @@ public class Grammar {
 							action("return annotations;")
 					)
 			),
-			production("Annotation", type("BUTree<? extends SAnnotationExpr>").build(),
+			production("Annotation", "BUTree<? extends SAnnotationExpr>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SAnnotationExpr> ret;").build()
-					),
+					stmts("BUTree<? extends SAnnotationExpr> ret;"),
 					sequence(
 							choice(
 									nonTerminal("ret", "NormalAnnotation"),
@@ -3542,12 +3275,12 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("NormalAnnotation", type("BUTree<SNormalAnnotationExpr>").build(),
+			production("NormalAnnotation", "BUTree<SNormalAnnotationExpr>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SQualifiedName> name;").build(),
-							stmt("BUTree<SNodeList> pairs = null;").build()
+					stmts(
+							"BUTree<SQualifiedName> name;",
+							"BUTree<SNodeList> pairs = null;"
 					),
 					sequence(
 							action("run();"),
@@ -3561,12 +3294,10 @@ public class Grammar {
 							action("return dress(SNormalAnnotationExpr.make(name, ensureNotNull(pairs)));")
 					)
 			),
-			production("MarkerAnnotation", type("BUTree<SMarkerAnnotationExpr>").build(),
+			production("MarkerAnnotation", "BUTree<SMarkerAnnotationExpr>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SQualifiedName> name;").build()
-					),
+					stmts("BUTree<SQualifiedName> name;"),
 					sequence(
 							action("run();"),
 							terminal("AT"),
@@ -3574,12 +3305,12 @@ public class Grammar {
 							action("return dress(SMarkerAnnotationExpr.make(name));")
 					)
 			),
-			production("SingleElementAnnotation", type("BUTree<SSingleMemberAnnotationExpr>").build(),
+			production("SingleElementAnnotation", "BUTree<SSingleMemberAnnotationExpr>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SQualifiedName> name;").build(),
-							stmt("BUTree<? extends SExpr> value;").build()
+					stmts(
+							"BUTree<SQualifiedName> name;",
+							"BUTree<? extends SExpr> value;"
 					),
 					sequence(
 							action("run();"),
@@ -3591,12 +3322,12 @@ public class Grammar {
 							action("return dress(SSingleMemberAnnotationExpr.make(name, value));")
 					)
 			),
-			production("ElementValuePairList", type("BUTree<SNodeList>").build(),
+			production("ElementValuePairList", "BUTree<SNodeList>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> ret = emptyList();").build(),
-							stmt("BUTree<SMemberValuePair> pair;").build()
+					stmts(
+							"BUTree<SNodeList> ret = emptyList();",
+							"BUTree<SMemberValuePair> pair;"
 					),
 					sequence(
 							nonTerminal("pair", "ElementValuePair"),
@@ -3609,12 +3340,12 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("ElementValuePair", type("BUTree<SMemberValuePair>").build(),
+			production("ElementValuePair", "BUTree<SMemberValuePair>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SName> name;").build(),
-							stmt("BUTree<? extends SExpr> value;").build()
+					stmts(
+							"BUTree<SName> name;",
+							"BUTree<? extends SExpr> value;"
 					),
 					sequence(
 							action("run();"),
@@ -3624,12 +3355,10 @@ public class Grammar {
 							action("return dress(SMemberValuePair.make(name, value));")
 					)
 			),
-			production("ElementValue", type("BUTree<? extends SExpr>").build(),
+			production("ElementValue", "BUTree<? extends SExpr>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<? extends SExpr> ret;").build()
-					),
+					stmts("BUTree<? extends SExpr> ret;"),
 					sequence(
 							choice(
 									nonTerminal("ret", "ConditionalExpression"),
@@ -3639,12 +3368,12 @@ public class Grammar {
 							action("return ret;")
 					)
 			),
-			production("ElementValueArrayInitializer", type("BUTree<? extends SExpr>").build(),
+			production("ElementValueArrayInitializer", "BUTree<? extends SExpr>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> values = null;").build(),
-							stmt("boolean trailingComma = false;").build()
+					stmts(
+							"BUTree<SNodeList> values = null;",
+							"boolean trailingComma = false;"
 					),
 					sequence(
 							action("run();"),
@@ -3660,12 +3389,12 @@ public class Grammar {
 							action("return dress(SArrayInitializerExpr.make(ensureNotNull(values), trailingComma));")
 					)
 			),
-			production("ElementValueList", type("BUTree<SNodeList>").build(),
+			production("ElementValueList", "BUTree<SNodeList>",
 					emptyList(),
 					emptyList(),
-					listOf(
-							stmt("BUTree<SNodeList> ret = emptyList();").build(),
-							stmt("BUTree<? extends SExpr> value;").build()
+					stmts(
+							"BUTree<SNodeList> ret = emptyList();",
+							"BUTree<? extends SExpr> value;"
 					),
 					sequence(
 							nonTerminal("value", "ElementValue"),
@@ -3679,4 +3408,28 @@ public class Grammar {
 					)
 			)
 	);
+
+	private static NodeList<Stmt> stmts(String... strings) {
+		NodeList<Stmt> result = emptyList();
+		for (String string : strings) {
+			result = result.append(Quotes.stmt(string).build());
+		}
+		return result;
+	}
+
+	private static NodeList<FormalParameter> params(String... strings) {
+		NodeList<FormalParameter> result = emptyList();
+		for (String string : strings) {
+			result = result.append(Quotes.param(string).build());
+		}
+		return result;
+	}
+
+	private static NodeList<Expr> exprs(String... strings) {
+		NodeList<Expr> result = emptyList();
+		for (String string : strings) {
+			result = result.append(Quotes.expr(string).build());
+		}
+		return result;
+	}
 }

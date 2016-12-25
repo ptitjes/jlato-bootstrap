@@ -1,6 +1,7 @@
 package org.jlato.cc.grammar;
 
 import org.jlato.bootstrap.Utils;
+import org.jlato.pattern.Quotes;
 import org.jlato.printer.Printer;
 import org.jlato.tree.Kind;
 import org.jlato.tree.NodeList;
@@ -23,6 +24,12 @@ public class GProduction {
 	                                     NodeList<FormalParameter> hintParams, NodeList<FormalParameter> dataParams,
 	                                     NodeList<Stmt> declarations, GExpansion expansion) {
 		return new GProduction(symbol, returnType, hintParams, dataParams, declarations, expansion);
+	}
+
+	public static GProduction production(String symbol, String returnType,
+	                                     NodeList<FormalParameter> hintParams, NodeList<FormalParameter> dataParams,
+	                                     NodeList<Stmt> declarations, GExpansion expansion) {
+		return new GProduction(symbol, Quotes.type(returnType).build(), hintParams, dataParams, declarations, expansion);
 	}
 
 	public final String symbol;
