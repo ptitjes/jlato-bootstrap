@@ -34,7 +34,7 @@ import static org.jlato.tree.Trees.*;
  */
 public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 
-	private final GProductions productions;
+	private GProductions productions;
 	private final String implementationName;
 
 	public ParserPattern(GProductions productions, String implementationName) {
@@ -72,6 +72,8 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				importDecl(qualifiedName("org.jlato.tree.decl.ModifierKeyword")),
 				importDecl(qualifiedName("org.jlato.tree.type.Primitive"))
 		));
+
+		productions = GrammarAnalysis.analysis(productions);
 
 		productions.recomputeReferences();
 		List<GProduction> allProductions = productions.getAll();
