@@ -35,40 +35,20 @@ public class GExpansion {
 		Action,
 	}
 
-	public static GExpansion choice(List<GExpansion> children) {
-		return new GExpansion(Kind.Choice, children, null, null, null, null, null);
-	}
-
 	public static GExpansion choice(GExpansion... children) {
 		return new GExpansion(Kind.Choice, Arrays.asList(children), null, null, null, null, null);
-	}
-
-	public static GExpansion sequence(List<GExpansion> children) {
-		return new GExpansion(Kind.Sequence, children, null, null, null, null, null);
 	}
 
 	public static GExpansion sequence(GExpansion... children) {
 		return new GExpansion(Kind.Sequence, Arrays.asList(children), null, null, null, null, null);
 	}
 
-	public static GExpansion zeroOrOne(List<GExpansion> children) {
-		return new GExpansion(Kind.ZeroOrOne, children, null, null, null, null, null);
-	}
-
 	public static GExpansion zeroOrOne(GExpansion... children) {
 		return new GExpansion(Kind.ZeroOrOne, Arrays.asList(children), null, null, null, null, null);
 	}
 
-	public static GExpansion zeroOrMore(List<GExpansion> children) {
-		return new GExpansion(Kind.ZeroOrMore, children, null, null, null, null, null);
-	}
-
 	public static GExpansion zeroOrMore(GExpansion... children) {
 		return new GExpansion(Kind.ZeroOrMore, Arrays.asList(children), null, null, null, null, null);
-	}
-
-	public static GExpansion oneOrMore(List<GExpansion> children) {
-		return new GExpansion(Kind.OneOrMore, children, null, null, null, null, null);
 	}
 
 	public static GExpansion oneOrMore(GExpansion... children) {
