@@ -23,7 +23,7 @@ public class GenParser {
 		String pathToJLaTo = System.getProperty("path.to.jlato");
 		String rootDirectory = pathToJLaTo + "src/main/java";
 
-		generateParser(new ParserPattern(Grammar.productions, "ParserImplementation"), "ParserImplementation", rootDirectory);
+		generateParser(new ParserPattern(JavaGrammar.productions, "ParserImplementation"), "ParserImplementation", rootDirectory);
 	}
 
 	private void generateParser(TypePattern<TreeClassDescriptor[], ClassDecl> pattern, String implementationName, String rootDirectory) throws org.jlato.parser.ParseException, IOException {

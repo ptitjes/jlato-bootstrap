@@ -18,7 +18,7 @@ import static org.jlato.cc.grammar.GExpansion.*;
 import static org.jlato.cc.grammar.GProduction.*;
 import static org.jlato.tree.Trees.voidType;
 
-public class Grammar {
+public class JavaGrammar {
 
 	public static GProductions productions = new GProductions(
 
