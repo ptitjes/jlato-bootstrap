@@ -1416,14 +1416,12 @@ public class Grammar {
 					emptyList(),
 					emptyList(),
 					stmts(
-							"BUTree<SNodeList> ret = emptyList();",
+							"BUTree<SNodeList> ret = null;",
 							"BUTree<? extends SType> type;"
 					),
 					sequence(
 							terminal("LT"),
-							zeroOrOne(
-									nonTerminal("ret", "TypeArgumentList")
-							),
+							nonTerminal("ret", "TypeArgumentList"),
 							terminal("GT"),
 							action("return ret;")
 					)
