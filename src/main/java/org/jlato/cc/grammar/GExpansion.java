@@ -9,10 +9,7 @@ import org.jlato.tree.expr.MethodInvocationExpr;
 import org.jlato.tree.name.Name;
 import org.jlato.tree.stmt.Stmt;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -119,6 +116,9 @@ public class GExpansion {
 	public final NodeList<Stmt> action;
 
 	public String constantName;
+
+	public boolean canUseLL1;
+	public List<Set<String>> ll1Decisions;
 
 	public GExpansion(Kind kind, List<GExpansion> children, String name, String symbol, NodeList<Expr> hints, NodeList<Expr> arguments, NodeList<Stmt> action) {
 		this.kind = kind;

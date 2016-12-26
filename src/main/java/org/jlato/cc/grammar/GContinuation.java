@@ -17,19 +17,27 @@ public class GContinuation {
 		locations.add(location);
 	}
 
-	private boolean exists(Predicate<GLocation> p) {
-		for (GLocation location : locations) {
-			if (p.test(location)) return true;
-		}
-		return false;
-	}
-
 	public Set<String> asTerminals() {
 		return locations.stream().map(l -> l.current.symbol).collect(Collectors.toSet());
 	}
 
-	public boolean intersects(GContinuation continuation) {
-		return exists(l -> continuation.asTerminals().contains(l.current.symbol));
+	public GContinuation moveToNextSiblingOrParentSiblings(GProductions productions) {
+		Set<GLocation> visited = new HashSet<>();
+		Set<GLocation> locations = new HashSet<>();
+		for (GLocation location : this.locations) {
+			nextSiblingOrParentsNextSiblings(location, locations, visited, productions);
+		}
+		this.locations = locations;
+		return this;
+	}
+
+	public GContinuation moveToFirstChild(GProductions productions) {
+		Set<GLocation> locations = new HashSet<>();
+		for (GLocation location : this.locations) {
+			locations.add(location.firstChild());
+		}
+		this.locations = locations;
+		return this;
 	}
 
 	public GContinuation moveToNextTerminals(GProductions productions) {
