@@ -73,7 +73,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				importDecl(qualifiedName("org.jlato.tree.type.Primitive"))
 		));
 
-		productions = GrammarAnalysis.analysis(productions);
+		productions = new GrammarAnalysis().analysis(productions);
 
 		productions.recomputeReferences();
 		List<GProduction> allProductions = productions.getAll();
@@ -119,7 +119,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 
 		for (GProduction production : allProductions) {
 			stateCount += 2;
-			members = grammarElements(production.symbol, production.expansion, members);
+			members = grammarElements(production.expansion, members);
 		}
 
 		// Make initializePreductions method
@@ -157,16 +157,16 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 			);
 		}
 
-		grammarConstants(production.symbol, production.expansion, members);
+		grammarConstants(production.expansion, members);
 	}
 
-	private void grammarConstants(String namePrefix, GExpansion expansion, Map<String, MemberDecl> members) {
+	private void grammarConstants(GExpansion expansion, Map<String, MemberDecl> members) {
 		switch (expansion.kind) {
 			case Choice:
 			case ZeroOrOne:
 			case ZeroOrMore:
 			case OneOrMore: {
-				String name = camelToConstant(lowerCaseFirst(namePrefix));
+				String name = camelToConstant(lowerCaseFirst(expansion.constantName));
 				if (!members.containsKey(name)) {
 					members.put(name, fieldDecl(qType("int"))
 							.withModifiers(listOf(Modifier.Static, Modifier.Final))
@@ -178,12 +178,9 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				}
 			}
 			case Sequence: {
-				int count = 1;
 				for (GExpansion child : expansion.children) {
 					if (isAction(child)) continue;
-
-					String name = namePrefix + '_' + count++;
-					grammarConstants(name, child, members);
+					grammarConstants(child, members);
 				}
 				break;
 			}
@@ -204,7 +201,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		}
 	}
 
-	private NodeList<MemberDecl> grammarElements(String namePrefix, GExpansion expansion, NodeList<MemberDecl> members) {
+	private NodeList<MemberDecl> grammarElements(GExpansion expansion, NodeList<MemberDecl> members) {
 		switch (expansion.kind) {
 			case Choice: {
 				int count = 1;
@@ -212,42 +209,39 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				for (GExpansion child : expansion.children) {
 					stateCount++;
 
-					String name = namePrefix + '_' + count++;
-					childrenExprs = grammarElementExpression(child, name, childrenExprs);
-					members = grammarElements(name, child, members);
+					childrenExprs = grammarElementExpression(child, childrenExprs);
+					members = grammarElements(child, members);
 				}
 
 				members = members.append(fieldDecl(qType("Choice"))
 						.withModifiers(listOf(Modifier.Static, Modifier.Final))
 						.withVariables(listOf(
-								variableDeclarator(variableDeclaratorId(name(namePrefix))).withInit(
+								variableDeclarator(variableDeclaratorId(name(expansion.constantName))).withInit(
 										methodInvocationExpr(name("choice"))
-												.withArgs(childrenExprs.prepend(literalExpr(namePrefix)))
+												.withArgs(childrenExprs.prepend(literalExpr(expansion.constantName)))
 								)
 						))
 				);
 				break;
 			}
 			case Sequence: {
-				int count = 1;
 				NodeList<Expr> childrenExprs = emptyList();
 				for (GExpansion child : expansion.children) {
 					if (isAction(child)) continue;
 					stateCount++;
 
-					String name = namePrefix + '_' + count++;
-					childrenExprs = grammarElementExpression(child, name, childrenExprs);
-					members = grammarElements(name, child, members);
+					childrenExprs = grammarElementExpression(child, childrenExprs);
+					members = grammarElements(child, members);
 				}
 				stateCount--;
 
-				if (!namePrefix.contains("_")) {
+				if (!expansion.constantName.contains("_")) {
 					members = members.append(fieldDecl(qType("Sequence"))
 							.withModifiers(listOf(Modifier.Static, Modifier.Final))
 							.withVariables(listOf(
-									variableDeclarator(variableDeclaratorId(name(namePrefix))).withInit(
+									variableDeclarator(variableDeclaratorId(name(expansion.constantName))).withInit(
 											methodInvocationExpr(name("sequence"))
-													.withArgs(childrenExprs.prepend(literalExpr(namePrefix)))
+													.withArgs(childrenExprs.prepend(literalExpr(expansion.constantName)))
 									)
 							))
 					);
@@ -258,18 +252,17 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				stateCount++;
 
 				NodeList<Expr> childrenExprs = emptyList();
-				GExpansion child = makeSequence(expansion);
-				String name = namePrefix + (child.kind != GExpansion.Kind.Sequence && child != expansion ? "_1" : "");
+				GExpansion child = uniqueChild(expansion);
 
-				childrenExprs = grammarElementExpression(child, name, childrenExprs);
-				members = grammarElements(name, child, members);
+				childrenExprs = grammarElementExpression(child, childrenExprs);
+				members = grammarElements(child, members);
 
 				members = members.append(fieldDecl(qType("ZeroOrOne"))
 						.withModifiers(listOf(Modifier.Static, Modifier.Final))
 						.withVariables(listOf(
-								variableDeclarator(variableDeclaratorId(name(namePrefix))).withInit(
+								variableDeclarator(variableDeclaratorId(name(expansion.constantName))).withInit(
 										methodInvocationExpr(name("zeroOrOne"))
-												.withArgs(childrenExprs.prepend(literalExpr(namePrefix)))
+												.withArgs(childrenExprs.prepend(literalExpr(expansion.constantName)))
 								)
 						))
 				);
@@ -279,18 +272,17 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				stateCount++;
 
 				NodeList<Expr> childrenExprs = emptyList();
-				GExpansion child = makeSequence(expansion);
-				String name = namePrefix + (child.kind != GExpansion.Kind.Sequence && child != expansion ? "_1" : "");
+				GExpansion child = uniqueChild(expansion);
 
-				childrenExprs = grammarElementExpression(child, name, childrenExprs);
-				members = grammarElements(name, child, members);
+				childrenExprs = grammarElementExpression(child, childrenExprs);
+				members = grammarElements(child, members);
 
 				members = members.append(fieldDecl(qType("ZeroOrMore"))
 						.withModifiers(listOf(Modifier.Static, Modifier.Final))
 						.withVariables(listOf(
-								variableDeclarator(variableDeclaratorId(name(namePrefix))).withInit(
+								variableDeclarator(variableDeclaratorId(name(expansion.constantName))).withInit(
 										methodInvocationExpr(name("zeroOrMore"))
-												.withArgs(childrenExprs.prepend(literalExpr(namePrefix)))
+												.withArgs(childrenExprs.prepend(literalExpr(expansion.constantName)))
 								)
 						))
 				);
@@ -300,18 +292,17 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				stateCount++;
 
 				NodeList<Expr> childrenExprs = emptyList();
-				GExpansion child = makeSequence(expansion);
-				String name = namePrefix + (child.kind != GExpansion.Kind.Sequence && child != expansion ? "_1" : "");
+				GExpansion child = uniqueChild(expansion);
 
-				childrenExprs = grammarElementExpression(child, name, childrenExprs);
-				members = grammarElements(name, child, members);
+				childrenExprs = grammarElementExpression(child, childrenExprs);
+				members = grammarElements(child, members);
 
 				members = members.append(fieldDecl(qType("OneOrMore"))
 						.withModifiers(listOf(Modifier.Static, Modifier.Final))
 						.withVariables(listOf(
-								variableDeclarator(variableDeclaratorId(name(namePrefix))).withInit(
+								variableDeclarator(variableDeclaratorId(name(expansion.constantName))).withInit(
 										methodInvocationExpr(name("oneOrMore"))
-												.withArgs(childrenExprs.prepend(literalExpr(namePrefix)))
+												.withArgs(childrenExprs.prepend(literalExpr(expansion.constantName)))
 								)
 						))
 				);
@@ -322,9 +313,9 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				members = members.append(fieldDecl(qType("NonTerminal"))
 						.withModifiers(listOf(Modifier.Static, Modifier.Final))
 						.withVariables(listOf(
-								variableDeclarator(variableDeclaratorId(name(namePrefix))).withInit(
+								variableDeclarator(variableDeclaratorId(name(expansion.constantName))).withInit(
 										methodInvocationExpr(name("nonTerminal"))
-												.withArgs(listOf(literalExpr(namePrefix), name(ntConstantName)))
+												.withArgs(listOf(literalExpr(expansion.constantName), name(ntConstantName)))
 								)
 						))
 				);
@@ -339,55 +330,51 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		return expansion.kind == GExpansion.Kind.Action;
 	}
 
-	private GExpansion makeSequence(GExpansion expansion) {
-		GExpansion uniqueChild = null;
+	private GExpansion uniqueChild(GExpansion expansion) {
 		for (GExpansion child : expansion.children) {
 			switch (child.kind) {
 				case Action:
 					break;
 				default:
-					if (uniqueChild == null) uniqueChild = child;
-					else return GExpansion.sequence(expansion.children);
+					return child;
 			}
 		}
-		return uniqueChild;
+		throw new IllegalArgumentException();
 	}
 
-	private NodeList<Expr> grammarElementExpression(GExpansion expansion, String namePrefix, NodeList<Expr> childrenExprs) {
-		int count = 1;
+	private NodeList<Expr> grammarElementExpression(GExpansion expansion, NodeList<Expr> childrenExprs) {
 		NodeList<Expr> localChildrenExprs = emptyList();
 		switch (expansion.kind) {
 			case Choice:
-				childrenExprs = childrenExprs.append(name(namePrefix));
+				childrenExprs = childrenExprs.append(name(expansion.constantName));
 				break;
 			case Sequence: {
 				for (GExpansion child : expansion.children) {
 					if (isAction(child)) continue;
 
-					String name = namePrefix + '_' + count++;
-					localChildrenExprs = grammarElementExpression(child, name, localChildrenExprs);
+					localChildrenExprs = grammarElementExpression(child, localChildrenExprs);
 				}
 				childrenExprs = childrenExprs.append(methodInvocationExpr(name("sequence"))
-						.withArgs(localChildrenExprs.prepend(literalExpr(namePrefix))));
+						.withArgs(localChildrenExprs.prepend(literalExpr(expansion.constantName))));
 				break;
 			}
 			case ZeroOrOne:
-				childrenExprs = childrenExprs.append(name(namePrefix));
+				childrenExprs = childrenExprs.append(name(expansion.constantName));
 				break;
 			case ZeroOrMore:
-				childrenExprs = childrenExprs.append(name(namePrefix));
+				childrenExprs = childrenExprs.append(name(expansion.constantName));
 				break;
 			case OneOrMore:
-				childrenExprs = childrenExprs.append(name(namePrefix));
+				childrenExprs = childrenExprs.append(name(expansion.constantName));
 				break;
 			case NonTerminal: {
-				childrenExprs = childrenExprs.append(name(namePrefix));
+				childrenExprs = childrenExprs.append(name(expansion.constantName));
 				break;
 			}
 			case Terminal: {
 				String name = expansion.symbol;
 				childrenExprs = childrenExprs.append(methodInvocationExpr(name("terminal"))
-						.withArgs(listOf(literalExpr(namePrefix), fieldAccessExpr(name(name)).withScope(name("TokenType"))))
+						.withArgs(listOf(literalExpr(expansion.constantName), fieldAccessExpr(name(name)).withScope(name("TokenType"))))
 				);
 				break;
 			}
@@ -409,31 +396,28 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				)
 		);
 
-		stmts = grammarDefStmts(symbol, production.expansion, stmts);
+		stmts = grammarDefStmts(production.expansion, stmts);
 		return stmts;
 	}
 
-	private NodeList<Stmt> grammarDefStmts(String namePrefix, GExpansion expansion, NodeList<Stmt> stmts) {
+	private NodeList<Stmt> grammarDefStmts(GExpansion expansion, NodeList<Stmt> stmts) {
 		switch (expansion.kind) {
 			case Choice:
 			case ZeroOrOne:
 			case ZeroOrMore:
 			case OneOrMore: {
-				String constantName = camelToConstant(lowerCaseFirst(namePrefix));
+				String constantName = camelToConstant(lowerCaseFirst(expansion.constantName));
 				stmts = stmts.append(
 						expressionStmt(
 								methodInvocationExpr(name("addChoicePoint"))
-										.withArgs(listOf(name(constantName), name(namePrefix)))
+										.withArgs(listOf(name(constantName), name(expansion.constantName)))
 						)
 				);
 			}
 			case Sequence: {
-				int count = 1;
 				for (GExpansion child : expansion.children) {
 					if (isAction(child)) continue;
-
-					String name = namePrefix + '_' + count++;
-					stmts = grammarDefStmts(name, child, stmts);
+					stmts = grammarDefStmts(child, stmts);
 				}
 				break;
 			}
@@ -451,7 +435,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		NodeList<Stmt> stmts = emptyList();
 		stmts = stmts.appendAll(production.declarations);
 		stmts = stmts.append(tokenVarDeclaration());
-		stmts = stmts.appendAll(parseStatementsFor(symbol, symbol, production.location(), production.hintParams, false));
+		stmts = stmts.appendAll(parseStatementsFor(symbol, production.location(), production.hintParams, false));
 
 		// Add push/pop callStack calls
 		String ntName = camelToConstant(lowerCaseFirst(symbol));
@@ -465,21 +449,21 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				.appendLeadingComment(production.expansion.toString(), true);
 	}
 
-	private NodeList<Stmt> parseStatementsFor(String symbol, String namePrefix, GLocation location, NodeList<FormalParameter> hintParams, boolean optional) {
+	private NodeList<Stmt> parseStatementsFor(String symbol, GLocation location, NodeList<FormalParameter> hintParams, boolean optional) {
 		NodeList<Stmt> stmts = emptyList();
 		GExpansion expansion = location.current;
 		switch (expansion.kind) {
 			case Sequence:
-				stmts = stmts.appendAll(parseStatementsForChildren(symbol, namePrefix, location, hintParams, false));
+				stmts = stmts.appendAll(parseStatementsForChildren(symbol, location, hintParams, false));
 				break;
 			case ZeroOrOne: {
 				if (expansion.children.size() == 1 && expansion.children.get(0).kind == GExpansion.Kind.Choice) {
-					stmts = stmts.appendAll(parseStatementsForChildren(symbol, namePrefix, location, hintParams, true));
+					stmts = stmts.appendAll(parseStatementsForChildren(symbol, location, hintParams, true));
 				} else {
 					stmts = stmts.append(tokenVarUpdate());
 					stmts = stmts.append(ifStmt(
-							makeKleeneCondition(namePrefix, location, hintParams),
-							blockStmt().withStmts(parseStatementsForChildren(symbol, namePrefix, location, hintParams, false))
+							makeKleeneCondition(expansion.constantName, location, hintParams),
+							blockStmt().withStmts(parseStatementsForChildren(symbol, location, hintParams, false))
 					));
 				}
 				break;
@@ -487,15 +471,15 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 			case ZeroOrMore: {
 				stmts = stmts.append(tokenVarUpdate());
 				stmts = stmts.append(whileStmt(
-						makeKleeneCondition(namePrefix, location, hintParams),
-						blockStmt().withStmts(parseStatementsForChildren(symbol, namePrefix, location, hintParams, false).append(tokenVarUpdate()))
+						makeKleeneCondition(expansion.constantName, location, hintParams),
+						blockStmt().withStmts(parseStatementsForChildren(symbol, location, hintParams, false).append(tokenVarUpdate()))
 				));
 				break;
 			}
 			case OneOrMore: {
 				stmts = stmts.append(doStmt(
-						blockStmt().withStmts(parseStatementsForChildren(symbol, namePrefix, location, hintParams, false).append(tokenVarUpdate())),
-						makeKleeneCondition(namePrefix, location, hintParams)
+						blockStmt().withStmts(parseStatementsForChildren(symbol, location, hintParams, false).append(tokenVarUpdate())),
+						makeKleeneCondition(expansion.constantName, location, hintParams)
 				));
 				break;
 			}
@@ -507,11 +491,10 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 
 					int count = 1;
 					for (GLocation child : location.allChildren()) {
-						Set<String> terminals = ll1DecisionTerminals.get(count - 1);
+						Set<String> terminals = ll1DecisionTerminals.get(count++ - 1);
 
 						// Produce statements
-						String name = namePrefix + "_" + count++;
-						NodeList<Stmt> caseStmts = parseStatementsFor(symbol, name, child, hintParams, optional);
+						NodeList<Stmt> caseStmts = parseStatementsFor(symbol, child, hintParams, optional);
 
 						// Produce case
 						cases = cases.append(ifStmt(matchExpression(terminals), blockStmt().withStmts(caseStmts)));
@@ -530,16 +513,15 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 							stmt.get()
 					));
 				} else {
-					Expr selector = predict(namePrefix, hintParams);
+					Expr selector = predict(expansion.constantName, hintParams);
 
 					NodeList<SwitchCase> cases = emptyList();
 
 					int count = 1;
 					for (GLocation child : location.allChildren()) {
-						LiteralExpr<Integer> label = literalExpr(count);
-						String name = namePrefix + "_" + count++;
+						LiteralExpr<Integer> label = literalExpr(count++);
 
-						NodeList<Stmt> caseStmts = parseStatementsFor(symbol, name, child, hintParams, optional);
+						NodeList<Stmt> caseStmts = parseStatementsFor(symbol, child, hintParams, optional);
 						if (caseStmts.last().kind() != Kind.ReturnStmt) caseStmts = caseStmts.append(breakStmt());
 
 						cases = cases.append(switchCase().withLabel(label).withStmts(caseStmts));
@@ -563,7 +545,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 						expansion.name == null ? call : assignExpr(name(expansion.name), AssignOp.Normal, call)
 				);
 
-				stmts = stmts.append(pushCallStack(namePrefix));
+				stmts = stmts.append(pushCallStack(expansion.constantName));
 				stmts = stmts.append(callStmt);
 				stmts = stmts.append(popCallStack());
 				break;
@@ -678,14 +660,10 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		return binaryExpr(TOKEN_VAR_NAME, BinaryOp.Equal, terminalName);
 	}
 
-	private NodeList<Stmt> parseStatementsForChildren(String symbol, String namePrefix, GLocation location, NodeList<FormalParameter> hintParams, boolean optional) {
-		int count = 1;
+	private NodeList<Stmt> parseStatementsForChildren(String symbol, GLocation location, NodeList<FormalParameter> hintParams, boolean optional) {
 		NodeList<Stmt> stmts = emptyList();
 		for (GLocation child : location.allChildren()) {
-			boolean lookaheadOrAction = isAction(child.current);
-			String name = namePrefix + (lookaheadOrAction ? "" : "_" + count++);
-
-			stmts = stmts.appendAll(parseStatementsFor(symbol, name, child, hintParams, optional));
+			stmts = stmts.appendAll(parseStatementsFor(symbol, child, hintParams, optional));
 		}
 		return stmts;
 	}

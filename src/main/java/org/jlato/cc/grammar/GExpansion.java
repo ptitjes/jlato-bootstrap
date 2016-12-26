@@ -10,6 +10,7 @@ import org.jlato.tree.name.Name;
 import org.jlato.tree.stmt.Stmt;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -40,19 +41,41 @@ public class GExpansion {
 	}
 
 	public static GExpansion sequence(GExpansion... children) {
-		return new GExpansion(Kind.Sequence, Arrays.asList(children), null, null, null, null, null);
+		return sequence(Arrays.asList(children));
+	}
+
+	private static GExpansion sequence(List<GExpansion> children) {
+		return new GExpansion(Kind.Sequence, children, null, null, null, null, null);
 	}
 
 	public static GExpansion zeroOrOne(GExpansion... children) {
-		return new GExpansion(Kind.ZeroOrOne, Arrays.asList(children), null, null, null, null, null);
+		return new GExpansion(Kind.ZeroOrOne, ensureUniqueChild(Arrays.asList(children)), null, null, null, null, null);
 	}
 
 	public static GExpansion zeroOrMore(GExpansion... children) {
-		return new GExpansion(Kind.ZeroOrMore, Arrays.asList(children), null, null, null, null, null);
+		return new GExpansion(Kind.ZeroOrMore, ensureUniqueChild(Arrays.asList(children)), null, null, null, null, null);
 	}
 
 	public static GExpansion oneOrMore(GExpansion... children) {
-		return new GExpansion(Kind.OneOrMore, Arrays.asList(children), null, null, null, null, null);
+		return new GExpansion(Kind.OneOrMore, ensureUniqueChild(Arrays.asList(children)), null, null, null, null, null);
+	}
+
+	private static boolean uniqueChild(List<GExpansion> children) {
+		boolean hadChild = false;
+		for (GExpansion child : children) {
+			switch (child.kind) {
+				case Action:
+					break;
+				default:
+					if (hadChild) return false;
+					else hadChild = true;
+			}
+		}
+		return true;
+	}
+
+	private static List<GExpansion> ensureUniqueChild(List<GExpansion> children) {
+		return uniqueChild(children) ? children : Collections.singletonList(sequence(children));
 	}
 
 	public static GExpansion nonTerminal(String symbol) {
@@ -94,6 +117,8 @@ public class GExpansion {
 	public final NodeList<Expr> hints;
 	public final NodeList<Expr> arguments;
 	public final NodeList<Stmt> action;
+
+	public String constantName;
 
 	public GExpansion(Kind kind, List<GExpansion> children, String name, String symbol, NodeList<Expr> hints, NodeList<Expr> arguments, NodeList<Stmt> action) {
 		this.kind = kind;
