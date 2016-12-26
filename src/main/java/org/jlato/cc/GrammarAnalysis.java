@@ -2,10 +2,7 @@ package org.jlato.cc;
 
 import org.jlato.cc.grammar.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Didier Villevalois
@@ -14,49 +11,30 @@ public class GrammarAnalysis {
 
 	private final GProductions productions;
 
-	private int decisionCount = 0;
-	private int ll1DecisionCount = 0;
+	public int decisionCount = 0;
+	public int ll1DecisionCount = 0;
+
+	// The constants are non-terminal ids and non-ll1 choice-point ids
+	public int entryPointCount = 0;
+	public Map<String, Integer> entryPointIds = new HashMap<>();
+	public int nonTerminalCount = 0;
+	public Map<String, Integer> nonTerminalIds = new HashMap<>();
+	public int choicePointCount = 0;
+	public Map<String, Integer> choicePointIds = new HashMap<>();
+
+	public Grammar grammar;
 
 	public GrammarAnalysis(GProductions productions) {
 		this.productions = productions;
 	}
 
 	public void analysis() {
-		assignConstantNames();
 		assignLL1Decisions();
+		System.out.println("Decision count: " + decisionCount + " (LL1: " + ll1DecisionCount + "; ALL*: " + (decisionCount - ll1DecisionCount) + ")");
 
-		System.out.println("Decision count: " + decisionCount + " (LL1: "+ ll1DecisionCount + "; ALL*: " + (decisionCount - ll1DecisionCount) + ")");
-	}
+		assignConstantNames();
 
-	// Assignment of constant names
-
-	private void assignConstantNames() {
-		for (GProduction production : productions.getAll()) {
-			assignConstantNames(production);
-		}
-	}
-
-	private void assignConstantNames(GProduction production) {
-		assignConstantNames(production.expansion, production.symbol);
-	}
-
-	private void assignConstantNames(GExpansion expansion, String namePrefix) {
-		expansion.constantName = namePrefix;
-		switch (expansion.kind) {
-			case Choice:
-			case Sequence:
-			case ZeroOrOne:
-			case ZeroOrMore:
-			case OneOrMore:
-				int index = 1;
-				for (GExpansion child : expansion.children) {
-					if (child.kind == GExpansion.Kind.Action) continue;
-					assignConstantNames(child, namePrefix + "_" + index++);
-				}
-				break;
-			default:
-				break;
-		}
+		assignGrammarStates();
 	}
 
 	// Computation of LL1 decisions
@@ -140,5 +118,139 @@ public class GrammarAnalysis {
 			}
 		}
 		return true;
+	}
+
+	// Assignment of constant names
+
+	private void assignConstantNames() {
+		for (GProduction production : productions.getAll()) {
+			assignConstantNames(production);
+		}
+	}
+
+	private void assignConstantNames(GProduction production) {
+		String symbol = production.symbol;
+
+		if (symbol.endsWith("Entry")) entryPointIds.put(symbol, entryPointCount++);
+		nonTerminalIds.put(symbol, nonTerminalCount++);
+
+		assignConstantNames(production.expansion, symbol);
+	}
+
+	private void assignConstantNames(GExpansion expansion, String namePrefix) {
+		expansion.constantName = namePrefix;
+		switch (expansion.kind) {
+			case Choice:
+			case ZeroOrOne:
+			case ZeroOrMore:
+			case OneOrMore:
+				if (!expansion.canUseLL1) choicePointIds.put(expansion.constantName, choicePointCount++);
+			case Sequence:
+				int index = 1;
+				for (GExpansion child : expansion.children) {
+					if (child.kind == GExpansion.Kind.Action) continue;
+					assignConstantNames(child, namePrefix + "_" + index++);
+				}
+				break;
+			default:
+				break;
+		}
+	}
+
+	// Assignment of grammar states
+
+	private void assignGrammarStates() {
+		grammar = new Grammar(this);
+
+		for (GProduction production : productions.getAll()) {
+			assignGrammarStates(production);
+		}
+	}
+
+	private void assignGrammarStates(GProduction production) {
+		String nonTerminal = production.symbol;
+		boolean isEntryPoint = nonTerminal.endsWith("Entry");
+
+		GrammarState start = grammar.newGrammarState(nonTerminal);
+		GrammarState end = grammar.newGrammarState(nonTerminal, nonTerminal);
+		assignGrammarStates(production.expansion, start, end, isEntryPoint ? nonTerminal : null);
+
+		grammar.addNonTerminalStartState(nonTerminal, start);
+	}
+
+	private void assignGrammarStates(GExpansion expansion, GrammarState start, GrammarState end, String entryPoint) {
+		expansion.startState = start;
+		expansion.endState = end;
+
+		switch (expansion.kind) {
+			case Choice: {
+				for (int i = 0; i < expansion.children.size(); i++) {
+					GrammarState choiceStart = grammar.newGrammarState(expansion.constantName);
+					start.addChoice(i + 1, choiceStart);
+					assignGrammarStates(expansion.children.get(i), choiceStart, end, entryPoint);
+				}
+				if (!expansion.canUseLL1) grammar.addChoicePointState(expansion.constantName, start);
+				break;
+			}
+			case Sequence: {
+				GrammarState state;
+				int lastIndex = expansion.children.size() - 1;
+				for (int i = 0; i <= lastIndex; i++) {
+					if (i == lastIndex) state = end;
+					else state = grammar.newGrammarState(expansion.name);
+
+					assignGrammarStates(expansion.children.get(i), start, state, entryPoint);
+					start = state;
+				}
+				break;
+			}
+			case ZeroOrOne: {
+				GrammarState childStart = grammar.newGrammarState(expansion.constantName);
+				assignGrammarStates(uniqueChild(expansion), childStart, end, entryPoint);
+
+				start.addChoice(0, end);
+				start.addChoice(1, childStart);
+				if (!expansion.canUseLL1) grammar.addChoicePointState(expansion.constantName, start);
+				break;
+			}
+			case ZeroOrMore: {
+				GrammarState childStart = grammar.newGrammarState(expansion.constantName);
+				assignGrammarStates(uniqueChild(expansion), childStart, start, entryPoint);
+
+				start.addChoice(0, end);
+				start.addChoice(1, childStart);
+				if (!expansion.canUseLL1) grammar.addChoicePointState(expansion.constantName, start);
+				break;
+			}
+			case OneOrMore: {
+				GrammarState childEnd = grammar.newGrammarState(expansion.constantName);
+				assignGrammarStates(uniqueChild(expansion), start, childEnd, entryPoint);
+
+				childEnd.addChoice(0, end);
+				childEnd.addChoice(1, start);
+				if (!expansion.canUseLL1) grammar.addChoicePointState(expansion.constantName, childEnd);
+				break;
+			}
+			case NonTerminal: {
+				start.setNonTerminal(expansion.symbol, end);
+
+				if (entryPoint != null) grammar.addNonTerminalEntryPointEndState(entryPoint, expansion.symbol, end);
+				else grammar.addNonTerminalEndState(expansion.symbol, end);
+				break;
+			}
+			case Terminal: {
+				start.setTerminal(expansion.symbol, end);
+				break;
+			}
+			case Action:
+				break;
+		}
+	}
+
+	private GExpansion uniqueChild(GExpansion expansion) {
+		for (GExpansion child : expansion.children) {
+			if (child.kind != GExpansion.Kind.Action) return child;
+		}
+		throw new IllegalArgumentException();
 	}
 }

@@ -116,9 +116,14 @@ public class GExpansion {
 	public final NodeList<Stmt> action;
 
 	public String constantName;
+	public int constantId;
 
 	public boolean canUseLL1;
 	public List<Set<String>> ll1Decisions;
+
+	public GrammarState startState;
+	public GrammarState endState;
+	public GrammarState choiceState;
 
 	public GExpansion(Kind kind, List<GExpansion> children, String name, String symbol, NodeList<Expr> hints, NodeList<Expr> arguments, NodeList<Stmt> action) {
 		this.kind = kind;
