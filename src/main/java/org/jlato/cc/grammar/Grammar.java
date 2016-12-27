@@ -1,9 +1,11 @@
 package org.jlato.cc.grammar;
 
 import org.jlato.cc.GrammarAnalysis;
-import org.jlato.internal.parser.util.IntSet;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author Didier Villevalois
@@ -16,7 +18,8 @@ public class Grammar {
 	public GrammarState[] nonTerminalStartStates;
 	public GrammarState[] choicePointStates;
 	public Set<GrammarState>[] nonTerminalEndStates;
-	public Set<GrammarState>[][] perEntryPointNonTerminalEndStates;
+	public short[] entryPointNonTerminalUse;
+	public short[] entryPointNonTerminalUseEndState;
 
 	public Grammar(GrammarAnalysis grammarAnalysis) {
 		this.grammarAnalysis = grammarAnalysis;
@@ -31,12 +34,8 @@ public class Grammar {
 			nonTerminalEndStates[i] = new HashSet<>();
 		}
 
-		perEntryPointNonTerminalEndStates = (Set<GrammarState>[][]) new Set[entryPointCount][nonTerminalCount];
-		for (int i = 0; i < entryPointCount; i++) {
-			for (int j = 0; j < nonTerminalCount; j++) {
-				perEntryPointNonTerminalEndStates[i][j] = new HashSet<>();
-			}
-		}
+		entryPointNonTerminalUse = new short[entryPointCount];
+		entryPointNonTerminalUseEndState = new short[entryPointCount];
 	}
 
 	public GrammarState newGrammarState(String name) {
@@ -62,7 +61,10 @@ public class Grammar {
 	}
 
 	public void addNonTerminalEntryPointEndState(String entryPoint, String nonTerminal, GrammarState state) {
-		perEntryPointNonTerminalEndStates[grammarAnalysis.entryPointIds.get(entryPoint)][grammarAnalysis.nonTerminalIds.get(nonTerminal)].add(state);
+		if (nonTerminal.equals("Epilog")) return;
+		int entryPointId = grammarAnalysis.entryPointIds.get(entryPoint);
+		entryPointNonTerminalUse[entryPointId] = (short) (int) grammarAnalysis.nonTerminalIds.get(nonTerminal);
+		entryPointNonTerminalUseEndState[entryPointId] = (short) state.id;
 	}
 
 	public org.jlato.internal.parser.all.Grammar build(GrammarAnalysis grammarAnalysis) {
@@ -72,37 +74,26 @@ public class Grammar {
 			theStates[i] = states.get(i).build(grammarAnalysis);
 		}
 
-		int[] theNonTerminalStartStates = new int[nonTerminalCount];
+		short[] theNonTerminalStartStates = new short[nonTerminalCount];
 		for (int i = 0; i < nonTerminalCount; i++) {
-			theNonTerminalStartStates[i] = nonTerminalStartStates[i].id;
+			theNonTerminalStartStates[i] = (short) nonTerminalStartStates[i].id;
 		}
 
-		int[] theChoicePointStates = new int[choicePointCount];
+		short[] theChoicePointStates = new short[choicePointCount];
 		for (int i = 0; i < choicePointCount; i++) {
-			theChoicePointStates[i] = choicePointStates[i].id;
+			theChoicePointStates[i] = (short) choicePointStates[i].id;
 		}
 
-		IntSet[] theNonTerminalEndStates = new IntSet[nonTerminalCount];
+		short[][] theNonTerminalEndStates = new short[nonTerminalCount][];
 		for (int i = 0; i < nonTerminalCount; i++) {
-			IntSet set = new IntSet();
+			theNonTerminalEndStates[i] = new short[nonTerminalEndStates[i].size()];
+			int j = 0;
 			for (GrammarState state : nonTerminalEndStates[i]) {
-				set.add(state.id);
-			}
-			theNonTerminalEndStates[i] = set;
-		}
-
-		IntSet[][] thePerEntryPointNonTerminalEndStates = new IntSet[entryPointCount][nonTerminalCount];
-		for (int i = 0; i < entryPointCount; i++) {
-			for (int j = 0; j < nonTerminalCount; j++) {
-				IntSet set = new IntSet();
-				for (GrammarState state : perEntryPointNonTerminalEndStates[i][j]) {
-					set.add(state.id);
-				}
-				thePerEntryPointNonTerminalEndStates[i][j] = set;
+				theNonTerminalEndStates[i][j++] = (short) state.id;
 			}
 		}
 
 		return new org.jlato.internal.parser.all.Grammar(theStates, theNonTerminalStartStates, theChoicePointStates,
-				theNonTerminalEndStates, thePerEntryPointNonTerminalEndStates);
+				theNonTerminalEndStates, entryPointNonTerminalUse, entryPointNonTerminalUseEndState);
 	}
 }

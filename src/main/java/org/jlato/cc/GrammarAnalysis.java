@@ -3,6 +3,7 @@ package org.jlato.cc;
 import org.jlato.cc.grammar.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Didier Villevalois
@@ -16,11 +17,13 @@ public class GrammarAnalysis {
 
 	// The constants are non-terminal ids and non-ll1 choice-point ids
 	public int entryPointCount = 0;
-	public Map<String, Integer> entryPointIds = new HashMap<>();
+	public Map<String, Integer> entryPointIds = new LinkedHashMap<>();
 	public int nonTerminalCount = 0;
-	public Map<String, Integer> nonTerminalIds = new HashMap<>();
+	public Map<String, Integer> nonTerminalIds = new LinkedHashMap<>();
 	public int choicePointCount = 0;
-	public Map<String, Integer> choicePointIds = new HashMap<>();
+	public Map<String, Integer> choicePointIds = new LinkedHashMap<>();
+
+	public Map<String, Integer> nonTerminalReturnIds = new LinkedHashMap<>();
 
 	public Grammar grammar;
 
@@ -35,6 +38,19 @@ public class GrammarAnalysis {
 		assignConstantNames();
 
 		assignGrammarStates();
+		System.out.println("State count: " + grammar.states.size());
+
+		int nonTerminalEnd = 0;
+		int choiceStates = 0;
+		int nonTerminalStates = 0;
+		int terminalStates = 0;
+		for (GrammarState state : grammar.states) {
+			if (state.endedNonTerminal != null) nonTerminalEnd++;
+			if (!state.choiceTransitions.isEmpty()) choiceStates++;
+			if (state.nonTerminalTransition != null) nonTerminalStates++;
+			if (state.terminalTransition != null) terminalStates++;
+		}
+		System.out.println("(Non-terminal end: " + nonTerminalEnd + "; choices: " + choiceStates + "; non-terminal: " + nonTerminalStates + "; terminal: " + terminalStates + ")");
 	}
 
 	// Computation of LL1 decisions
@@ -184,22 +200,24 @@ public class GrammarAnalysis {
 
 		switch (expansion.kind) {
 			case Choice: {
-				for (int i = 0; i < expansion.children.size(); i++) {
+				List<GExpansion> children = expansion.children;
+				for (int i = 0; i < children.size(); i++) {
 					GrammarState choiceStart = grammar.newGrammarState(expansion.constantName);
 					start.addChoice(i + 1, choiceStart);
-					assignGrammarStates(expansion.children.get(i), choiceStart, end, entryPoint);
+					assignGrammarStates(children.get(i), choiceStart, end, entryPoint);
 				}
 				if (!expansion.canUseLL1) grammar.addChoicePointState(expansion.constantName, start);
 				break;
 			}
 			case Sequence: {
+				List<GExpansion> children = filterActions(expansion.children);
 				GrammarState state;
-				int lastIndex = expansion.children.size() - 1;
+				int lastIndex = children.size() - 1;
 				for (int i = 0; i <= lastIndex; i++) {
 					if (i == lastIndex) state = end;
 					else state = grammar.newGrammarState(expansion.name);
 
-					assignGrammarStates(expansion.children.get(i), start, state, entryPoint);
+					assignGrammarStates(children.get(i), start, state, entryPoint);
 					start = state;
 				}
 				break;
@@ -232,6 +250,7 @@ public class GrammarAnalysis {
 				break;
 			}
 			case NonTerminal: {
+				nonTerminalReturnIds.put(expansion.constantName, end.id);
 				start.setNonTerminal(expansion.symbol, end);
 
 				if (entryPoint != null) grammar.addNonTerminalEntryPointEndState(entryPoint, expansion.symbol, end);
@@ -245,6 +264,10 @@ public class GrammarAnalysis {
 			case Action:
 				break;
 		}
+	}
+
+	private List<GExpansion> filterActions(List<GExpansion> children) {
+		return children.stream().filter(e -> e.kind != GExpansion.Kind.Action).collect(Collectors.toList());
 	}
 
 	private GExpansion uniqueChild(GExpansion expansion) {

@@ -150,7 +150,7 @@ public class JavaGrammar {
 					emptyList(),
 					stmts("BUTree<SCompilationUnit> ret;"),
 					sequence(
-							action("entryPoint = JavaGrammar.COMPILATION_UNIT_ENTRY;"),
+							action("entryPoint = COMPILATION_UNIT_ENTRY;"),
 							nonTerminal("ret", "CompilationUnit"),
 							action("return ret;")
 					)
@@ -160,7 +160,7 @@ public class JavaGrammar {
 					emptyList(),
 					stmts("BUTree<SPackageDecl> ret;"),
 					sequence(
-							action("entryPoint = JavaGrammar.PACKAGE_DECL_ENTRY;"),
+							action("entryPoint = PACKAGE_DECL_ENTRY;"),
 							nonTerminal("ret", "PackageDecl"),
 							nonTerminal("Epilog"),
 							action("return dressWithPrologAndEpilog(ret);")
@@ -171,7 +171,7 @@ public class JavaGrammar {
 					emptyList(),
 					stmts("BUTree<SImportDecl> ret;"),
 					sequence(
-							action("entryPoint = JavaGrammar.IMPORT_DECL_ENTRY;"),
+							action("entryPoint = IMPORT_DECL_ENTRY;"),
 							nonTerminal("ret", "ImportDecl"),
 							nonTerminal("Epilog"),
 							action("return dressWithPrologAndEpilog(ret);")
@@ -182,7 +182,7 @@ public class JavaGrammar {
 					emptyList(),
 					stmts("BUTree<? extends STypeDecl> ret;"),
 					sequence(
-							action("entryPoint = JavaGrammar.TYPE_DECL_ENTRY;"),
+							action("entryPoint = TYPE_DECL_ENTRY;"),
 							nonTerminal("ret", "TypeDecl"),
 							nonTerminal("Epilog"),
 							action("return dressWithPrologAndEpilog(ret);")
@@ -193,7 +193,7 @@ public class JavaGrammar {
 					emptyList(),
 					stmts("BUTree<? extends SMemberDecl> ret;"),
 					sequence(
-							action("entryPoint = JavaGrammar.MEMBER_DECL_ENTRY;"),
+							action("entryPoint = MEMBER_DECL_ENTRY;"),
 							nonTerminal("ret", "ClassOrInterfaceBodyDecl", exprs("typeKind")),
 							nonTerminal("Epilog"),
 							action("return dressWithPrologAndEpilog(ret);")
@@ -204,7 +204,7 @@ public class JavaGrammar {
 					emptyList(),
 					stmts("BUTree<? extends SMemberDecl> ret;"),
 					sequence(
-							action("entryPoint = JavaGrammar.ANNOTATION_MEMBER_DECL_ENTRY;"),
+							action("entryPoint = ANNOTATION_MEMBER_DECL_ENTRY;"),
 							// TODO Rename AnnotationMemberDecl
 							nonTerminal("ret", "AnnotationTypeBodyDecl"),
 							nonTerminal("Epilog"),
@@ -217,7 +217,7 @@ public class JavaGrammar {
 					emptyList(),
 					stmts("BUTree<SNodeList> ret;"),
 					sequence(
-							action("entryPoint = JavaGrammar.MODIFIERS_ENTRY;"),
+							action("entryPoint = MODIFIERS_ENTRY;"),
 							nonTerminal("ret", "Modifiers"),
 							nonTerminal("Epilog"),
 							action("return ret;")
@@ -228,7 +228,7 @@ public class JavaGrammar {
 					emptyList(),
 					stmts("BUTree<SNodeList> ret;"),
 					sequence(
-							action("entryPoint = JavaGrammar.ANNOTATIONS_ENTRY;"),
+							action("entryPoint = ANNOTATIONS_ENTRY;"),
 							nonTerminal("ret", "Annotations"),
 							nonTerminal("Epilog"),
 							action("return ret;")
@@ -243,7 +243,7 @@ public class JavaGrammar {
 							"BUTree<SMethodDecl> ret;"
 					),
 					sequence(
-							action("entryPoint = JavaGrammar.METHOD_DECL_ENTRY;"),
+							action("entryPoint = METHOD_DECL_ENTRY;"),
 							action("run();"),
 							nonTerminal("modifiers", "Modifiers"),
 							nonTerminal("ret", "MethodDecl", exprs("modifiers")),
@@ -259,7 +259,7 @@ public class JavaGrammar {
 							"BUTree<SFieldDecl> ret;"
 					),
 					sequence(
-							action("entryPoint = JavaGrammar.FIELD_DECL_ENTRY;"),
+							action("entryPoint = FIELD_DECL_ENTRY;"),
 							action("run();"),
 							nonTerminal("modifiers", "Modifiers"),
 							nonTerminal("ret", "FieldDecl", exprs("modifiers")),
@@ -275,7 +275,7 @@ public class JavaGrammar {
 							"BUTree<SAnnotationMemberDecl> ret;"
 					),
 					sequence(
-							action("entryPoint = JavaGrammar.ANNOTATION_ELEMENT_DECL_ENTRY;"),
+							action("entryPoint = ANNOTATION_ELEMENT_DECL_ENTRY;"),
 							action("run();"),
 							nonTerminal("modifiers", "Modifiers"),
 							// TODO Rename AnnotationElementDecl
@@ -290,7 +290,7 @@ public class JavaGrammar {
 					emptyList(),
 					stmts("BUTree<SEnumConstantDecl> ret;"),
 					sequence(
-							action("entryPoint = JavaGrammar.ENUM_CONSTANT_DECL_ENTRY;"),
+							action("entryPoint = ENUM_CONSTANT_DECL_ENTRY;"),
 							nonTerminal("ret", "EnumConstantDecl"),
 							nonTerminal("Epilog"),
 							action("return dressWithPrologAndEpilog(ret);")
@@ -301,7 +301,7 @@ public class JavaGrammar {
 					emptyList(),
 					stmts("BUTree<SFormalParameter> ret;"),
 					sequence(
-							action("entryPoint = JavaGrammar.FORMAL_PARAMETER_ENTRY;"),
+							action("entryPoint = FORMAL_PARAMETER_ENTRY;"),
 							nonTerminal("ret", "FormalParameter"),
 							nonTerminal("Epilog"),
 							action("return dressWithPrologAndEpilog(ret);")
@@ -312,7 +312,7 @@ public class JavaGrammar {
 					emptyList(),
 					stmts("BUTree<STypeParameter> ret;"),
 					sequence(
-							action("entryPoint = JavaGrammar.TYPE_PARAMETER_ENTRY;"),
+							action("entryPoint = TYPE_PARAMETER_ENTRY;"),
 							nonTerminal("ret", "TypeParameter"),
 							nonTerminal("Epilog"),
 							action("return dressWithPrologAndEpilog(ret);")
@@ -323,7 +323,7 @@ public class JavaGrammar {
 					emptyList(),
 					stmts("BUTree<SNodeList> ret;"),
 					sequence(
-							action("entryPoint = JavaGrammar.STATEMENTS_ENTRY;"),
+							action("entryPoint = STATEMENTS_ENTRY;"),
 							nonTerminal("ret", "Statements"),
 							nonTerminal("Epilog"),
 							action("return ret;")
@@ -334,7 +334,7 @@ public class JavaGrammar {
 					emptyList(),
 					stmts("BUTree<? extends SStmt> ret;"),
 					sequence(
-							action("entryPoint = JavaGrammar.BLOCK_STATEMENT_ENTRY;"),
+							action("entryPoint = BLOCK_STATEMENT_ENTRY;"),
 							nonTerminal("ret", "BlockStatement"),
 							nonTerminal("Epilog"),
 							action("return dressWithPrologAndEpilog(ret);")
@@ -345,7 +345,7 @@ public class JavaGrammar {
 					emptyList(),
 					stmts("BUTree<? extends SExpr> ret;"),
 					sequence(
-							action("entryPoint = JavaGrammar.EXPRESSION_ENTRY;"),
+							action("entryPoint = EXPRESSION_ENTRY;"),
 							nonTerminal("ret", "Expression"),
 							nonTerminal("Epilog"),
 							action("return dressWithPrologAndEpilog(ret);")
@@ -361,7 +361,7 @@ public class JavaGrammar {
 							"BUTree<? extends SType> ret;"
 					),
 					sequence(
-							action("entryPoint = JavaGrammar.TYPE_ENTRY;"),
+							action("entryPoint = TYPE_ENTRY;"),
 							action("run();"),
 							nonTerminal("annotations", "Annotations"),
 							nonTerminal("ret", "Type", exprs("annotations")),
@@ -375,7 +375,7 @@ public class JavaGrammar {
 					emptyList(),
 					stmts("BUTree<SQualifiedName> ret;"),
 					sequence(
-							action("entryPoint = JavaGrammar.QUALIFIED_NAME_ENTRY;"),
+							action("entryPoint = QUALIFIED_NAME_ENTRY;"),
 							nonTerminal("ret", "QualifiedName"),
 							nonTerminal("Epilog"),
 							action("return dressWithPrologAndEpilog(ret);")
@@ -386,7 +386,7 @@ public class JavaGrammar {
 					emptyList(),
 					stmts("BUTree<SName> ret;"),
 					sequence(
-							action("entryPoint = JavaGrammar.NAME_ENTRY;"),
+							action("entryPoint = NAME_ENTRY;"),
 							nonTerminal("ret", "Name"),
 							nonTerminal("Epilog"),
 							action("return dressWithPrologAndEpilog(ret);")
@@ -2775,16 +2775,18 @@ public class JavaGrammar {
 							"BUTree<SNodeList> annotations = null;",
 							"BUTree<SArrayInitializerExpr> initializer;"
 					),
-					choice(
-							sequence(
-									nonTerminal("arrayDimExprs", "ArrayDimExprsMandatory"),
-									nonTerminal("arrayDims", "ArrayDims"),
-									action("return dress(SArrayCreationExpr.make(componentType, arrayDimExprs, arrayDims, none()));")
-							),
-							sequence(
-									nonTerminal("arrayDims", "ArrayDimsMandatory"),
-									nonTerminal("initializer", "ArrayInitializer"),
-									action("return dress(SArrayCreationExpr.make(componentType, arrayDimExprs, arrayDims, optionOf(initializer)));")
+					sequence(
+							choice(
+									sequence(
+											nonTerminal("arrayDimExprs", "ArrayDimExprsMandatory"),
+											nonTerminal("arrayDims", "ArrayDims"),
+											action("return dress(SArrayCreationExpr.make(componentType, arrayDimExprs, arrayDims, none()));")
+									),
+									sequence(
+											nonTerminal("arrayDims", "ArrayDimsMandatory"),
+											nonTerminal("initializer", "ArrayInitializer"),
+											action("return dress(SArrayCreationExpr.make(componentType, arrayDimExprs, arrayDims, optionOf(initializer)));")
+									)
 							)
 					)
 			),

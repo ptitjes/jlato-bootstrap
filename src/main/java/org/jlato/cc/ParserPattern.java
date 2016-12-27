@@ -3,7 +3,10 @@ package org.jlato.cc;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.util.ImportManager;
 import org.jlato.bootstrap.util.TypePattern;
-import org.jlato.cc.grammar.*;
+import org.jlato.cc.grammar.GExpansion;
+import org.jlato.cc.grammar.GProduction;
+import org.jlato.cc.grammar.GProductions;
+import org.jlato.internal.parser.all.Grammar;
 import org.jlato.tree.Kind;
 import org.jlato.tree.NodeList;
 import org.jlato.tree.NodeOption;
@@ -18,12 +21,8 @@ import org.jlato.tree.stmt.SwitchCase;
 import org.jlato.tree.type.Primitive;
 import org.jlato.tree.type.Type;
 
+import java.io.IOException;
 import java.util.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import static org.jlato.pattern.Quotes.memberDecl;
@@ -36,6 +35,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 
 	private GProductions productions;
 	private final String implementationName;
+	private GrammarAnalysis grammarAnalysis;
 
 	public ParserPattern(GProductions productions, String implementationName) {
 		this.productions = productions;
@@ -62,6 +62,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				importDecl(qualifiedName("org.jlato.internal.bu.name")).setOnDemand(true),
 				importDecl(qualifiedName("org.jlato.internal.bu.stmt")).setOnDemand(true),
 				importDecl(qualifiedName("org.jlato.internal.bu.type")).setOnDemand(true),
+				importDecl(qualifiedName("org.jlato.internal.parser.all.Grammar")),
 				importDecl(qualifiedName("org.jlato.internal.parser.Token")),
 				importDecl(qualifiedName("org.jlato.internal.parser.TokenType")),
 				importDecl(qualifiedName("org.jlato.tree.Problem.Severity")),
@@ -70,361 +71,169 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				importDecl(qualifiedName("org.jlato.tree.expr.BinaryOp")),
 				importDecl(qualifiedName("org.jlato.tree.expr.UnaryOp")),
 				importDecl(qualifiedName("org.jlato.tree.decl.ModifierKeyword")),
-				importDecl(qualifiedName("org.jlato.tree.type.Primitive"))
+				importDecl(qualifiedName("org.jlato.tree.type.Primitive")),
+				importDecl(qualifiedName("java.io.IOException"))
 		));
 
 		productions.recomputeReferences();
 
-		new GrammarAnalysis(productions).analysis();
+		grammarAnalysis = new GrammarAnalysis(productions);
+		grammarAnalysis.analysis();
+
+		// Test that it can be encoded and decoded before emiting any code
+		try {
+			Grammar grammar = grammarAnalysis.grammar.build(grammarAnalysis);
+			Grammar.decode(Grammar.encode(grammar));
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 
 		List<GProduction> allProductions = productions.getAll();
 
 		NodeList<MemberDecl> members = Trees.emptyList();
-		members = members.append(memberDecl("protected Grammar initializeGrammar() { return new JavaGrammar(); }").build());
+		members = members.append(memberDecl("" +
+				"@Override protected Grammar initializeGrammar() {" +
+				"   try { return Grammar.decode(serializedGrammar); }" +
+				"   catch(IOException e) { throw new RuntimeException(\"Can't initialize grammar\", e); }" +
+				"   catch(ClassNotFoundException e) { throw new RuntimeException(\"Can't initialize grammar\", e); }" +
+				"}"
+		).build());
 
-		members = members.append(grammarClass(importManager, allProductions));
+		members = members.appendAll(constants());
 
 		for (GProduction production : allProductions) {
-			if (excluded(production)) continue;
 			members = members.append(parseMethod(importManager, production));
 		}
+
+		members = members.append(serializedGrammarField());
 
 		return decl.withMembers(members);
 	}
 
-	private boolean excluded(GProduction production) {
-		return false;
-	}
+	private NodeList<MemberDecl> constants() {
+		NodeList<MemberDecl> members = emptyList();
 
-	/* ALL(*) Grammar declaration */
+		// TODO Generate entry-point ids ?
 
-	private int constantCount = 0;
-	private int stateCount = 0;
+		// Generate entry-point ids
+		boolean first = true;
+//		for (Map.Entry<String, Integer> entry : grammarAnalysis.entryPointIds.entrySet()) {
+//			String id = camelToConstant(lowerCaseFirst(entry.getKey()));
+//			FieldDecl constant = fieldDecl(qType("int"))
+//					.withModifiers(listOf(Modifier.Static, Modifier.Final))
+//					.withVariables(listOf(
+//							variableDeclarator(variableDeclaratorId(name(id)))
+//									.withInit(literalExpr(entry.getValue()))
+//					));
+//			if (first) {
+//				constant = constant.appendLeadingComment("Identifiers for non-terminal start states", true);
+//				first = false;
+//			}
+//			members = members.append(constant);
+//		}
 
-	private MemberDecl grammarClass(ImportManager importManager, List<GProduction> allProductions) {
-		importManager.addImports(listOf(
-				importDecl(qualifiedName("org.jlato.internal.parser.all.Grammar")),
-				importDecl(qualifiedName("org.jlato.internal.parser.all.GrammarProduction")).setOnDemand(true).setStatic(true),
-				importDecl(qualifiedName("org.jlato.internal.parser.TokenType"))
-		));
-
-		NodeList<MemberDecl> members = Trees.emptyList();
-
-		Map<String, MemberDecl> constants = new TreeMap<>();
-		for (GProduction production : allProductions) {
-			grammarConstants(production, constants);
-		}
-		for (MemberDecl memberDecl : constants.values()) {
-			members = members.append(memberDecl);
-		}
-
-		for (GProduction production : allProductions) {
-			stateCount += 2;
-			members = grammarElements(production.expansion, members);
-		}
-
-		// Make initializePreductions method
-		NodeList<Stmt> stmts = emptyList();
-		for (GProduction production : allProductions) {
-			stmts = grammarDefStmts(production, stmts);
-		}
-
-		members = members.append(
-				methodDecl(voidType(), name("initializeProductions"))
-						.withModifiers(listOf(Modifier.Protected))
-						.withBody(blockStmt().withStmts(stmts))
-		);
-
-		ConstructorDecl constructor = constructorDecl(name("JavaGrammar")).withBody(blockStmt().withStmts(listOf(
-				explicitConstructorInvocationStmt().withArgs(listOf(
-						literalExpr(stateCount), literalExpr(constantCount)
-				))
-		)));
-
-		return classDecl(name("JavaGrammar")).withExtendsClause(qType("Grammar"))
-				.withModifiers(listOf(Modifier.Private, Modifier.Static))
-				.withMembers(members.prepend(constructor));
-	}
-
-	private void grammarConstants(GProduction production, Map<String, MemberDecl> members) {
-		String name = camelToConstant(lowerCaseFirst(production.symbol));
-		if (!members.containsKey(name)) {
-			members.put(name, fieldDecl(qType("int"))
+		// Generate non-terminal ids
+		first = true;
+		for (Map.Entry<String, Integer> entry : grammarAnalysis.nonTerminalIds.entrySet()) {
+			String id = camelToConstant(lowerCaseFirst(entry.getKey()));
+			FieldDecl constant = fieldDecl(qType("int"))
 					.withModifiers(listOf(Modifier.Static, Modifier.Final))
 					.withVariables(listOf(
-							variableDeclarator(variableDeclaratorId(name(name)))
-									.withInit(literalExpr(constantCount++))
-					))
-			);
+							variableDeclarator(variableDeclaratorId(name(id)))
+									.withInit(literalExpr(entry.getValue()))
+					));
+			if (first) {
+				constant = constant.appendLeadingComment("Identifiers for non-terminal start states", true);
+				first = false;
+			}
+			members = members.append(constant);
 		}
 
-		grammarConstants(production.expansion, members);
-	}
-
-	private void grammarConstants(GExpansion expansion, Map<String, MemberDecl> members) {
-		switch (expansion.kind) {
-			case Choice:
-			case ZeroOrOne:
-			case ZeroOrMore:
-			case OneOrMore: {
-				String name = camelToConstant(lowerCaseFirst(expansion.constantName));
-				if (!members.containsKey(name)) {
-					members.put(name, fieldDecl(qType("int"))
-							.withModifiers(listOf(Modifier.Static, Modifier.Final))
-							.withVariables(listOf(
-									variableDeclarator(variableDeclaratorId(name(name)))
-											.withInit(literalExpr(constantCount++))
-							))
-					);
-				}
+		// Generate choice-point ids
+		first = true;
+		for (Map.Entry<String, Integer> entry : grammarAnalysis.choicePointIds.entrySet()) {
+			String id = camelToConstant(lowerCaseFirst(entry.getKey()));
+			FieldDecl constant = fieldDecl(qType("int"))
+					.withModifiers(listOf(Modifier.Static, Modifier.Final))
+					.withVariables(listOf(
+							variableDeclarator(variableDeclaratorId(name(id)))
+									.withInit(literalExpr(entry.getValue()))
+					));
+			if (first) {
+				constant = constant.appendLeadingComment("Identifiers for (non-ll1) choice-point states", true);
+				first = false;
 			}
-			case Sequence: {
-				for (GExpansion child : expansion.children) {
-					if (isAction(child)) continue;
-					grammarConstants(child, members);
-				}
-				break;
-			}
-			case NonTerminal: {
-				String name = camelToConstant(lowerCaseFirst(expansion.symbol));
-				if (!members.containsKey(name)) {
-					members.put(name, fieldDecl(qType("int"))
-							.withModifiers(listOf(Modifier.Static, Modifier.Final))
-							.withVariables(listOf(
-									variableDeclarator(variableDeclaratorId(name(name)))
-											.withInit(literalExpr(constantCount++))
-							))
-					);
-				}
-				break;
-			}
-			default:
+			members = members.append(constant);
 		}
-	}
 
-	private NodeList<MemberDecl> grammarElements(GExpansion expansion, NodeList<MemberDecl> members) {
-		switch (expansion.kind) {
-			case Choice: {
-				int count = 1;
-				NodeList<Expr> childrenExprs = emptyList();
-				for (GExpansion child : expansion.children) {
-					stateCount++;
-
-					childrenExprs = grammarElementExpression(child, childrenExprs);
-					members = grammarElements(child, members);
-				}
-
-				members = members.append(fieldDecl(qType("Choice"))
-						.withModifiers(listOf(Modifier.Static, Modifier.Final))
-						.withVariables(listOf(
-								variableDeclarator(variableDeclaratorId(name(expansion.constantName))).withInit(
-										methodInvocationExpr(name("choice"))
-												.withArgs(childrenExprs.prepend(literalExpr(expansion.constantName)))
-								)
-						))
-				);
-				break;
+		// Generate non-terminal return ids
+		first = true;
+		for (Map.Entry<String, Integer> entry : grammarAnalysis.nonTerminalReturnIds.entrySet()) {
+			String id = camelToConstant(lowerCaseFirst(entry.getKey()));
+			FieldDecl constant = fieldDecl(qType("int"))
+					.withModifiers(listOf(Modifier.Static, Modifier.Final))
+					.withVariables(listOf(
+							variableDeclarator(variableDeclaratorId(name(id)))
+									.withInit(literalExpr(entry.getValue()))
+					));
+			if (first) {
+				constant = constant.appendLeadingComment("Identifiers for non-terminal return states", true);
+				first = false;
 			}
-			case Sequence: {
-				NodeList<Expr> childrenExprs = emptyList();
-				for (GExpansion child : expansion.children) {
-					if (isAction(child)) continue;
-					stateCount++;
-
-					childrenExprs = grammarElementExpression(child, childrenExprs);
-					members = grammarElements(child, members);
-				}
-				stateCount--;
-
-				if (!expansion.constantName.contains("_")) {
-					members = members.append(fieldDecl(qType("Sequence"))
-							.withModifiers(listOf(Modifier.Static, Modifier.Final))
-							.withVariables(listOf(
-									variableDeclarator(variableDeclaratorId(name(expansion.constantName))).withInit(
-											methodInvocationExpr(name("sequence"))
-													.withArgs(childrenExprs.prepend(literalExpr(expansion.constantName)))
-									)
-							))
-					);
-				}
-				break;
-			}
-			case ZeroOrOne: {
-				stateCount++;
-
-				NodeList<Expr> childrenExprs = emptyList();
-				GExpansion child = uniqueChild(expansion);
-
-				childrenExprs = grammarElementExpression(child, childrenExprs);
-				members = grammarElements(child, members);
-
-				members = members.append(fieldDecl(qType("ZeroOrOne"))
-						.withModifiers(listOf(Modifier.Static, Modifier.Final))
-						.withVariables(listOf(
-								variableDeclarator(variableDeclaratorId(name(expansion.constantName))).withInit(
-										methodInvocationExpr(name("zeroOrOne"))
-												.withArgs(childrenExprs.prepend(literalExpr(expansion.constantName)))
-								)
-						))
-				);
-				break;
-			}
-			case ZeroOrMore: {
-				stateCount++;
-
-				NodeList<Expr> childrenExprs = emptyList();
-				GExpansion child = uniqueChild(expansion);
-
-				childrenExprs = grammarElementExpression(child, childrenExprs);
-				members = grammarElements(child, members);
-
-				members = members.append(fieldDecl(qType("ZeroOrMore"))
-						.withModifiers(listOf(Modifier.Static, Modifier.Final))
-						.withVariables(listOf(
-								variableDeclarator(variableDeclaratorId(name(expansion.constantName))).withInit(
-										methodInvocationExpr(name("zeroOrMore"))
-												.withArgs(childrenExprs.prepend(literalExpr(expansion.constantName)))
-								)
-						))
-				);
-				break;
-			}
-			case OneOrMore: {
-				stateCount++;
-
-				NodeList<Expr> childrenExprs = emptyList();
-				GExpansion child = uniqueChild(expansion);
-
-				childrenExprs = grammarElementExpression(child, childrenExprs);
-				members = grammarElements(child, members);
-
-				members = members.append(fieldDecl(qType("OneOrMore"))
-						.withModifiers(listOf(Modifier.Static, Modifier.Final))
-						.withVariables(listOf(
-								variableDeclarator(variableDeclaratorId(name(expansion.constantName))).withInit(
-										methodInvocationExpr(name("oneOrMore"))
-												.withArgs(childrenExprs.prepend(literalExpr(expansion.constantName)))
-								)
-						))
-				);
-				break;
-			}
-			case NonTerminal: {
-				String ntConstantName = camelToConstant(lowerCaseFirst(expansion.symbol));
-				members = members.append(fieldDecl(qType("NonTerminal"))
-						.withModifiers(listOf(Modifier.Static, Modifier.Final))
-						.withVariables(listOf(
-								variableDeclarator(variableDeclaratorId(name(expansion.constantName))).withInit(
-										methodInvocationExpr(name("nonTerminal"))
-												.withArgs(listOf(literalExpr(expansion.constantName), name(ntConstantName)))
-								)
-						))
-				);
-				break;
-			}
-			default:
+			members = members.append(constant);
 		}
 		return members;
 	}
 
-	private boolean isAction(GExpansion expansion) {
-		return expansion.kind == GExpansion.Kind.Action;
-	}
+	/* Serialized ALL(*) Grammar declaration */
 
-	private GExpansion uniqueChild(GExpansion expansion) {
-		for (GExpansion child : expansion.children) {
-			switch (child.kind) {
-				case Action:
-					break;
-				default:
-					return child;
-			}
+	private MemberDecl serializedGrammarField() {
+		org.jlato.internal.parser.all.Grammar buildGrammar = grammarAnalysis.grammar.build(grammarAnalysis);
+
+		try {
+			String data = Grammar.encode(buildGrammar);
+			System.out.println("Serialized grammar length: " + data.length());
+
+			NodeList<Expr> stringPartExprs = splitString(data, 100);
+			Expr stringExpr = stringPartExprs.<Expr>foldLeft(literalExpr(""), (e1, e2) -> binaryExpr(e1, BinaryOp.Plus, e2));
+
+			return fieldDecl(qualifiedType(name("String")))
+					.withModifiers(listOf(Modifier.Private, Modifier.Static, Modifier.Final))
+					.withVariables(listOf(
+							variableDeclarator(variableDeclaratorId(name("serializedGrammar"))).withInit(stringExpr)
+					));
+		} catch (IOException e) {
+			throw new RuntimeException("Can't serialize grammar: ", e);
 		}
-		throw new IllegalArgumentException();
 	}
 
-	private NodeList<Expr> grammarElementExpression(GExpansion expansion, NodeList<Expr> childrenExprs) {
-		NodeList<Expr> localChildrenExprs = emptyList();
-		switch (expansion.kind) {
-			case Choice:
-				childrenExprs = childrenExprs.append(name(expansion.constantName));
-				break;
-			case Sequence: {
-				for (GExpansion child : expansion.children) {
-					if (isAction(child)) continue;
+	private NodeList<Expr> splitString(String data, int chunkSize) {
+		NodeList<Expr> stringPartExprs = emptyList();
+		int length = data.length();
+		for (int i = 0; i < length; ) {
+			int split = chunkSize / 6;
+			int delta = 0;
+			String part;
+			do {
+				split -= delta;
+				part = data.substring(i, i + split > length ? length : i + split);
+				part = escape(part);
+				delta = (int) Math.signum(part.length() - chunkSize);
+			} while ((i + split <= length && part.length() < chunkSize - 5) || part.length() > chunkSize);
+			i += split;
 
-					localChildrenExprs = grammarElementExpression(child, localChildrenExprs);
-				}
-				childrenExprs = childrenExprs.append(methodInvocationExpr(name("sequence"))
-						.withArgs(localChildrenExprs.prepend(literalExpr(expansion.constantName))));
-				break;
-			}
-			case ZeroOrOne:
-				childrenExprs = childrenExprs.append(name(expansion.constantName));
-				break;
-			case ZeroOrMore:
-				childrenExprs = childrenExprs.append(name(expansion.constantName));
-				break;
-			case OneOrMore:
-				childrenExprs = childrenExprs.append(name(expansion.constantName));
-				break;
-			case NonTerminal: {
-				childrenExprs = childrenExprs.append(name(expansion.constantName));
-				break;
-			}
-			case Terminal: {
-				String name = expansion.symbol;
-				childrenExprs = childrenExprs.append(methodInvocationExpr(name("terminal"))
-						.withArgs(listOf(literalExpr(expansion.constantName), fieldAccessExpr(name(name)).withScope(name("TokenType"))))
-				);
-				break;
-			}
-			default:
+			stringPartExprs = stringPartExprs.append(literalExpr(part).appendLeadingNewLine());
 		}
-		return childrenExprs;
+		return stringPartExprs;
 	}
 
-	private NodeList<Stmt> grammarDefStmts(GProduction production, NodeList<Stmt> stmts) {
-		String symbol = production.symbol;
-		String productionConstantName = camelToConstant(lowerCaseFirst(symbol));
-		stmts = stmts.append(
-				expressionStmt(
-						methodInvocationExpr(name("addProduction")).withArgs(listOf(
-								name(productionConstantName),
-								name(symbol),
-								literalExpr(symbol.endsWith("Entry") && !symbol.equals("SwitchEntry"))
-						))
-				)
-		);
-
-		stmts = grammarDefStmts(production.expansion, stmts);
-		return stmts;
-	}
-
-	private NodeList<Stmt> grammarDefStmts(GExpansion expansion, NodeList<Stmt> stmts) {
-		switch (expansion.kind) {
-			case Choice:
-			case ZeroOrOne:
-			case ZeroOrMore:
-			case OneOrMore: {
-				String constantName = camelToConstant(lowerCaseFirst(expansion.constantName));
-				stmts = stmts.append(
-						expressionStmt(
-								methodInvocationExpr(name("addChoicePoint"))
-										.withArgs(listOf(name(constantName), name(expansion.constantName)))
-						)
-				);
-			}
-			case Sequence: {
-				for (GExpansion child : expansion.children) {
-					if (isAction(child)) continue;
-					stmts = grammarDefStmts(child, stmts);
-				}
-				break;
-			}
-			default:
+	String escape(String str) {
+		StringBuilder b = new StringBuilder();
+		for (char c : str.toCharArray()) {
+			if (c >= 256) b.append("\\u").append(String.format("%04X", (int) c));
+			else if (c < 256) b.append("\\").append(String.format("%o", (int) c));
 		}
-		return stmts;
+		return b.toString();
 	}
 
 	/* Parse methods */
@@ -437,10 +246,6 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		stmts = stmts.appendAll(production.declarations);
 		stmts = stmts.append(tokenVarDeclaration());
 		stmts = stmts.appendAll(parseStatementsFor(symbol, production.expansion, production.hintParams, false));
-
-		// Add push/pop callStack calls
-		String ntName = camelToConstant(lowerCaseFirst(symbol));
-		Expr constant = fieldAccessExpr(name(ntName)).withScope(name("JavaGrammar"));
 
 		return methodDecl(type, name("parse" + upperCaseFirst(symbol)))
 				.withModifiers(listOf(symbol.endsWith("Entry") ? Modifier.Public : Modifier.Protected))
@@ -576,6 +381,8 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		return stmts;
 	}
 
+	/* Decisions' condition generation */
+
 	private Expr makeKleeneCondition(GExpansion expansion, NodeList<FormalParameter> hintParams) {
 		List<Set<String>> ll1DecisionTerminals = expansion.ll1Decisions;
 		// TODO Check for length of ll1DecisionTerminals[0] and ll1DecisionTerminals[1]
@@ -686,17 +493,20 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 
 	private Expr predict(String namePrefix, NodeList<FormalParameter> hintParams) {
 		String name = camelToConstant(lowerCaseFirst(namePrefix));
-		Expr constant = fieldAccessExpr(name(name)).withScope(name("JavaGrammar"));
+		Expr constant = fieldAccessExpr(name(name))/*.withScope(name("JavaGrammar"))*/;
 
 		return methodInvocationExpr(name("predict")).withArgs(listOf(constant));
 	}
+
+	/* Miscellaneous method call generation */
 
 	private Expr getTokenKind(Expr lookahead) {
 		return fieldAccessExpr(name("kind")).withScope(methodInvocationExpr(name("getToken")).withArgs(listOf(lookahead)));
 	}
 
 	private Stmt pushCallStack(String name) {
-		Expr constant = fieldAccessExpr(name(name)).withScope(name("JavaGrammar"));
+		String id = camelToConstant(lowerCaseFirst(name));
+		Expr constant = fieldAccessExpr(name(id))/*.withScope(name("JavaGrammar"))*/;
 
 		return expressionStmt(methodInvocationExpr(name("pushCallStack")).withArgs(listOf(constant)));
 	}
