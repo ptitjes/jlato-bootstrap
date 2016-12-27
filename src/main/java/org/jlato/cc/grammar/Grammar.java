@@ -2,6 +2,8 @@ package org.jlato.cc.grammar;
 
 import org.jlato.cc.GrammarAnalysis;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -17,7 +19,7 @@ public class Grammar {
 	public List<GrammarState> states = new ArrayList<>();
 	public GrammarState[] nonTerminalStartStates;
 	public GrammarState[] choicePointStates;
-	public Set<GrammarState>[] nonTerminalEndStates;
+	public Set<GrammarState>[] nonTerminalUseEndStates;
 	public short[] entryPointNonTerminalUse;
 	public short[] entryPointNonTerminalUseEndState;
 
@@ -29,9 +31,9 @@ public class Grammar {
 
 		nonTerminalStartStates = new GrammarState[nonTerminalCount];
 		choicePointStates = new GrammarState[choicePointCount];
-		nonTerminalEndStates = (Set<GrammarState>[]) new Set[nonTerminalCount];
+		nonTerminalUseEndStates = (Set<GrammarState>[]) new Set[nonTerminalCount];
 		for (int i = 0; i < nonTerminalCount; i++) {
-			nonTerminalEndStates[i] = new HashSet<>();
+			nonTerminalUseEndStates[i] = new HashSet<>();
 		}
 
 		entryPointNonTerminalUse = new short[entryPointCount];
@@ -57,7 +59,7 @@ public class Grammar {
 	}
 
 	public void addNonTerminalEndState(String nonTerminal, GrammarState state) {
-		nonTerminalEndStates[grammarAnalysis.nonTerminalIds.get(nonTerminal)].add(state);
+		nonTerminalUseEndStates[grammarAnalysis.nonTerminalIds.get(nonTerminal)].add(state);
 	}
 
 	public void addNonTerminalEntryPointEndState(String entryPoint, String nonTerminal, GrammarState state) {
@@ -65,6 +67,40 @@ public class Grammar {
 		int entryPointId = grammarAnalysis.entryPointIds.get(entryPoint);
 		entryPointNonTerminalUse[entryPointId] = (short) (int) grammarAnalysis.nonTerminalIds.get(nonTerminal);
 		entryPointNonTerminalUseEndState[entryPointId] = (short) state.id;
+	}
+
+	public void writeTo(ObjectOutputStream out) throws IOException {
+		// Write the grammar
+
+		int stateCount = states.size();
+		out.writeShort(stateCount);
+		for (int i = 0; i < stateCount; i++) {
+			states.get(i).writeTo(out, grammarAnalysis);
+		}
+
+		out.writeShort(nonTerminalCount);
+		for (int i = 0; i < nonTerminalCount; i++) {
+			out.writeShort(nonTerminalStartStates[i].id);
+		}
+
+		out.writeShort(choicePointCount);
+		for (int i = 0; i < choicePointCount; i++) {
+			out.writeShort(choicePointStates[i].id);
+		}
+
+		for (int i = 0; i < nonTerminalCount; i++) {
+			int useCount = nonTerminalUseEndStates[i].size();
+			out.writeShort(useCount);
+			for (GrammarState state : nonTerminalUseEndStates[i]) {
+				out.writeShort(state.id);
+			}
+		}
+
+		out.writeShort(entryPointCount);
+		for (int i = 0; i < entryPointCount; i++) {
+			out.writeShort(entryPointNonTerminalUse[i]);
+			out.writeShort(entryPointNonTerminalUseEndState[i]);
+		}
 	}
 
 	public org.jlato.internal.parser.all.Grammar build(GrammarAnalysis grammarAnalysis) {
@@ -86,9 +122,9 @@ public class Grammar {
 
 		short[][] theNonTerminalEndStates = new short[nonTerminalCount][];
 		for (int i = 0; i < nonTerminalCount; i++) {
-			theNonTerminalEndStates[i] = new short[nonTerminalEndStates[i].size()];
+			theNonTerminalEndStates[i] = new short[nonTerminalUseEndStates[i].size()];
 			int j = 0;
-			for (GrammarState state : nonTerminalEndStates[i]) {
+			for (GrammarState state : nonTerminalUseEndStates[i]) {
 				theNonTerminalEndStates[i][j++] = (short) state.id;
 			}
 		}

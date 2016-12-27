@@ -6,7 +6,7 @@ import org.jlato.bootstrap.util.TypePattern;
 import org.jlato.cc.grammar.GExpansion;
 import org.jlato.cc.grammar.GProduction;
 import org.jlato.cc.grammar.GProductions;
-import org.jlato.internal.parser.all.Grammar;
+import org.jlato.cc.grammar.Grammar;
 import org.jlato.tree.Kind;
 import org.jlato.tree.NodeList;
 import org.jlato.tree.NodeOption;
@@ -21,7 +21,9 @@ import org.jlato.tree.stmt.SwitchCase;
 import org.jlato.tree.type.Primitive;
 import org.jlato.tree.type.Type;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -80,14 +82,6 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		grammarAnalysis = new GrammarAnalysis(productions);
 		grammarAnalysis.analysis();
 
-		// Test that it can be encoded and decoded before emiting any code
-		try {
-			Grammar grammar = grammarAnalysis.grammar.build(grammarAnalysis);
-			Grammar.decode(Grammar.encode(grammar));
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-
 		List<GProduction> allProductions = productions.getAll();
 
 		NodeList<MemberDecl> members = Trees.emptyList();
@@ -95,7 +89,6 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				"@Override protected Grammar initializeGrammar() {" +
 				"   try { return Grammar.decode(serializedGrammar); }" +
 				"   catch(IOException e) { throw new RuntimeException(\"Can't initialize grammar\", e); }" +
-				"   catch(ClassNotFoundException e) { throw new RuntimeException(\"Can't initialize grammar\", e); }" +
 				"}"
 		).build());
 
@@ -188,10 +181,8 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 	/* Serialized ALL(*) Grammar declaration */
 
 	private MemberDecl serializedGrammarField() {
-		org.jlato.internal.parser.all.Grammar buildGrammar = grammarAnalysis.grammar.build(grammarAnalysis);
-
 		try {
-			String data = Grammar.encode(buildGrammar);
+			String data = encode(grammarAnalysis.grammar);
 			System.out.println("Serialized grammar length: " + data.length());
 
 			NodeList<Expr> stringPartExprs = splitString(data, 100);
@@ -205,6 +196,25 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		} catch (IOException e) {
 			throw new RuntimeException("Can't serialize grammar: ", e);
 		}
+	}
+
+	public static String encode(Grammar grammar) throws IOException {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ObjectOutputStream oos = new ObjectOutputStream(baos);
+		grammar.writeTo(oos);
+		oos.close();
+		byte[] bytes = baos.toByteArray();
+
+		int length = bytes.length / 2 + (bytes.length % 2);
+		char[] chars = new char[length];
+		for (int i = 0; i < length; i++) {
+			int j = i * 2;
+			byte byte1 = bytes[j];
+			byte byte2 = j + 1 < bytes.length ? bytes[j + 1] : 0;
+			chars[i] = (char) (((int) byte1 << 8 | (int) byte2 & 0xff) + 2 & 0xFFFF);
+		}
+
+		return new String(chars);
 	}
 
 	private NodeList<Expr> splitString(String data, int chunkSize) {
