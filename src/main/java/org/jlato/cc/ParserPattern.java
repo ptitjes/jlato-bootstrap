@@ -22,6 +22,7 @@ import org.jlato.tree.type.Primitive;
 import org.jlato.tree.type.Type;
 
 import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.*;
@@ -65,6 +66,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				importDecl(qualifiedName("org.jlato.internal.bu.stmt")).setOnDemand(true),
 				importDecl(qualifiedName("org.jlato.internal.bu.type")).setOnDemand(true),
 				importDecl(qualifiedName("org.jlato.internal.parser.all.Grammar")),
+				importDecl(qualifiedName("org.jlato.internal.parser.all.GrammarSerialization")),
 				importDecl(qualifiedName("org.jlato.internal.parser.Token")),
 				importDecl(qualifiedName("org.jlato.internal.parser.TokenType")),
 				importDecl(qualifiedName("org.jlato.tree.Problem.Severity")),
@@ -87,7 +89,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		NodeList<MemberDecl> members = Trees.emptyList();
 		members = members.append(memberDecl("" +
 				"@Override protected Grammar initializeGrammar() {" +
-				"   try { return Grammar.decode(serializedGrammar); }" +
+				"   try { return GrammarSerialization.VERSION_1.decode(serializedGrammar); }" +
 				"   catch(IOException e) { throw new RuntimeException(\"Can't initialize grammar\", e); }" +
 				"}"
 		).build());
@@ -189,7 +191,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 			Expr stringExpr = stringPartExprs.<Expr>foldLeft(literalExpr(""), (e1, e2) -> binaryExpr(e1, BinaryOp.Plus, e2));
 
 			return fieldDecl(qualifiedType(name("String")))
-					.withModifiers(listOf(Modifier.Private, Modifier.Static, Modifier.Final))
+					.withModifiers(listOf(Modifier.Static, Modifier.Final))
 					.withVariables(listOf(
 							variableDeclarator(variableDeclaratorId(name("serializedGrammar"))).withInit(stringExpr)
 					));
@@ -200,18 +202,17 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 
 	public static String encode(Grammar grammar) throws IOException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		ObjectOutputStream oos = new ObjectOutputStream(baos);
+		DataOutputStream oos = new DataOutputStream(baos);
 		grammar.writeTo(oos);
 		oos.close();
 		byte[] bytes = baos.toByteArray();
 
-		int length = bytes.length / 2 + (bytes.length % 2);
-		char[] chars = new char[length];
-		for (int i = 0; i < length; i++) {
-			int j = i * 2;
-			byte byte1 = bytes[j];
-			byte byte2 = j + 1 < bytes.length ? bytes[j + 1] : 0;
-			chars[i] = (char) (((int) byte1 << 8 | (int) byte2 & 0xff) + 2 & 0xFFFF);
+		int length = bytes.length;
+		char[] chars = new char[length / 2 + length % 2];
+		for (int i = 0; i < length; i += 2) {
+			byte byte1 = bytes[i];
+			byte byte2 = i + 1 < length ? bytes[i + 1] : 0;
+			chars[i / 2] = (char) (((int) byte1 << 8 | (int) byte2 & 0xff) + 2 & 0xffff);
 		}
 
 		return new String(chars);

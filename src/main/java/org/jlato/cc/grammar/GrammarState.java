@@ -3,6 +3,7 @@ package org.jlato.cc.grammar;
 import org.jlato.cc.GrammarAnalysis;
 import org.jlato.cc.JavaGrammar;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutput;
 import java.util.LinkedHashMap;
@@ -46,7 +47,7 @@ public class GrammarState {
 		terminalTransitionEnd = target;
 	}
 
-	public void writeTo(ObjectOutput out, GrammarAnalysis grammarAnalysis) throws IOException {
+	public void writeTo(DataOutputStream out, GrammarAnalysis grammarAnalysis) throws IOException {
 
 		// Prepare the data
 
