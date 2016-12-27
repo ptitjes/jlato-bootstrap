@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Didier Villevalois
@@ -93,7 +94,10 @@ public class Grammar {
 		for (int i = 0; i < nonTerminalCount; i++) {
 			int useCount = nonTerminalUseEndStates[i].size();
 			out.writeShort(useCount);
-			for (GrammarState state : nonTerminalUseEndStates[i]) {
+			List<GrammarState> sorted = nonTerminalUseEndStates[i].stream()
+					.sorted((s1, s2) -> Integer.compare(s1.id, s2.id))
+					.collect(Collectors.toList());
+			for (GrammarState state : sorted) {
 				out.writeShort(state.id);
 			}
 		}
