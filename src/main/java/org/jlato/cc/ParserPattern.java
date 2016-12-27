@@ -200,9 +200,14 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		}
 	}
 
+	private static final long version1UUID = 0xa199ceb7f6dbd9aaL;
+
 	public static String encode(Grammar grammar) throws IOException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		DataOutputStream oos = new DataOutputStream(baos);
+
+		oos.writeLong(version1UUID);
+
 		grammar.writeTo(oos);
 		oos.close();
 		byte[] bytes = baos.toByteArray();
@@ -212,7 +217,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		for (int i = 0; i < length; i += 2) {
 			byte byte1 = bytes[i];
 			byte byte2 = i + 1 < length ? bytes[i + 1] : 0;
-			chars[i / 2] = (char) (((int) byte1 << 8 | (int) byte2 & 0xff) + 2 & 0xffff);
+			chars[i / 2] = (char) ((int) byte1 << 8 | (int) byte2 & 0xff);
 		}
 
 		return new String(chars);

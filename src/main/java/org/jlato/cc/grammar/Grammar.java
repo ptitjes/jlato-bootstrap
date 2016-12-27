@@ -4,7 +4,6 @@ import org.jlato.cc.GrammarAnalysis;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -79,25 +78,17 @@ public class Grammar {
 		out.writeShort(choicePointCount);
 		out.writeShort(entryPointCount);
 
-		out.writeLong(0);
-
 		for (int i = 0; i < stateCount; i++) {
 			states.get(i).writeTo(out, grammarAnalysis);
 		}
-
-		out.writeLong(0);
 
 		for (int i = 0; i < nonTerminalCount; i++) {
 			out.writeShort(nonTerminalStartStates[i].id);
 		}
 
-		out.writeLong(0);
-
 		for (int i = 0; i < choicePointCount; i++) {
 			out.writeShort(choicePointStates[i].id);
 		}
-
-		out.writeLong(0);
 
 		for (int i = 0; i < nonTerminalCount; i++) {
 			int useCount = nonTerminalUseEndStates[i].size();
@@ -106,8 +97,6 @@ public class Grammar {
 				out.writeShort(state.id);
 			}
 		}
-
-		out.writeLong(0);
 
 		for (int i = 0; i < entryPointCount; i++) {
 			out.writeShort(entryPointNonTerminalUse[i]);

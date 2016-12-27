@@ -5,7 +5,6 @@ import org.jlato.cc.JavaGrammar;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutput;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -84,25 +83,4 @@ public class GrammarState {
 		out.writeShort(theTerminalTransition);
 		out.writeShort(theTerminalTransitionEnd);
 	}
-
-	public org.jlato.internal.parser.all.GrammarState build(GrammarAnalysis grammarAnalysis) {
-		Optional<Integer> maxChoice = choiceTransitions.keySet().stream().max(Integer::compare);
-		short[] theChoiceTransitions;
-		if (maxChoice.isPresent()) {
-			theChoiceTransitions = new short[maxChoice.get() + 1];
-			for (int i = 0; i <= maxChoice.get(); i++) {
-				GrammarState state = choiceTransitions.get(i);
-				theChoiceTransitions[i] = (short) (state == null ? -1 : state.id);
-			}
-		} else theChoiceTransitions = new short[0];
-
-		return new org.jlato.internal.parser.all.GrammarState((short) id,
-				endedNonTerminal == null ? -1 : (short) (int) grammarAnalysis.nonTerminalIds.get(endedNonTerminal),
-				theChoiceTransitions,
-				nonTerminalTransition == null ? -1 : (short) (int) grammarAnalysis.nonTerminalIds.get(nonTerminalTransition),
-				nonTerminalTransitionEnd == null ? -1 : (short) nonTerminalTransitionEnd.id,
-				terminalTransition == null ? -1 : (short) (int) JavaGrammar.terminals.get(terminalTransition),
-				terminalTransitionEnd == null ? -1 : (short) terminalTransitionEnd.id);
-	}
-
 }
