@@ -446,13 +446,25 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 	}
 
 	private Expr matchExpression(List<Expr> terminalNames, boolean negated) {
-		// TODO Have a better heuristic to choose between explicit matches and bit operations
+		int min = Integer.MAX_VALUE;
+		int max = Integer.MIN_VALUE;
+		for (Expr terminal : terminalNames) {
+			int value = terminalTable.get(terminal);
+			min = Math.min(min, value);
+			max = Math.max(max, value);
+		}
+
 		if (terminalNames.size() == 1)
 			return matchExpression(terminalNames.get(0), negated);
 		else if (terminalNames.size() == 2) {
 			Expr lhs = matchExpression(terminalNames.get(0), negated);
 			Expr rhs = matchExpression(terminalNames.get(1), negated);
 			return binaryExpr(lhs, negated ? BinaryOp.And : BinaryOp.Or, rhs);
+		} else if (terminalNames.size() == 3 && max - min >= 64) {
+			Expr o1 = matchExpression(terminalNames.get(0), negated);
+			Expr o2 = matchExpression(terminalNames.get(1), negated);
+			Expr o3 = matchExpression(terminalNames.get(2), negated);
+			return binaryExpr(o1, negated ? BinaryOp.And : BinaryOp.Or, binaryExpr(o2, negated ? BinaryOp.And : BinaryOp.Or, o3));
 		} else {
 			Expr test = null;
 			Expr mask = null;
@@ -481,7 +493,8 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 				Expr thisTest = testFor(mask, firstValue, negated);
 
 				if (test == null) test = thisTest;
-				else test = binaryExpr(parenthesizedExpr(test), negated ? BinaryOp.And : BinaryOp.Or, parenthesizedExpr(thisTest));
+				else
+					test = binaryExpr(parenthesizedExpr(test), negated ? BinaryOp.And : BinaryOp.Or, parenthesizedExpr(thisTest));
 			}
 
 			return test;
