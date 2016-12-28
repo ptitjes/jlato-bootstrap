@@ -57,22 +57,8 @@ public class GExpansion {
 		return new GExpansion(Kind.OneOrMore, ensureUniqueChild(Arrays.asList(children)), null, null, null, null, null);
 	}
 
-	private static boolean uniqueChild(List<GExpansion> children) {
-		boolean hadChild = false;
-		for (GExpansion child : children) {
-			switch (child.kind) {
-				case Action:
-					break;
-				default:
-					if (hadChild) return false;
-					else hadChild = true;
-			}
-		}
-		return true;
-	}
-
 	private static List<GExpansion> ensureUniqueChild(List<GExpansion> children) {
-		return uniqueChild(children) ? children : Collections.singletonList(sequence(children));
+		return children.size() == 1 ? children : Collections.singletonList(sequence(children));
 	}
 
 	public static GExpansion nonTerminal(String symbol) {
