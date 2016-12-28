@@ -17,8 +17,9 @@ public class GrammarAnalysis {
 	}
 
 	public void analysis() {
-		assignLL1Decisions();
 		assignConstantNames();
+		assignLL1Decisions();
+		assignConstantIds();
 		assignGrammarStates();
 
 		for (String stat : statistics()) {
@@ -31,6 +32,37 @@ public class GrammarAnalysis {
 		stats.add("Decision count: " + decisionCount + " (LL1: " + ll1DecisionCount + "; ALL*: " + (decisionCount - ll1DecisionCount) + ")");
 		stats.add("State count: " + grammar.states.size() + " (Non-terminal end: " + nonTerminalEnd + "; choices: " + choiceStates + "; non-terminal: " + nonTerminalStates + "; terminal: " + terminalStates + ")");
 		return stats;
+	}
+
+	// Assignment of constant names
+
+	private void assignConstantNames() {
+		for (GProduction production : productions.getAll()) {
+			assignConstantNames(production);
+		}
+	}
+
+	private void assignConstantNames(GProduction production) {
+		assignConstantNames(production.expansion, production.symbol);
+	}
+
+	private void assignConstantNames(GExpansion expansion, String namePrefix) {
+		expansion.constantName = namePrefix;
+		switch (expansion.kind) {
+			case Choice:
+			case ZeroOrOne:
+			case ZeroOrMore:
+			case OneOrMore:
+			case Sequence:
+				int index = 1;
+				for (GExpansion child : expansion.children) {
+					if (child.kind == GExpansion.Kind.Action) continue;
+					assignConstantNames(child, namePrefix + "_" + index++);
+				}
+				break;
+			default:
+				break;
+		}
 	}
 
 	// Computation of LL1 decisions
@@ -119,7 +151,7 @@ public class GrammarAnalysis {
 		return true;
 	}
 
-	// Assignment of constant names
+	// Assignment of constant ids
 
 	// The constants are non-terminal ids and non-ll1 choice-point ids
 	public int entryPointCount = 0;
@@ -129,23 +161,22 @@ public class GrammarAnalysis {
 	public int choicePointCount = 0;
 	public Map<String, Integer> choicePointIds = new LinkedHashMap<>();
 
-	private void assignConstantNames() {
+	private void assignConstantIds() {
 		for (GProduction production : productions.getAll()) {
-			assignConstantNames(production);
+			assignConstantIds(production);
 		}
 	}
 
-	private void assignConstantNames(GProduction production) {
+	private void assignConstantIds(GProduction production) {
 		String symbol = production.symbol;
 
 		if (symbol.endsWith("Entry")) entryPointIds.put(symbol, entryPointCount++);
 		nonTerminalIds.put(symbol, nonTerminalCount++);
 
-		assignConstantNames(production.expansion, symbol);
+		assignConstantIds(production.expansion);
 	}
 
-	private void assignConstantNames(GExpansion expansion, String namePrefix) {
-		expansion.constantName = namePrefix;
+	private void assignConstantIds(GExpansion expansion) {
 		switch (expansion.kind) {
 			case Choice:
 			case ZeroOrOne:
@@ -153,10 +184,9 @@ public class GrammarAnalysis {
 			case OneOrMore:
 				if (!expansion.canUseLL1) choicePointIds.put(expansion.constantName, choicePointCount++);
 			case Sequence:
-				int index = 1;
 				for (GExpansion child : expansion.children) {
 					if (child.kind == GExpansion.Kind.Action) continue;
-					assignConstantNames(child, namePrefix + "_" + index++);
+					assignConstantIds(child);
 				}
 				break;
 			default:
