@@ -102,7 +102,14 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 
 		members = members.append(serializedGrammarField());
 
-		return decl.withMembers(members);
+		decl = decl.withMembers(members);
+
+		for (String statisticsLine : grammarAnalysis.statistics()) {
+			decl = decl.appendLeadingComment(statisticsLine);
+		}
+
+
+		return decl;
 	}
 
 	private NodeList<MemberDecl> constants() {

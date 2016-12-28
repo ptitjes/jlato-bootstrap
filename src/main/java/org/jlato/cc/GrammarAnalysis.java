@@ -12,48 +12,31 @@ public class GrammarAnalysis {
 
 	private final GProductions productions;
 
-	public int decisionCount = 0;
-	public int ll1DecisionCount = 0;
-
-	// The constants are non-terminal ids and non-ll1 choice-point ids
-	public int entryPointCount = 0;
-	public Map<String, Integer> entryPointIds = new LinkedHashMap<>();
-	public int nonTerminalCount = 0;
-	public Map<String, Integer> nonTerminalIds = new LinkedHashMap<>();
-	public int choicePointCount = 0;
-	public Map<String, Integer> choicePointIds = new LinkedHashMap<>();
-
-	public Map<String, Integer> nonTerminalReturnIds = new LinkedHashMap<>();
-
-	public Grammar grammar;
-
 	public GrammarAnalysis(GProductions productions) {
 		this.productions = productions;
 	}
 
 	public void analysis() {
 		assignLL1Decisions();
-		System.out.println("Decision count: " + decisionCount + " (LL1: " + ll1DecisionCount + "; ALL*: " + (decisionCount - ll1DecisionCount) + ")");
-
 		assignConstantNames();
-
 		assignGrammarStates();
-		System.out.println("State count: " + grammar.states.size());
 
-		int nonTerminalEnd = 0;
-		int choiceStates = 0;
-		int nonTerminalStates = 0;
-		int terminalStates = 0;
-		for (GrammarState state : grammar.states) {
-			if (state.endedNonTerminal != null) nonTerminalEnd++;
-			if (!state.choiceTransitions.isEmpty()) choiceStates++;
-			if (state.nonTerminalTransition != null) nonTerminalStates++;
-			if (state.terminalTransition != null) terminalStates++;
+		for (String stat : statistics()) {
+			System.out.println(stat);
 		}
-		System.out.println("(Non-terminal end: " + nonTerminalEnd + "; choices: " + choiceStates + "; non-terminal: " + nonTerminalStates + "; terminal: " + terminalStates + ")");
+	}
+
+	public List<String> statistics() {
+		List<String> stats = new ArrayList<String>();
+		stats.add("Decision count: " + decisionCount + " (LL1: " + ll1DecisionCount + "; ALL*: " + (decisionCount - ll1DecisionCount) + ")");
+		stats.add("State count: " + grammar.states.size() + " (Non-terminal end: " + nonTerminalEnd + "; choices: " + choiceStates + "; non-terminal: " + nonTerminalStates + "; terminal: " + terminalStates + ")");
+		return stats;
 	}
 
 	// Computation of LL1 decisions
+
+	public int decisionCount = 0;
+	public int ll1DecisionCount = 0;
 
 	private void assignLL1Decisions() {
 		for (GProduction production : productions.getAll()) {
@@ -138,6 +121,14 @@ public class GrammarAnalysis {
 
 	// Assignment of constant names
 
+	// The constants are non-terminal ids and non-ll1 choice-point ids
+	public int entryPointCount = 0;
+	public Map<String, Integer> entryPointIds = new LinkedHashMap<>();
+	public int nonTerminalCount = 0;
+	public Map<String, Integer> nonTerminalIds = new LinkedHashMap<>();
+	public int choicePointCount = 0;
+	public Map<String, Integer> choicePointIds = new LinkedHashMap<>();
+
 	private void assignConstantNames() {
 		for (GProduction production : productions.getAll()) {
 			assignConstantNames(production);
@@ -175,11 +166,27 @@ public class GrammarAnalysis {
 
 	// Assignment of grammar states
 
+	public Grammar grammar;
+
+	public Map<String, Integer> nonTerminalReturnIds = new LinkedHashMap<>();
+
+	public int nonTerminalEnd = 0;
+	public int choiceStates = 0;
+	public int nonTerminalStates = 0;
+	public int terminalStates = 0;
+
 	private void assignGrammarStates() {
 		grammar = new Grammar(this);
 
 		for (GProduction production : productions.getAll()) {
 			assignGrammarStates(production);
+		}
+
+		for (GrammarState state : grammar.states) {
+			if (state.endedNonTerminal != null) nonTerminalEnd++;
+			if (!state.choiceTransitions.isEmpty()) choiceStates++;
+			if (state.nonTerminalTransition != null) nonTerminalStates++;
+			if (state.terminalTransition != null) terminalStates++;
 		}
 	}
 
