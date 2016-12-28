@@ -124,7 +124,7 @@ public class GrammarAnalysis {
 	}
 
 	private List<Set<String>> computeKleeneLL1Decisions(GLocation location) {
-		GContinuation after = new GContinuation(location).moveToNextSiblingOrParentSiblings(productions);
+		GContinuation after = new GContinuation(location).moveToNextOrParentsNext(productions);
 		GContinuation inside = new GContinuation(location).moveToFirstChild(productions);
 		return computeContinuations(Arrays.asList(after, inside));
 	}

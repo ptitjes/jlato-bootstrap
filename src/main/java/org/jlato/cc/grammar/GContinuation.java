@@ -3,7 +3,6 @@ package org.jlato.cc.grammar;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -21,11 +20,12 @@ public class GContinuation {
 		return locations.stream().map(l -> l.current.symbol).collect(Collectors.toSet());
 	}
 
-	public GContinuation moveToNextSiblingOrParentSiblings(GProductions productions) {
+	public GContinuation moveToNextOrParentsNext(GProductions productions) {
 		Set<GLocation> visited = new HashSet<>();
 		Set<GLocation> locations = new HashSet<>();
 		for (GLocation location : this.locations) {
-			nextSiblingOrParentsNextSiblings(location, locations, visited, productions);
+			visited.add(location);
+			nextOrParentsNext(location, locations, visited, productions);
 		}
 		this.locations = locations;
 		return this;
@@ -66,7 +66,7 @@ public class GContinuation {
 				break;
 			case ZeroOrOne:
 			case ZeroOrMore:
-				nextSiblingOrParentsNextSiblings(location, locations, visited, productions);
+				nextOrParentsNext(location, locations, visited, productions);
 				moveToNextTerminals(location.firstChild(), locations, visited, productions);
 				break;
 			case OneOrMore:
@@ -77,29 +77,32 @@ public class GContinuation {
 				moveToNextTerminals(location.traverseRef(productions), locations, visited, productions);
 				break;
 			case Action:
-				nextSiblingOrParentsNextSiblings(location, locations, visited, productions);
+				nextOrParentsNext(location, locations, visited, productions);
 				break;
 			default:
 				throw new IllegalArgumentException();
 		}
 	}
 
-	private void nextSiblingOrParentsNextSiblings(GLocation location, Set<GLocation> locations, Set<GLocation> visited, GProductions productions) {
+	private void nextOrParentsNext(GLocation location, Set<GLocation> locations, Set<GLocation> visited, GProductions productions) {
+		GLocation thisParent = location.parent;
 		GLocation nextSibling = location.nextSibling();
-		if (nextSibling != null) {
+		if (thisParent != null && thisParent.current.kind != GExpansion.Kind.Choice && nextSibling != null) {
 			moveToNextTerminals(nextSibling, locations, visited, productions);
 		} else {
-			Set<GLocation> nonChoiceParents = nonChoiceParents(location, productions);
-			for (GLocation nonChoiceParent : nonChoiceParents) {
-				nextSiblingOrParentsNextSiblings(nonChoiceParent, locations, visited, productions);
+			Set<GLocation> parents = parents(location, productions);
+			for (GLocation parent : parents) {
+				if (parent.current.kind == GExpansion.Kind.ZeroOrMore || parent.current.kind == GExpansion.Kind.OneOrMore)
+					moveToNextTerminals(parent, locations, visited, productions);
+				nextOrParentsNext(parent, locations, visited, productions);
 			}
 		}
 	}
 
-	private static Set<GLocation> nonChoiceParents(GLocation location, GProductions productions) {
+	private static Set<GLocation> parents(GLocation location, GProductions productions) {
 		GLocation parent = location.parent;
 		if (parent != null) {
-			return parent.current.kind != GExpansion.Kind.Choice ? Collections.singleton(parent) : nonChoiceParents(parent, productions);
+			return Collections.singleton(parent);
 		} else {
 			GProduction production = location.production;
 			if (production == null) throw new IllegalStateException();
