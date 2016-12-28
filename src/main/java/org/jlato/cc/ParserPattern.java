@@ -24,7 +24,6 @@ import org.jlato.tree.type.Type;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -324,7 +323,7 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 						NodeList<Stmt> caseStmts = parseStatementsFor(symbol, child, hintParams, optional);
 
 						// Produce case
-						cases = cases.append(ifStmt(matchExpression(terminals), blockStmt().withStmts(caseStmts)));
+						cases = cases.append(ifStmt(matchExpression(terminals, false), blockStmt().withStmts(caseStmts)));
 					}
 
 					NodeOption<Stmt> stmt = cases.foldRight(
@@ -407,12 +406,17 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 	/* Decisions' condition generation */
 
 	private Expr makeKleeneCondition(GExpansion expansion, NodeList<FormalParameter> hintParams) {
-		List<Set<String>> ll1DecisionTerminals = expansion.ll1Decisions;
-		// TODO Check for length of ll1DecisionTerminals[0] and ll1DecisionTerminals[1]
-		// Because we could also negate a condition made from ll1DecisionTerminals[0]
-		return expansion.canUseLL1 ?
-				matchExpression(ll1DecisionTerminals.get(1)) :
-				binaryExpr(predict(expansion.constantName, hintParams), BinaryOp.Equal, literalExpr(1));
+		if (expansion.canUseLL1) {
+			List<Set<String>> ll1DecisionTerminals = expansion.ll1Decisions;
+			Set<String> terminalsAfter = ll1DecisionTerminals.get(0);
+			Set<String> terminalsInside = ll1DecisionTerminals.get(1);
+
+			// Check for length of ll1DecisionTerminals[0] and ll1DecisionTerminals[1]
+			// Because we could also negate a condition made from ll1DecisionTerminals[0]
+			boolean reversedCondition = terminalsAfter.size() < terminalsInside.size();
+
+			return matchExpression(reversedCondition ? terminalsAfter : terminalsInside, reversedCondition);
+		} else return binaryExpr(predict(expansion.constantName, hintParams), BinaryOp.Equal, literalExpr(1));
 	}
 
 	private Set<String> merge(List<Set<String>> ll1Decisions) {
@@ -437,17 +441,19 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		return expressionStmt(assignExpr(TOKEN_VAR_NAME, AssignOp.Normal, getTokenKind(literalExpr(0))));
 	}
 
-	private Expr matchExpression(Collection<String> terminals) {
-		return matchExpression(prefixedAndOrderedConstants(terminals));
+	private Expr matchExpression(Collection<String> terminals, boolean negated) {
+		return matchExpression(prefixedAndOrderedConstants(terminals), negated);
 	}
 
-	private Expr matchExpression(List<Expr> terminalNames) {
+	private Expr matchExpression(List<Expr> terminalNames, boolean negated) {
 		// TODO Have a better heuristic to choose between explicit matches and bit operations
 		if (terminalNames.size() == 1)
-			return matchExpression(terminalNames.get(0));
-		else if (terminalNames.size() == 2)
-			return binaryExpr(matchExpression(terminalNames.get(0)), BinaryOp.Or, matchExpression(terminalNames.get(1)));
-		else {
+			return matchExpression(terminalNames.get(0), negated);
+		else if (terminalNames.size() == 2) {
+			Expr lhs = matchExpression(terminalNames.get(0), negated);
+			Expr rhs = matchExpression(terminalNames.get(1), negated);
+			return binaryExpr(lhs, negated ? BinaryOp.And : BinaryOp.Or, rhs);
+		} else {
 			Expr test = null;
 			Expr mask = null;
 			int firstValue = -1;
@@ -457,10 +463,10 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 
 				if (firstValue == -1) firstValue = value;
 				if (value >= firstValue + 64) {
-					Expr thisTest = testFor(mask, firstValue);
+					Expr thisTest = testFor(mask, firstValue, negated);
 
 					if (test == null) test = thisTest;
-					else test = binaryExpr(test, BinaryOp.Or, thisTest);
+					else test = binaryExpr(test, negated ? BinaryOp.And : BinaryOp.Or, thisTest);
 
 					firstValue = value;
 					mask = null;
@@ -472,17 +478,17 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 			}
 
 			if (mask != null) {
-				Expr thisTest = testFor(mask, firstValue);
+				Expr thisTest = testFor(mask, firstValue, negated);
 
 				if (test == null) test = thisTest;
-				else test = binaryExpr(parenthesizedExpr(test), BinaryOp.Or, parenthesizedExpr(thisTest));
+				else test = binaryExpr(parenthesizedExpr(test), negated ? BinaryOp.And : BinaryOp.Or, parenthesizedExpr(thisTest));
 			}
 
 			return test;
 		}
 	}
 
-	private Expr testFor(Expr mask, int firstValue) {
+	private Expr testFor(Expr mask, int firstValue, boolean negated) {
 		return binaryExpr(
 				binaryExpr(
 						parenthesizedBinExpr(
@@ -490,13 +496,13 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 								BinaryOp.BinAnd,
 								unaryExpr(UnaryOp.Inverse, literalExpr(63))
 						),
-						BinaryOp.Equal,
+						negated ? BinaryOp.NotEqual : BinaryOp.Equal,
 						literalExpr(0)
 				),
-				BinaryOp.And,
+				negated ? BinaryOp.Or : BinaryOp.And,
 				binaryExpr(
 						parenthesizedBinExpr(maskFor(TOKEN_VAR_NAME, firstValue), BinaryOp.BinAnd, parenthesizedExpr(mask)),
-						BinaryOp.NotEqual,
+						negated ? BinaryOp.Equal : BinaryOp.NotEqual,
 						literalExpr(0)
 				)
 		);
@@ -510,8 +516,8 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 		return parenthesizedExpr(binaryExpr(left, op, right));
 	}
 
-	private Expr matchExpression(Expr terminalName) {
-		return binaryExpr(TOKEN_VAR_NAME, BinaryOp.Equal, terminalName);
+	private Expr matchExpression(Expr terminalName, boolean negated) {
+		return binaryExpr(TOKEN_VAR_NAME, negated ? BinaryOp.NotEqual : BinaryOp.Equal, terminalName);
 	}
 
 	private Expr predict(String namePrefix, NodeList<FormalParameter> hintParams) {
