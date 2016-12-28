@@ -1449,30 +1449,20 @@ public class JavaGrammar {
 					emptyList(),
 					params("BUTree<SNodeList> annotations"),
 					stmts(
-							"BUTree<? extends SType> primitiveType = null;",
-							"BUTree<? extends SReferenceType> type = null;",
+							"BUTree<? extends SType> type = null;",
 							"BUTree<SNodeList> arrayDims;"
 					),
 					sequence(
 							choice(
-									sequence(
-											nonTerminal("primitiveType", "PrimitiveType", null, exprs("annotations")),
-											zeroOrOne(
-													action("lateRun();"),
-													nonTerminal("arrayDims", "ArrayDimsMandatory"),
-													action("type = dress(SArrayType.make(primitiveType, arrayDims));")
-											)
-									),
-									sequence(
-											nonTerminal("type", "QualifiedType", null, exprs("annotations")),
-											zeroOrOne(
-													action("lateRun();"),
-													nonTerminal("arrayDims", "ArrayDimsMandatory"),
-													action("type = dress(SArrayType.make(type, arrayDims));")
-											)
-									)
+									nonTerminal("type", "PrimitiveType", null, exprs("annotations")),
+									nonTerminal("type", "QualifiedType", null, exprs("annotations"))
 							),
-							action("return type == null ? primitiveType : type;")
+							zeroOrOne(
+									action("lateRun();"),
+									nonTerminal("arrayDims", "ArrayDimsMandatory"),
+									action("type = dress(SArrayType.make(type, arrayDims));")
+							),
+							action("return type;")
 					)
 			),
 			production("ReferenceType", "BUTree<? extends SReferenceType>",
