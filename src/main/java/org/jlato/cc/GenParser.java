@@ -24,7 +24,7 @@ public class GenParser {
 		String pathToJLaTo = System.getProperty("path.to.jlato");
 		String rootDirectory = pathToJLaTo + "src/main/java";
 
-		generateTokenType(new TokenTypePattern(), rootDirectory);
+//		generateTokenType(new TokenTypePattern(), rootDirectory);
 
 		generateParser(new ParserPattern(JavaGrammar.productions, "ParserImplementation"), "ParserImplementation", rootDirectory);
 	}
