@@ -7,6 +7,7 @@ import org.jlato.bootstrap.util.TypePattern;
 import org.jlato.parser.ParseException;
 import org.jlato.printer.FormattingSettings;
 import org.jlato.tree.decl.ClassDecl;
+import org.jlato.tree.decl.InterfaceDecl;
 
 import java.io.IOException;
 
@@ -23,10 +24,19 @@ public class GenParser {
 		String pathToJLaTo = System.getProperty("path.to.jlato");
 		String rootDirectory = pathToJLaTo + "src/main/java";
 
+		generateTokenType(new TokenTypePattern(), rootDirectory);
+
 		generateParser(new ParserPattern(JavaGrammar.productions, "ParserImplementation"), "ParserImplementation", rootDirectory);
 	}
 
-	private void generateParser(TypePattern<TreeClassDescriptor[], ClassDecl> pattern, String implementationName, String rootDirectory) throws org.jlato.parser.ParseException, IOException {
+	private void generateTokenType(TypePattern<TreeClassDescriptor[], InterfaceDecl> pattern, String rootDirectory) throws ParseException, IOException {
+		final TreeClassDescriptor[] classDescriptors = AllDescriptors.ALL_CLASSES;
+		CompilationUnitPattern.of(pattern)
+				.withFormatting(true, FormattingSettings.Default.withCommentFormatting(true))
+				.apply(rootDirectory, "org/jlato/internal/parser/TokenType.java", classDescriptors);
+	}
+
+	private void generateParser(TypePattern<TreeClassDescriptor[], ClassDecl> pattern, String implementationName, String rootDirectory) throws ParseException, IOException {
 		final TreeClassDescriptor[] classDescriptors = AllDescriptors.ALL_CLASSES;
 		CompilationUnitPattern.of(pattern)
 				.withFormatting(true, FormattingSettings.Default.withCommentFormatting(true))
