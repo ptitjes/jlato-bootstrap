@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 public class GrammarAnalysis {
 
 	private final GProductions productions;
+	private boolean someStateHasNoUniqueRole;
 
 	public GrammarAnalysis(GProductions productions) {
 		this.productions = productions;
@@ -31,6 +32,7 @@ public class GrammarAnalysis {
 		List<String> stats = new ArrayList<String>();
 		stats.add("Decision count: " + decisionCount + " (LL1: " + ll1DecisionCount + "; ALL*: " + (decisionCount - ll1DecisionCount) + ")");
 		stats.add("State count: " + grammar.states.size() + " (Non-terminal end: " + nonTerminalEnd + "; choices: " + choiceStates + "; non-terminal: " + nonTerminalStates + "; terminal: " + terminalStates + ")");
+		if (someStateHasNoUniqueRole) stats.add("Warning: Some state has not a unique role !");
 		return stats;
 	}
 
@@ -212,11 +214,25 @@ public class GrammarAnalysis {
 			assignGrammarStates(production);
 		}
 
+		// Check that every state has a unique role
+		// And count each type of states
 		for (GrammarState state : grammar.states) {
-			if (state.endedNonTerminal != null) nonTerminalEnd++;
-			if (!state.choiceTransitions.isEmpty()) choiceStates++;
-			if (state.nonTerminalTransition != null) nonTerminalStates++;
-			if (state.terminalTransition != null) terminalStates++;
+			boolean nonTerminalEnd = state.endedNonTerminal != null;
+			boolean choice = !state.choiceTransitions.isEmpty();
+			boolean nonTerminal = state.nonTerminalTransition != null;
+			boolean terminal = state.terminalTransition != null;
+
+			int roleCount = nonTerminalEnd ? 1 : 0;
+			roleCount += choice ? 1 : 0;
+			roleCount += nonTerminal ? 1 : 0;
+			roleCount += terminal ? 1 : 0;
+
+			someStateHasNoUniqueRole = someStateHasNoUniqueRole || roleCount != 1;
+
+			if (nonTerminalEnd) this.nonTerminalEnd++;
+			if (choice) choiceStates++;
+			if (nonTerminal) nonTerminalStates++;
+			if (terminal) terminalStates++;
 		}
 	}
 
