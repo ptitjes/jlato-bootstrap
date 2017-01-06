@@ -121,6 +121,10 @@ public class GExpansion {
 		this.action = action;
 	}
 
+	public GExpansion withChildren(List<GExpansion> children) {
+		return new GExpansion(kind, children, name, symbol, hints, arguments, action);
+	}
+
 	public GExpansion rewrite(Function<GExpansion, GExpansion> f) {
 		switch (kind) {
 			case Choice:
@@ -130,7 +134,7 @@ public class GExpansion {
 			case OneOrMore:
 				List<GExpansion> rewroteChildren =
 						children.stream().map(e -> e.rewrite(f)).filter(Objects::nonNull).collect(Collectors.toList());
-				return f.apply(new GExpansion(kind, rewroteChildren, name, symbol, hints, arguments, action));
+				return f.apply(this.withChildren(rewroteChildren));
 			case NonTerminal:
 			case Terminal:
 			case Action:

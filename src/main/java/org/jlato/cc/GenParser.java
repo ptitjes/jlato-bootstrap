@@ -4,6 +4,7 @@ import org.jlato.bootstrap.descriptors.AllDescriptors;
 import org.jlato.bootstrap.descriptors.TreeClassDescriptor;
 import org.jlato.bootstrap.util.CompilationUnitPattern;
 import org.jlato.bootstrap.util.TypePattern;
+import org.jlato.cc.grammar.GProductions;
 import org.jlato.parser.ParseException;
 import org.jlato.printer.FormattingSettings;
 import org.jlato.tree.decl.ClassDecl;
@@ -26,7 +27,11 @@ public class GenParser {
 
 //		generateTokenType(new TokenTypePattern(), rootDirectory);
 
-		generateParser(new ParserPattern(JavaGrammar.productions, "ParserImplementation"), "ParserImplementation", rootDirectory);
+		GProductions productions = JavaGrammar.productions;
+		GrammarTransform grammarTransform = new GrammarTransform();
+		productions = grammarTransform.transform(productions);
+
+		generateParser(new ParserPattern(productions, "ParserImplementation"), "ParserImplementation", rootDirectory);
 	}
 
 	private void generateTokenType(TypePattern<TreeClassDescriptor[], InterfaceDecl> pattern, String rootDirectory) throws ParseException, IOException {
