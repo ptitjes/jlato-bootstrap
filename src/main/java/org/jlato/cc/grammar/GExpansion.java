@@ -41,7 +41,7 @@ public class GExpansion {
 		return sequence(Arrays.asList(children));
 	}
 
-	private static GExpansion sequence(List<GExpansion> children) {
+	public static GExpansion sequence(List<GExpansion> children) {
 		return new GExpansion(Kind.Sequence, children, null, null, null, null, null);
 	}
 
@@ -101,6 +101,8 @@ public class GExpansion {
 	public final NodeList<Expr> arguments;
 	public final NodeList<Stmt> action;
 
+	public boolean rightAssociative;
+
 	public String constantName;
 	public int constantId;
 
@@ -119,6 +121,11 @@ public class GExpansion {
 		this.hints = hints == null ? emptyList() : hints;
 		this.arguments = arguments == null ? emptyList() : arguments;
 		this.action = action;
+	}
+
+	public GExpansion setRightAssociative(boolean rightAssociative) {
+		this.rightAssociative = rightAssociative;
+		return this;
 	}
 
 	public GExpansion withChildren(List<GExpansion> children) {
@@ -224,6 +231,18 @@ public class GExpansion {
 			case NonTerminal:
 				if (this.name != null) builder.append(this.name).append(", ");
 				builder.append(symbol);
+				if (!this.hints.isEmpty()) {
+					builder.append(", ").append("{ ");
+					Utils.print(this.hints, builder);
+					builder.append(" }");
+				} else if (!this.arguments.isEmpty()) {
+					builder.append(", ").append("{ }");
+				}
+				if (!this.arguments.isEmpty()) {
+					builder.append(", ").append("{ ");
+					Utils.print(this.arguments, builder);
+					builder.append(" }");
+				}
 				break;
 			case Terminal:
 				if (this.name != null) builder.append(this.name).append(", ");

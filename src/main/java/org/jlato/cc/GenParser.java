@@ -28,8 +28,8 @@ public class GenParser {
 //		generateTokenType(new TokenTypePattern(), rootDirectory);
 
 		GProductions productions = JavaGrammar.productions;
-		GrammarTransform grammarTransform = new GrammarTransform();
-		productions = grammarTransform.transform(productions);
+		productions = new LeftRecursionElimination().transform(productions);
+		productions = new GrammarTransform().transform(productions);
 
 		generateParser(new ParserPattern(productions, "ParserImplementation"), "ParserImplementation", rootDirectory);
 	}

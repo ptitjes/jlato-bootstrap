@@ -3527,7 +3527,7 @@ public class JavaGrammar {
 			)
 	);
 
-	private static NodeList<Stmt> stmts(String... strings) {
+	public static NodeList<Stmt> stmts(String... strings) {
 		NodeList<Stmt> result = emptyList();
 		for (String string : strings) {
 			result = result.append(Quotes.stmt(string).build());

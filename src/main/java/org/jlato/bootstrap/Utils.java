@@ -583,10 +583,13 @@ public class Utils {
 		}
 	}
 
-	public static void printIndented(Expr expr, StringBuilder builder, int indent) {
-		printIndent(builder, indent);
-		builder.append(Printer.printToString(expr, true));
-		builder.append("\n");
+	public static void print(NodeList<Expr> exprs, StringBuilder builder) {
+		boolean first = true;
+		for (Expr expr : exprs) {
+			if (first) first = false;
+			else builder.append(", ");
+			builder.append(Printer.printToString(expr, true));
+		}
 	}
 
 	public static void printIndented(String content, StringBuilder builder, int indent) {
