@@ -4,6 +4,7 @@ import org.jlato.cc.grammar.GExpansion;
 import org.jlato.cc.grammar.GProduction;
 import org.jlato.cc.grammar.GProductions;
 import org.jlato.tree.NodeList;
+import org.jlato.tree.Tree;
 import org.jlato.tree.TreeCombinators;
 import org.jlato.tree.expr.AssignOp;
 import org.jlato.tree.expr.Expr;
@@ -113,13 +114,13 @@ public class LeftRecursionElimination {
 				production.dataParams,
 				listOf(variableDecls(resultType, RESULT_VAR)),
 				sequence(
-						nonTerminal(RESULT_VAR, symbol, listOf(expr("0").build())),
+						nonTerminal(RESULT_VAR, symbol + "Rec", listOf(expr("0").build())),
 						action("return " + RESULT_VAR + ";")
 				)
 		));
 
 		// TODO clean declarations
-		newProductions.add(production(symbol, resultType,
+		newProductions.add(production(symbol + "Rec", resultType,
 				production.hintParams.append(
 						formalParameter(primitiveType(Primitive.Int)).withId(variableDeclaratorId(name(PRECEDENCE_VAR)))
 				),
@@ -238,7 +239,9 @@ public class LeftRecursionElimination {
 		String suffixVar;
 
 		public GExpansion toChoice(String symbol) {
-			boolean explicitlyRightAssoc = body.stream().anyMatch(e -> e.kind == Kind.Terminal && e.rightAssociative);
+			boolean explicitlyRightAssoc = body.stream().anyMatch(e ->
+					(e.kind == Kind.NonTerminal || e.kind == Kind.Terminal) && e.rightAssociative
+			);
 			boolean leftAssoc = !explicitlyRightAssoc && !(prefix == null);
 
 			List<GExpansion> expansions = new ArrayList<>();
@@ -289,7 +292,7 @@ public class LeftRecursionElimination {
 				case NonTerminal:
 					if (expansion.symbol.equals(symbol)) {
 						NodeList<Expr> newHints = expansion.hints.append(literalExpr(nextPrecedence));
-						return nonTerminal(expansion.name, expansion.symbol, newHints, expansion.arguments);
+						return nonTerminal(expansion.name, expansion.symbol + "Rec", newHints, expansion.arguments);
 					} else return expansion;
 
 				case Terminal:
@@ -346,20 +349,31 @@ public class LeftRecursionElimination {
 
 				case NonTerminal:
 					if (expansion.name.equals(oldName))
-						return nonTerminal(newName, expansion.symbol, expansion.hints, expansion.arguments);
-					else return expansion;
+						return nonTerminal(newName, expansion.symbol,
+								renameVar(expansion.hints, oldName, newName),
+								renameVar(expansion.arguments, oldName, newName)
+						);
+					else
+						return nonTerminal(expansion.name, expansion.symbol,
+								renameVar(expansion.hints, oldName, newName),
+								renameVar(expansion.arguments, oldName, newName)
+						);
 
 				case Terminal:
 					return expansion;
 
 				case Action:
-					return action(expansion.action.map(a ->
-							((TreeCombinators<Stmt>) a).forAll(expr(oldName), (t, s) -> name(newName))
-					));
+					return action(renameVar(expansion.action, oldName, newName));
 
 				default:
 					throw new IllegalArgumentException();
 			}
+		}
+
+		@SuppressWarnings("unchecked")
+		private <T extends Tree> NodeList<T> renameVar(NodeList<T> list, String oldName, String newName) {
+			if (list == null) return null;
+			return list.map(a -> ((TreeCombinators<T>) a).forAll(expr(oldName), (t, s) -> name(newName)));
 		}
 
 		@Override

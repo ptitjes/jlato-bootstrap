@@ -28,6 +28,8 @@ public class GProductions {
 	}
 
 	public GProduction get(String symbol) {
+		if (!productionsByName.containsKey(symbol))
+			throw new IllegalArgumentException("No such production: " + symbol);
 		return productionsByName.get(symbol);
 	}
 

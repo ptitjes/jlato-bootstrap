@@ -1403,7 +1403,7 @@ public class JavaGrammar {
 									),
 									sequence(
 											zeroOrOne(
-													nonTerminal("expr", "PrimaryExpressionWithoutSuperSuffix"),
+													nonTerminal("expr", "Expression"),
 													terminal("DOT")
 											),
 											zeroOrOne(
@@ -1745,38 +1745,6 @@ public class JavaGrammar {
 							action("return name;")
 					)
 			),
-			production("Expression", "BUTree<? extends SExpr>",
-					emptyList(),
-					emptyList(),
-					stmts("BUTree<? extends SExpr> ret;"),
-					sequence(
-							choice(
-									nonTerminal("ret", "AssignmentExpression"),
-									nonTerminal("ret", "LambdaExpression")
-							),
-							action("return ret;")
-					)
-			),
-			production("AssignmentExpression", "BUTree<? extends SExpr>",
-					emptyList(),
-					emptyList(),
-					stmts(
-							"BUTree<? extends SExpr> ret;",
-							"AssignOp op;",
-							"BUTree<? extends SExpr> expr;"
-					),
-					sequence(
-							// TODO Add checks to report invalid left hand side in assignment
-							nonTerminal("ret", "ConditionalExpression"),
-							zeroOrOne(
-									action("lateRun();"),
-									nonTerminal("op", "AssignmentOperator"),
-									nonTerminal("expr", "Expression"),
-									action("ret = dress(SAssignExpr.make(ret, op, expr));")
-							),
-							action("return ret;")
-					)
-			),
 			production("LambdaExpression", "BUTree<? extends SExpr>",
 					emptyList(),
 					emptyList(),
@@ -1907,6 +1875,378 @@ public class JavaGrammar {
 							action("return makeFormalParameter(name);")
 					)
 			),
+			production("Expression", "BUTree<? extends SExpr>",
+					emptyList(),
+					emptyList(),
+					stmts(
+							"BUTree<? extends SExpr> expr;",
+							"BUTree<? extends SExpr> lhs;",
+							"BUTree<? extends SExpr> rhs;",
+							"BUTree<? extends SExpr> ths;",
+							"BUTree<? extends SExpr> fhs;",
+							"AssignOp aop;",
+							"BinaryOp bop;",
+							"UnaryOp uop;",
+							"BUTree<SNodeList> annotations;",
+							"BUTree<? extends SType> type;"
+					),
+					choice(
+							sequence(
+									nonTerminal("expr", "PrimaryExpression"),
+									action("return expr;")
+							),
+							sequence(
+									action("run();"),
+									nonTerminal("lhs", "Expression"),
+									terminal("LBRACKET"),
+									nonTerminal("expr", "Expression"),
+									terminal("RBRACKET"),
+									action("return dress(SArrayAccessExpr.make(lhs, expr));")
+							),
+							sequence(
+									action("run();"),
+									nonTerminal("lhs", "Expression"),
+									nonTerminal("expr", "FieldAccess", null, exprs("lhs")),
+									action("return expr;")
+							),
+							sequence(
+									action("run();"),
+									nonTerminal("lhs", "Expression"),
+									nonTerminal("expr", "MethodInvocation", null, exprs("lhs")),
+									action("return expr;")
+							),
+							sequence(
+									action("run();"),
+									nonTerminal("lhs", "Expression"),
+									nonTerminal("expr", "ClassCreationExpr", null, exprs("lhs")),
+									action("return expr;")
+							),
+							sequence(
+									action("run();"),
+									nonTerminal("lhs", "Expression"),
+									nonTerminal("expr", "MethodReferenceSuffix", null, exprs("lhs")),
+									action("return expr;")
+							),
+							sequence(
+									action("run();"),
+									nonTerminal("expr", "Expression"),
+									terminal("DOT"),
+									terminal("THIS"),
+									action("return dress(SThisExpr.make(optionOf(expr)));")
+							),
+							sequence(
+									action("run();"),
+									nonTerminal("expr", "Expression"),
+									terminal("DOT"),
+									terminal("SUPER"),
+									action("return dress(SSuperExpr.make(optionOf(expr)));")
+							),
+							sequence(
+									nonTerminal("expr", "ArrayCreationExpr", null, exprs("null")),
+									action("return expr;")
+							),
+							sequence(
+									action("run();"),
+									terminal("LPAREN"),
+									// TODO Make an AnnotatedCastType
+									action("run();"),
+									nonTerminal("annotations", "Annotations"),
+									choice(
+											sequence(
+													nonTerminal("type", "PrimitiveType", null, exprs("annotations"))
+											),
+											sequence(
+													nonTerminal("type", "ReferenceType", null, exprs("annotations")),
+													nonTerminal("type", "ReferenceCastTypeRest", null, exprs("type"))
+											)
+									),
+									terminal("RPAREN"),
+									nonTerminal("expr", "Expression"),
+									action("return dress(SCastExpr.make(type, expr));")
+							),
+							sequence(
+									action("run();"),
+									nonTerminal("expr", "Expression"),
+									choice(
+											sequence(
+													terminal("INCR"),
+													action("uop = UnaryOp.PostIncrement;")
+											),
+											sequence(
+													terminal("DECR"),
+													action("uop = UnaryOp.PostDecrement;")
+											)
+									),
+									action("return dress(SUnaryExpr.make(uop, expr));")
+							),
+							sequence(
+									action("run();"),
+									choice(
+											sequence(
+													terminal("TILDE"),
+													action("uop = UnaryOp.Inverse;")
+											),
+											sequence(
+													terminal("BANG"),
+													action("uop = UnaryOp.Not;")
+											)
+									),
+									nonTerminal("expr", "Expression"),
+									action("return dress(SUnaryExpr.make(uop, expr));")
+							),
+							sequence(
+									action("run();"),
+									choice(
+											sequence(
+													terminal("INCR"),
+													action("uop = UnaryOp.PreIncrement;")
+											),
+											sequence(
+													terminal("DECR"),
+													action("uop = UnaryOp.PreDecrement;")
+											)
+									),
+									nonTerminal("expr", "Expression"),
+									action("return dress(SUnaryExpr.make(uop, expr));")
+							),
+							sequence(
+									action("run();"),
+									choice(
+											sequence(
+													terminal("PLUS"),
+													action("uop = UnaryOp.Positive;")
+											),
+											sequence(
+													terminal("MINUS"),
+													action("uop = UnaryOp.Negative;")
+											)
+									),
+									nonTerminal("expr", "Expression"),
+									action("return dress(SUnaryExpr.make(uop, expr));")
+							),
+							sequence(
+									action("run();"),
+									nonTerminal("lhs", "Expression"),
+									choice(
+											sequence(
+													terminal("PLUS"),
+													action("bop = BinaryOp.Plus;")
+											),
+											sequence(
+													terminal("MINUS"),
+													action("bop = BinaryOp.Minus;")
+											)
+									),
+									nonTerminal("rhs", "Expression"),
+									action("return dress(SBinaryExpr.make(lhs, bop, rhs));")
+							),
+							sequence(
+									action("run();"),
+									nonTerminal("lhs", "Expression"),
+									choice(
+											sequence(
+													terminal("LSHIFT"),
+													action("bop = BinaryOp.LeftShift;")
+											),
+											sequence(
+													terminal("GT"),
+													terminal("GT"),
+													terminal("GT"),
+													action("popNewWhitespaces(2);"),
+													action("bop = BinaryOp.RightUnsignedShift;")
+											),
+											sequence(
+													terminal("GT"),
+													terminal("GT"),
+													action("popNewWhitespaces(1);"),
+													action("bop = BinaryOp.RightSignedShift;")
+											)
+									),
+									nonTerminal("rhs", "Expression"),
+									action("return dress(SBinaryExpr.make(lhs, bop, rhs));")
+							),
+							sequence(
+									action("run();"),
+									nonTerminal("lhs", "Expression"),
+									choice(
+											sequence(
+													terminal("LT"),
+													action("bop = BinaryOp.Less;")
+											),
+											sequence(
+													terminal("GT"),
+													action("bop = BinaryOp.Greater;")
+											),
+											sequence(
+													terminal("LE"),
+													action("bop = BinaryOp.LessOrEqual;")
+											),
+											sequence(
+													terminal("GE"),
+													action("bop = BinaryOp.GreaterOrEqual;")
+											)
+									),
+									nonTerminal("rhs", "Expression"),
+									action("return dress(SBinaryExpr.make(lhs, bop, rhs));")
+							),
+							sequence(
+									action("run();"),
+									nonTerminal("lhs", "Expression"),
+									terminal("INSTANCEOF"),
+									// TODO Make an AnnotatedType production
+									action("run();"),
+									nonTerminal("annotations", "Annotations"),
+									nonTerminal("type", "Type", null, exprs("annotations")),
+									action("return dress(SInstanceOfExpr.make(lhs, type));")
+							),
+							sequence(
+									action("run();"),
+									nonTerminal("lhs", "Expression"),
+									choice(
+											sequence(
+													terminal("EQ"),
+													action("bop = BinaryOp.Equal;")
+											),
+											sequence(
+													terminal("NE"),
+													action("bop = BinaryOp.NotEqual;")
+											)
+									),
+									nonTerminal("rhs", "Expression"),
+									action("return dress(SBinaryExpr.make(lhs, bop, rhs));")
+							),
+							sequence(
+									action("run();"),
+									nonTerminal("lhs", "Expression"),
+									terminal("BIT_AND"),
+									nonTerminal("rhs", "Expression"),
+									action("return dress(SBinaryExpr.make(lhs, BinaryOp.BinAnd, rhs));")
+							),
+							sequence(
+									action("run();"),
+									nonTerminal("lhs", "Expression"),
+									terminal("XOR"),
+									nonTerminal("rhs", "Expression"),
+									action("return dress(SBinaryExpr.make(lhs, BinaryOp.XOr, rhs));")
+							),
+							sequence(
+									action("run();"),
+									nonTerminal("lhs", "Expression"),
+									terminal("BIT_OR"),
+									nonTerminal("rhs", "Expression"),
+									action("return dress(SBinaryExpr.make(lhs, BinaryOp.BinOr, rhs));")
+							),
+							sequence(
+									action("run();"),
+									nonTerminal("lhs", "Expression"),
+									terminal("SC_AND"),
+									nonTerminal("rhs", "Expression"),
+									action("return dress(SBinaryExpr.make(lhs, BinaryOp.And, rhs));")
+							),
+							sequence(
+									action("run();"),
+									nonTerminal("lhs", "Expression"),
+									terminal("SC_OR"),
+									nonTerminal("rhs", "Expression"),
+									action("return dress(SBinaryExpr.make(lhs, BinaryOp.Or, rhs));")
+							),
+							sequence(
+									action("run();"),
+									nonTerminal("lhs", "Expression"),
+									terminal("HOOK"),
+									nonTerminal("ths", "Expression"),
+									terminal("COLON"),
+									nonTerminal("fhs", "Expression"),
+									action("return dress(SConditionalExpr.make(lhs, ths, fhs));")
+							),
+							sequence(
+									nonTerminal("expr", "LambdaExpression"),
+									action("return expr;")
+							),
+							sequence(
+									action("run();"),
+									nonTerminal("lhs", "Expression"),
+									nonTerminal("aop", "AssignmentOperator").setRightAssociative(true),
+									nonTerminal("rhs", "Expression"),
+									action("return dress(SAssignExpr.make(lhs, aop, rhs));")
+							)
+					)
+			),
+			production("PrimaryExpression", "BUTree<? extends SExpr>",
+					emptyList(),
+					emptyList(),
+					stmts(
+							"BUTree<? extends SExpr> expr;",
+							"BUTree<? extends SType> type;"
+					),
+					sequence(
+							choice(
+									sequence(
+											nonTerminal("expr", "Literal"),
+											action("return expr;")
+									),
+									sequence(
+											action("run();"),
+											terminal("THIS"),
+											action("return dress(SThisExpr.make(none()));")
+									),
+									sequence(
+											action("run();"),
+											terminal("SUPER"),
+											action("return dress(SSuperExpr.make(none()));")/*,
+									choice(
+											sequence(
+													action("lateRun();"),
+													terminal("DOT"),
+													choice(
+															nonTerminal("ret", "MethodInvocation", null, exprs("ret")),
+															nonTerminal("ret", "FieldAccess", null, exprs("ret"))
+													)
+											),
+											sequence(
+													action("lateRun();"),
+													nonTerminal("ret", "MethodReferenceSuffix", null, exprs("ret"))
+											)
+									)*/
+									),
+									sequence(
+											nonTerminal("expr", "ClassCreationExpr", null, exprs("null")),
+											action("return expr;")
+									),
+									sequence(
+											action("run();"),
+											nonTerminal("type", "ResultType"),
+											terminal("DOT"),
+											terminal("CLASS"),
+											action("return dress(SClassExpr.make(type));")
+									),
+									sequence(
+											action("run();"),
+											nonTerminal("type", "ResultType"),
+											nonTerminal("expr", "MethodReferenceSuffix", null, exprs("STypeExpr.make(type)")),
+											action("return expr;")
+									),
+									sequence(
+											// TODO Remove from PrimaryExpression
+											action("run();"),
+											nonTerminal("expr", "MethodInvocation", null, exprs("null")),
+											action("return expr;")
+									),
+									sequence(
+											nonTerminal("expr", "Name"),
+											action("return expr;")
+									),
+									sequence(
+											action("run();"),
+											terminal("LPAREN"),
+											nonTerminal("expr", "Expression"),
+											terminal("RPAREN"),
+											action("return dress(SParenthesizedExpr.make(expr));")
+									)
+							)
+					)
+			),
+
 			production("AssignmentOperator", "AssignOp",
 					emptyList(),
 					emptyList(),
@@ -1960,444 +2300,6 @@ public class JavaGrammar {
 									sequence(
 											terminal("ORASSIGN"),
 											action("ret = AssignOp.Or;")
-									)
-							),
-							action("return ret;")
-					)
-			),
-			production("ConditionalExpression", "BUTree<? extends SExpr>",
-					emptyList(),
-					emptyList(),
-					stmts(
-							"BUTree<? extends SExpr> ret;",
-							"BUTree<? extends SExpr> left;",
-							"BUTree<? extends SExpr> right;"
-					),
-					sequence(
-							nonTerminal("ret", "ConditionalOrExpression"),
-							zeroOrOne(
-									action("lateRun();"),
-									terminal("HOOK"),
-									nonTerminal("left", "Expression"),
-									terminal("COLON"),
-									choice(
-											nonTerminal("right", "ConditionalExpression"),
-											nonTerminal("right", "LambdaExpression")
-									),
-									action("ret = dress(SConditionalExpr.make(ret, left, right));")
-							),
-							action("return ret;")
-					)
-			),
-			production("ConditionalOrExpression", "BUTree<? extends SExpr>",
-					emptyList(),
-					emptyList(),
-					stmts(
-							"BUTree<? extends SExpr> ret;",
-							"BUTree<? extends SExpr> right;"
-					),
-					sequence(
-							nonTerminal("ret", "ConditionalAndExpression"),
-							zeroOrMore(
-									action("lateRun();"),
-									terminal("SC_OR"),
-									nonTerminal("right", "ConditionalAndExpression"),
-									action("ret = dress(SBinaryExpr.make(ret, BinaryOp.Or, right));")
-							),
-							action("return ret;")
-					)
-			),
-			production("ConditionalAndExpression", "BUTree<? extends SExpr>",
-					emptyList(),
-					emptyList(),
-					stmts(
-							"BUTree<? extends SExpr> ret;",
-							"BUTree<? extends SExpr> right;"
-					),
-					sequence(
-							nonTerminal("ret", "InclusiveOrExpression"),
-							zeroOrMore(
-									action("lateRun();"),
-									terminal("SC_AND"),
-									nonTerminal("right", "InclusiveOrExpression"),
-									action("ret = dress(SBinaryExpr.make(ret, BinaryOp.And, right));")
-							),
-							action("return ret;")
-					)
-			),
-			production("InclusiveOrExpression", "BUTree<? extends SExpr>",
-					emptyList(),
-					emptyList(),
-					stmts(
-							"BUTree<? extends SExpr> ret;",
-							"BUTree<? extends SExpr> right;"
-					),
-					sequence(
-							nonTerminal("ret", "ExclusiveOrExpression"),
-							zeroOrMore(
-									action("lateRun();"),
-									terminal("BIT_OR"),
-									nonTerminal("right", "ExclusiveOrExpression"),
-									action("ret = dress(SBinaryExpr.make(ret, BinaryOp.BinOr, right));")
-							),
-							action("return ret;")
-					)
-			),
-			production("ExclusiveOrExpression", "BUTree<? extends SExpr>",
-					emptyList(),
-					emptyList(),
-					stmts(
-							"BUTree<? extends SExpr> ret;",
-							"BUTree<? extends SExpr> right;"
-					),
-					sequence(
-							nonTerminal("ret", "AndExpression"),
-							zeroOrMore(
-									action("lateRun();"),
-									terminal("XOR"),
-									nonTerminal("right", "AndExpression"),
-									action("ret = dress(SBinaryExpr.make(ret, BinaryOp.XOr, right));")
-							),
-							action("return ret;")
-					)
-			),
-			production("AndExpression", "BUTree<? extends SExpr>",
-					emptyList(),
-					emptyList(),
-					stmts(
-							"BUTree<? extends SExpr> ret;",
-							"BUTree<? extends SExpr> right;"
-					),
-					sequence(
-							nonTerminal("ret", "EqualityExpression"),
-							zeroOrMore(
-									action("lateRun();"),
-									terminal("BIT_AND"),
-									nonTerminal("right", "EqualityExpression"),
-									action("ret = dress(SBinaryExpr.make(ret, BinaryOp.BinAnd, right));")
-							),
-							action("return ret;")
-					)
-			),
-			production("EqualityExpression", "BUTree<? extends SExpr>",
-					emptyList(),
-					emptyList(),
-					stmts(
-							"BUTree<? extends SExpr> ret;",
-							"BUTree<? extends SExpr> right;",
-							"BinaryOp op;"
-					),
-					sequence(
-							nonTerminal("ret", "InstanceOfExpression"),
-							zeroOrMore(
-									action("lateRun();"),
-									choice(
-											sequence(
-													terminal("EQ"),
-													action("op = BinaryOp.Equal;")
-											),
-											sequence(
-													terminal("NE"),
-													action("op = BinaryOp.NotEqual;")
-											)
-									),
-									nonTerminal("right", "InstanceOfExpression"),
-									action("ret = dress(SBinaryExpr.make(ret, op, right));")
-							),
-							action("return ret;")
-					)
-			),
-			production("InstanceOfExpression", "BUTree<? extends SExpr>",
-					emptyList(),
-					emptyList(),
-					stmts(
-							"BUTree<? extends SExpr> ret;",
-							"BUTree<SNodeList> annotations;",
-							"BUTree<? extends SType> type;"
-					),
-					sequence(
-							nonTerminal("ret", "RelationalExpression"),
-							zeroOrOne(
-									action("lateRun();"),
-									terminal("INSTANCEOF"),
-									action("run();"),
-									nonTerminal("annotations", "Annotations"),
-									nonTerminal("type", "Type", null, exprs("annotations")),
-									action("ret = dress(SInstanceOfExpr.make(ret, type));")
-							),
-							action("return ret;")
-					)
-			),
-			production("RelationalExpression", "BUTree<? extends SExpr>",
-					emptyList(),
-					emptyList(),
-					stmts(
-							"BUTree<? extends SExpr> ret;",
-							"BUTree<? extends SExpr> right;",
-							"BinaryOp op;"
-					),
-					sequence(
-							nonTerminal("ret", "ShiftExpression"),
-							zeroOrMore(
-									action("lateRun();"),
-									choice(
-											sequence(
-													terminal("LT"),
-													action("op = BinaryOp.Less;")
-											),
-											sequence(
-													terminal("GT"),
-													action("op = BinaryOp.Greater;")
-											),
-											sequence(
-													terminal("LE"),
-													action("op = BinaryOp.LessOrEqual;")
-											),
-											sequence(
-													terminal("GE"),
-													action("op = BinaryOp.GreaterOrEqual;")
-											)
-									),
-									nonTerminal("right", "ShiftExpression"),
-									action("ret = dress(SBinaryExpr.make(ret, op, right));")
-							),
-							action("return ret;")
-					)
-			),
-			production("ShiftExpression", "BUTree<? extends SExpr>",
-					emptyList(),
-					emptyList(),
-					stmts(
-							"BUTree<? extends SExpr> ret;",
-							"BUTree<? extends SExpr> right;",
-							"BinaryOp op;"
-					),
-					sequence(
-							nonTerminal("ret", "AdditiveExpression"),
-							zeroOrMore(
-									action("lateRun();"),
-									choice(
-											sequence(
-													terminal("LSHIFT"),
-													action("op = BinaryOp.LeftShift;")
-											),
-											sequence(
-													terminal("GT"),
-													terminal("GT"),
-													terminal("GT"),
-													action("popNewWhitespaces(2);"),
-													action("op = BinaryOp.RightUnsignedShift;")
-											),
-											sequence(
-													terminal("GT"),
-													terminal("GT"),
-													action("popNewWhitespaces(1);"),
-													action("op = BinaryOp.RightSignedShift;")
-											)
-									),
-									nonTerminal("right", "AdditiveExpression"),
-									action("ret = dress(SBinaryExpr.make(ret, op, right));")
-							),
-							action("return ret;")
-					)
-			),
-			production("AdditiveExpression", "BUTree<? extends SExpr>",
-					emptyList(),
-					emptyList(),
-					stmts(
-							"BUTree<? extends SExpr> ret;",
-							"BUTree<? extends SExpr> right;",
-							"BinaryOp op;"
-					),
-					sequence(
-							nonTerminal("ret", "MultiplicativeExpression"),
-							zeroOrMore(
-									action("lateRun();"),
-									choice(
-											sequence(
-													terminal("PLUS"),
-													action("op = BinaryOp.Plus;")
-											),
-											sequence(
-													terminal("MINUS"),
-													action("op = BinaryOp.Minus;")
-											)
-									),
-									nonTerminal("right", "MultiplicativeExpression"),
-									action("ret = dress(SBinaryExpr.make(ret, op, right));")
-							),
-							action("return ret;")
-					)
-			),
-			production("MultiplicativeExpression", "BUTree<? extends SExpr>",
-					emptyList(),
-					emptyList(),
-					stmts(
-							"BUTree<? extends SExpr> ret;",
-							"BUTree<? extends SExpr> right;",
-							"BinaryOp op;"
-					),
-					sequence(
-							nonTerminal("ret", "UnaryExpression"),
-							zeroOrMore(
-									action("lateRun();"),
-									choice(
-											sequence(
-													terminal("STAR"),
-													action("op = BinaryOp.Times;")
-											),
-											sequence(
-													terminal("SLASH"),
-													action("op = BinaryOp.Divide;")
-											),
-											sequence(
-													terminal("REM"),
-													action("op = BinaryOp.Remainder;")
-											)
-									),
-									nonTerminal("right", "UnaryExpression"),
-									action("ret = dress(SBinaryExpr.make(ret, op, right));")
-							),
-							action("return ret;")
-					)
-			),
-			production("UnaryExpression", "BUTree<? extends SExpr>",
-					emptyList(),
-					emptyList(),
-					stmts(
-							"BUTree<? extends SExpr> ret;",
-							"UnaryOp op;"
-					),
-					sequence(
-							choice(
-									nonTerminal("ret", "PrefixExpression"),
-									sequence(
-											action("run();"),
-											choice(
-													sequence(
-															terminal("PLUS"),
-															action("op = UnaryOp.Positive;")
-													),
-													sequence(
-															terminal("MINUS"),
-															action("op = UnaryOp.Negative;")
-													)
-											),
-											nonTerminal("ret", "UnaryExpression"),
-											action("ret = dress(SUnaryExpr.make(op, ret));")
-									),
-									nonTerminal("ret", "UnaryExpressionNotPlusMinus")
-							),
-							action("return ret;")
-					)
-			),
-			production("PrefixExpression", "BUTree<? extends SExpr>",
-					emptyList(),
-					emptyList(),
-					stmts(
-							"UnaryOp op;",
-							"BUTree<? extends SExpr> ret;"
-					),
-					sequence(
-							action("run();"),
-							choice(
-									sequence(
-											terminal("INCR"),
-											action("op = UnaryOp.PreIncrement;")
-									),
-									sequence(
-											terminal("DECR"),
-											action("op = UnaryOp.PreDecrement;")
-									)
-							),
-							nonTerminal("ret", "UnaryExpression"),
-							action("return dress(SUnaryExpr.make(op, ret));")
-					)
-			),
-			production("UnaryExpressionNotPlusMinus", "BUTree<? extends SExpr>",
-					emptyList(),
-					emptyList(),
-					stmts(
-							"BUTree<? extends SExpr> ret;",
-							"UnaryOp op;"
-					),
-					sequence(
-							choice(
-									sequence(
-											action("run();"),
-											choice(
-													sequence(
-															terminal("TILDE"),
-															action("op = UnaryOp.Inverse;")
-													),
-													sequence(
-															terminal("BANG"),
-															action("op = UnaryOp.Not;")
-													)
-											),
-											nonTerminal("ret", "UnaryExpression"),
-											action("ret = dress(SUnaryExpr.make(op, ret));")
-									),
-									nonTerminal("ret", "CastExpression"),
-									nonTerminal("ret", "PostfixExpression")
-							),
-							action("return ret;")
-					)
-			),
-			production("PostfixExpression", "BUTree<? extends SExpr>",
-					emptyList(),
-					emptyList(),
-					stmts(
-							"BUTree<? extends SExpr> ret;",
-							"UnaryOp op;"
-					),
-					sequence(
-							nonTerminal("ret", "PrimaryExpression"),
-							zeroOrOne(
-									action("lateRun();"),
-									choice(
-											sequence(
-													terminal("INCR"),
-													action("op = UnaryOp.PostIncrement;")
-											),
-											sequence(
-													terminal("DECR"),
-													action("op = UnaryOp.PostDecrement;")
-											)
-									),
-									action("ret = dress(SUnaryExpr.make(op, ret));")
-							),
-							action("return ret;")
-					)
-			),
-			production("CastExpression", "BUTree<? extends SExpr>",
-					emptyList(),
-					emptyList(),
-					stmts(
-							"BUTree<SNodeList> annotations = null;",
-							"BUTree<? extends SType> primitiveType;",
-							"BUTree<? extends SType> type;",
-							"BUTree<SNodeList> arrayDims;",
-							"BUTree<? extends SExpr> ret;"
-					),
-					sequence(
-							action("run();"),
-							terminal("LPAREN"),
-							action("run();"),
-							nonTerminal("annotations", "Annotations"),
-							choice(
-									sequence(
-											nonTerminal("primitiveType", "PrimitiveType", null, exprs("annotations")),
-											terminal("RPAREN"),
-											nonTerminal("ret", "UnaryExpression"),
-											action("ret = dress(SCastExpr.make(primitiveType, ret));")
-									),
-									sequence(
-											nonTerminal("type", "ReferenceType", null, exprs("annotations")),
-											nonTerminal("type", "ReferenceCastTypeRest", null, exprs("type")),
-											terminal("RPAREN"),
-											nonTerminal("ret", "UnaryExpressionNotPlusMinus"),
-											action("ret = dress(SCastExpr.make(type, ret));")
 									)
 							),
 							action("return ret;")
@@ -2474,160 +2376,6 @@ public class JavaGrammar {
 									)
 							),
 							action("return dress(ret);")
-					)
-			),
-			production("PrimaryExpression", "BUTree<? extends SExpr>",
-					emptyList(),
-					emptyList(),
-					stmts("BUTree<? extends SExpr> ret;"),
-					sequence(
-							choice(
-									nonTerminal("ret", "PrimaryNoNewArray"),
-									nonTerminal("ret", "ArrayCreationExpr", null, exprs("null"))
-							),
-							action("return ret;")
-					)
-			),
-			production("PrimaryNoNewArray", "BUTree<? extends SExpr>",
-					emptyList(),
-					emptyList(),
-					stmts("BUTree<? extends SExpr> ret;"),
-					sequence(
-							nonTerminal("ret", "PrimaryPrefix"),
-							zeroOrMore(
-									action("lateRun();"),
-									nonTerminal("ret", "PrimarySuffix", null, exprs("ret"))
-							),
-							action("return ret;")
-					)
-			),
-			production("PrimaryExpressionWithoutSuperSuffix", "BUTree<? extends SExpr>",
-					emptyList(),
-					emptyList(),
-					stmts("BUTree<? extends SExpr> ret;"),
-					sequence(
-							nonTerminal("ret", "PrimaryPrefix"),
-							zeroOrMore(
-									action("lateRun();"),
-									nonTerminal("ret", "PrimarySuffixWithoutSuper", null, exprs("ret"))
-							),
-							action("return ret;")
-					)
-			),
-			production("PrimaryPrefix", "BUTree<? extends SExpr>",
-					emptyList(),
-					emptyList(),
-					stmts(
-							"BUTree<? extends SExpr> ret = null;",
-							"BUTree<SNodeList> typeArgs = null;",
-							"BUTree<SNodeList> params;",
-							"BUTree<? extends SType> type;"
-					),
-					sequence(
-							choice(
-									nonTerminal("ret", "Literal"),
-									sequence(
-											action("run();"),
-											terminal("THIS"),
-											action("ret = dress(SThisExpr.make(none()));")
-									),
-									sequence(
-											action("run();"),
-											terminal("SUPER"),
-											action("ret = dress(SSuperExpr.make(none()));"),
-											choice(
-													sequence(
-															action("lateRun();"),
-															terminal("DOT"),
-															choice(
-																	nonTerminal("ret", "MethodInvocation", null, exprs("ret")),
-																	nonTerminal("ret", "FieldAccess", null, exprs("ret"))
-															)
-													),
-													sequence(
-															action("lateRun();"),
-															nonTerminal("ret", "MethodReferenceSuffix", null, exprs("ret"))
-													)
-											)
-									),
-									nonTerminal("ret", "ClassCreationExpr", null, exprs("null")),
-									sequence(
-											action("run();"),
-											nonTerminal("type", "ResultType"),
-											terminal("DOT"),
-											terminal("CLASS"),
-											action("ret = dress(SClassExpr.make(type));")
-									),
-									sequence(
-											action("run();"),
-											nonTerminal("type", "ResultType"),
-											action("ret = STypeExpr.make(type);"),
-											nonTerminal("ret", "MethodReferenceSuffix", null, exprs("ret"))
-									),
-									sequence(
-											action("run();"),
-											nonTerminal("ret", "MethodInvocation", null, exprs("null"))
-									),
-									nonTerminal("ret", "Name"),
-									sequence(
-											action("run();"),
-											terminal("LPAREN"),
-											nonTerminal("ret", "Expression"),
-											terminal("RPAREN"),
-											action("ret = dress(SParenthesizedExpr.make(ret));")
-									)
-							),
-							action("return ret;")
-					)
-			),
-			production("PrimarySuffix", "BUTree<? extends SExpr>",
-					emptyList(),
-					params("BUTree<? extends SExpr> scope"),
-					stmts("BUTree<? extends SExpr> ret;"),
-					sequence(
-							choice(
-									sequence(
-											nonTerminal("ret", "PrimarySuffixWithoutSuper", null, exprs("scope"))
-									),
-									sequence(
-											terminal("DOT"),
-											terminal("SUPER"),
-											action("ret = dress(SSuperExpr.make(optionOf(scope)));")
-									),
-									nonTerminal("ret", "MethodReferenceSuffix", null, exprs("scope"))
-							),
-							action("return ret;")
-					)
-			),
-			production("PrimarySuffixWithoutSuper", "BUTree<? extends SExpr>",
-					emptyList(),
-					params("BUTree<? extends SExpr> scope"),
-					stmts(
-							"BUTree<? extends SExpr> ret;",
-							"BUTree<SName> name;"
-					),
-					sequence(
-							choice(
-									sequence(
-											terminal("DOT"),
-											choice(
-													sequence(
-															terminal("THIS"),
-															action("ret = dress(SThisExpr.make(optionOf(scope)));")
-													),
-													nonTerminal("ret", "ClassCreationExpr", null, exprs("scope")),
-													nonTerminal("ret", "MethodInvocation", null, exprs("scope")),
-													nonTerminal("ret", "FieldAccess", null, exprs("scope"))
-											)
-									),
-									sequence(
-											terminal("LBRACKET"),
-											nonTerminal("ret", "Expression"),
-											terminal("RBRACKET"),
-											action("ret = dress(SArrayAccessExpr.make(scope, ret));")
-									)
-							),
-							action("return ret;")
 					)
 			),
 			production("FieldAccess", "BUTree<? extends SExpr>",
@@ -3479,7 +3227,7 @@ public class JavaGrammar {
 					stmts("BUTree<? extends SExpr> ret;"),
 					sequence(
 							choice(
-									nonTerminal("ret", "ConditionalExpression"),
+									nonTerminal("ret", "Expression"),
 									nonTerminal("ret", "ElementValueArrayInitializer"),
 									nonTerminal("ret", "Annotation")
 							),
