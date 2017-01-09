@@ -126,9 +126,9 @@ public class GrammarAnalysis {
 	}
 
 	private List<Set<String>> computeKleeneLL1Decisions(GLocation location) {
-		GContinuation after = new GContinuation(location).moveToNextOrParentsNext(productions);
 		GContinuation inside = new GContinuation(location).moveToFirstChild(productions);
-		return computeContinuations(Arrays.asList(after, inside));
+		GContinuation after = new GContinuation(location).moveToNextOrParentsNext(productions);
+		return computeContinuations(Arrays.asList(inside, after));
 	}
 
 	private List<Set<String>> computeContinuations(List<GContinuation> continuations) {
@@ -279,8 +279,8 @@ public class GrammarAnalysis {
 				GrammarState childStart = grammar.newGrammarState(expansion.constantName);
 				assignGrammarStates(uniqueChild(expansion), childStart, end, entryPoint);
 
-				start.addChoice(0, end);
-				start.addChoice(1, childStart);
+				start.addChoice(0, childStart);
+				start.addChoice(1, end);
 				if (!expansion.canUseLL1) grammar.addChoicePointState(expansion.constantName, start);
 				break;
 			}
@@ -288,8 +288,8 @@ public class GrammarAnalysis {
 				GrammarState childStart = grammar.newGrammarState(expansion.constantName);
 				assignGrammarStates(uniqueChild(expansion), childStart, start, entryPoint);
 
-				start.addChoice(0, end);
-				start.addChoice(1, childStart);
+				start.addChoice(0, childStart);
+				start.addChoice(1, end);
 				if (!expansion.canUseLL1) grammar.addChoicePointState(expansion.constantName, start);
 				break;
 			}
@@ -297,8 +297,8 @@ public class GrammarAnalysis {
 				GrammarState childEnd = grammar.newGrammarState(expansion.constantName);
 				assignGrammarStates(uniqueChild(expansion), start, childEnd, entryPoint);
 
-				childEnd.addChoice(0, end);
-				childEnd.addChoice(1, start);
+				childEnd.addChoice(0, start);
+				childEnd.addChoice(1, end);
 				if (!expansion.canUseLL1) grammar.addChoicePointState(expansion.constantName, childEnd);
 				break;
 			}

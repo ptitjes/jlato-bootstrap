@@ -408,15 +408,15 @@ public class ParserPattern extends TypePattern.OfClass<TreeClassDescriptor[]> {
 	private Expr makeKleeneCondition(GExpansion expansion, NodeList<FormalParameter> hintParams) {
 		if (expansion.canUseLL1) {
 			List<Set<String>> ll1DecisionTerminals = expansion.ll1Decisions;
-			Set<String> terminalsAfter = ll1DecisionTerminals.get(0);
-			Set<String> terminalsInside = ll1DecisionTerminals.get(1);
+			Set<String> terminalsInside = ll1DecisionTerminals.get(0);
+			Set<String> terminalsAfter = ll1DecisionTerminals.get(1);
 
 			// Check for length of ll1DecisionTerminals[0] and ll1DecisionTerminals[1]
 			// Because we could also negate a condition made from ll1DecisionTerminals[0]
 			boolean reversedCondition = terminalsAfter.size() < terminalsInside.size();
 
 			return matchExpression(reversedCondition ? terminalsAfter : terminalsInside, reversedCondition);
-		} else return binaryExpr(predict(expansion.constantName, hintParams), BinaryOp.Equal, literalExpr(1));
+		} else return binaryExpr(predict(expansion.constantName, hintParams), BinaryOp.Equal, literalExpr(0));
 	}
 
 	private Set<String> merge(List<Set<String>> ll1Decisions) {
