@@ -1968,28 +1968,16 @@ public class JavaGrammar {
 									action("run();"),
 									nonTerminal("expr", "Expression"),
 									choice(
-											sequence(
-													terminal("INCR"),
-													action("uop = UnaryOp.PostIncrement;")
-											),
-											sequence(
-													terminal("DECR"),
-													action("uop = UnaryOp.PostDecrement;")
-											)
+											sequence(terminal("INCR"), action("uop = UnaryOp.PostIncrement;")),
+											sequence(terminal("DECR"), action("uop = UnaryOp.PostDecrement;"))
 									),
 									action("return dress(SUnaryExpr.make(uop, expr));")
 							),
 							sequence(
 									action("run();"),
 									choice(
-											sequence(
-													terminal("TILDE"),
-													action("uop = UnaryOp.Inverse;")
-											),
-											sequence(
-													terminal("BANG"),
-													action("uop = UnaryOp.Not;")
-											)
+											sequence(terminal("TILDE"), action("uop = UnaryOp.Inverse;")),
+											sequence(terminal("BANG"), action("uop = UnaryOp.Not;"))
 									),
 									nonTerminal("expr", "Expression"),
 									action("return dress(SUnaryExpr.make(uop, expr));")
@@ -1997,14 +1985,8 @@ public class JavaGrammar {
 							sequence(
 									action("run();"),
 									choice(
-											sequence(
-													terminal("INCR"),
-													action("uop = UnaryOp.PreIncrement;")
-											),
-											sequence(
-													terminal("DECR"),
-													action("uop = UnaryOp.PreDecrement;")
-											)
+											sequence(terminal("INCR"), action("uop = UnaryOp.PreIncrement;")),
+											sequence(terminal("DECR"), action("uop = UnaryOp.PreDecrement;"))
 									),
 									nonTerminal("expr", "Expression"),
 									action("return dress(SUnaryExpr.make(uop, expr));")
@@ -2012,14 +1994,8 @@ public class JavaGrammar {
 							sequence(
 									action("run();"),
 									choice(
-											sequence(
-													terminal("PLUS"),
-													action("uop = UnaryOp.Positive;")
-											),
-											sequence(
-													terminal("MINUS"),
-													action("uop = UnaryOp.Negative;")
-											)
+											sequence(terminal("PLUS"), action("uop = UnaryOp.Positive;")),
+											sequence(terminal("MINUS"), action("uop = UnaryOp.Negative;"))
 									),
 									nonTerminal("expr", "Expression"),
 									action("return dress(SUnaryExpr.make(uop, expr));")
@@ -2028,14 +2004,9 @@ public class JavaGrammar {
 									action("run();"),
 									nonTerminal("lhs", "Expression"),
 									choice(
-											sequence(
-													terminal("PLUS"),
-													action("bop = BinaryOp.Plus;")
-											),
-											sequence(
-													terminal("MINUS"),
-													action("bop = BinaryOp.Minus;")
-											)
+											sequence(terminal("STAR"), action("bop = BinaryOp.Times;")),
+											sequence(terminal("SLASH"), action("bop = BinaryOp.Divide;")),
+											sequence(terminal("REM"), action("bop = BinaryOp.Remainder;"))
 									),
 									nonTerminal("rhs", "Expression"),
 									action("return dress(SBinaryExpr.make(lhs, bop, rhs));")
@@ -2044,20 +2015,24 @@ public class JavaGrammar {
 									action("run();"),
 									nonTerminal("lhs", "Expression"),
 									choice(
+											sequence(terminal("PLUS"), action("bop = BinaryOp.Plus;")),
+											sequence(terminal("MINUS"), action("bop = BinaryOp.Minus;"))
+									),
+									nonTerminal("rhs", "Expression"),
+									action("return dress(SBinaryExpr.make(lhs, bop, rhs));")
+							),
+							sequence(
+									action("run();"),
+									nonTerminal("lhs", "Expression"),
+									choice(
+											sequence(terminal("LSHIFT"), action("bop = BinaryOp.LeftShift;")),
 											sequence(
-													terminal("LSHIFT"),
-													action("bop = BinaryOp.LeftShift;")
-											),
-											sequence(
-													terminal("GT"),
-													terminal("GT"),
-													terminal("GT"),
+													terminal("GT"), terminal("GT"), terminal("GT"),
 													action("popNewWhitespaces(2);"),
 													action("bop = BinaryOp.RightUnsignedShift;")
 											),
 											sequence(
-													terminal("GT"),
-													terminal("GT"),
+													terminal("GT"), terminal("GT"),
 													action("popNewWhitespaces(1);"),
 													action("bop = BinaryOp.RightSignedShift;")
 											)
@@ -2069,22 +2044,10 @@ public class JavaGrammar {
 									action("run();"),
 									nonTerminal("lhs", "Expression"),
 									choice(
-											sequence(
-													terminal("LT"),
-													action("bop = BinaryOp.Less;")
-											),
-											sequence(
-													terminal("GT"),
-													action("bop = BinaryOp.Greater;")
-											),
-											sequence(
-													terminal("LE"),
-													action("bop = BinaryOp.LessOrEqual;")
-											),
-											sequence(
-													terminal("GE"),
-													action("bop = BinaryOp.GreaterOrEqual;")
-											)
+											sequence(terminal("LT"), action("bop = BinaryOp.Less;")),
+											sequence(terminal("GT"), action("bop = BinaryOp.Greater;")),
+											sequence(terminal("LE"), action("bop = BinaryOp.LessOrEqual;")),
+											sequence(terminal("GE"), action("bop = BinaryOp.GreaterOrEqual;"))
 									),
 									nonTerminal("rhs", "Expression"),
 									action("return dress(SBinaryExpr.make(lhs, bop, rhs));")
@@ -2103,14 +2066,8 @@ public class JavaGrammar {
 									action("run();"),
 									nonTerminal("lhs", "Expression"),
 									choice(
-											sequence(
-													terminal("EQ"),
-													action("bop = BinaryOp.Equal;")
-											),
-											sequence(
-													terminal("NE"),
-													action("bop = BinaryOp.NotEqual;")
-											)
+											sequence(terminal("EQ"), action("bop = BinaryOp.Equal;")),
+											sequence(terminal("NE"), action("bop = BinaryOp.NotEqual;"))
 									),
 									nonTerminal("rhs", "Expression"),
 									action("return dress(SBinaryExpr.make(lhs, bop, rhs));")
