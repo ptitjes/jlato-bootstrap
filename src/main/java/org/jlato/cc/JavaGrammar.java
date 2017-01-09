@@ -1906,18 +1906,21 @@ public class JavaGrammar {
 							sequence(
 									action("run();"),
 									nonTerminal("lhs", "Expression"),
+									terminal("DOT"),
 									nonTerminal("expr", "FieldAccess", null, exprs("lhs")),
 									action("return expr;")
 							),
 							sequence(
 									action("run();"),
 									nonTerminal("lhs", "Expression"),
+									terminal("DOT"),
 									nonTerminal("expr", "MethodInvocation", null, exprs("lhs")),
 									action("return expr;")
 							),
 							sequence(
 									action("run();"),
 									nonTerminal("lhs", "Expression"),
+									terminal("DOT"),
 									nonTerminal("expr", "ClassCreationExpr", null, exprs("lhs")),
 									action("return expr;")
 							),
