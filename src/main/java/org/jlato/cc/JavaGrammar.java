@@ -1949,6 +1949,10 @@ public class JavaGrammar {
 									action("return expr;")
 							),
 							sequence(
+									nonTerminal("expr", "ClassCreationExpr", null, exprs("null")),
+									action("return expr;")
+							),
+							sequence(
 									action("run();"),
 									terminal("LPAREN"),
 									// TODO Make an AnnotatedCastType
@@ -1979,15 +1983,8 @@ public class JavaGrammar {
 							sequence(
 									action("run();"),
 									choice(
-											sequence(terminal("TILDE"), action("uop = UnaryOp.Inverse;")),
-											sequence(terminal("BANG"), action("uop = UnaryOp.Not;"))
-									),
-									nonTerminal("expr", "Expression"),
-									action("return dress(SUnaryExpr.make(uop, expr));")
-							),
-							sequence(
-									action("run();"),
-									choice(
+											sequence(terminal("PLUS"), action("uop = UnaryOp.Positive;")),
+											sequence(terminal("MINUS"), action("uop = UnaryOp.Negative;")),
 											sequence(terminal("INCR"), action("uop = UnaryOp.PreIncrement;")),
 											sequence(terminal("DECR"), action("uop = UnaryOp.PreDecrement;"))
 									),
@@ -1997,8 +1994,8 @@ public class JavaGrammar {
 							sequence(
 									action("run();"),
 									choice(
-											sequence(terminal("PLUS"), action("uop = UnaryOp.Positive;")),
-											sequence(terminal("MINUS"), action("uop = UnaryOp.Negative;"))
+											sequence(terminal("TILDE"), action("uop = UnaryOp.Inverse;")),
+											sequence(terminal("BANG"), action("uop = UnaryOp.Not;"))
 									),
 									nonTerminal("expr", "Expression"),
 									action("return dress(SUnaryExpr.make(uop, expr));")
@@ -2142,6 +2139,13 @@ public class JavaGrammar {
 					sequence(
 							choice(
 									sequence(
+											action("run();"),
+											terminal("LPAREN"),
+											nonTerminal("expr", "Expression"),
+											terminal("RPAREN"),
+											action("return dress(SParenthesizedExpr.make(expr));")
+									),
+									sequence(
 											nonTerminal("expr", "Literal"),
 											action("return expr;")
 									),
@@ -2170,10 +2174,6 @@ public class JavaGrammar {
 									)*/
 									),
 									sequence(
-											nonTerminal("expr", "ClassCreationExpr", null, exprs("null")),
-											action("return expr;")
-									),
-									sequence(
 											action("run();"),
 											nonTerminal("type", "ResultType"),
 											terminal("DOT"),
@@ -2187,21 +2187,14 @@ public class JavaGrammar {
 											action("return expr;")
 									),
 									sequence(
-											// TODO Remove from PrimaryExpression
-											action("run();"),
-											nonTerminal("expr", "MethodInvocation", null, exprs("null")),
-											action("return expr;")
-									),
-									sequence(
 											nonTerminal("expr", "Name"),
 											action("return expr;")
 									),
 									sequence(
+											// TODO Remove from PrimaryExpression
 											action("run();"),
-											terminal("LPAREN"),
-											nonTerminal("expr", "Expression"),
-											terminal("RPAREN"),
-											action("return dress(SParenthesizedExpr.make(expr));")
+											nonTerminal("expr", "MethodInvocation", null, exprs("null")),
+											action("return expr;")
 									)
 							)
 					)
